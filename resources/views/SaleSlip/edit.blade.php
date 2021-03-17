@@ -1217,6 +1217,21 @@
                     return false;
                 }
             });
+
+            // ------------------------------
+            // submit_typeのフォーカスが外れた時
+            // ------------------------------
+            $('#sale_submit_type').blur(function() {
+                var submitType = $('#sale_submit_type').val();
+                if (submitType == 1) {
+                    $('#sale_submit_type_text').val('登録');
+                } else if (submitType == 2) {
+                    $('#sale_submit_type_text').val('一時保存');
+                } else {
+                    alert("存在しない登録番号です。");
+                }
+            });
+
         });
     })(jQuery);
 

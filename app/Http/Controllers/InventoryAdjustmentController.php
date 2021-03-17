@@ -202,7 +202,7 @@ class InventoryAdjustmentController extends Controller
                 'SupplySlipDetail.unit_id'
             )
             ->havingRaw('SUM(SupplySlipDetail.unit_num - SupplySlipDetail.consumption) > ?', [0])
-            ->paginate(5);
+            ->paginate(20);
 
             // ---------------------
             // 最新の売上日付を取得する

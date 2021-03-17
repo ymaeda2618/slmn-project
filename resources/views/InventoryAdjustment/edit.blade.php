@@ -96,11 +96,11 @@
             <tr>
                 <th class="width-10">担当者</th>
                 <td>
-                    <input type="text" class="form-control staff_code_input" id="staff_code" name="data[InventoryManage][staff_code]" tabindex="1">
-                    <input type="hidden" id="staff_id" name="data[InventoryManage][staff_id]">
+                    <input type="text" class="form-control staff_code_input" id="staff_code" name="data[InventoryManage][staff_code]" value="1009" tabindex="1">
+                    <input type="hidden" id="staff_id" name="data[InventoryManage][staff_id]" value="9">
                 </td>
                 <td>
-                    <input type="text" class="form-control" id="staff_text" name="data[InventoryManage][staff_text]" readonly>
+                    <input type="text" class="form-control" id="staff_text" name="data[InventoryManage][staff_text]" value="石塚 貞雄" readonly>
                 </td>
             </tr>
             <tr>

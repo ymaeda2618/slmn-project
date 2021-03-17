@@ -125,7 +125,7 @@ class DepositController extends Controller
                 return $query->where('Deposit.sale_company_id', '=', $condition_company_id);
             })
             ->where('Deposit.active', '=', '1')
-            ->orderBy('Deposit.date', 'desc')->paginate(5);
+            ->orderBy('Deposit.date', 'desc')->paginate(20);
 
         } catch (\Exception $e) {
 

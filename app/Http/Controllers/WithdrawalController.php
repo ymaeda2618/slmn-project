@@ -143,7 +143,7 @@ class WithdrawalController extends Controller
                 return $query->where('Withdrawal.supply_company_id', '=', $condition_company_id);
             })
             ->where('Withdrawal.active', '=', '1')
-            ->orderBy('Withdrawal.date', 'desc')->paginate(5);
+            ->orderBy('Withdrawal.date', 'desc')->paginate(20);
 
         } catch (\Exception $e) {
 

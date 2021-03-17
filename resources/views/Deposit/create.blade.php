@@ -76,11 +76,11 @@
                 <tr>
                     <th class="width-5">担当者</th>
                     <td>
-                        <input type="text" class="form-control staff_code_input" id="staff_code" name="data[Deposit][staff_code]" tabindex="6">
-                        <input type="hidden" id="staff_id" name="data[Deposit][staff_id]">
+                        <input type="text" class="form-control staff_code_input" id="staff_code" name="data[Deposit][staff_code]" value="1009" tabindex="6">
+                        <input type="hidden" id="staff_id" name="data[Deposit][staff_id]" value="9">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="staff_text" name="data[Deposit][staff_text]" readonly>
+                        <input type="text" class="form-control" id="staff_text" name="data[Deposit][staff_text]" value="石塚 貞雄" readonly>
                     </td>
                 </tr>
                 <tr>

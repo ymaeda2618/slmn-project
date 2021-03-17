@@ -200,7 +200,7 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->where('SaleSlip.active', '=', '1')
-            ->orderBy('SaleSlip.date', 'desc')->paginate(5);
+            ->orderBy('SaleSlip.date', 'desc')->paginate(10);
 
             // 伝票詳細を取得
             $SaleSlipDetailList = DB::table('sale_slip_details AS SaleSlipDetail')

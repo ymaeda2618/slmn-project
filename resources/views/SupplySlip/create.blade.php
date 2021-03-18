@@ -236,15 +236,15 @@
                         <input type="hidden" id="delivery_id" name="data[SupplySlip][delivery_id]">
                     </td>
                     <td><input type="text" class="form-control" id="delivery_text" name="data[SupplySlip][delivery_text]" readonly></td>
-                    <td><input type="tel" class="form-control" id="delivery_price" name="data[SupplySlip][delivery_price]" value='0' onKeyUp='javascript:adjustPrice()'></td>
+                    <td><input type="number" class="form-control" id="delivery_price" name="data[SupplySlip][delivery_price]" value='0' onKeyUp='javascript:adjustPrice()'></td>
                 </tr>
                 <tr>
                     <th>調整額</th>
                     <th colspan="2">調整後税込額</th>
                 </tr>
                 <tr>
-                    <td><input type="tel" class="form-control" id="adjust_price" name="data[SupplySlip][adjust_price]" value='0' onKeyUp='javascript:adjustPrice()'></td>
-                    <td colspan="2"><input type="tel" class="form-control" id="total" name="data[SupplySlip][total]" value='0' readonly></td>
+                    <td><input type="number" class="form-control" id="adjust_price" name="data[SupplySlip][adjust_price]" value='0' onKeyUp='javascript:adjustPrice()'></td>
+                    <td colspan="2"><input type="number" class="form-control" id="total" name="data[SupplySlip][total]" value='0' readonly></td>
                 </tr>
             </table>
             <br><br>
@@ -259,7 +259,7 @@
             <table class="register-btn-table">
                 <tr>
                     <td class="width-20">
-                        <input type="text" class="form-control" id="supply_submit_type" name="data[SupplySlip][supply_submit_type]" value="1">
+                        <input type="number" class="form-control" id="supply_submit_type" name="data[SupplySlip][supply_submit_type]" value="1">
                     </td>
                     <td class="width-30">
                         <input type="text" class="form-control" id="supply_submit_type_text" name="data[SupplySlip][supply_submit_type_text]" value="登録" readonly>
@@ -533,7 +533,6 @@
                 }
             });
 
-
             //-------------------------------------
             // フォーカスアウトしたときの処理
             //-------------------------------------
@@ -541,6 +540,11 @@
 
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
+                // 全角数字を半角に変換
+                set_val = set_val.replace( /[０-９]/g, function(s) {
+                    return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                });
+                $(this).val(set_val);
                 var selector_code = $(this).attr('id');
                 var selector_id = selector_code.replace('_code', '_id');
                 var selector_text = selector_code.replace('_code', '_text');

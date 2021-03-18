@@ -175,7 +175,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
 
-        Barryvdh\Snappy\ServiceProvider::class, //追加
+        //Barryvdh\Snappy\ServiceProvider::class, //追加
 
     ],
 
@@ -230,8 +230,8 @@ return [
 
         'Home' => App\Http\Controllers\HomeController::class,
 
-        'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
-        'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
+        //'PDF' => Barryvdh\Snappy\Facades\SnappyPdf::class,
+        //'SnappyImage' => Barryvdh\Snappy\Facades\SnappyImage::class,
     ],
 
 ];

@@ -1755,7 +1755,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= "         <input type='hidden' id='staff_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_id]' >";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-20'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_text]' placeholder='担当欄'  readonly>";
+        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_text]' placeholder='担当欄' value='石塚 貞雄' readonly>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-15'>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='tax_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][tax_text]'' placeholder='税率欄'  readonly>";
@@ -1852,7 +1852,7 @@ class SaleSlipController extends Controller
         // 品質ID
         $autoCompleteQuality = "<input type='text' class='form-control quality_code_input' id='quality_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][quality_code]'>";
         // 担当
-        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 4)."'>";
+        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 4)."' value='1009'>";
 
         $slip_num = intval($slip_num) + 1;
 

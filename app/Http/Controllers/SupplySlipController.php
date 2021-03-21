@@ -1618,7 +1618,7 @@ class SupplySlipController extends Controller
         $ajaxHtml1 .= "         <input type='hidden' id='staff_id_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_id]' >";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-20'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_text]' placeholder='担当欄'  readonly>";
+        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_text]' placeholder='担当欄' value='石塚 貞雄' readonly>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='seri_no_".$slip_num."'  name='data[SupplySlipDetail][".$slip_num."][seri_no]' placeholder='セリNO欄' tabindex='".($tabInitialNum + 6)."'>";
@@ -1680,7 +1680,7 @@ class SupplySlipController extends Controller
         // 産地
         $autoCompleteOrigin = "<input type='text' class='form-control origin_area_code_input' id='origin_area_code_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][origin_area_code]' tabindex='".($tabInitialNum + 4)."'>";
         // 担当
-        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 5)."'>";
+        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 5)."' value='1009'>";
 
         $slip_num = intval($slip_num) + 1;
 

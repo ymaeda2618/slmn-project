@@ -481,82 +481,97 @@ class SupplySlipController extends Controller
             $SupplySlipData = $request->data['SupplySlip'];
             $SupplySlipDetailData = $request->data['SupplySlipDetail'];
 
-            // 値がNULLのところを初期化
-            if(empty($SupplySlipData['supply_shop_id'])) $SupplySlipData['supply_shop_id'] = 0;
-            if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;
-            if(empty($SupplySlipData['delivery_price'])) $SupplySlipData['delivery_price'] = 0;
-            if(empty($SupplySlipData['adjust_price'])) $SupplySlipData['adjust_price'] = 0;
+            if ($SupplySlipData['supply_submit_type'] == 3) {
 
-            // supply_slipsを登録する
-            $SupplySlip = \App\SupplySlip::find($SupplySlipData['id']);
-            $SupplySlip->date               = $SupplySlipData['supply_date'];          // 日付
-            $SupplySlip->delivery_date      = $SupplySlipData['delivery_date'];        // 納品日
-            $SupplySlip->supply_company_id  = $SupplySlipData['supply_company_id'];    // 仕入先ID
-            $SupplySlip->supply_shop_id     = $SupplySlipData['supply_shop_id'];       // 仕入先店舗ID
-            $SupplySlip->delivery_id        = $SupplySlipData['delivery_id'];          // 配送ID
-            $SupplySlip->notax_sub_total_8  = $SupplySlipData['notax_sub_total_8'];    // 8%課税対象額
-            $SupplySlip->notax_sub_total_10 = $SupplySlipData['notax_sub_total_10'];   // 10%課税対象額
-            $SupplySlip->notax_sub_total    = $SupplySlipData['notax_sub_total'];      // 税抜合計額
-            $SupplySlip->tax_total_8        = $SupplySlipData['tax_total_8'];          // 8%課税対象額
-            $SupplySlip->tax_total_10       = $SupplySlipData['tax_total_10'];         // 10%課税対象額
-            $SupplySlip->tax_total          = $SupplySlipData['tax_total'];            // 税抜合計額
-            $SupplySlip->sub_total_8        = $SupplySlipData['sub_total_8'];          // 8%合計額
-            $SupplySlip->sub_total_10       = $SupplySlipData['sub_total_10'];         // 10%合計額
-            $SupplySlip->delivery_price     = $SupplySlipData['delivery_price'];       // 合計額
-            $SupplySlip->sub_total          = $SupplySlipData['sub_total'];            // 配送額
-            $SupplySlip->adjust_price       = $SupplySlipData['adjust_price'];         // 調整額
-            $SupplySlip->total              = $SupplySlipData['total'];                // 合計額
-            $SupplySlip->remarks            = $SupplySlipData['remarks'];              // 備考
-            $SupplySlip->supply_submit_type = $SupplySlipData['supply_submit_type'];   // 登録タイプ
-            $SupplySlip->modified_user_id   = $user_info_id;                           // 更新者ユーザーID
-            $SupplySlip->modified           = Carbon::now();                           // 更新時間
+                // -----------------
+                // 伝票を論理削除させる
+                // -----------------
+                $SupplySlip = \App\SupplySlip::find($SupplySlipData['id']);
+                $SupplySlip->active           = 0;              // アクティブフラグ
+                $SupplySlip->modified_user_id = $user_info_id;  // 更新者ユーザーID
+                $SupplySlip->modified         = Carbon::now();  // 更新時間
 
-            $SupplySlip->save();
+                $SupplySlip->save();
 
-            // 作成したIDを取得する
-            $supply_slip_new_id = $SupplySlip->id;
-
-            // 伝票詳細を削除
-            \App\SupplySlipDetail::where('supply_slip_id', $SupplySlipData['id'])->delete();
-
-            $supply_slip_detail = array();
-            $sort = 0;
-
-            foreach($SupplySlipDetailData as $SupplySlipDetail){
+            } else {
 
                 // 値がNULLのところを初期化
-                if (empty($SupplySlipData['standard_id'])) $SupplySlipData['standard_id'] = 0;
-                if (empty($SupplySlipData['quality_id'])) $SupplySlipData['quality_id'] = 0;
-                if (empty($SupplySlipData['origin_area_id'])) $SupplySlipData['origin_area_id'] = 0;
+                if(empty($SupplySlipData['supply_shop_id'])) $SupplySlipData['supply_shop_id'] = 0;
+                if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;
+                if(empty($SupplySlipData['delivery_price'])) $SupplySlipData['delivery_price'] = 0;
+                if(empty($SupplySlipData['adjust_price'])) $SupplySlipData['adjust_price'] = 0;
 
-                $supply_slip_detail[] = [
-                    'supply_slip_id'     => $supply_slip_new_id,
-                    'product_id'         => $SupplySlipDetail['product_id'],
-                    'standard_id'        => $SupplySlipDetail['standard_id'],
-                    'quality_id'         => $SupplySlipDetail['quality_id'],
-                    'unit_price'         => $SupplySlipDetail['unit_price'],
-                    'unit_num'           => $SupplySlipDetail['unit_num'],
-                    'notax_price'        => $SupplySlipDetail['notax_price'],
-                    'unit_id'            => $SupplySlipDetail['unit_id'],
-                    'origin_area_id'     => $SupplySlipDetail['origin_area_id'],
-                    'staff_id'           => $SupplySlipDetail['staff_id'],
-                    'seri_no'            => $SupplySlipDetail['seri_no'],
-                    'inventory_unit_id'  => $SupplySlipDetail['inventory_unit_id'],
-                    'inventory_unit_num' => $SupplySlipDetail['inventory_unit_num'],
-                    'memo'               => $SupplySlipDetail['memo'],
-                    'sort'               => $sort,
-                    'created_user_id'    => $user_info_id,
-                    'created'            => Carbon::now(),
-                    'modified_user_id'   => $user_info_id,
-                    'modified'           => Carbon::now(),
-                ];
+                // supply_slipsを登録する
+                $SupplySlip = \App\SupplySlip::find($SupplySlipData['id']);
+                $SupplySlip->date               = $SupplySlipData['supply_date'];          // 日付
+                $SupplySlip->delivery_date      = $SupplySlipData['delivery_date'];        // 納品日
+                $SupplySlip->supply_company_id  = $SupplySlipData['supply_company_id'];    // 仕入先ID
+                $SupplySlip->supply_shop_id     = $SupplySlipData['supply_shop_id'];       // 仕入先店舗ID
+                $SupplySlip->delivery_id        = $SupplySlipData['delivery_id'];          // 配送ID
+                $SupplySlip->notax_sub_total_8  = $SupplySlipData['notax_sub_total_8'];    // 8%課税対象額
+                $SupplySlip->notax_sub_total_10 = $SupplySlipData['notax_sub_total_10'];   // 10%課税対象額
+                $SupplySlip->notax_sub_total    = $SupplySlipData['notax_sub_total'];      // 税抜合計額
+                $SupplySlip->tax_total_8        = $SupplySlipData['tax_total_8'];          // 8%課税対象額
+                $SupplySlip->tax_total_10       = $SupplySlipData['tax_total_10'];         // 10%課税対象額
+                $SupplySlip->tax_total          = $SupplySlipData['tax_total'];            // 税抜合計額
+                $SupplySlip->sub_total_8        = $SupplySlipData['sub_total_8'];          // 8%合計額
+                $SupplySlip->sub_total_10       = $SupplySlipData['sub_total_10'];         // 10%合計額
+                $SupplySlip->delivery_price     = $SupplySlipData['delivery_price'];       // 合計額
+                $SupplySlip->sub_total          = $SupplySlipData['sub_total'];            // 配送額
+                $SupplySlip->adjust_price       = $SupplySlipData['adjust_price'];         // 調整額
+                $SupplySlip->total              = $SupplySlipData['total'];                // 合計額
+                $SupplySlip->remarks            = $SupplySlipData['remarks'];              // 備考
+                $SupplySlip->supply_submit_type = $SupplySlipData['supply_submit_type'];   // 登録タイプ
+                $SupplySlip->modified_user_id   = $user_info_id;                           // 更新者ユーザーID
+                $SupplySlip->modified           = Carbon::now();                           // 更新時間
 
-                $sort ++;
-            }
+                $SupplySlip->save();
 
-            if(!empty($supply_slip_detail)) {
+                // 作成したIDを取得する
+                $supply_slip_new_id = $SupplySlip->id;
 
-                DB::table('supply_slip_details')->insert($supply_slip_detail);
+                // 伝票詳細を削除
+                \App\SupplySlipDetail::where('supply_slip_id', $SupplySlipData['id'])->delete();
+
+                $supply_slip_detail = array();
+                $sort = 0;
+
+                foreach($SupplySlipDetailData as $SupplySlipDetail){
+
+                    // 値がNULLのところを初期化
+                    if (empty($SupplySlipData['standard_id'])) $SupplySlipData['standard_id'] = 0;
+                    if (empty($SupplySlipData['quality_id'])) $SupplySlipData['quality_id'] = 0;
+                    if (empty($SupplySlipData['origin_area_id'])) $SupplySlipData['origin_area_id'] = 0;
+
+                    $supply_slip_detail[] = [
+                        'supply_slip_id'     => $supply_slip_new_id,
+                        'product_id'         => $SupplySlipDetail['product_id'],
+                        'standard_id'        => $SupplySlipDetail['standard_id'],
+                        'quality_id'         => $SupplySlipDetail['quality_id'],
+                        'unit_price'         => $SupplySlipDetail['unit_price'],
+                        'unit_num'           => $SupplySlipDetail['unit_num'],
+                        'notax_price'        => $SupplySlipDetail['notax_price'],
+                        'unit_id'            => $SupplySlipDetail['unit_id'],
+                        'origin_area_id'     => $SupplySlipDetail['origin_area_id'],
+                        'staff_id'           => $SupplySlipDetail['staff_id'],
+                        'seri_no'            => $SupplySlipDetail['seri_no'],
+                        'inventory_unit_id'  => $SupplySlipDetail['inventory_unit_id'],
+                        'inventory_unit_num' => $SupplySlipDetail['inventory_unit_num'],
+                        'memo'               => $SupplySlipDetail['memo'],
+                        'sort'               => $sort,
+                        'created_user_id'    => $user_info_id,
+                        'created'            => Carbon::now(),
+                        'modified_user_id'   => $user_info_id,
+                        'modified'           => Carbon::now(),
+                    ];
+
+                    $sort ++;
+                }
+
+                if(!empty($supply_slip_detail)) {
+
+                    DB::table('supply_slip_details')->insert($supply_slip_detail);
+                }
             }
 
         } catch (\Exception $e) {

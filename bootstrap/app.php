@@ -11,7 +11,7 @@
 |
 */
 
-dd($_ENV['APP_BASE_PATH'] ?? dirname(__DIR__));
+var_dump($_ENV['APP_BASE_PATH'] ?? dirname(__DIR__));
 
 $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)

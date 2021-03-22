@@ -1161,6 +1161,8 @@
                     $('#supply-slip-create-form').submit();
                 } else if (this_val == "2") {
                     $('#supply-slip-create-form').submit();
+                } else if (this_val == "3") {
+                    $('#supply-slip-create-form').submit();
                 } else {
                     return false;
                 }
@@ -1175,6 +1177,8 @@
                     $('#supply_submit_type_text').val('登録');
                 } else if (submitType == 2) {
                     $('#supply_submit_type_text').val('一時保存');
+                } else if (submitType == 3) {
+                    $('#supply_submit_type_text').val('削除');
                 } else {
                     alert("存在しない登録番号です。");
                 }

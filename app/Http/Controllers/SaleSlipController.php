@@ -535,162 +535,176 @@ class SaleSlipController extends Controller
             $SaleSlipData = $request->data['SaleSlip'];
             $SaleSlipDetailData = $request->data['SaleSlipDetail'];
 
-            // 値がNULLのところを初期化
-            if(empty($SaleSlipData['sale_shop_id'])) $SaleSlipData['sale_shop_id'] = 0;
-            if(empty($SaleSlipData['delivery_id'])) $SaleSlipData['delivery_id'] = 0;
-            if(empty($SaleSlipData['delivery_price'])) $SaleSlipData['delivery_price'] = 0;
-            if(empty($SaleSlipData['adjust_price'])) $SaleSlipData['adjust_price'] = 0;
+            if ($SaleSlipData['sale_submit_type'] == 3) {
 
-            // sale_slipsを登録する
-            $SaleSlip = \App\SaleSlip::find($SaleSlipData['id']);
-            $SaleSlip->date               = $SaleSlipData['sale_date'];            // 日付
-            $SaleSlip->delivery_date      = $SaleSlipData['delivery_date'];        // 納品日
-            $SaleSlip->sale_company_id    = $SaleSlipData['sale_company_id'];      // 売上先ID
-            $SaleSlip->sale_shop_id       = $SaleSlipData['sale_shop_id'];         // 売上先店舗ID
-            $SaleSlip->delivery_id        = $SaleSlipData['delivery_id'];          // 配送ID
-            $SaleSlip->notax_sub_total_8  = $SaleSlipData['notax_sub_total_8'];    // 8%課税対象額
-            $SaleSlip->notax_sub_total_10 = $SaleSlipData['notax_sub_total_10'];   // 10%課税対象額
-            $SaleSlip->notax_sub_total    = $SaleSlipData['notax_sub_total'];      // 税抜合計額
-            $SaleSlip->tax_total_8        = $SaleSlipData['tax_total_8'];          // 8%課税対象額
-            $SaleSlip->tax_total_10       = $SaleSlipData['tax_total_10'];         // 10%課税対象額
-            $SaleSlip->tax_total          = $SaleSlipData['tax_total'];            // 税抜合計額
-            $SaleSlip->sub_total_8        = $SaleSlipData['sub_total_8'];          // 8%合計額
-            $SaleSlip->sub_total_10       = $SaleSlipData['sub_total_10'];         // 10%合計額
-            $SaleSlip->delivery_price     = $SaleSlipData['delivery_price'];       // 合計額
-            $SaleSlip->sub_total          = $SaleSlipData['sub_total'];            // 配送額
-            $SaleSlip->adjust_price       = $SaleSlipData['adjust_price'];         // 調整額
-            $SaleSlip->total              = $SaleSlipData['total'];                // 合計額
-            $SaleSlip->remarks            = $SaleSlipData['remarks'];              // 備考
-            $SaleSlip->sale_submit_type   = $SaleSlipData['sale_submit_type'];     // 登録タイプ
-            $SaleSlip->modified_user_id   = $user_info_id;                         // 更新者ユーザーID
-            $SaleSlip->modified           = Carbon::now();                         // 更新時間
+                // -----------------
+                // 伝票を論理削除させる
+                // -----------------
+                $SaleSlip = \App\SaleSlip::find($SaleSlipData['id']);
+                $SaleSlip->active           = 0;              // アクティブフラグ
+                $SaleSlip->modified_user_id = $user_info_id;  // 更新者ユーザーID
+                $SaleSlip->modified         = Carbon::now();  // 更新時間
 
-            $SaleSlip->save();
+                $SaleSlip->save();
 
-            // 作成したIDを取得する
-            $sale_slip_new_id = $SaleSlip->id;
-
-            // 伝票詳細を削除
-            \App\SaleSlipDetail::where('sale_slip_id', $SaleSlipData['id'])->delete();
-
-            $sale_slip_detail = array();
-            $sort = 0;
-
-            $saleSlipDetailIds = array();
-            foreach($SaleSlipDetailData as $SaleSlipDetail){
+            } else {
 
                 // 値がNULLのところを初期化
-                if (empty($SaleSlipDetail['standard_id'])) $SaleSlipDetail['standard_id'] = 0;
-                if (empty($SaleSlipDetail['quality_id'])) $SaleSlipDetail['quality_id'] = 0;
-                if (empty($SaleSlipDetail['origin_area_id'])) $SaleSlipDetail['origin_area_id'] = 0;
-                if (empty($SaleSlipDetail['seri_no'])) $SaleSlipDetail['seri_no'] = 0;
+                if(empty($SaleSlipData['sale_shop_id'])) $SaleSlipData['sale_shop_id'] = 0;
+                if(empty($SaleSlipData['delivery_id'])) $SaleSlipData['delivery_id'] = 0;
+                if(empty($SaleSlipData['delivery_price'])) $SaleSlipData['delivery_price'] = 0;
+                if(empty($SaleSlipData['adjust_price'])) $SaleSlipData['adjust_price'] = 0;
 
-                $sale_slip_detail[] = [
-                    'sale_slip_id'       => $sale_slip_new_id,
-                    'product_id'         => $SaleSlipDetail['product_id'],
-                    'standard_id'        => $SaleSlipDetail['standard_id'],
-                    'quality_id'         => $SaleSlipDetail['quality_id'],
-                    'unit_price'         => $SaleSlipDetail['unit_price'],
-                    'unit_num'           => $SaleSlipDetail['unit_num'],
-                    'notax_price'        => $SaleSlipDetail['notax_price'],
-                    'unit_id'            => $SaleSlipDetail['unit_id'],
-                    'origin_area_id'     => $SaleSlipDetail['origin_area_id'],
-                    'staff_id'           => $SaleSlipDetail['staff_id'],
-                    'seri_no'            => $SaleSlipDetail['seri_no'],
-                    'inventory_unit_id'  => $SaleSlipDetail['inventory_unit_id'],
-                    'inventory_unit_num' => $SaleSlipDetail['inventory_unit_num'],
-                    'memo'               => $SaleSlipDetail['memo'],
-                    'sort'               => $sort,
-                    'created_user_id'    => $user_info_id,
-                    'created'            => Carbon::now(),
-                    'modified_user_id'   => $user_info_id,
-                    'modified'           => Carbon::now(),
-                ];
+                // sale_slipsを登録する
+                $SaleSlip = \App\SaleSlip::find($SaleSlipData['id']);
+                $SaleSlip->date               = $SaleSlipData['sale_date'];            // 日付
+                $SaleSlip->delivery_date      = $SaleSlipData['delivery_date'];        // 納品日
+                $SaleSlip->sale_company_id    = $SaleSlipData['sale_company_id'];      // 売上先ID
+                $SaleSlip->sale_shop_id       = $SaleSlipData['sale_shop_id'];         // 売上先店舗ID
+                $SaleSlip->delivery_id        = $SaleSlipData['delivery_id'];          // 配送ID
+                $SaleSlip->notax_sub_total_8  = $SaleSlipData['notax_sub_total_8'];    // 8%課税対象額
+                $SaleSlip->notax_sub_total_10 = $SaleSlipData['notax_sub_total_10'];   // 10%課税対象額
+                $SaleSlip->notax_sub_total    = $SaleSlipData['notax_sub_total'];      // 税抜合計額
+                $SaleSlip->tax_total_8        = $SaleSlipData['tax_total_8'];          // 8%課税対象額
+                $SaleSlip->tax_total_10       = $SaleSlipData['tax_total_10'];         // 10%課税対象額
+                $SaleSlip->tax_total          = $SaleSlipData['tax_total'];            // 税抜合計額
+                $SaleSlip->sub_total_8        = $SaleSlipData['sub_total_8'];          // 8%合計額
+                $SaleSlip->sub_total_10       = $SaleSlipData['sub_total_10'];         // 10%合計額
+                $SaleSlip->delivery_price     = $SaleSlipData['delivery_price'];       // 合計額
+                $SaleSlip->sub_total          = $SaleSlipData['sub_total'];            // 配送額
+                $SaleSlip->adjust_price       = $SaleSlipData['adjust_price'];         // 調整額
+                $SaleSlip->total              = $SaleSlipData['total'];                // 合計額
+                $SaleSlip->remarks            = $SaleSlipData['remarks'];              // 備考
+                $SaleSlip->sale_submit_type   = $SaleSlipData['sale_submit_type'];     // 登録タイプ
+                $SaleSlip->modified_user_id   = $user_info_id;                         // 更新者ユーザーID
+                $SaleSlip->modified           = Carbon::now();                         // 更新時間
 
-                $sort ++;
+                $SaleSlip->save();
 
-                if(!empty($sale_slip_detail)) {
+                // 作成したIDを取得する
+                $sale_slip_new_id = $SaleSlip->id;
 
-                    DB::table('sale_slip_details')->insert($sale_slip_detail);
-                    $saleSlipDetailIds[] = DB::getPdo()->lastInsertId();
-                }
-            }
+                // 伝票詳細を削除
+                \App\SaleSlipDetail::where('sale_slip_id', $SaleSlipData['id'])->delete();
 
-            // inventory_managesも物理削除して新規登録する
+                $sale_slip_detail = array();
+                $sort = 0;
 
-            // -----------------------------
-            // 登録されている対象売上データの削除
-            // -----------------------------
-            \App\InventoryManage::where('sale_detail_slip_id', $SaleSlipDetailData[0]['id'])->delete();
+                $saleSlipDetailIds = array();
+                foreach($SaleSlipDetailData as $SaleSlipDetail){
 
-            // -------
-            // 新規登録
-            // -------
-            // 登録データ用格納配列初期化
-            $inventoryManage = array();
+                    // 値がNULLのところを初期化
+                    if (empty($SaleSlipDetail['standard_id'])) $SaleSlipDetail['standard_id'] = 0;
+                    if (empty($SaleSlipDetail['quality_id'])) $SaleSlipDetail['quality_id'] = 0;
+                    if (empty($SaleSlipDetail['origin_area_id'])) $SaleSlipDetail['origin_area_id'] = 0;
+                    if (empty($SaleSlipDetail['seri_no'])) $SaleSlipDetail['seri_no'] = 0;
 
-            if (isset($request->data['InventoryManage']) && !empty($request->data['InventoryManage'])) {
-                foreach ($request->data['InventoryManage'] as $key => $requestInventoryManageDatas) {
-                    foreach ($requestInventoryManageDatas['supply_slip_id'] as $supplySlipIdKey => $supplySlipId) {
+                    $sale_slip_detail[] = [
+                        'sale_slip_id'       => $sale_slip_new_id,
+                        'product_id'         => $SaleSlipDetail['product_id'],
+                        'standard_id'        => $SaleSlipDetail['standard_id'],
+                        'quality_id'         => $SaleSlipDetail['quality_id'],
+                        'unit_price'         => $SaleSlipDetail['unit_price'],
+                        'unit_num'           => $SaleSlipDetail['unit_num'],
+                        'notax_price'        => $SaleSlipDetail['notax_price'],
+                        'unit_id'            => $SaleSlipDetail['unit_id'],
+                        'origin_area_id'     => $SaleSlipDetail['origin_area_id'],
+                        'staff_id'           => $SaleSlipDetail['staff_id'],
+                        'seri_no'            => $SaleSlipDetail['seri_no'],
+                        'inventory_unit_id'  => $SaleSlipDetail['inventory_unit_id'],
+                        'inventory_unit_num' => $SaleSlipDetail['inventory_unit_num'],
+                        'memo'               => $SaleSlipDetail['memo'],
+                        'sort'               => $sort,
+                        'created_user_id'    => $user_info_id,
+                        'created'            => Carbon::now(),
+                        'modified_user_id'   => $user_info_id,
+                        'modified'           => Carbon::now(),
+                    ];
 
-                        // 利用仕入数取得
-                        $unitNum = floatval($requestInventoryManageDatas['use_num'][$supplySlipIdKey]);
+                    $sort ++;
 
-                        // 登録データ格納
-                        $inventoryManage[] = [
-                            "sale_detail_slip_id"       => $saleSlipDetailIds[$key],
-                            "supply_detail_slip_id"     => $supplySlipId,
-                            "unit_num"                  => $unitNum,
-                            "sort"                      => $supplySlipIdKey,
-                            "created_user_id"           => $user_info_id,
-                            "created"                   => Carbon::now(),
-                            "modified_user_id"          => $user_info_id,
-                            "modified"                  => Carbon::now()
-                        ];
+                    if(!empty($sale_slip_detail)) {
 
-                        // 対象の仕入伝票を取得
-                        $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
-                        ->select(
-                            'SupplySlipDetail.id           AS supply_slip_detail_id',
-                            'SupplySlipDetail.unit_num     AS unit_num',
-                            'SupplySlipDetail.consumption  AS consumption'
-                        )
-                            ->where([
-                                ['SupplySlipDetail.id', '=', $supplySlipId],
-                                ['SupplySlipDetail.active', '=', 1],
-                            ])->first();
-
-                        // もし伝票が存在しない場合はエラーを飛ばす
-                        if (empty($SupplySlipDetailList)) {
-                            throw new \Exception("存在しない仕入伝票が選択されています。");
-                        }
-
-                        $sale_slip_detail_unit_num    = floatval($SupplySlipDetailList->unit_num);
-                        $sale_slip_detail_consumption = floatval($SupplySlipDetailList->consumption);
-                        $sale_slip_detail_remain      = $sale_slip_detail_unit_num - $sale_slip_detail_consumption;
-
-                        if ($sale_slip_detail_remain < $unitNum) {
-                            throw new \Exception("在庫数より多くの仕入数が入ってきています。");
-                        }
-
-                        // 今回の利用数を含めて登録
-                        $sale_slip_detail_unit_num_new = $sale_slip_detail_consumption + $unitNum;
-
-                        // 仕入伝票登録を登録する
-                        $SupplySlipDetail = \App\SupplySlipDetail::find($SupplySlipDetailList->supply_slip_detail_id);
-                        $SupplySlipDetail->consumption        = $sale_slip_detail_unit_num_new;
-                        $SupplySlipDetail->modified_user_id   = $user_info_id;
-                        $SupplySlipDetail->modified           = Carbon::now();
-                        $SupplySlipDetail->save();
-
-                        if (!empty($inventoryManage)) {
-
-                            DB::table('inventory_manages')->insert($inventoryManage);
-                        }
+                        DB::table('sale_slip_details')->insert($sale_slip_detail);
+                        $saleSlipDetailIds[] = DB::getPdo()->lastInsertId();
                     }
                 }
 
-        }
+                // inventory_managesも物理削除して新規登録する
+
+                // -----------------------------
+                // 登録されている対象売上データの削除
+                // -----------------------------
+                \App\InventoryManage::where('sale_detail_slip_id', $SaleSlipDetailData[0]['id'])->delete();
+
+                // -------
+                // 新規登録
+                // -------
+                // 登録データ用格納配列初期化
+                $inventoryManage = array();
+
+                if (isset($request->data['InventoryManage']) && !empty($request->data['InventoryManage'])) {
+                    foreach ($request->data['InventoryManage'] as $key => $requestInventoryManageDatas) {
+                        foreach ($requestInventoryManageDatas['supply_slip_id'] as $supplySlipIdKey => $supplySlipId) {
+
+                            // 利用仕入数取得
+                            $unitNum = floatval($requestInventoryManageDatas['use_num'][$supplySlipIdKey]);
+
+                            // 登録データ格納
+                            $inventoryManage[] = [
+                                "sale_detail_slip_id"       => $saleSlipDetailIds[$key],
+                                "supply_detail_slip_id"     => $supplySlipId,
+                                "unit_num"                  => $unitNum,
+                                "sort"                      => $supplySlipIdKey,
+                                "created_user_id"           => $user_info_id,
+                                "created"                   => Carbon::now(),
+                                "modified_user_id"          => $user_info_id,
+                                "modified"                  => Carbon::now()
+                            ];
+
+                            // 対象の仕入伝票を取得
+                            $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
+                            ->select(
+                                'SupplySlipDetail.id           AS supply_slip_detail_id',
+                                'SupplySlipDetail.unit_num     AS unit_num',
+                                'SupplySlipDetail.consumption  AS consumption'
+                            )
+                                ->where([
+                                    ['SupplySlipDetail.id', '=', $supplySlipId],
+                                    ['SupplySlipDetail.active', '=', 1],
+                                ])->first();
+
+                            // もし伝票が存在しない場合はエラーを飛ばす
+                            if (empty($SupplySlipDetailList)) {
+                                throw new \Exception("存在しない仕入伝票が選択されています。");
+                            }
+
+                            $sale_slip_detail_unit_num    = floatval($SupplySlipDetailList->unit_num);
+                            $sale_slip_detail_consumption = floatval($SupplySlipDetailList->consumption);
+                            $sale_slip_detail_remain      = $sale_slip_detail_unit_num - $sale_slip_detail_consumption;
+
+                            if ($sale_slip_detail_remain < $unitNum) {
+                                throw new \Exception("在庫数より多くの仕入数が入ってきています。");
+                            }
+
+                            // 今回の利用数を含めて登録
+                            $sale_slip_detail_unit_num_new = $sale_slip_detail_consumption + $unitNum;
+
+                            // 仕入伝票登録を登録する
+                            $SupplySlipDetail = \App\SupplySlipDetail::find($SupplySlipDetailList->supply_slip_detail_id);
+                            $SupplySlipDetail->consumption        = $sale_slip_detail_unit_num_new;
+                            $SupplySlipDetail->modified_user_id   = $user_info_id;
+                            $SupplySlipDetail->modified           = Carbon::now();
+                            $SupplySlipDetail->save();
+
+                            if (!empty($inventoryManage)) {
+
+                                DB::table('inventory_manages')->insert($inventoryManage);
+                            }
+                        }
+                    }
+                }
+            }
 
             // 問題なければコミット
             DB::connection()->commit();
@@ -1755,7 +1769,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= "         <input type='hidden' id='staff_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_id]' >";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-20'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_text]' placeholder='担当欄'  readonly>";
+        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_text]' placeholder='担当欄' value='石塚 貞雄' readonly>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-15'>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='tax_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][tax_text]'' placeholder='税率欄'  readonly>";
@@ -1852,7 +1866,7 @@ class SaleSlipController extends Controller
         // 品質ID
         $autoCompleteQuality = "<input type='text' class='form-control quality_code_input' id='quality_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][quality_code]'>";
         // 担当
-        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 4)."'>";
+        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 4)."' value='1009'>";
 
         $slip_num = intval($slip_num) + 1;
 

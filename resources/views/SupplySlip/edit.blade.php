@@ -81,11 +81,11 @@
                         <input type="text" class="form-control" id="product_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_text]" value="{{$SupplySlipDetails->product_name}}" placeholder="製品欄" readonly>
                     </td>
                     <!--<td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 1}}" onKeyUp='javascript:priceNumChange({{$SupplySlipDetails->sort}})'>
+                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 1}}" onchange='javascript:priceNumChange({{$SupplySlipDetails->sort}})'>
                     </td>-->
                     <td>
                         <input type="number" class="form-control" id="inventory_unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_num]" value="{{$SupplySlipDetails->inventory_unit_num}}" tabindex="{{$tabInitialNum + 1}}"
-                            onKeyUp='javascript:priceNumChange({{ $SupplySlipDetails->inventory_unit_num}})' placeholder="個数欄">
+                            onchange='javascript:priceNumChange({{ $SupplySlipDetails->inventory_unit_num}})' placeholder="個数欄">
                     </td>
                     <td>
                         <input type="text" class="form-control" id="inventory_unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_text]" value="{{$SupplySlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
@@ -115,7 +115,7 @@
                         <input type="text" class="form-control" id="standard_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][standard_text]" value="{{$SupplySlipDetails->standard_name}}" placeholder="規格欄" readonly>
                     </td>
                     <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onKeyUp='javascript:priceNumChange({{ $SupplySlipDetails->product_code }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SupplySlipDetails->product_code }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_text]" value="{{$SupplySlipDetails->unit_name}}" readonly>
@@ -123,14 +123,14 @@
                     </td>
                     <td>
                         <input type="number" class="form-control" id="inventory_unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_num]" value="{{$SupplySlipDetails->inventory_unit_num}}" tabindex="{{$tabInitialNum + 2}}"
-                            onKeyUp='javascript:priceNumChange({{ $SupplySlipDetails->inventory_unit_num}})' placeholder="個数欄">
+                            onchange='javascript:priceNumChange({{ $SupplySlipDetails->inventory_unit_num}})' placeholder="個数欄">
                     </td>
                     <td>
                         <input type="text" class="form-control" id="inventory_unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_text]" value="{{$SupplySlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
                         <input type="hidden" id="inventory_unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_id]" value="{{$SupplySlipDetails->inventory_unit_id}}">
                     </td>-->
                     <td>
-                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onKeyUp='javascript:priceNumChange({{ $SupplySlipDetails->sort }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SupplySlipDetails->sort }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_text]" value="{{$SupplySlipDetails->unit_name}}" placeholder="数量欄" readonly>
@@ -159,7 +159,7 @@
                         <input type="text" class="form-control" id="notax_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][notax_price]" value="{{$SupplySlipDetails->notax_price}}" readonly>
                     </td>-->
                     <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 3}}" onKeyUp='javascript:priceNumChange({{ $SupplySlipDetails->sort }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{ $SupplySlipDetails->sort }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_text]" value="{{$SupplySlipDetails->unit_name}}" placeholder="数量欄" readonly>
@@ -174,7 +174,7 @@
                         <input type="hidden" id="inventory_unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_id]" value="{{$SupplySlipDetails->inventory_unit_id}}">
                     </td>-->
                     <td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 3}}" onKeyUp='javascript:priceNumChange({{$SupplySlipDetails->sort}})'>
+                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{$SupplySlipDetails->sort}})'>
                     </td>
                     <td colspan="4">
                         <input type="text" class="form-control" id="memo_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][memo]" value="{{$SupplySlipDetails->memo}}" placeholder="摘要欄" tabindex="{{$tabInitialNum + 8}}">
@@ -1196,7 +1196,7 @@
         if (!this_unit_price) this_unit_price = 0;
         if (!this_unit_num) this_unit_num = 0;
 
-        var this_calc_price = this_unit_price * this_unit_num;
+        var this_calc_price = CalcDecimalPoint(this_unit_price, this_unit_num, 1);
         $("#notax_price_" + this_slip_num).val(this_calc_price);
 
 
@@ -1239,7 +1239,7 @@
             if (!unit_price) unit_price = 0;
             if (!unit_num) unit_num = 0;
 
-            calc_price = unit_price * unit_num;
+            calc_price = CalcDecimalPoint(unit_price, unit_num, 1);
 
             // 税額を取得
             tax_id = $("#tax_id_" + slip_num).val();
@@ -1430,6 +1430,28 @@
 
         }
     }
+
+    // --------------
+    // 小数点の計算処理
+    // --------------
+    function CalcDecimalPoint(num1, num2, type) {
+
+        var result = 0;
+
+        var calcNum1 = parseInt(num1 * 100);
+        var calcNum2 = parseInt(num2 * 100)
+
+        if (type == 1) {
+            var tmpClacResult = calcNum1 * calcNum2;
+        } else {
+            var tmpClacResult = calcNum1 / calcNum2;
+        }
+
+        result = tmpClacResult / 10000;
+
+        return result;
+    }
+
 </script>
 <style>
     /* 共通 */

@@ -1794,7 +1794,7 @@ class SaleSlipController extends Controller
         //$ajaxHtml1 .= "         <input type='hidden' id='inventory_unit_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_id]' value='0'>";
         //$ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_num]' onKeyUp='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 2)."'>";
+        $ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_num]' onchange='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 2)."'>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='unit_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_text]' placeholder='数量欄' readonly>";
@@ -1837,7 +1837,7 @@ class SaleSlipController extends Controller
         //$ajaxHtml1 .= "         <input type='text' class='form-control' id='sale_supply_slip_unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][supply_unit_num]' value='0' readonly>";
         //$ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-15' colspan='2'>";
-        $ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_price]' onKeyUp='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 3)."'>";
+        $ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_price]' onchange='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 3)."'>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td colspan='3'>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='memo_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][memo]' placeholder='摘要欄' tabindex='".($tabInitialNum + 5)."'>";

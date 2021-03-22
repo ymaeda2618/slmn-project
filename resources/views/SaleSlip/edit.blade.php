@@ -85,7 +85,7 @@
                         <input type="text" class="form-control" id="product_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_text]" value="{{$SaleSlipDetails->product_name}}" placeholder="製品欄" readonly>
                     </td>
                     <!--<td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 1}}" onKeyUp='javascript:priceNumChange({{$SaleSlipDetails->sort}})'>
+                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 1}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'>
                     </td>-->
                     <td>
                         @php $readonly = empty($SaleSlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
@@ -120,7 +120,7 @@
                         <input type="text" class="form-control" id="standard_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][standard_text]" value="{{$SaleSlipDetails->standard_name}}" placeholder="規格欄" readonly>
                     </td>
                     <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onKeyUp='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>
@@ -138,7 +138,7 @@
                         <input type="text" class="form-control" id="notax_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][notax_price]" value="{{$SaleSlipDetails->notax_price}}" readonly>
                     </td>-->
                     <td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onKeyUp='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>
@@ -164,7 +164,7 @@
                         <input type="text" class="form-control" id="quality_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][quality_text]" value="{{$SaleSlipDetails->quality_name}}" placeholder="品質欄" readonly>
                     </td>
                     <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 3}}" onKeyUp='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>
@@ -183,7 +183,7 @@
                         <input type="text" class="form-control" id="sale_supply_slip_unit_num_0" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][supply_unit_num]" value="{{$SaleSlipDetails->unit_num_sum}}" readonly>
                     </td>-->
                     <td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 3}}" onKeyUp='javascript:priceNumChange({{$SaleSlipDetails->sort}})'>
+                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'>
                     </td>
                     <td colspan="3">
                         <input type="text " class="form-control " id="memo_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][memo]" value="{{$SaleSlipDetails->memo}}" tabindex="{{$tabInitialNum + 5}}">
@@ -1253,7 +1253,7 @@
         if (!this_unit_price) this_unit_price = 0;
         if (!this_unit_num) this_unit_num = 0;
 
-        var this_calc_price = this_unit_price * this_unit_num;
+        var this_calc_price = CalcDecimalPoint(this_unit_price, this_unit_num, 1);
         $("#notax_price_" + this_slip_num).val(this_calc_price);
 
 
@@ -1296,7 +1296,7 @@
             if (!unit_price) unit_price = 0;
             if (!unit_num) unit_num = 0;
 
-            calc_price = unit_price * unit_num;
+            calc_price = CalcDecimalPoint(unit_price, unit_num, 1);
 
             // 税額を取得
             tax_id = $("#tax_id_" + slip_num).val();
@@ -1704,6 +1704,28 @@
 
         }
     }
+
+    // --------------
+    // 小数点の計算処理
+    // --------------
+    function CalcDecimalPoint(num1, num2, type) {
+
+        var result = 0;
+
+        var calcNum1 = parseInt(num1 * 100);
+        var calcNum2 = parseInt(num2 * 100)
+
+        if (type == 1) {
+            var tmpClacResult = calcNum1 * calcNum2;
+        } else {
+            var tmpClacResult = calcNum1 / calcNum2;
+        }
+
+        result = tmpClacResult / 10000;
+
+        return result;
+    }
+
 </script>
 <style>
     /* 共通 */

@@ -193,3 +193,6 @@ Route::group(['middleware' => ['auth', 'can:admin-higher']], function () {
 // システム管理者のみ
 Route::group(['middleware' => ['auth', 'can:system-only']], function () {
 });
+
+// PDFテスト用
+Route::get('pdfTest', 'PdfController@index');

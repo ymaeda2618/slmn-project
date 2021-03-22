@@ -70,7 +70,7 @@
                                 <a href="{{ asset('/') }}WithdrawalIndex" class="dropdown-item">支払一覧</a>
                                 @if (Home::authClerkCheck()) <a href="{{ asset('/') }}DepositCreate" class="dropdown-item">入金登録</a> @endif
                                 <a href="{{ asset('/') }}DepositIndex" class="dropdown-item">入金一覧</a>
-                                <a href="./searchEvent" class="dropdown-item">請求書出力</a>
+                                <a href="{{ asset('/') }}InvoiceOutputIndex" class="dropdown-item">請求書出力</a>
                             </div>
                         </li>
                         <li class="nav-item dropdown">

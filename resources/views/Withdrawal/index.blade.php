@@ -185,6 +185,11 @@
 
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
+                // 全角数字を半角に変換
+                set_val = set_val.replace( /[０-９]/g, function(s) {
+                    return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                });
+                $(this).val(set_val);
                 var selector_code = $(this).attr('id');
                 var selector_id = selector_code.replace('_code', '_id');
                 var selector_text = selector_code.replace('_code', '_text');

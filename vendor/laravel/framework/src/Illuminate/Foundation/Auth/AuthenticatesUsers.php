@@ -43,6 +43,14 @@ trait AuthenticatesUsers
         }
 
         if ($this->attemptLogin($request)) {
+
+            $role = Auth::guard()->user()->role;
+            if ($role < 1) {
+                $this->logout($request);
+                $this->incrementLoginAttempts($request);
+                return $this->sendFailedLoginResponse($request, 'role');
+            }
+
             return $this->sendLoginResponse($request);
         }
 
@@ -130,11 +138,18 @@ trait AuthenticatesUsers
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    protected function sendFailedLoginResponse(Request $request)
+    protected function sendFailedLoginResponse(Request $request, $type=NULL)
     {
-        throw ValidationException::withMessages([
-            $this->username() => [trans('auth.failed')],
-        ]);
+        if ($type == 'role') {
+            throw ValidationException::withMessages([
+                $this->username() => [trans('auth.role_failed')],
+            ]);
+        } else {
+            throw ValidationException::withMessages([
+                $this->username() => [trans('auth.failed')],
+            ]);
+        }
+
     }
 
     /**

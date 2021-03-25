@@ -47,28 +47,34 @@
             </form>
         </div>
 
-        <div class='list-area'>
-            <table class='index-table'>
-                <tbody>
-                    <tr>
-                        <th>入金日付</th>
-                        <th>伝票日付</th>
-                        <th class="width-15">企業</th>
-                        <th>入金金額</th>
-                        @if (Home::authClerkCheck()) <th>編集</th> @endif
-                    </tr>
-                    @foreach ($depositList as $deposit)
-                    <tr>
-                        <td>{{$deposit->deposit_date}}</td>
-                        <td>{{$deposit->sale_from_date}}~{{$deposit->sale_to_date}}</td>
-                        <td>{{$deposit->sale_company_name}}</td>
-                        <td>{{number_format($deposit->amount)}}</td>
-                        @if (Home::authClerkCheck()) <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        <form id="pdf-output-form" method="post" action='./invoiceOutput' enctype="multipart/form-data">
+            {{ csrf_field() }}
+            <div class='list-area'>
+                <table class='index-table'>
+                    <tbody>
+                        <tr>
+                            <th>入金日付</th>
+                            <th>伝票日付</th>
+                            <th class="width-15">企業</th>
+                            <th>入金金額</th>
+                            @if (Home::authClerkCheck()) <th>編集</th> @endif
+                            <th>印刷</th>
+                        </tr>
+                        @foreach ($depositList as $deposit)
+                        <tr>
+                            <td>{{$deposit->deposit_date}}</td>
+                            <td>{{$deposit->sale_from_date}}~{{$deposit->sale_to_date}}</td>
+                            <td>{{$deposit->sale_company_name}}</td>
+                            <td>{{number_format($deposit->amount)}}</td>
+                            @if (Home::authClerkCheck()) <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
+                            {{--  <td><input type='submit' class='output-btn btn btn-primary' name='output-btn' id="output-btn-{{$deposit->deposit_id}}" value='印刷'></td>  --}}
+                            <td><button type="submit" class="output-btn btn btn-primary" name="data[Deposit][{{$deposit->deposit_id}}][id]" id="output-btn-{{$deposit->deposit_id}}" value="{{$deposit->deposit_id}}">印刷</button></td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </form>
 
         <div class="d-flex justify-content-center">
             {{ $depositList->links() }}
@@ -393,4 +399,22 @@
         text-align: center;
         padding: 10px;
     }
+
+    .output-btn {
+        border-radius: 5px!important;
+        color: #fff!important;
+        background-color: #e3342fa6!important;
+        width: 80%!important;
+        margin: auto!important;
+        display: block!important;
+        text-align: center!important;
+        padding: 9px!important;
+        font-size: 10px!important;
+        border: #e3342fa6!important;
+    }
+
+    #pdf-output-form {
+        width: 100%;
+    }
+
 </style>

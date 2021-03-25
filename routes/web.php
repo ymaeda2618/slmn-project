@@ -165,6 +165,7 @@ Route::post('AjaxSearchSaleSlips', 'DepositController@AjaxSearchSaleSlips');
 Route::post('registerDeposit', 'DepositController@registerDeposit');
 Route::get('DepositEdit/{deposit_id}', 'DepositController@edit');
 Route::post('editRegisterDeposit', 'DepositController@editRegisterDeposit');
+Route::post('invoiceOutput', 'DepositController@invoiceOutput');
 
 // 在庫管理
 Route::get('InventoryAdjustmentIndex', 'InventoryAdjustmentController@index');
@@ -177,6 +178,8 @@ Route::post('editInventoryAdjustment', 'InventoryAdjustmentController@editInvent
 // 請求書出力
 Route::get('InvoiceOutputIndex', 'InvoiceOutputController@index');
 Route::post('InvoiceOutputIndex', 'InvoiceOutputController@index');
+Route::get('InvoiceOutputOutput', 'InvoiceOutputController@output');
+Route::post('InvoiceOutputOutput', 'InvoiceOutputController@output');
 
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {

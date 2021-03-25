@@ -47,32 +47,44 @@
             </form>
         </div>
 
-        <div class='list-area'>
-            <table class='index-table'>
-                <tbody>
-                    <tr>
-                        <th class="width-5 center">印刷</th>
-                        <th class="width-15">伝票日付</th>
-                        <th class="width-15">支払日付</th>
-                        <th class="width-15">企業</th>
-                        <th class="width-10">支払金額</th>
-                    </tr>
-                    @foreach ($withdrawalList as $withdrawalDatas)
-                    <tr>
-                        <td class='center'><input type='checkbox'></td>
-                        <td>{{$withdrawalDatas->withdrawal_date}}</td>
-                        <td>{{$withdrawalDatas->payment_from_date}}~{{$withdrawalDatas->payment_to_date}}</td>
-                        <td>{{$withdrawalDatas->supply_company_name}}</td>
-                        <td>{{number_format($withdrawalDatas->amount)}}</td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+        <form id="pdf-output-form" method="post" action='./InvoiceOutputOutput' enctype="multipart/form-data" onsubmit="return inputCheck();">
+            {{ csrf_field() }}
+            <div class='list-area'>
+                <table class='index-table'>
+                    <tbody>
+                        <tr>
+                            <th class="width-5 center">印刷</th>
+                            <th class="width-15">伝票日付</th>
+                            <th class="width-15">支払日付</th>
+                            <th class="width-15">企業</th>
+                            <th class="width-10">支払金額</th>
+                        </tr>
+                        @foreach ($depositList as $depositDatas)
+                        <tr>
+                            <td class='center'><input type='checkbox' id="output-{{$depositDatas->deposit_id}}" name="data['InvoiceOutput'][{{$depositDatas->deposit_id}}]['id']" value="{{$depositDatas->deposit_id}}" onchange="javascript:discardDepositId({{$depositDatas->deposit_id}})"></td>
+                            <td>{{$depositDatas->deposit_date}}</td>
+                            <td>{{$depositDatas->sale_from_date}}~{{$depositDatas->sale_to_date}}</td>
+                            <td>{{$depositDatas->sale_company_name}}</td>
+                            <td>{{number_format($depositDatas->amount)}}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
 
-        <div class="d-flex justify-content-center">
-            {{ $withdrawalList->links() }}
-        </div>
+            <div class="d-flex justify-content-center">
+                {{ $depositList->links() }}
+            </div>
+
+            <br>
+            <br>
+
+            <div id="target-id-area"></div>
+            <div class="output-btn-area">
+                <input type='submit' class='output-btn btn btn-primary width-30' name='output-btn' id="output-btn" value='印刷' tabindex="9">
+                {{--  <button id="output-btn" class="output-btn btn btn-primary width-30" type="button" tabindex="9">印刷</button>  --}}
+            </div>
+        </form>
 
     </div>
 </div>
@@ -101,6 +113,9 @@
                     var tabindex = parseInt($(this).attr('tabindex'), 10);
                     if (isNaN(tabindex) && this_id == "search-btn") {
                         $('#index-search-form').submit();
+                        return;
+                    } else if (isNaN(tabindex) && this_id == "output-btn") {
+                        $('#pdf-output-form').submit();
                         return;
                     } else if (isNaN(tabindex)) return false;
 
@@ -161,7 +176,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteSupplyCompany",
+                        url: "./AjaxAutoCompleteSaleCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -198,7 +213,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetSupplyCompany",
+                            url: "./AjaxSetSaleCompany",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -218,6 +233,41 @@
 
         });
     })(jQuery);
+
+    // -------------------
+    // deposit_idの取得
+    // -------------------
+    function discardDepositId(id) {
+
+        // 対象IDのチェック状態を取得
+        var isCheck = $('#output-' + id).prop('checked');
+
+        if (isCheck) {
+            if (!($('#output-detail-id-' + id).length)) {
+                // チェックしたら詳細エリアにIDを追加
+                $('#target-id-area').append('<input type="hidden" id="output-detail-id-' + id + '" name="data[InvoiceOutput][deposit_ids][]" value="' + id + '">');
+            }
+        } else {
+            if ($('#output-detail-id-' + id).length) {
+                // チェック外れたらIDを詳細エリアから外す
+                $('#output-detail-id-' + id).remove();
+            }
+        }
+    }
+
+    // --------------
+    // 印刷時のチェック
+    // --------------
+    function inputCheck() {
+
+        var checkCnt = $('.list-area :checked').length;
+
+        if (checkCnt == 0) {
+            alert('印刷対象を選択してください。');
+            return false;
+        }
+    }
+
 </script>
 <style>
     /* 共通 */
@@ -388,5 +438,14 @@
         display: block;
         text-align: center;
         padding: 10px;
+    }
+
+    .output-btn-area {
+        width: 100%;
+        text-align: center;
+    }
+
+    #pdf-output-form {
+        width: 100%;
     }
 </style>

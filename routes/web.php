@@ -181,6 +181,16 @@ Route::post('InvoiceOutputIndex', 'InvoiceOutputController@index');
 Route::get('InvoiceOutputOutput', 'InvoiceOutputController@output');
 Route::post('InvoiceOutputOutput', 'InvoiceOutputController@output');
 
+// ユーザー登録
+Route::get('UserIndex', 'UserController@index');
+Route::post('UserIndex', 'UserController@index');
+Route::get('UserCreate', 'UserController@create');
+Route::post('UserCreate', 'UserController@create');
+Route::get('UserEdit/{user_id}', 'UserController@edit');
+Route::get('UserRegister', 'UserController@register');
+Route::post('UserRegister', 'UserController@register');
+Route::post('UserEditRegister', 'UserController@editRegister');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

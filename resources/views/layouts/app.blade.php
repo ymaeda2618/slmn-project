@@ -45,11 +45,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
                         </li>
-                        @if (Route::has('register'))
+                        {{-- @if (Route::has('register'))
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                         </li>
-                        @endif @else
+                        @endif --}}
+                        @else
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     取引登録<span class="caret"></span>
@@ -86,6 +87,8 @@
                                     マスタ登録<span class="caret"></span>
                                 </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}UserCreate" class="dropdown-item">ユーザ登録</a> @endif
+                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}UserIndex" class="dropdown-item">ユーザ一覧</a> @endif
                                 @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}StaffCreate" class="dropdown-item">スタッフ登録</a> @endif
                                 <a href="{{ asset('/') }}StaffIndex" class="dropdown-item">スタッフ一覧</a>
                                 @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}ProductCreate" class="dropdown-item">製品登録</a> @endif

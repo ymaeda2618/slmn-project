@@ -441,10 +441,20 @@
 
                         if ($('input[tabindex="' + tabindex + '"]').length) {
 
-                            var this_val = $('input[tabindex="' + tabindex + '"]').val();
-                            $('input[tabindex="' + tabindex + '"]').val("");
-                            $('input[tabindex="' + tabindex + '"]').focus();
-                            $('input[tabindex="' + tabindex + '"]').val(this_val);
+                            if (this_id.match(/unit_num_/) || this_id.match(/unit_price_/)) { // 数量と単価の場合は一度値を削除しない
+
+                                var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                                $('input[tabindex="' + tabindex + '"]').focus();
+                                $('input[tabindex="' + tabindex + '"]').val(this_val);
+
+                            } else {
+
+                                var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                                $('input[tabindex="' + tabindex + '"]').val("");
+                                $('input[tabindex="' + tabindex + '"]').focus();
+                                $('input[tabindex="' + tabindex + '"]').val(this_val);
+
+                            }
 
                         } else {
 
@@ -520,10 +530,19 @@
                         tabindex = max;
 
                         if ($('input[tabindex="' + tabindex + '"]').length) {
-                            var this_val = $('input[tabindex="' + tabindex + '"]').val();
-                            $('input[tabindex="' + tabindex + '"]').val("");
-                            $('input[tabindex="' + tabindex + '"]').focus();
-                            $('input[tabindex="' + tabindex + '"]').val(this_val);
+
+                            if (this_id.match(/unit_num_/) || this_id.match(/unit_price_/)) { // 数量と単価の場合は一度値を削除しない
+
+                                var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                                $('input[tabindex="' + tabindex + '"]').focus();
+                                $('input[tabindex="' + tabindex + '"]').val(this_val);
+
+                            } else {
+                                var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                                $('input[tabindex="' + tabindex + '"]').val("");
+                                $('input[tabindex="' + tabindex + '"]').focus();
+                                $('input[tabindex="' + tabindex + '"]').val(this_val);
+                            }
                         }
                     }
 
@@ -602,7 +621,7 @@
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
                 // 全角数字を半角に変換
-                set_val = set_val.replace( /[０-９]/g, function(s) {
+                set_val = set_val.replace(/[０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
                 $(this).val(set_val);

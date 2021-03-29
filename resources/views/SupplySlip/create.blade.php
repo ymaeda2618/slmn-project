@@ -1186,7 +1186,7 @@
         if (!this_unit_num) this_unit_num = 0;
 
         // 小数点の計算がおかしくなる可能性があるので、100倍して型揃えて計算する
-        var this_calc_price = CalcDecimalPoint(this_unit_price, this_unit_num, 1);
+        var this_calc_price = CalcDecimalPoint(this_unit_price, this_unit_num);
         $("#notax_price_" + this_slip_num).val(this_calc_price);
 
 
@@ -1229,7 +1229,7 @@
             if (!unit_price) unit_price = 0;
             if (!unit_num) unit_num = 0;
 
-            calc_price = CalcDecimalPoint(unit_price, unit_num, 1);
+            calc_price = CalcDecimalPoint(unit_price, unit_num);
 
             // 税額を取得
             tax_id = $("#tax_id_" + slip_num).val();
@@ -1424,22 +1424,40 @@
     // --------------
     // 小数点の計算処理
     // --------------
-    function CalcDecimalPoint(num1, num2, type) {
+    function CalcDecimalPoint(value1, value2) {
 
-        var result = 0;
+        // それぞれの小数点の位置を取得
+        var dotPosition1 = getDotPosition(value1);
+        var dotPosition2 = getDotPosition(value2);
 
-        var calcNum1 = parseInt(num1 * 100);
-        var calcNum2 = parseInt(num2 * 100)
+        // 位置の値が大きい方（小数点以下の位が多い方）の位置を取得
+        var max = Math.max(dotPosition1,dotPosition2);
 
-        if (type == 1) {
-            var tmpClacResult = calcNum1 * calcNum2;
-        } else {
-            var tmpClacResult = calcNum1 / calcNum2;
+        // 大きい方に小数の桁を合わせて文字列化、
+        // 小数点を除いて整数の値にする
+        var intValue1 = parseInt((parseFloat(value1).toFixed(max) + '').replace('.', ''));
+        var intValue2 = parseInt((parseFloat(value2).toFixed(max) + '').replace('.', ''));
+
+        // 10^N の値を計算
+        var power = Math.pow(100,max);
+
+        // 整数値で引き算した後に10^Nで割る
+        return (intValue1 * intValue2) / power;
+    }
+
+    function getDotPosition(value){
+
+        // 数値のままだと操作できないので文字列化する
+        var strVal = String(value);
+        var dotPosition = 0;
+
+        //　小数点が存在するか確認
+        if(strVal.lastIndexOf('.') === -1){
+        // 小数点があったら位置を取得
+        dotPosition = (strVal.length-1) - strVal.lastIndexOf('.');
         }
 
-        result = tmpClacResult / 10000;
-
-        return result;
+        return dotPosition;
     }
 
 </script>

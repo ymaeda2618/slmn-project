@@ -1461,7 +1461,7 @@ class SupplySlipController extends Controller
 
             $SupplySlipData = $request->data['SupplySlip'];
             $SupplySlipDetailData = $request->data['SupplySlipDetail'];
-error_log(print_r($SupplySlipDetailData, true), '3', '/home/xs662848/xs662848.xsrv.jp/public_html/laravel/storage/logs/error.log');
+
             // 値がNULLのところを初期化
             if(empty($SupplySlipData['supply_shop_id'])) $SupplySlipData['supply_shop_id'] = 0;
             if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;

@@ -1461,7 +1461,7 @@ class SupplySlipController extends Controller
 
             $SupplySlipData = $request->data['SupplySlip'];
             $SupplySlipDetailData = $request->data['SupplySlipDetail'];
-
+error_log(print_r($SupplySlipDetailData, true), '3', '/home/xs662848/xs662848.xsrv.jp/public_html/laravel/storage/logs/error.log');
             // 値がNULLのところを初期化
             if(empty($SupplySlipData['supply_shop_id'])) $SupplySlipData['supply_shop_id'] = 0;
             if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;
@@ -1630,7 +1630,7 @@ class SupplySlipController extends Controller
         $ajaxHtml1 .= "         <input type='hidden' id='unit_id_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][unit_id]' value='0'>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-10' id='staff-code-area-".$slip_num."'>";
-        $ajaxHtml1 .= "         <input type='hidden' id='staff_id_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_id]' >";
+        $ajaxHtml1 .= "         <input type='hidden' id='staff_id_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_id]' value='9'>";
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= "     <td class='width-20'>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SupplySlipDetail][".$slip_num."][staff_text]' placeholder='担当欄' value='石塚 貞雄' readonly>";

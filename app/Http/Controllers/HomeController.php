@@ -31,9 +31,6 @@ class HomeController extends Controller
             $today        = date('Y-m-d');
             $firstOfMonth = date('Y-m-01');
             $endOfMonth   = date('Y-m-t');
-            // $today        = '2020-11-07';
-            // $firstOfMonth = '2020-11-01';
-            // $endOfMonth   = '2020-11-30';
 
             // -----------
             // 仕入金額取得
@@ -51,7 +48,10 @@ class HomeController extends Controller
             $supplySlipInfoList['month_total'] = 0;
             foreach ($tmpSupplySlipInfoList as $supplySlipInfo) {
                 // 日付をキーに配列を入れ替える
-                $supplySlipInfoList[$supplySlipInfo->supply_slip_date] = $supplySlipInfo->supply_slip_total;
+                if (!isset($supplySlipInfoList[$supplySlipInfo->supply_slip_date])) {
+                    $supplySlipInfoList[$supplySlipInfo->supply_slip_date] = 0;
+                }
+                $supplySlipInfoList[$supplySlipInfo->supply_slip_date] += $supplySlipInfo->supply_slip_total;
 
                 // 月の合計を計算
                 $supplySlipInfoList['month_total'] += $supplySlipInfo->supply_slip_total;
@@ -73,7 +73,10 @@ class HomeController extends Controller
             $saleSlipInfoList['month_total'] = 0;
             foreach ($tmpSaleSlipInfoList as $saleSlipInfo) {
                 // 日付をキーに配列を入れ替える
-                $saleSlipInfoList[$saleSlipInfo->sale_slip_date] = $saleSlipInfo->sale_slip_total;
+                if (!isset($saleSlipInfoList[$saleSlipInfo->sale_slip_date])) {
+                    $saleSlipInfoList[$saleSlipInfo->sale_slip_date] = 0;
+                }
+                $saleSlipInfoList[$saleSlipInfo->sale_slip_date] += $saleSlipInfo->sale_slip_total;
 
                 // 月の合計を計算
                 $saleSlipInfoList['month_total'] += $saleSlipInfo->sale_slip_total;
@@ -95,7 +98,10 @@ class HomeController extends Controller
             $depositsInfoList['month_total'] = 0;
             foreach ($tmpDepositsInfoList as $depositsInfo) {
                 // 日付をキーに配列を入れ替える
-                $depositsInfoList[$depositsInfo->Deposit_date] = $depositsInfo->Deposit_total;
+                if (!isset($depositsInfoList[$depositsInfo->Deposit_date])) {
+                    $depositsInfoList[$depositsInfo->Deposit_date] = 0;
+                }
+                $depositsInfoList[$depositsInfo->Deposit_date] += $depositsInfo->Deposit_total;
 
                 // 月の合計を計算
                 $depositsInfoList['month_total'] += $depositsInfo->Deposit_total;
@@ -117,7 +123,10 @@ class HomeController extends Controller
             $withdrawalsInfoList['month_total'] = 0;
             foreach ($tmpWithdrawalsInfoList as $withdrawalsInfo) {
                 // 日付をキーに配列を入れ替える
-                $withdrawalsInfoList[$withdrawalsInfo->withdrawal_date] = $withdrawalsInfo->withdrawal_total;
+                if (!isset($withdrawalsInfoList[$withdrawalsInfo->withdrawal_date])) {
+                    $withdrawalsInfoList[$withdrawalsInfo->withdrawal_date] = 0;
+                }
+                $withdrawalsInfoList[$withdrawalsInfo->withdrawal_date] += $withdrawalsInfo->withdrawal_total;
 
                 // 月の合計を計算
                 $withdrawalsInfoList['month_total'] += $withdrawalsInfo->withdrawal_total;

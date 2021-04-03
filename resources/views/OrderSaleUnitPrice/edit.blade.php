@@ -3,43 +3,43 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">仕入発注伝票 編集画面</div>
+        <div class="top-title">売上発注伝票 編集画面</div>
 
-        <form class="smn-form" id="order-supply-unit-price-create-form" method="post" action="./../OrderSupplyUnitPriceEditRegister" enctype="multipart/form-data" onsubmit="return inputCheck();">
+        <form class="smn-form" id="order-sale-unit-price-create-form" method="post" action="./../OrderSaleUnitPriceEditRegister" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
-            <input type="hidden" id="order_supply_unit_price_id" name="data[OrderSupplyUnitPrice][id]" value="{{$orderSupplyUnitPriceList->order_supply_unit_price_id}}">
+            <input type="hidden" id="order_sale_unit_price_id" name="data[OrderSaleUnitPrice][id]" value="{{$orderSaleUnitPriceList->order_sale_unit_price_id}}">
             <div class="form-group">
                 <div class="apply_from_box">
                     <label class="column-label" for="apply_from">適用開始日</label>
-                    <input type="date" class="form-control " id="apply_from " name="data[OrderSupplyUnitPrice][apply_from]" value="{{$orderSupplyUnitPriceList->apply_from}}">
+                    <input type="date" class="form-control " id="apply_from " name="data[OrderSaleUnitPrice][apply_from]" value="{{$orderSaleUnitPriceList->apply_from}}">
                 </div>
 
                 <div class="apply_to_box">
                     <label class="column-label" for="apply_to">適用終了日</label>
-                    <input type="date" class="form-control " id="apply_to " name="data[OrderSupplyUnitPrice][apply_to]" value="{{$orderSupplyUnitPriceList->apply_to}}">
+                    <input type="date" class="form-control " id="apply_to " name="data[OrderSaleUnitPrice][apply_to]" value="{{$orderSaleUnitPriceList->apply_to}}">
                 </div>
             </div>
 
 
-            <table class="supply-from-table">
+            <table class="sale-from-table">
                 <tr>
-                    <th colspan="2">仕入企業</th>
-                    <th colspan="2">仕入店舗</th>
+                    <th colspan="2">売上企業</th>
+                    <th colspan="2">売上店舗</th>
                 </tr>
                 <tr>
                     <td class="width-20">
-                        <input type="text" class="form-control supply_company_code_input" id="supply_company_code" name="data[OrderSupplyUnitPrice][supply_company_code]" value="{{$orderSupplyUnitPriceList->supply_company_code}}" tabindex="1">
-                        <input type="hidden" id="supply_company_id" name="data[OrderSupplyUnitPrice][supply_company_id]" value="{{$orderSupplyUnitPriceList->supply_company_id}}">
+                        <input type="text" class="form-control sale_company_code_input" id="sale_company_code" name="data[OrderSaleUnitPrice][sale_company_code]" value="{{$orderSaleUnitPriceList->sale_company_code}}" tabindex="1">
+                        <input type="hidden" id="sale_company_id" name="data[OrderSaleUnitPrice][sale_company_id]" value="{{$orderSaleUnitPriceList->sale_company_id}}">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="supply_company_text" name="data[OrderSupplyUnitPrice][supply_company_text]" value="{{$orderSupplyUnitPriceList->supply_company_name}}" readonly>
+                        <input type="text" class="form-control" id="sale_company_text" name="data[OrderSaleUnitPrice][sale_company_text]" value="{{$orderSaleUnitPriceList->sale_company_name}}" readonly>
                     </td>
                     <td class="width-20">
-                        <input type="text" class="form-control supply_shop_code_input" id="supply_shop_code" name="data[OrderSupplyUnitPrice][supply_shop_code]" tabindex="2" value="{{$orderSupplyUnitPriceList->supply_shop_code}}">
-                        <input type="hidden" id="supply_shop_id" name="data[OrderSupplyUnitPrice][supply_shop_id]" value="{{$orderSupplyUnitPriceList->supply_shop_id}}">
+                        <input type="text" class="form-control sale_shop_code_input" id="sale_shop_code" name="data[OrderSaleUnitPrice][sale_shop_code]" tabindex="2" value="{{$orderSaleUnitPriceList->sale_shop_code}}">
+                        <input type="hidden" id="sale_shop_id" name="data[OrderSaleUnitPrice][sale_shop_id]" value="{{$orderSaleUnitPriceList->sale_shop_id}}">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="supply_shop_text" name="data[OrderSupplyUnitPrice][supply_shop_text]" value="{{$orderSupplyUnitPriceList->supply_shop_name}}" readonly>
+                        <input type="text" class="form-control" id="sale_shop_text" name="data[OrderSaleUnitPrice][sale_shop_text]" value="{{$orderSaleUnitPriceList->sale_shop_name}}" readonly>
                     </td>
                 </tr>
 
@@ -52,36 +52,36 @@
                     <th colspan="2">担当</th>
                     <th>削除</th>
                 </tr>
-                @foreach ($orderSupplyUnitPriceDetailList as $orderSupplyUnitPriceDetails)
-                <tr id="product-partition-{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" class="partition-area"></tr>
-                <tr id="product-upper-{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}">
-                    <input type="hidden" id="order_supply_unit_price_detail_id" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][id]" value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}">
+                @foreach ($orderSaleUnitPriceDetailList as $orderSaleUnitPriceDetails)
+                <tr id="product-partition-{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" class="partition-area"></tr>
+                <tr id="product-upper-{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}">
+                    <input type="hidden" id="order_sale_unit_price_detail_id" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][id]" value="{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}">
                     {{-- 製品 START --}}
                     <td class="width-10">
-                        <input type="text" class="form-control product_code_input" id="product_code_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_code]" value="{{$orderSupplyUnitPriceDetails->product_code}}" tabindex="3">
-                        <input type="hidden" id="product_id_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_id]" value="{{$orderSupplyUnitPriceDetails->product_id}}">
+                        <input type="text" class="form-control product_code_input" id="product_code_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][product_code]" value="{{$orderSaleUnitPriceDetails->product_code}}" tabindex="3">
+                        <input type="hidden" id="product_id_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][product_id]" value="{{$orderSaleUnitPriceDetails->product_id}}">
                     </td>
                     <td class="width-35">
-                        <input type="text" class="form-control" id="product_text_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_text]" value="{{$orderSupplyUnitPriceDetails->product_name}}" placeholder="製品欄" readonly>
+                        <input type="text" class="form-control" id="product_text_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][product_text]" value="{{$orderSaleUnitPriceDetails->product_name}}" placeholder="製品欄" readonly>
                     </td>
                     {{-- 製品 END --}}
                     {{-- 金額 START --}}
                     <td class="width-20">
-                        <input type="number" class="form-control" id="order_unit_price_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][order_unit_price]" value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_price}}" tabindex="4">
+                        <input type="number" class="form-control" id="order_unit_price_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][order_unit_price]" value="{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_price}}" tabindex="4">
                     </td>
                     {{-- 金額 END --}}
                     {{-- 担当 START --}}
                     <td class="width-10">
-                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][staff_code]" value="{{$orderSupplyUnitPriceDetails->staff_code}}" tabindex="5">
-                        <input type="hidden" id="staff_id_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][staff_id]" value="{{$orderSupplyUnitPriceDetails->staff_id}}">
+                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][staff_code]" value="{{$orderSaleUnitPriceDetails->staff_code}}" tabindex="5">
+                        <input type="hidden" id="staff_id_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][staff_id]" value="{{$orderSaleUnitPriceDetails->staff_id}}">
                     </td>
                     <td class="width-20">
-                        <input type="text" class="form-control" id="staff_text_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][staff_text]" placeholder="担当欄" value="{{$orderSupplyUnitPriceDetails->staff_name}}" readonly>
+                        <input type="text" class="form-control" id="staff_text_{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}" name="data[OrderSaleUnitPriceDetail][{{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}][staff_text]" placeholder="担当欄" value="{{$orderSaleUnitPriceDetails->staff_name}}" readonly>
                     </td>
                     {{-- 担当 END --}}
                     {{-- 削除 START --}}
                     <td class="width-5">
-                        <button id="remove-product-btn" type="button" class="btn remove-product-btn btn-secondary" onclick='javascript:removeProduct({{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}) '>削除</button>
+                        <button id="remove-product-btn" type="button" class="btn remove-product-btn btn-secondary" onclick='javascript:removeProduct({{$orderSaleUnitPriceDetails->order_sale_unit_price_detail_id}}) '>削除</button>
                     </td>
                     {{-- 削除 END --}}
                 </tr>
@@ -90,12 +90,12 @@
             <br><br>
             <div class="add-product-btn-area">
                 <button id="add-product-btn" type="button" class="btn add-product-btn btn-primary">伝票追加</button>
-                <input type='hidden' name="product_num" id="product_num" value="{{count($orderSupplyUnitPriceDetailList) + 1}}">
+                <input type='hidden' name="product_num" id="product_num" value="{{count($orderSaleUnitPriceDetailList) + 1}}">
             </div>
 
             <div class="form-group">
                 <label class="column-label" for="remarks">備考欄</label>
-                <textarea id="remarks" class="form-control" name="data[OrderSupplyUnitPrice][remarks]" rows="4" cols="40"></textarea>
+                <textarea id="remarks" class="form-control" name="data[OrderSaleUnitPrice][remarks]" rows="4" cols="40"></textarea>
             </div>
 
             <table class="register-btn-table">
@@ -119,8 +119,8 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 一番最初は仕入先企業にフォーカスする
-            $('#supply_company_code').focus();
+            // 一番最初は売上先企業にフォーカスする
+            $('#sale_company_code').focus();
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
@@ -137,7 +137,7 @@
 
                     // ひとつ前のタブの最小値を取得
                     var min = 0;
-                    $("#order-supply-unit-price-create-form [tabindex]").attr("tabindex", function(a, b) {
+                    $("#order-sale-unit-price-create-form [tabindex]").attr("tabindex", function(a, b) {
 
                         b = parseInt(b, 10);
                         if (tabindex < b) {
@@ -175,7 +175,7 @@
 
                     // ひとつ前のタブの最大値を取得
                     var max = 0;
-                    $("#order-supply-unit-price-create-form [tabindex]").attr("tabindex", function(a, b) {
+                    $("#order-sale-unit-price-create-form [tabindex]").attr("tabindex", function(a, b) {
 
                         b = parseInt(b, 10);
                         if (tabindex > b) {
@@ -231,13 +231,13 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/supply_company/)) { // 仕入先企業
+                if (selector_code.match(/sale_company/)) { // 売上先企業
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./../AjaxSetSupplyCompany",
+                            url: "./../AjaxSetSaleCompany",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -251,13 +251,13 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
+                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./../AjaxSetSupplyShop",
+                            url: "./../AjaxSetSaleShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -317,15 +317,15 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入企業ID
+            // autocomplete処理 売上企業ID
             //-------------------------------------
-            $(".supply_company_code_input").autocomplete({
+            $(".sale_company_code_input").autocomplete({
                 source: function(req, resp) {
                     $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../AjaxAutoCompleteSupplyCompany",
+                        url: "./../AjaxAutoCompleteSaleCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -343,15 +343,15 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入店舗ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
+            $(".sale_shop_code_input").autocomplete({
                 source: function(req, resp) {
                     $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../AjaxAutoCompleteSupplyShop",
+                        url: "./../AjaxAutoCompleteSaleShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -436,7 +436,7 @@
                         headers: {
                             'X-CSRF-TOKEN': $("[name='_token']").val()
                         },
-                        url: "./../AjaxAddProduct",
+                        url: "./../AjaxAddSaleProduct",
                         type: "POST",
                         dataType: "JSON",
                         data: fd,
@@ -515,7 +515,7 @@
             // 登録ボタン押下時
             //---------------
             $(document).on("click", ".register-btn", function() {
-                $('#order-supply-unit-price-create-form').submit();
+                $('#order-sale-unit-price-create-form').submit();
             });
 
         });
@@ -538,7 +538,7 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code;    // 仕入企業
+        var sale_company_code;    // 売上企業
         var product_code;           // 製品ID
         var order_unit_price;       // 金額
         var staff_code;             // 担当
@@ -546,9 +546,9 @@
         // -----------
         // 入力チェック
         // -----------
-        supply_company_code = $("#supply_company_code").val();
-        if (supply_company_code == '') {
-            alert('「仕入企業」を入力してください。');
+        sale_company_code = $("#sale_company_code").val();
+        if (sale_company_code == '') {
+            alert('「売上企業」を入力してください。');
             return false;
         }
 
@@ -632,7 +632,7 @@
         margin: auto 5px;
     }
 
-    .supply-from-table {
+    .sale-from-table {
         width: 100%;
         margin-bottom: 50px;
     }

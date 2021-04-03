@@ -60,6 +60,10 @@
                                 <a href="{{ asset('/') }}SupplySlipIndex" class="dropdown-item">仕入一覧</a>
                                 @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SaleSlipCreate" class="dropdown-item">売上登録</a> @endif
                                 <a href="{{ asset('/') }}SaleSlipIndex" class="dropdown-item">売上一覧</a>
+                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}OrderSupplyUnitPriceCreate" class="dropdown-item">仕入発注単価登録</a> @endif
+                                <a href="{{ asset('/') }}OrderSupplyUnitPriceIndex" class="dropdown-item">仕入発注単価一覧</a>
+                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}OrderSaleUnitPriceCreate" class="dropdown-item">売上発注単価登録</a> @endif
+                                <a href="{{ asset('/') }}OrderSaleUnitPriceIndex" class="dropdown-item">売上発注単価一覧</a>
                             </div>
                         </li>
                         <li class="nav-item dropdown">

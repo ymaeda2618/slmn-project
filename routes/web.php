@@ -191,6 +191,17 @@ Route::get('UserRegister', 'UserController@register');
 Route::post('UserRegister', 'UserController@register');
 Route::post('UserEditRegister', 'UserController@editRegister');
 
+// 発注単価登録
+Route::get('OrderSupplyUnitPriceIndex', 'OrderSupplyUnitPriceController@index');
+Route::post('OrderSupplyUnitPriceIndex', 'OrderSupplyUnitPriceController@index');
+Route::get('OrderSupplyUnitPriceCreate', 'OrderSupplyUnitPriceController@create');
+Route::post('OrderSupplyUnitPriceCreate', 'OrderSupplyUnitPriceController@create');
+Route::get('OrderSupplyUnitPriceEdit/{order_supply_unit_price_id}', 'OrderSupplyUnitPriceController@edit');
+Route::post('AjaxAddProduct', 'OrderSupplyUnitPriceController@AjaxAddProduct');
+Route::get('OrderSupplyUnitPriceRegister', 'OrderSupplyUnitPriceController@register');
+Route::post('OrderSupplyUnitPriceRegister', 'OrderSupplyUnitPriceController@register');
+Route::post('OrderSupplyUnitPriceEditRegister', 'OrderSupplyUnitPriceController@editRegister');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

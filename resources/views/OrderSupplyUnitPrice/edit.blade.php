@@ -95,7 +95,7 @@
 
             <div class="form-group">
                 <label class="column-label" for="remarks">備考欄</label>
-                <textarea id="remarks" class="form-control" name="data[OrderSupplyUnitPrice][remarks]" rows="4" cols="40"></textarea>
+                <textarea id="remarks" class="form-control" name="data[OrderSupplyUnitPrice][remarks]" rows="4" cols="40">{{$orderSupplyUnitPriceList->remarks}}</textarea>
             </div>
 
             <table class="register-btn-table">

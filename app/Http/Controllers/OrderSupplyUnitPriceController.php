@@ -366,6 +366,7 @@ class OrderSupplyUnitPriceController extends Controller
             'OrderSupplyUnitPrice.id         AS order_supply_unit_price_id',
             'OrderSupplyUnitPrice.apply_from AS apply_from',
             'OrderSupplyUnitPrice.apply_to   AS apply_to',
+            'OrderSupplyUnitPrice.remarks    AS remarks',
             'SupplyCompany.id                AS supply_company_id',
             'SupplyCompany.code              AS supply_company_code',
             'SupplyCompany.name              AS supply_company_name',

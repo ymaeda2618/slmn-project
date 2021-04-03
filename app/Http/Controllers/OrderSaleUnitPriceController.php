@@ -366,6 +366,7 @@ class OrderSaleUnitPriceController extends Controller
             'OrderSaleUnitPrice.id         AS order_sale_unit_price_id',
             'OrderSaleUnitPrice.apply_from AS apply_from',
             'OrderSaleUnitPrice.apply_to   AS apply_to',
+            'OrderSaleUnitPrice.remarks    AS remarks',
             'SaleCompany.id                AS sale_company_id',
             'SaleCompany.code              AS sale_company_code',
             'SaleCompany.name              AS sale_company_name',

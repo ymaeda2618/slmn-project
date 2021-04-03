@@ -201,6 +201,15 @@ Route::post('AjaxAddProduct', 'OrderSupplyUnitPriceController@AjaxAddProduct');
 Route::get('OrderSupplyUnitPriceRegister', 'OrderSupplyUnitPriceController@register');
 Route::post('OrderSupplyUnitPriceRegister', 'OrderSupplyUnitPriceController@register');
 Route::post('OrderSupplyUnitPriceEditRegister', 'OrderSupplyUnitPriceController@editRegister');
+Route::get('OrderSaleUnitPriceIndex', 'OrderSaleUnitPriceController@index');
+Route::post('OrderSaleUnitPriceIndex', 'OrderSaleUnitPriceController@index');
+Route::get('OrderSaleUnitPriceCreate', 'OrderSaleUnitPriceController@create');
+Route::post('OrderSaleUnitPriceCreate', 'OrderSaleUnitPriceController@create');
+Route::get('OrderSaleUnitPriceEdit/{order_sale_unit_price_id}', 'OrderSaleUnitPriceController@edit');
+Route::post('AjaxAddSaleProduct', 'OrderSaleUnitPriceController@AjaxAddSaleProduct');
+Route::get('OrderSaleUnitPriceRegister', 'OrderSaleUnitPriceController@register');
+Route::post('OrderSaleUnitPriceRegister', 'OrderSaleUnitPriceController@register');
+Route::post('OrderSaleUnitPriceEditRegister', 'OrderSaleUnitPriceController@editRegister');
 
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {

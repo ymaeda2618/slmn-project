@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
-use App\Staff;
 use App\OrderSaleUnitPrice;
 use App\OrderSaleUnitPriceDetail;
 use Carbon\Carbon;
@@ -129,9 +128,8 @@ class OrderSaleUnitPriceController extends Controller
             // order_sale_unit_price_detailsのサブクエリを作成
             $product_sub_query = null;
             if(!empty($condition_product_id)) {
-
                 $product_sub_query = DB::table('order_sale_unit_price_details as SubTable')
-                ->select('SubTable.order_sale_unit_price_id AS order_sale_unit_price_id')
+                ->select('SubTable.order_sale_unit_price_id AS sub_order_sale_unit_price_id')
                 ->where('SubTable.product_id', '=', $condition_product_id)
                 ->groupBy('SubTable.order_sale_unit_price_id');
             }
@@ -139,12 +137,12 @@ class OrderSaleUnitPriceController extends Controller
             // 売上発注単価一覧を取得
             $orderSaleUnitPriceList = DB::table('order_sale_unit_prices AS OrderSaleUnitPrice')
             ->select(
-                'OrderSaleUnitPrice.id         AS order_sale_unit_price_id',
-                'OrderSaleUnitPrice.apply_from AS apply_from',
-                'OrderSaleUnitPrice.apply_to   AS apply_to',
-                'SaleCompany.code              AS sale_company_code',
-                'SaleCompany.name              AS sale_company_name'
+                'OrderSaleUnitPrice.id       AS order_sale_unit_price_id',
+                'OrderSaleUnitPrice.modified AS modified',
+                'SaleCompany.code            AS sale_company_code',
+                'SaleCompany.name            AS sale_company_name'
             )
+            ->selectRaw('MIN(OrderSaleUnitPriceDetail.apply_from) AS apply_from')
             ->join('sale_companies AS SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'OrderSaleUnitPrice.company_id');
             })
@@ -153,18 +151,19 @@ class OrderSaleUnitPriceController extends Controller
             })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
-                       ->join(DB::raw('('. $product_sub_query->toSql() .') as OrderSaleUnitPriceDetail'), 'OrderSaleUnitPriceDetail.order_sale_unit_price_id', '=', 'OrderSaleUnitPrice.id')
+                       ->join(DB::raw('('. $product_sub_query->toSql() .') as OrderSaleUnitPriceDetail'), 'OrderSaleUnitPriceDetail.sub_order_sale_unit_price_id', '=', 'OrderSaleUnitPrice.id')
                        ->mergeBindings($product_sub_query);
             })
             ->if(!empty($condition_date_from) && !empty($condition_date_to), function ($query) use ($condition_date_from, $condition_date_to) {
                 return $query
-                        ->where('OrderSaleUnitPrice.apply_from', '>=', $condition_date_from)
-                        ->where('OrderSaleUnitPrice.apply_to', '<=', $condition_date_to);
+                        ->join('order_sale_unit_price_details AS OrderSaleUnitPriceDetail', 'OrderSaleUnitPrice.id', '=', 'OrderSaleUnitPriceDetail.order_sale_unit_price_id')
+                        ->whereBetween('OrderSaleUnitPriceDetail.apply_from', [$condition_date_from, $condition_date_to]);
             })
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('OrderSaleUnitPrice.company_id', '=', $condition_company_id);
             })
             ->where('OrderSaleUnitPrice.active', '=', '1')
+            ->groupBy('OrderSaleUnitPrice.id')
             ->orderBy('OrderSaleUnitPrice.id', 'asc')
             ->paginate(10);
 
@@ -181,7 +180,6 @@ class OrderSaleUnitPriceController extends Controller
                 'OrderSaleUnitPriceDetail.price AS order_sale_unit_price_detail_price',
                 'Unit.name                      AS unit_name'
             )
-            ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
             ->join('order_sale_unit_prices as OrderSaleUnitPrice', function ($join) {
                 $join->on('OrderSaleUnitPrice.id', '=', 'OrderSaleUnitPriceDetail.order_sale_unit_price_id')
                 ->where('OrderSaleUnitPrice.active', '=', true);
@@ -193,10 +191,6 @@ class OrderSaleUnitPriceController extends Controller
             ->join('units as Unit', function ($join) {
                 $join->on('Unit.id', '=', 'Product.unit_id')
                 ->where('Unit.active', '=', true);
-            })
-            ->leftJoin('staffs as Staff', function ($join) {
-                $join->on('Staff.id', '=', 'OrderSaleUnitPriceDetail.staff_id')
-                ->where('Staff.active', '=', true);
             })
             ->leftJoin('sale_companies as SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'OrderSaleUnitPrice.company_id')
@@ -224,7 +218,6 @@ class OrderSaleUnitPriceController extends Controller
                     'order_sale_unit_price_detail_id'    => $orderSaleUnitPriceDetails->order_sale_unit_price_detail_id,
                     'order_sale_unit_price_detail_price' => $orderSaleUnitPriceDetails->order_sale_unit_price_detail_price,
                     'unit_name'                          => $orderSaleUnitPriceDetails->unit_name,
-                    'staff_name'                         => $orderSaleUnitPriceDetails->staff_name,
                 ];
             }
 
@@ -232,7 +225,7 @@ class OrderSaleUnitPriceController extends Controller
 
             dd($e);
 
-            return view('SaleSlip.complete')->with([
+            return view('OrderSaleUnitPrice.index')->with([
                 'errorMessage' => $e
             ]);
         }
@@ -296,8 +289,6 @@ class OrderSaleUnitPriceController extends Controller
             $OrderSaleUnitPrice = new OrderSaleUnitPrice;
             $OrderSaleUnitPrice->company_id       = $OrderSaleUnitPriceData['sale_company_id']; // 企業ID
             $OrderSaleUnitPrice->shop_id          = $OrderSaleUnitPriceData['sale_shop_id'];    // 店舗ID
-            $OrderSaleUnitPrice->apply_from       = $OrderSaleUnitPriceData['apply_from'];      // 適用開始日
-            $OrderSaleUnitPrice->apply_to         = $OrderSaleUnitPriceData['apply_to'];        // 適用終了日
             $OrderSaleUnitPrice->remarks          = $OrderSaleUnitPriceData['remarks'];         // 備考
             $OrderSaleUnitPrice->active           = 1;                                          // 有効フラグ
             $OrderSaleUnitPrice->created_user_id  = $userInfoId;                                // 作成者ID
@@ -318,11 +309,23 @@ class OrderSaleUnitPriceController extends Controller
 
             foreach ($OrderSaleUnitPriceDetailData as $OrderSaleUnitPriceDetail) {
 
+                // 税抜計算
+                $product_data = DB::table('products')->where('id', '=', $OrderSaleUnitPriceDetail['product_id'])->get();
+                $tax_id = $product_data[0]->tax_id;
+                $notax_price = 0;
+                if ($tax_id == 1) {
+                    // 8%
+                    $notax_price = round($OrderSaleUnitPriceDetail['order_unit_price'] / 1.08);
+                } else {
+                    // 10%
+                    $notax_price = round($OrderSaleUnitPriceDetail['order_unit_price'] / 1.1);
+                }
+
                 $insertDetailParams[] = [
                     'order_sale_unit_price_id' => $orderSaleUnitPriceId,
                     'product_id'               => $OrderSaleUnitPriceDetail['product_id'],
-                    'staff_id'                 => $OrderSaleUnitPriceDetail['staff_id'],
-                    'notax_price'              => $OrderSaleUnitPriceDetail['order_unit_price'],
+                    'apply_from'               => $OrderSaleUnitPriceDetail['apply_from'],
+                    'notax_price'              => $notax_price,
                     'price'                    => $OrderSaleUnitPriceDetail['order_unit_price'],
                     'active'                   => 1,
                     'created_user_id'          => $userInfoId,
@@ -364,8 +367,6 @@ class OrderSaleUnitPriceController extends Controller
         $orderSaleUnitPriceList = DB::table('order_sale_unit_prices AS OrderSaleUnitPrice')
         ->select(
             'OrderSaleUnitPrice.id         AS order_sale_unit_price_id',
-            'OrderSaleUnitPrice.apply_from AS apply_from',
-            'OrderSaleUnitPrice.apply_to   AS apply_to',
             'OrderSaleUnitPrice.remarks    AS remarks',
             'SaleCompany.id                AS sale_company_id',
             'SaleCompany.code              AS sale_company_code',
@@ -388,16 +389,14 @@ class OrderSaleUnitPriceController extends Controller
         // -----------------
         $orderSaleUnitPriceDetailList = DB::table('order_sale_unit_price_details AS OrderSaleUnitPriceDetail')
         ->select(
-            'OrderSaleUnitPrice.id          AS order_sale_unit_price_id',
-            'Product.code                   AS product_code',
-            'Product.name                   AS product_name',
-            'Product.id                     AS product_id',
-            'OrderSaleUnitPriceDetail.id    AS order_sale_unit_price_detail_id',
-            'OrderSaleUnitPriceDetail.price AS order_sale_unit_price_detail_price',
-            'Staff.id                       AS staff_id',
-            'Staff.code                     AS staff_code'
+            'OrderSaleUnitPrice.id               AS order_sale_unit_price_id',
+            'Product.code                        AS product_code',
+            'Product.name                        AS product_name',
+            'Product.id                          AS product_id',
+            'OrderSaleUnitPriceDetail.id         AS order_sale_unit_price_detail_id',
+            'OrderSaleUnitPriceDetail.price      AS order_sale_unit_price_detail_price',
+            'OrderSaleUnitPriceDetail.apply_from AS apply_from'
         )
-        ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
         ->join('order_sale_unit_prices as OrderSaleUnitPrice', function ($join) {
             $join->on('OrderSaleUnitPrice.id', '=', 'OrderSaleUnitPriceDetail.order_sale_unit_price_id')
             ->where('OrderSaleUnitPrice.active', '=', true);
@@ -405,10 +404,6 @@ class OrderSaleUnitPriceController extends Controller
         ->join('products as Product', function ($join) {
             $join->on('Product.id', '=', 'OrderSaleUnitPriceDetail.product_id')
             ->where('Product.active', '=', true);
-        })
-        ->leftJoin('staffs as Staff', function ($join) {
-            $join->on('Staff.id', '=', 'OrderSaleUnitPriceDetail.staff_id')
-            ->where('Staff.active', '=', true);
         })
         ->where('OrderSaleUnitPriceDetail.order_sale_unit_price_id', '=', $order_sale_unit_price_id)
         ->get();
@@ -446,13 +441,11 @@ class OrderSaleUnitPriceController extends Controller
             // order_sale_unit_pricesを登録する
             // --------------------------------
             $OrderSaleUnitPrice = \App\OrderSaleUnitPrice::find($OrderSaleUnitPriceDatas['id']);
-            $OrderSaleUnitPrice->company_id       = $OrderSaleUnitPriceDatas['sale_company_id'];  // 企業ID
-            $OrderSaleUnitPrice->shop_id          = $OrderSaleUnitPriceDatas['sale_shop_id'];     // 店舗ID
-            $OrderSaleUnitPrice->apply_from       = $OrderSaleUnitPriceDatas['apply_from'];         // 適用開始日
-            $OrderSaleUnitPrice->apply_to         = $OrderSaleUnitPriceDatas['apply_to'];           // 適用終了日
+            $OrderSaleUnitPrice->company_id       = $OrderSaleUnitPriceDatas['sale_company_id'];    // 企業ID
+            $OrderSaleUnitPrice->shop_id          = $OrderSaleUnitPriceDatas['sale_shop_id'];       // 店舗ID
             $OrderSaleUnitPrice->remarks          = $OrderSaleUnitPriceDatas['remarks'];            // 備考
-            $OrderSaleUnitPrice->modified_user_id = $user_info_id;                                    // 更新者ユーザーID
-            $OrderSaleUnitPrice->modified         = Carbon::now();                                    // 更新時間
+            $OrderSaleUnitPrice->modified_user_id = $user_info_id;                                  // 更新者ユーザーID
+            $OrderSaleUnitPrice->modified         = Carbon::now();                                  // 更新時間
 
             $OrderSaleUnitPrice->save();
 
@@ -467,17 +460,29 @@ class OrderSaleUnitPriceController extends Controller
 
             foreach($OrderSaleUnitPriceDetailDatas as $OrderSaleUnitPriceDetail){
 
+                // 税抜計算
+                $product_data = DB::table('products')->where('id', '=', $OrderSaleUnitPriceDetail['product_id'])->get();
+                $tax_id = $product_data[0]->tax_id;
+                $notax_price = 0;
+                if ($tax_id == 1) {
+                    // 8%
+                    $notax_price = round($OrderSaleUnitPriceDetail['order_unit_price'] / 1.08);
+                } else {
+                    // 10%
+                    $notax_price = round($OrderSaleUnitPriceDetail['order_unit_price'] / 1.1);
+                }
+
                 $detail_datas[] = [
                     'order_sale_unit_price_id' => $OrderSaleUnitPriceDatas['id'],
-                    'product_id'                 => $OrderSaleUnitPriceDetail['product_id'],
-                    'staff_id'                   => $OrderSaleUnitPriceDetail['staff_id'],
-                    'notax_price'                => $OrderSaleUnitPriceDetail['order_unit_price'],
-                    'price'                      => $OrderSaleUnitPriceDetail['order_unit_price'],
-                    'active'                     => 1,
-                    'created_user_id'            => $user_info_id,
-                    'created'                    => Carbon::now(),
-                    'modified_user_id'           => $user_info_id,
-                    'modified'                   => Carbon::now(),
+                    'product_id'               => $OrderSaleUnitPriceDetail['product_id'],
+                    'apply_from'               => $OrderSaleUnitPriceDetail['apply_from'],
+                    'notax_price'              => $notax_price,
+                    'price'                    => $OrderSaleUnitPriceDetail['order_unit_price'],
+                    'active'                   => 1,
+                    'created_user_id'          => $user_info_id,
+                    'created'                  => Carbon::now(),
+                    'modified_user_id'         => $user_info_id,
+                    'modified'                 => Carbon::now(),
                 ];
 
             }
@@ -513,6 +518,8 @@ class OrderSaleUnitPriceController extends Controller
 
         $tabInitialNum = intval(4*$product_num + 3);
 
+        $today = date('Y-m-d');
+
         // 追加伝票形成
         $ajaxHtml = '';
         $ajaxHtml .= " <tr id='product-partition-".$product_num."' class='partition-area'>";
@@ -521,17 +528,14 @@ class OrderSaleUnitPriceController extends Controller
         $ajaxHtml .= "     <td class='width-10' id='product-code-area-".$product_num."'>";
         $ajaxHtml .= "         <input type='hidden' id='product_id_".$product_num."' name='data[OrderSaleUnitPriceDetail][".$product_num."][product_id]'>";
         $ajaxHtml .= "     </td>";
-        $ajaxHtml .= "     <td class='width-35'>";
+        $ajaxHtml .= "     <td class='width-20'>";
         $ajaxHtml .= "         <input type='text' class='form-control' id='product_text_".$product_num."' name='data[OrderSaleUnitPriceDetail][".$product_num."][product_text]' placeholder='製品欄' readonly>";
         $ajaxHtml .= "     </td>";
-        $ajaxHtml .= "     <td class='width-20'>";
+        $ajaxHtml .= "     <td class='width-10'>";
         $ajaxHtml .= "         <input type='number' class='form-control' id='order_unit_price_".$product_num."' name='data[OrderSaleUnitPriceDetail][".$product_num."][order_unit_price]' tabindex='".($tabInitialNum + 1)."'>";
         $ajaxHtml .= "     </td>";
-        $ajaxHtml .= "     <td class='width-10' id='staff-code-area-".$product_num."'>";
-        $ajaxHtml .= "         <input type='hidden' id='staff_id_".$product_num."' name='data[OrderSaleUnitPriceDetail][".$product_num."][staff_id]' value='9'>";
-        $ajaxHtml .= "     </td>";
-        $ajaxHtml .= "     <td class='width-20'>";
-        $ajaxHtml .= "         <input type='text' class='form-control' id='staff_text_".$product_num."' name='data[OrderSaleUnitPriceDetail][".$product_num."][staff_text]' placeholder='担当欄' value='石塚 貞雄' readonly>";
+        $ajaxHtml .= "     <td class='width-10'>";
+        $ajaxHtml .= "         <input type='date' class='form-control' id='apply_from' name='data[OrderSaleUnitPriceDetail][".$product_num."][apply_from]' value='" . $today ."' tabindex='".($tabInitialNum + 2)."'>";
         $ajaxHtml .= "     </td>";
         $ajaxHtml .= "     <td rowspan='2' class='width-5'>";
         $ajaxHtml .= "         <button id='remove-product-btn' type='button' class='btn remove-product-btn btn-secondary' onclick='javascript:removeProduct(".$product_num.") '>削除</button>";
@@ -544,12 +548,10 @@ class OrderSaleUnitPriceController extends Controller
         //-------------------------------
         // 製品ID
         $autoCompleteProduct = "<input type='text' class='form-control product_code_input' id='product_code_".$product_num."' name='data[OrderSaleUnitPrice][".$product_num."][product_code]' tabindex='".$tabInitialNum."''>";
-        // 担当
-        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$product_num."' name='data[OrderSaleUnitPrice][".$product_num."][staff_code]' tabindex='".($tabInitialNum + 2)."' value='1009'>";
 
         $product_num = intval($product_num) + 1;
 
-        $returnArray = array($product_num, $ajaxHtml, $autoCompleteProduct, $autoCompleteStaff);
+        $returnArray = array($product_num, $ajaxHtml, $autoCompleteProduct);
 
         return $returnArray;
     }

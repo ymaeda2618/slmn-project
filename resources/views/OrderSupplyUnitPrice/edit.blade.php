@@ -7,24 +7,12 @@
 
         <form class="smn-form" id="order-supply-unit-price-create-form" method="post" action="./../OrderSupplyUnitPriceEditRegister" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
+            <br>
             <input type="hidden" id="order_supply_unit_price_id" name="data[OrderSupplyUnitPrice][id]" value="{{$orderSupplyUnitPriceList->order_supply_unit_price_id}}">
-            <div class="form-group">
-                <div class="apply_from_box">
-                    <label class="column-label" for="apply_from">適用開始日</label>
-                    <input type="date" class="form-control " id="apply_from " name="data[OrderSupplyUnitPrice][apply_from]" value="{{$orderSupplyUnitPriceList->apply_from}}">
-                </div>
-
-                <div class="apply_to_box">
-                    <label class="column-label" for="apply_to">適用終了日</label>
-                    <input type="date" class="form-control " id="apply_to " name="data[OrderSupplyUnitPrice][apply_to]" value="{{$orderSupplyUnitPriceList->apply_to}}">
-                </div>
-            </div>
-
-
             <table class="supply-from-table">
                 <tr>
-                    <th colspan="2">仕入企業</th>
-                    <th colspan="2">仕入店舗</th>
+                    <th class="column-label" colspan="2">仕入企業</th>
+                    <th class="column-label" colspan="2">仕入店舗</th>
                 </tr>
                 <tr>
                     <td class="width-20">
@@ -49,7 +37,7 @@
                 <tr>
                     <th colspan="2">製品ID</th>
                     <th>金額</th>
-                    <th colspan="2">担当</th>
+                    <th>適用開始日</th>
                     <th>削除</th>
                 </tr>
                 @foreach ($orderSupplyUnitPriceDetailList as $orderSupplyUnitPriceDetails)
@@ -61,24 +49,20 @@
                         <input type="text" class="form-control product_code_input" id="product_code_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_code]" value="{{$orderSupplyUnitPriceDetails->product_code}}" tabindex="3">
                         <input type="hidden" id="product_id_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_id]" value="{{$orderSupplyUnitPriceDetails->product_id}}">
                     </td>
-                    <td class="width-35">
+                    <td class="width-20">
                         <input type="text" class="form-control" id="product_text_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_text]" value="{{$orderSupplyUnitPriceDetails->product_name}}" placeholder="製品欄" readonly>
                     </td>
                     {{-- 製品 END --}}
                     {{-- 金額 START --}}
-                    <td class="width-20">
+                    <td class="width-10">
                         <input type="number" class="form-control" id="order_unit_price_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][order_unit_price]" value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_price}}" tabindex="4">
                     </td>
                     {{-- 金額 END --}}
-                    {{-- 担当 START --}}
+                    {{-- 適用開始日 START --}}
                     <td class="width-10">
-                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][staff_code]" value="{{$orderSupplyUnitPriceDetails->staff_code}}" tabindex="5">
-                        <input type="hidden" id="staff_id_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][staff_id]" value="{{$orderSupplyUnitPriceDetails->staff_id}}">
+                        <input type="date" class="form-control" id="apply_from" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][apply_from]" value="{{$orderSupplyUnitPriceDetails->apply_from}}" tabindex="5">
                     </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control" id="staff_text_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][staff_text]" placeholder="担当欄" value="{{$orderSupplyUnitPriceDetails->staff_name}}" readonly>
-                    </td>
-                    {{-- 担当 END --}}
+                    {{-- 適用開始日 END --}}
                     {{-- 削除 START --}}
                     <td class="width-5">
                         <button id="remove-product-btn" type="button" class="btn remove-product-btn btn-secondary" onclick='javascript:removeProduct({{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}) '>削除</button>
@@ -294,25 +278,6 @@
 
                         });
 
-                } else if (selector_code.match(/staff/)) { // 担当者IDの部分
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./../AjaxSetStaff",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
                 }
             });
 
@@ -395,32 +360,6 @@
                 }
             });
 
-            //-------------------------------------
-            // autocomplete処理 担当者ID
-            //-------------------------------------
-            $(".staff_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./../AjaxAutoCompleteStaff",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
             //--------------------
             // 伝票追加処理
             //--------------------
@@ -476,31 +415,6 @@
                         });
                         $("#product-code-area-" + product_num).append(product_code_selector);
 
-                        // 担当ID
-                        let staff_code_selector = $(data[3]).autocomplete({
-                            source: function(req, resp) {
-                                $.ajax({
-                                    headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                                    },
-                                    url: "./../AjaxAutoCompleteStaff",
-                                    type: "POST",
-                                    cache: false,
-                                    dataType: "json",
-                                    data: {
-                                        inputText: req.term
-                                    },
-                                    success: function(o) {
-                                        resp(o);
-                                    },
-                                    error: function(xhr, ts, err) {
-                                        resp(['']);
-                                    }
-                                });
-                            }
-                        });
-                        $("#staff-code-area-" + product_num).append(staff_code_selector);
-
                     })
                     .fail(function(XMLHttpRequest, textStatus, errorThrown) {
                         alert(XMLHttpRequest);
@@ -541,7 +455,6 @@
         var supply_company_code;    // 仕入企業
         var product_code;           // 製品ID
         var order_unit_price;       // 金額
-        var staff_code;             // 担当
 
         // -----------
         // 入力チェック
@@ -567,13 +480,6 @@
             order_unit_price = $("#order_unit_price_" + i).val();
             if (order_unit_price == '') {
                 alert('「金額」を入力してください。');
-                return false;
-            }
-
-            // 担当
-            staff_code = $("#staff_code_" + i).val();
-            if (staff_code == '') {
-                alert('「担当」を入力してください。');
                 return false;
             }
 

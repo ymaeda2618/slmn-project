@@ -73,7 +73,7 @@
                         <th>取引先コード</th>
                         <th class="double-width" colspan="2">取引先名</th>
                         <th>適用開始日</th>
-                        <th>適用終了日</th>
+                        <th>更新日</th>
                         <th></th>
                     </tr>
                 </tbody>
@@ -93,10 +93,10 @@
                             <!--適用開始日-->{{$orderSupplyUnitPrices->apply_from}}
                         </td>
                         <td>
-                            <!--適用終了日-->{{$orderSupplyUnitPrices->apply_to}}
+                            <!--更新日-->{{$orderSupplyUnitPrices->modified}}
                         </td>
                         @if (Home::authClerkCheck())
-                            <td>
+                            <td rowspan={{count($order_supply_unit_price_detail_arr[$orderSupplyUnitPrices->order_supply_unit_price_id])+1}}>
                                 <!--編集ボタン--><a class='edit-btn' href='./OrderSupplyUnitPriceEdit/{{$orderSupplyUnitPrices->order_supply_unit_price_id}}'>編集</a>
                             </td>
                         @endif
@@ -109,11 +109,8 @@
                         <td class="double-width" colspan="2">
                             <!--製品名-->{{$order_supply_unit_price_detail_val['product_name']}}
                         </td>
-                        <td>
-                            <!--担当者名-->{{$order_supply_unit_price_detail_val['staff_name']}}
-                        </td>
                         <td class='text-right'>
-                            <!--単価-->{{number_format($order_supply_unit_price_detail_val['order_supply_unit_price_detail_price'])}}
+                            <!--単価-->{{number_format($order_supply_unit_price_detail_val['order_supply_unit_price_detail_price'])}}円
                         </td>
                         <td>
                             <!--単位-->{{$order_supply_unit_price_detail_val['unit_name']}}

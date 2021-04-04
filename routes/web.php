@@ -165,6 +165,7 @@ Route::post('AjaxSearchSaleSlips', 'DepositController@AjaxSearchSaleSlips');
 Route::post('registerDeposit', 'DepositController@registerDeposit');
 Route::get('DepositEdit/{deposit_id}', 'DepositController@edit');
 Route::post('editRegisterDeposit', 'DepositController@editRegisterDeposit');
+Route::post('invoiceOutput', 'DepositController@invoiceOutput');
 
 // 在庫管理
 Route::get('InventoryAdjustmentIndex', 'InventoryAdjustmentController@index');
@@ -177,6 +178,38 @@ Route::post('editInventoryAdjustment', 'InventoryAdjustmentController@editInvent
 // 請求書出力
 Route::get('InvoiceOutputIndex', 'InvoiceOutputController@index');
 Route::post('InvoiceOutputIndex', 'InvoiceOutputController@index');
+Route::get('InvoiceOutputOutput', 'InvoiceOutputController@output');
+Route::post('InvoiceOutputOutput', 'InvoiceOutputController@output');
+
+// ユーザー登録
+Route::get('UserIndex', 'UserController@index');
+Route::post('UserIndex', 'UserController@index');
+Route::get('UserCreate', 'UserController@create');
+Route::post('UserCreate', 'UserController@create');
+Route::get('UserEdit/{user_id}', 'UserController@edit');
+Route::get('UserRegister', 'UserController@register');
+Route::post('UserRegister', 'UserController@register');
+Route::post('UserEditRegister', 'UserController@editRegister');
+
+// 発注単価登録
+Route::get('OrderSupplyUnitPriceIndex', 'OrderSupplyUnitPriceController@index');
+Route::post('OrderSupplyUnitPriceIndex', 'OrderSupplyUnitPriceController@index');
+Route::get('OrderSupplyUnitPriceCreate', 'OrderSupplyUnitPriceController@create');
+Route::post('OrderSupplyUnitPriceCreate', 'OrderSupplyUnitPriceController@create');
+Route::get('OrderSupplyUnitPriceEdit/{order_supply_unit_price_id}', 'OrderSupplyUnitPriceController@edit');
+Route::post('AjaxAddProduct', 'OrderSupplyUnitPriceController@AjaxAddProduct');
+Route::get('OrderSupplyUnitPriceRegister', 'OrderSupplyUnitPriceController@register');
+Route::post('OrderSupplyUnitPriceRegister', 'OrderSupplyUnitPriceController@register');
+Route::post('OrderSupplyUnitPriceEditRegister', 'OrderSupplyUnitPriceController@editRegister');
+Route::get('OrderSaleUnitPriceIndex', 'OrderSaleUnitPriceController@index');
+Route::post('OrderSaleUnitPriceIndex', 'OrderSaleUnitPriceController@index');
+Route::get('OrderSaleUnitPriceCreate', 'OrderSaleUnitPriceController@create');
+Route::post('OrderSaleUnitPriceCreate', 'OrderSaleUnitPriceController@create');
+Route::get('OrderSaleUnitPriceEdit/{order_sale_unit_price_id}', 'OrderSaleUnitPriceController@edit');
+Route::post('AjaxAddSaleProduct', 'OrderSaleUnitPriceController@AjaxAddSaleProduct');
+Route::get('OrderSaleUnitPriceRegister', 'OrderSaleUnitPriceController@register');
+Route::post('OrderSaleUnitPriceRegister', 'OrderSaleUnitPriceController@register');
+Route::post('OrderSaleUnitPriceEditRegister', 'OrderSaleUnitPriceController@editRegister');
 
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {

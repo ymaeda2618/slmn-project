@@ -1,6 +1,5 @@
 <?php 
     $today = date('Y-m-d');
-    $today = '2020-11-01';
 ?>
 @extends('layouts.app')
 

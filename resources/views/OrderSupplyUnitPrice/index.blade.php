@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">売上一覧</div>
+        <div class="top-title">仕入発注単価一覧</div>
 
         <!--検索エリア-->
         <div class='search-area'>
@@ -13,16 +13,12 @@
                     <tbody>
                         <tr>
                             <td>
-                                <div class="table-th">対象日付</div>
-                                <div class="table-td radio_box">
-                                    <label class="radio-label"><input type="radio" name="data[SaleSlip][date_type]" value="1" {{$check_str_slip_date}}> 伝票日付</label>
-                                    <label class="radio-label"><input type="radio" name="data[SaleSlip][date_type]" value="2" {{$check_str_deliver_date}}> 納品日付</label>
+                                <div class="table-th">適用日付</div>
+                                <div class="table-td">
+                                    <input type="date" class="search-control" id="apply_from" name="data[OrderSupplyUnitPrice][apply_from]" value="{{$condition_date_from}}" tabindex="1">
                                 </div>
                                 <div class="table-td">
-                                    <input type="date" class="search-control" id="sale_date_from" name="data[SaleSlip][sale_date_from]" value="{{$condition_date_from}}" tabindex="1">
-                                </div>
-                                <div class="table-td">
-                                    <input type="date" class="search-control" id="sale_date_to" name="data[SaleSlip][sale_date_to]" value="{{$condition_date_to}}" tabindex="2">
+                                    <input type="date" class="search-control" id="apply_to" name="data[OrderSupplyUnitPrice][apply_to]" value="{{$condition_date_to}}" tabindex="2">
                                 </div>
                             </td>
                         </tr>
@@ -30,19 +26,19 @@
                             <td>
                                 <div class="table-th">取引先企業</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" value="{{$condition_company_code}}" tabindex="3">
-                                    <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]" value="{{$condition_company_id}}">
+                                    <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[OrderSupplyUnitPrice][supply_company_code]" value="{{$condition_company_code}}" tabindex="3">
+                                    <input type="hidden" id="supply_company_id" name="data[OrderSupplyUnitPrice][supply_company_id]" value="{{$condition_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="sale_company_text" name="data[SaleSlip][sale_company_text]" value="{{$condition_company_text}}" readonly>
+                                    <input type="text" class="search-control" id="supply_company_text" name="data[OrderSupplyUnitPrice][supply_company_text]" value="{{$condition_company_text}}" readonly>
                                 </div>
                                 <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[SaleSlip][sale_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="sale_shop_id" name="data[SaleSlip][sale_shop_id]" value="{{$condition_shop_id}}">
+                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[OrderSupplyUnitPrice][supply_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
+                                    <input type="hidden" id="supply_shop_id" name="data[OrderSupplyUnitPrice][supply_shop_id]" value="{{$condition_shop_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$condition_shop_text}}" readonly>
+                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[OrderSupplyUnitPrice][supply_shop_text]" value="{{$condition_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -50,20 +46,11 @@
                             <td>
                                 <div class="table-th">仕入製品</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[SaleSlipDetail][product_code]" value="{{$condition_product_code}}" tabindex="5">
-                                    <input type="hidden" id="product_id" name="data[SaleSlipDetail][product_id]" value="{{$condition_product_id}}">
+                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[OrderSupplyUnitPrice][product_code]" value="{{$condition_product_code}}" tabindex="5">
+                                    <input type="hidden" id="product_id" name="data[OrderSupplyUnitPrice][product_id]" value="{{$condition_product_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="product_text" name="data[SaleSlipDetail][product_text]" value="{{$condition_product_text}}" readonly>
-                                </div>
-                                <div class="table-th">状態</div>
-                                <div class="table-double-td">
-                                    <select class="search-control " id="sale_submit_type " name="data[SaleSlip][sale_submit_type] ">
-                                    <option value="0 " selected>全て</option>
-                                    <option value="1 ">登録済</option>
-                                    <option value="2 ">一時保存</option>
-                                </select>
-                                    <input type='hidden' id='sale_submit_type_selected' value='{{$condition_submit_type}}'>
+                                    <input type="text" class="search-control" id="product_text" name="data[OrderSupplyUnitPrice][product_text]" value="{{$condition_product_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -78,159 +65,58 @@
             </form>
         </div>
 
-        <!--<div class='search-area'>
-            <div class='div-st'>売上先店舗 検索エリア</div>
-            <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
-                {{ csrf_field() }}
-                <table>
-                    <tbody>
-                        <tr>
-                            <th>売上日付</th>
-                            <td>
-                                <input type="date" class="form-control" id="sale_date_from" name="data[SaleSlip][sale_date_from]" value="{{$condition_date_from}}" tabindex="1">
-                            </td>
-                            <td>
-                                <input type="date" class="form-control" id="sale_date_to" name="data[SaleSlip][sale_date_to]" value="{{$condition_date_to}}" tabindex="2">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>売上企業</th>
-                            <td class="width-20">
-                                <input type="text" class="form-control sale_company_code_input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" value="{{$condition_company_code}}" tabindex="3">
-                                <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]" value="{{$condition_company_id}}">
-                            </td>
-                            <td class="width-30">
-                                <input type="text" class="form-control" id="sale_company_text" name="data[SaleSlip][sale_company_text]" value="{{$condition_company_text}}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>売上店舗</th>
-                            <td class="width-20">
-                                <input type="text" class="form-control sale_shop_code_input" id="sale_shop_code" name="data[SaleSlip][sale_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                <input type="hidden" id="sale_shop_id" name="data[SaleSlip][sale_shop_id]" value="{{$condition_shop_id}}">
-                            </td>
-                            <td class="width-30">
-                                <input type="text" class="form-control" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$condition_shop_text}}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>売上製品</th>
-                            <td class="width-10">
-                                <input type="text" class="form-control product_code_input" id="product_code" name="data[SaleSlipDetail][product_code]" value="{{$condition_product_code}}" tabindex="5">
-                                <input type="hidden" id="product_id" name="data[SaleSlipDetail][product_id]" value="{{$condition_product_id}}">
-                            </td>
-                            <td class="width-20">
-                                <input type="text" class="form-control" id="product_text" name="data[SaleSlipDetail][product_text]" value="{{$condition_product_text}}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>状態</th>
-                            <td class="width-10" colspan="2">
-                                <select class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]">
-                                    <option value="0" selected>全て</option>
-                                    <option value="1">登録済</option>
-                                    <option value="2">一時保存</option>
-                                    <option value="3">仕入伝票未設定</option>
-                                </select>
-                                <input type='hidden' id='sale_submit_type_selected' value='{{$condition_submit_type}}'>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class='search-btn-area'>
-                    <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索'>
-                </div>
-                <div class='initial-btn-area'>
-                    <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット'>
-                </div>
-            </form>
-        </div>-->
-
         <!--一覧表示エリア-->
         <div class='list-area'>
             <table class='index-table'>
                 <tbody>
                     <tr>
-                        <th rowspan="2 ">種別.</th>
-                        <th>伝票No.</th>
-                        <th>伝票日付</th>
                         <th>取引先コード</th>
-                        <th class="forth-width " colspan="4 ">取引先名</th>
-                        <th class="double-width " colspan="2 " rowspan="2 "></th>
-                    </tr>
-                    <tr>
-                        <th>納品日</th>
-                        <th class="double-width " colspan="2 ">登録日</th>
-                        <th class="double-width " colspan="2 ">配送費+調整額</th>
-                        <th class="double-width " colspan="2 ">税抜商品合計</th>
+                        <th class="double-width" colspan="2">取引先名</th>
+                        <th>適用開始日</th>
+                        <th>適用終了日</th>
+                        <th></th>
                     </tr>
                 </tbody>
             </table>
 
-            @foreach ($saleSlipList as $saleSlips)
+            @foreach ($orderSupplyUnitPriceList as $orderSupplyUnitPrices)
             <table class='index-table'>
                 <tbody>
                     <tr>
-                        <!--種別-->
-                        @if ($saleSlips->sale_submit_type == 1)
-                        <td class="regis-complete" rowspan="<?php echo ($sale_slip_detail_count_arr[$saleSlips->sale_slip_id] + 2); ?>">登録済</td>
-                        @else
-                        <td class="regis-temp" rowspan="<?php echo ($sale_slip_detail_count_arr[$saleSlips->sale_slip_id] + 2); ?>">一時保存</td>
-                        @endif
                         <td>
-                            <!--伝票NO-->{{$saleSlips->sale_slip_id}}
+                            <!--取引先コード-->{{$orderSupplyUnitPrices->supply_company_code}}
+                        </td>
+                        <td class="double-width bold-tr" colspan="2">
+                            <!--取引先名-->{{$orderSupplyUnitPrices->supply_company_name}}
                         </td>
                         <td>
-                            <!--伝票日付-->{{$saleSlips->sale_slip_date}}
+                            <!--適用開始日-->{{$orderSupplyUnitPrices->apply_from}}
                         </td>
                         <td>
-                            <!--取引先コード-->{{$saleSlips->sale_company_code}}
+                            <!--適用終了日-->{{$orderSupplyUnitPrices->apply_to}}
                         </td>
-                        <td class="forth-width bold-tr" colspan="4">
-                            <!--取引先名-->{{$saleSlips->sale_company_name}}
-                        </td>
-                        @if (Home::authClerkCheck()) 
-                            <td class="double-width" colspan="2" rowspan="2">
-                                <!--編集ボタン--><a class='edit-btn' href='./SaleSlipEdit/{{$saleSlips->sale_slip_id}}'>編集</a>
+                        @if (Home::authClerkCheck())
+                            <td>
+                                <!--編集ボタン--><a class='edit-btn' href='./OrderSupplyUnitPriceEdit/{{$orderSupplyUnitPrices->order_supply_unit_price_id}}'>編集</a>
                             </td>
                         @endif
                     </tr>
-                    <tr>
-                        <td class="bold-tr">
-                            <!--納品日-->{{$saleSlips->sale_slip_delivery_date}}
-                        </td>
-                        <td class="double-width" colspan="2">
-                            <!--登録日付-->{{$saleSlips->sale_slip_modified}}
-                        </td>
-                        <td class="double-width" colspan="2">
-                            <!--調整額-->{{$saleSlips->delivery_price + $saleSlips->adjust_price}}
-                        </td>
-                        <td class="double-width" colspan="2">
-                            <!--総合計-->{{$saleSlips->notax_sub_total}}
-                        </td>
-                    </tr>
-                    @foreach ($sale_slip_detail_arr[$saleSlips->sale_slip_id] as $sale_slip_detail_key => $sale_slip_detail_val)
+                    @foreach ($order_supply_unit_price_detail_arr[$orderSupplyUnitPrices->order_supply_unit_price_id] as $order_supply_unit_price_detail_key => $order_supply_unit_price_detail_val)
                     <tr>
                         <td>
-                            <!--製品コード-->{{$sale_slip_detail_val['product_code']}}
+                            <!--製品コード-->{{$order_supply_unit_price_detail_val['product_code']}}
                         </td>
                         <td class="double-width" colspan="2">
-                            <!--製品名-->{{$sale_slip_detail_val['product_name']}}
-                        </td>
-                        <td class="double-width" colspan="2">
-                            <!--規格-->{{$sale_slip_detail_val['standard_name']}}
+                            <!--製品名-->{{$order_supply_unit_price_detail_val['product_name']}}
                         </td>
                         <td>
-                            <!--担当者名-->{{$sale_slip_detail_val['staff_name']}}
+                            <!--担当者名-->{{$order_supply_unit_price_detail_val['staff_name']}}
+                        </td>
+                        <td class='text-right'>
+                            <!--単価-->{{number_format($order_supply_unit_price_detail_val['order_supply_unit_price_detail_price'])}}
                         </td>
                         <td>
-                            <!--単価-->{{$sale_slip_detail_val['sale_slip_detail_unit_price']}}
-                        </td>
-                        <td>
-                            <!--数量-->{{$sale_slip_detail_val['sale_slip_detail_unit_num']}}
-                        </td>
-                        <td>
-                            <!--単位-->{{$sale_slip_detail_val['unit_name']}}
+                            <!--単位-->{{$order_supply_unit_price_detail_val['unit_name']}}
                         </td>
                     </tr>
                     @endforeach
@@ -240,7 +126,7 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            {{ $saleSlipList->links() }}
+            {{ $orderSupplyUnitPriceList->links() }}
         </div>
 
     </div>
@@ -254,9 +140,9 @@
         jQuery(window).load(function() {
 
             // 検索されて選択状態の企業を取得
-            var sale_submit_type_selected = $("#sale_submit_type_selected").val();
+            var supply_submit_type_selected = $("#supply_submit_type_selected").val();
             // 検索条件で設定された企業を設定
-            $('#sale_submit_type').val(sale_submit_type_selected);
+            $('#supply_submit_type').val(supply_submit_type_selected);
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
@@ -284,10 +170,7 @@
 
                     } else {
 
-                        var this_val = $('#search-btn').val();
-                        $('#search-btn').val("");
                         $('#search-btn').focus();
-                        $('#search-btn').val(this_val);
                     }
 
                     return false;
@@ -325,15 +208,15 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 仕入企業ID
             //-------------------------------------
-            $(".sale_company_code_input").autocomplete({
+            $(".supply_company_code_input").autocomplete({
                 source: function(req, resp) {
                     $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteSaleCompany",
+                        url: "./AjaxAutoCompleteSupplyCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -351,15 +234,15 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上店舗ID
+            // autocomplete処理 仕入店舗ID
             //-------------------------------------
-            $(".sale_shop_code_input").autocomplete({
+            $(".supply_shop_code_input").autocomplete({
                 source: function(req, resp) {
                     $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteSaleShop",
+                        url: "./AjaxAutoCompleteSupplyShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -421,13 +304,13 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/sale_company/)) { // 売上先企業
+                if (selector_code.match(/supply_company/)) { // 仕入先企業
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetSaleCompany",
+                            url: "./AjaxSetSupplyCompany",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -441,13 +324,13 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
+                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetSaleShop",
+                            url: "./AjaxSetSupplyShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -689,5 +572,9 @@
 
     .bold-tr {
         font-weight: bold;
+    }
+
+    .text-right {
+        text-align: right;
     }
 </style>

@@ -93,7 +93,7 @@
                             <!--適用開始日-->{{$orderSaleUnitPrices->apply_from}}
                         </td>
                         <td>
-                            <!--更新日-->{{$orderSaleUnitPrices->modified}}
+                            <!--更新日-->{{date('Y-m-d H:i', strtotime($orderSaleUnitPrices->modified))}}
                         </td>
                         @if (Home::authClerkCheck())
                             <td rowspan={{count($order_sale_unit_price_detail_arr[$orderSaleUnitPrices->order_sale_unit_price_id])+1}}>

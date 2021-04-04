@@ -172,13 +172,13 @@ class OrderSupplyUnitPriceController extends Controller
             // ===================
             $orderSupplyUnitPriceDetailList = DB::table('order_supply_unit_price_details AS OrderSupplyUnitPriceDetail')
             ->select(
-                'OrderSupplyUnitPrice.id          AS order_supply_unit_price_id',
-                'Product.code                     AS product_code',
-                'Product.name                     AS product_name',
-                'Product.tax_id                   AS product_tax_id',
-                'OrderSupplyUnitPriceDetail.id    AS order_supply_unit_price_detail_id',
-                'OrderSupplyUnitPriceDetail.price AS order_supply_unit_price_detail_price',
-                'Unit.name                        AS unit_name'
+                'OrderSupplyUnitPrice.id                AS order_supply_unit_price_id',
+                'Product.code                           AS product_code',
+                'Product.name                           AS product_name',
+                'Product.tax_id                         AS product_tax_id',
+                'OrderSupplyUnitPriceDetail.id          AS order_supply_unit_price_detail_id',
+                'OrderSupplyUnitPriceDetail.notax_price AS order_supply_unit_price_detail_price',
+                'Unit.name                              AS unit_name'
             )
             ->join('order_supply_unit_prices as OrderSupplyUnitPrice', function ($join) {
                 $join->on('OrderSupplyUnitPrice.id', '=', 'OrderSupplyUnitPriceDetail.order_supply_unit_price_id')
@@ -309,24 +309,24 @@ class OrderSupplyUnitPriceController extends Controller
 
             foreach ($OrderSupplyUnitPriceDetailData as $OrderSupplyUnitPriceDetail) {
 
-                // 税抜計算
+                // 税込計算
                 $product_data = DB::table('products')->where('id', '=', $OrderSupplyUnitPriceDetail['product_id'])->get();
                 $tax_id = $product_data[0]->tax_id;
-                $notax_price = 0;
+                $price = 0;
                 if ($tax_id == 1) {
                     // 8%
-                    $notax_price = round($OrderSupplyUnitPriceDetail['order_unit_price'] / 1.08);
+                    $price = round($OrderSupplyUnitPriceDetail['order_unit_price'] * 1.08);
                 } else {
                     // 10%
-                    $notax_price = round($OrderSupplyUnitPriceDetail['order_unit_price'] / 1.1);
+                    $price = round($OrderSupplyUnitPriceDetail['order_unit_price'] * 1.1);
                 }
 
                 $insertDetailParams[] = [
                     'order_supply_unit_price_id' => $orderSupplyUnitPriceId,
                     'product_id'                 => $OrderSupplyUnitPriceDetail['product_id'],
                     'apply_from'                 => $OrderSupplyUnitPriceDetail['apply_from'],
-                    'notax_price'                => $notax_price,
-                    'price'                      => $OrderSupplyUnitPriceDetail['order_unit_price'],
+                    'notax_price'                => $OrderSupplyUnitPriceDetail['order_unit_price'],
+                    'price'                      => $price,
                     'active'                     => 1,
                     'created_user_id'            => $userInfoId,
                     'created'                    => Carbon::now(),
@@ -389,13 +389,13 @@ class OrderSupplyUnitPriceController extends Controller
         // -----------------
         $orderSupplyUnitPriceDetailList = DB::table('order_supply_unit_price_details AS OrderSupplyUnitPriceDetail')
         ->select(
-            'OrderSupplyUnitPrice.id               AS order_supply_unit_price_id',
-            'Product.code                          AS product_code',
-            'Product.name                          AS product_name',
-            'Product.id                            AS product_id',
-            'OrderSupplyUnitPriceDetail.id         AS order_supply_unit_price_detail_id',
-            'OrderSupplyUnitPriceDetail.price      AS order_supply_unit_price_detail_price',
-            'OrderSupplyUnitPriceDetail.apply_from AS apply_from'
+            'OrderSupplyUnitPrice.id                AS order_supply_unit_price_id',
+            'Product.code                           AS product_code',
+            'Product.name                           AS product_name',
+            'Product.id                             AS product_id',
+            'OrderSupplyUnitPriceDetail.id          AS order_supply_unit_price_detail_id',
+            'OrderSupplyUnitPriceDetail.notax_price AS order_supply_unit_price_detail_price',
+            'OrderSupplyUnitPriceDetail.apply_from  AS apply_from'
         )
         ->join('order_supply_unit_prices as OrderSupplyUnitPrice', function ($join) {
             $join->on('OrderSupplyUnitPrice.id', '=', 'OrderSupplyUnitPriceDetail.order_supply_unit_price_id')
@@ -460,24 +460,24 @@ class OrderSupplyUnitPriceController extends Controller
 
             foreach($OrderSupplyUnitPriceDetailDatas as $OrderSupplyUnitPriceDetail){
 
-                // 税抜計算
+                // 税込計算
                 $product_data = DB::table('products')->where('id', '=', $OrderSupplyUnitPriceDetail['product_id'])->get();
                 $tax_id = $product_data[0]->tax_id;
-                $notax_price = 0;
+                $price = 0;
                 if ($tax_id == 1) {
                     // 8%
-                    $notax_price = round($OrderSupplyUnitPriceDetail['order_unit_price'] / 1.08);
+                    $price = round($OrderSupplyUnitPriceDetail['order_unit_price'] * 1.08);
                 } else {
                     // 10%
-                    $notax_price = round($OrderSupplyUnitPriceDetail['order_unit_price'] / 1.1);
+                    $price = round($OrderSupplyUnitPriceDetail['order_unit_price'] * 1.1);
                 }
 
                 $detail_datas[] = [
                     'order_supply_unit_price_id' => $OrderSupplyUnitPriceDatas['id'],
                     'product_id'                 => $OrderSupplyUnitPriceDetail['product_id'],
                     'apply_from'                 => $OrderSupplyUnitPriceDetail['apply_from'],
-                    'notax_price'                => $notax_price,
-                    'price'                      => $OrderSupplyUnitPriceDetail['order_unit_price'],
+                    'notax_price'                => $OrderSupplyUnitPriceDetail['order_unit_price'],
+                    'price'                      => $price,
                     'active'                     => 1,
                     'created_user_id'            => $user_info_id,
                     'created'                    => Carbon::now(),

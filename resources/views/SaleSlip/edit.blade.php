@@ -10,7 +10,7 @@
             <div class="form-group">
                 <div class="sale_date_box">
                     <label class="column-label" for="sale_date">売上日付</label>
-                    <input type="date" class="form-control " id="sale_date " name="data[SaleSlip][sale_date]" value="{{$SaleSlipList->sale_slip_sale_date}}">
+                    <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]" value="{{$SaleSlipList->sale_slip_sale_date}}">
                 </div>
 
                 <div class="delivery_date_box">
@@ -75,6 +75,7 @@
                 @foreach ($SaleSlipDetailList as $SaleSlipDetails)
                 <?php $tabInitialNum = intval(9*($SaleSlipDetails->sort) + 3); ?>
                 <tr id="slip-partition-{{$SaleSlipDetails->sort}}" class="partition-area"></tr>
+                <input type="hidden" name="sort" id="sort" value="{{$SaleSlipDetails->sort}}">
                 <input type="hidden" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][id]" value="{{$SaleSlipDetails->sale_slip_detail_id}}">
                 <tr id="slip-upper-{{$SaleSlipDetails->sort}}">
                     <td class="width-10">
@@ -650,6 +651,9 @@
                             $("#" + selector_code).val(data[0]);
                             $("#" + selector_id).val(data[1]);
                             $("#" + selector_text).val(data[2]);
+
+                            // 仕入発注単価の設定
+                            setMultiOrderSaleUnitPirce();
                         });
 
                 } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
@@ -729,6 +733,9 @@
                                 $("#" + selector_unit_num).val('');
                                 priceNumChange(parseInt(selector_id.replace('product_id_', ''), 10));
                             }
+
+                            // 発注単価を設定
+                            setOrderSaleUnitPrice(data[1], selector_unit_price);
 
                         });
 
@@ -1260,6 +1267,13 @@
                 }
             });
 
+            // ----------------------------------
+            // 売上日付が変更された場合、単価を変更する
+            // ----------------------------------
+            $('#sale_date').change(function() {
+                setMultiOrderSaleUnitPirce();
+            });
+
         });
     })(jQuery);
 
@@ -1761,6 +1775,84 @@
         }
 
         return dotPosition;
+    }
+
+    /**
+     * 仕入発注単価の設定
+     */
+     function setOrderSaleUnitPrice(product_id, selector_unit_price) {
+
+        // 画面から企業IDと仕入日付を取得
+        var company_id = $('#sale_company_id').val();
+        var sale_date = $('#sale_date').val();
+
+        // company_idが設定されていない場合は何もしない
+        if (company_id == null || company_id == '' || company_id == 0) {
+            return;
+        }
+
+        // パラメータの設定
+        var fd = new FormData();
+        fd.append("company_id", company_id);
+        fd.append("product_id", product_id);
+        fd.append("sale_date", sale_date);
+
+        $.ajax({
+                headers: {
+                    "X-CSRF-TOKEN": $("[name='_token']").val()
+                },
+                url: "./../getOrderSaleUnitPrice",
+                type: "POST",
+                dataType: "JSON",
+                data: fd,
+                processData: false,
+                contentType: false
+            })
+            .done(function(data) {
+
+                var price = '';
+                if (data != '' && data != null) {
+                    price = data;
+                }
+
+                // 単価を設定
+                var selector_unit_price_val = $("#" + selector_unit_price).val();
+                if (!selector_unit_price_val) {
+                    $("#" + selector_unit_price).val(price);
+                } else if (selector_unit_price_val && price && price !== selector_unit_price_val) {
+                    $("#" + selector_unit_price).val(price);
+                }
+
+
+            })
+            .fail(function(XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest);
+                alert(textStatus);
+                alert(errorThrown);
+                // 送信失敗
+                alert("失敗しました。");
+            });
+
+    }
+
+    function setMultiOrderSaleUnitPirce() {
+        // 伝票数と企業IDを取得
+        var slip_num = $('#slip_num').val();
+        var company_id = $('#sale_company_id').val();
+
+        // 伝票数が0の時は何もしない
+        if (slip_num == 0) return;
+
+        $('.partition-area').each(function(index, element){
+
+            // product_idを取得
+            var product_id = $('#product_id_' + index).val();
+
+            // セレクタ
+            var selector_unit_price = 'unit_price_' + index;
+
+            setOrderSaleUnitPrice(product_id, selector_unit_price);
+        });
     }
 
 </script>

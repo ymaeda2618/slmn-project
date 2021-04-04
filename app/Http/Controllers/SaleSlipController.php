@@ -1748,6 +1748,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 = '';
         $ajaxHtml1 .= " <tr id='slip-partition-".$slip_num."' class='partition-area'>";
         $ajaxHtml1 .= " </tr>";
+        $ajaxHtml1 .= "<input type='hidden' name='sort' id='sort' value='".$slip_num."'>";
         $ajaxHtml1 .= " <tr id='slip-upper-".$slip_num."'>";
         $ajaxHtml1 .= "     <td class='width-10' id='product-code-area-".$slip_num."'>";
         $ajaxHtml1 .= "         <input type='hidden' id='product_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][product_id]'>";
@@ -2088,5 +2089,44 @@ class SaleSlipController extends Controller
         }
 
         return $returnArray;
+    }
+
+    /**
+     * 売上発注単価の取得
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function getOrderSaleUnitPrice(Request $request) {
+
+        // パラメータの取得
+        $companyId = $request->company_id;
+        $productId = $request->product_id;
+        $saleDate = $request->sale_date;
+
+        // データの取得
+        $orderSaleUnitPriceDetails = DB::table('order_sale_unit_price_details AS OrderSaleUnitPriceDetails')
+        ->select(
+            'OrderSaleUnitPriceDetails.notax_price AS notax_price'
+        )
+        ->join('order_sale_unit_prices AS OrderSaleUnitPrice', function ($join) {
+            $join->on('OrderSaleUnitPriceDetails.order_sale_unit_price_id', '=', 'OrderSaleUnitPrice.id');
+        })
+        ->where([
+            ['OrderSaleUnitPriceDetails.apply_from', '<=', $saleDate],
+            ['OrderSaleUnitPriceDetails.product_id', '=', $productId],
+            ['OrderSaleUnitPrice.company_id', '=', $companyId],
+            ['OrderSaleUnitPriceDetails.active', '=', '1'],
+            ['OrderSaleUnitPrice.active', '=', '1'],
+        ])
+        ->orderBy('OrderSaleUnitPriceDetails.apply_from', 'desc')
+        ->limit(1)
+        ->get();
+
+        $orderSaleUnitPirce = 0;
+        if (isset($orderSaleUnitPriceDetails[0]->notax_price))
+            $orderSaleUnitPirce = $orderSaleUnitPriceDetails[0]->notax_price;
+
+        return $orderSaleUnitPirce;
+
     }
 }

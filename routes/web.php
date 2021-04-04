@@ -118,6 +118,7 @@ Route::post('AjaxSetDelivery', 'SupplySlipController@AjaxSetDelivery');
 Route::post('registerSupplySlips', 'SupplySlipController@registerSupplySlips');
 Route::get('SupplySlipEdit/{supply_slip_id}', 'SupplySlipController@edit');
 Route::post('editRegisterSupplySlips', 'SupplySlipController@editRegister');
+Route::post('getOrderSupplyUnitPrice', 'SupplySlipController@getOrderSupplyUnitPrice');
 
 // 売上登録
 Route::get('SaleSlipIndex', 'SaleSlipController@index');
@@ -147,6 +148,7 @@ Route::post('registerSaleSlips', 'SaleSlipController@registerSaleSlips');
 Route::get('SaleSlipEdit/{supply_slip_id}', 'SaleSlipController@edit');
 Route::post('editRegisterSaleSlips', 'SaleSlipController@editRegister');
 Route::post('AjaxShowSupplySlip', 'SaleSlipController@AjaxShowSupplySlip');
+Route::post('getOrderSaleUnitPrice', 'SaleSlipController@getOrderSaleUnitPrice');
 
 // 入出金管理関連
 Route::get('WithdrawalIndex', 'WithdrawalController@index');

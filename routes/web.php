@@ -168,6 +168,7 @@ Route::post('registerDeposit', 'DepositController@registerDeposit');
 Route::get('DepositEdit/{deposit_id}', 'DepositController@edit');
 Route::post('editRegisterDeposit', 'DepositController@editRegisterDeposit');
 Route::post('invoiceOutput', 'DepositController@invoiceOutput');
+Route::get('invoiceOutput/{deposit_id}', 'DepositController@invoiceOutput');
 
 // 在庫管理
 Route::get('InventoryAdjustmentIndex', 'InventoryAdjustmentController@index');

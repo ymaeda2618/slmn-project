@@ -743,11 +743,7 @@ class DepositController extends Controller
     /**
      * 請求書印刷
      */
-    public function invoiceOutput(Request $request) {
-
-        // リクエストパラメータ取得
-        $reqParams = $request->data['Deposit'];
-        $depositId = array_key_first($reqParams);
+    public function invoiceOutput($depositId) {
 
         // 請求情報を取得
         $depositList = DB::table('deposits AS Deposit')

@@ -67,8 +67,7 @@
                             <td>{{$deposit->sale_company_name}}</td>
                             <td>{{number_format($deposit->amount)}}</td>
                             @if (Home::authClerkCheck()) <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
-                            {{--  <td><input type='submit' class='output-btn btn btn-primary' name='output-btn' id="output-btn-{{$deposit->deposit_id}}" value='印刷'></td>  --}}
-                            <td><button type="submit" class="output-btn btn btn-primary" name="data[Deposit][{{$deposit->deposit_id}}][id]" id="output-btn-{{$deposit->deposit_id}}" value="{{$deposit->deposit_id}}">印刷</button></td>
+                            <td><a class='output-btn btn btn-primary' href='./invoiceOutput/{{$deposit->deposit_id}}' target='_blank' rel='noopener noreferrer'>印刷</a></td>
                         </tr>
                         @endforeach
                     </tbody>

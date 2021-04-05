@@ -10,7 +10,7 @@
             <div class="form-group">
                 <div class="sale_date_box">
                     <label class="column-label" for="sale_date">売上日付</label>
-                    <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]" value="{{$SaleSlipList->sale_slip_sale_date}}">
+                    <input type="date" class="form-control " id="sale_date " name="data[SaleSlip][sale_date]" value="{{$SaleSlipList->sale_slip_sale_date}}">
                 </div>
 
                 <div class="delivery_date_box">
@@ -50,6 +50,7 @@
 
             <table class="slip-table">
                 <tr>
+                    <th rowspan="3">No.</th>
                     <th colspan="2">製品ID</th>
                     <th colspan="2">単価</th>
                     <th colspan="2">担当</th>
@@ -59,17 +60,14 @@
                 <tr>
                     <th colspan="2">規格</th>
                     <th colspan="2">数量</th>
-                    <th colspan="3">発注数量</th>
-                </tr>
-                <tr>
-                    <th colspan="2">品質</th>
-                    <th colspan="2">金額</th>
                     <th>対応仕入</th>
                     <th>対象件数</th>
                     <th>対象数量</th>
                 </tr>
                 <tr>
-                    <th colspan="7">摘要</th>
+                    <th colspan="2">品質</th>
+                    <th colspan="2">金額</th>
+                    <th colspan="3">摘要</th>
                 </tr>
 
                 @foreach ($SaleSlipDetailList as $SaleSlipDetails)
@@ -78,6 +76,7 @@
                 <input type="hidden" name="sort" id="sort" value="{{$SaleSlipDetails->sort}}">
                 <input type="hidden" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][id]" value="{{$SaleSlipDetails->sale_slip_detail_id}}">
                 <tr id="slip-upper-{{$SaleSlipDetails->sort}}">
+                    <td class="index-td" rowspan="4">{{$SaleSlipDetails->sort}}</td>
                     <td class="width-10">
                         <input type="text" class="form-control product_code_input" id="product_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_code]" value="{{$SaleSlipDetails->product_code}}" tabindex="{{ $tabInitialNum }}">
                         <input type="hidden" id="product_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_id]" value="{{$SaleSlipDetails->product_id}}">
@@ -191,7 +190,7 @@
                     </td>
                 </tr>
                 <tr id="slip-most-lower-{{$SaleSlipDetails->sort}}">
-                    <td>
+                    <td class='subtotal-text'>
                         小計
                     </td>
                     <td colspan="3">
@@ -1748,7 +1747,7 @@
         var dotPosition2 = getDotPosition(value2);
 
         // 位置の値が大きい方（小数点以下の位が多い方）の位置を取得
-        var max = Math.max(dotPosition1,dotPosition2);
+        var max = Math.max(dotPosition1, dotPosition2);
 
         // 大きい方に小数の桁を合わせて文字列化、
         // 小数点を除いて整数の値にする
@@ -1756,22 +1755,22 @@
         var intValue2 = parseInt((parseFloat(value2).toFixed(max) + '').replace('.', ''));
 
         // 10^N の値を計算
-        var power = Math.pow(100,max);
+        var power = Math.pow(100, max);
 
         // 整数値で引き算した後に10^Nで割る
         return (intValue1 * intValue2) / power;
     }
 
-    function getDotPosition(value){
+    function getDotPosition(value) {
 
         // 数値のままだと操作できないので文字列化する
         var strVal = String(value);
         var dotPosition = 0;
 
         //　小数点が存在するか確認
-        if(strVal.lastIndexOf('.') === -1){
-        // 小数点があったら位置を取得
-        dotPosition = (strVal.length-1) - strVal.lastIndexOf('.');
+        if (strVal.lastIndexOf('.') === -1) {
+            // 小数点があったら位置を取得
+            dotPosition = (strVal.length - 1) - strVal.lastIndexOf('.');
         }
 
         return dotPosition;
@@ -1780,7 +1779,7 @@
     /**
      * 仕入発注単価の設定
      */
-     function setOrderSaleUnitPrice(product_id, selector_unit_price) {
+    function setOrderSaleUnitPrice(product_id, selector_unit_price) {
 
         // 画面から企業IDと仕入日付を取得
         var company_id = $('#sale_company_id').val();
@@ -1843,7 +1842,7 @@
         // 伝票数が0の時は何もしない
         if (slip_num == 0) return;
 
-        $('.partition-area').each(function(index, element){
+        $('.partition-area').each(function(index, element) {
 
             // product_idを取得
             var product_id = $('#product_id_' + index).val();
@@ -1854,7 +1853,6 @@
             setOrderSaleUnitPrice(product_id, selector_unit_price);
         });
     }
-
 </script>
 <style>
     /* 共通 */
@@ -1974,6 +1972,18 @@
     .partition-area {
         width: 100%;
         height: 1.0em;
+    }
+
+    .index-td {
+        font-size: 14px;
+        background-color: #f0d2d2;
+        font-weight: bold;
+        border-left: 3px solid #cb0000!important;
+        text-align: center;
+    }
+
+    .subtotal-text {
+        text-align: center;
     }
     /*modal関連*/
 

@@ -1750,6 +1750,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= " </tr>";
         $ajaxHtml1 .= "<input type='hidden' name='sort' id='sort' value='".$slip_num."'>";
         $ajaxHtml1 .= " <tr id='slip-upper-".$slip_num."'>";
+        $ajaxHtml1 .= "     <td class='index-td' rowspan='4'>".$slip_num."</td>";
         $ajaxHtml1 .= "     <td class='width-10' id='product-code-area-".$slip_num."'>";
         $ajaxHtml1 .= "         <input type='hidden' id='product_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][product_id]'>";
         $ajaxHtml1 .= "     </td>";
@@ -1845,7 +1846,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= "     </td>";
         $ajaxHtml1 .= " </tr>";
         $ajaxHtml1 .= " <tr id='slip-most-lower-".$slip_num."'>";
-        $ajaxHtml1 .= "     <td>小計</td>";
+        $ajaxHtml1 .= "     <td class='subtotal-text'>小計</td>";
         $ajaxHtml1 .= "     <td colspan='3'>";
         $ajaxHtml1 .= "         <input type='text' class='form-control' id='notax_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][notax_price]' value='0' readonly>";
         $ajaxHtml1 .= "     </td>";

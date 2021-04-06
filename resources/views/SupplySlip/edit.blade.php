@@ -73,8 +73,8 @@
                 <?php $tabInitialNum = intval(9*($SupplySlipDetails->sort) + 3); ?>
                 <tr id="slip-partition-{{$SupplySlipDetails->sort}}" class="partition-area"></tr>
                 <input type="hidden" name="sort" id="sort" value="{{$SupplySlipDetails->sort}}">
-                <input type="hidden" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][id]" value="{{$SupplySlipDetails->supply_slip_detail_id}}">
                 <tr id="slip-upper-{{$SupplySlipDetails->sort}}">
+                    <input type="hidden" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][id]" value="{{$SupplySlipDetails->supply_slip_detail_id}}">
                     <td class="index-td" rowspan="4">{{$SupplySlipDetails->sort}}</td>
                     <td class="width-10">
                         <input type="text" class="form-control product_code_input" id="product_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_code]" value="{{$SupplySlipDetails->product_code}}" tabindex="{{ $tabInitialNum }}">
@@ -1380,10 +1380,6 @@
         $("#slip-middle-" + remove_num).remove();
         $("#slip-lower-" + remove_num).remove();
         $("#slip-most-lower-" + remove_num).remove();
-
-        // 伝票数をマイナスする
-        var silp_num = $('#slip_num').val();
-        $('#slip_num').val(silp_num - 1);
 
         // 再計算
         priceNumChange(remove_num);

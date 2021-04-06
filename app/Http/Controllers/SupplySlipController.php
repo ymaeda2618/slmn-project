@@ -472,6 +472,9 @@ class SupplySlipController extends Controller
     public function editRegister(Request $request)
     {
 
+        // トランザクション開始
+        DB::connection()->beginTransaction();
+
         try{
 
             // ユーザー情報の取得
@@ -573,6 +576,9 @@ class SupplySlipController extends Controller
                     DB::table('supply_slip_details')->insert($supply_slip_detail);
                 }
             }
+
+            // 問題なければコミット
+            DB::connection()->commit();
 
         } catch (\Exception $e) {
 

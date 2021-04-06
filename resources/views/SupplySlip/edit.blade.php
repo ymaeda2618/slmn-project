@@ -1381,6 +1381,10 @@
         $("#slip-lower-" + remove_num).remove();
         $("#slip-most-lower-" + remove_num).remove();
 
+        // 伝票数をマイナスする
+        var silp_num = $('#slip_num').val();
+        $('#slip_num').val(silp_num - 1);
+
         // 再計算
         priceNumChange(remove_num);
 

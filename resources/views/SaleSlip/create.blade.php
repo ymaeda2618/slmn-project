@@ -1597,17 +1597,27 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code; // 売上企業
-        var sale_shop_code; // 売上店舗
-        var product_code; // 製品ID
-        var unit_price; // 単価
-        var unit_num; // 数量
-        var staff_code; // 担当
-        var inventory_unit_num // 発注数量
+        var sale_company_code;  // 売上企業
+        var sale_shop_code;     // 売上店舗
+        var product_code;       // 製品ID
+        var unit_price;         // 単価
+        var unit_num;           // 数量
+        var staff_code;         // 担当
+        var inventory_unit_num  // 発注数量
 
         // -----------
         // 入力チェック
         // -----------
+        // 伝票数を確認
+        var slip_num = 0;
+        $('.partition-area').each(function(index, element){
+            slip_num++;
+        });
+        if (slip_num <= 0) {
+            alert('伝票は1つ以上登録してください。');
+            return false;
+        }
+
         sale_company_code = $("#sale_company_code").val();
         sale_shop_code = $("#sale_shop_code").val();
         if (sale_company_code == '') {

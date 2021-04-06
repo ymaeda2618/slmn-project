@@ -34,18 +34,6 @@ class SaleSlipController extends Controller
      */
     public function index(Request $request)
     {
-        $depositList = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
-            ->select(
-                'DepositWithdrawalDetail.deposit_withdrawal_id AS deposit_id'
-            )
-            ->where([
-                ['supply_sale_slip_id', '=', '74'],
-                ['type', '=', '2'],
-                ['active', '=', '1']
-            ])
-            ->get();
-
-error_log(print_r(isset($depositList[0]->deposit_id), true), '3', '/home/xs662848/xs662848.xsrv.jp/public_html/laravel/storage/logs/error.log');
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);

@@ -301,7 +301,13 @@
                         <input type="number" class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]" value="{{$SaleSlipList->sale_submit_type}}">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="登録" readonly>
+                        <?php
+                            $text = '';
+                            if ($SaleSlipList->sale_submit_type == 1) $text = '登録';
+                            if ($SaleSlipList->sale_submit_type == 2) $text = '一時保存';
+                            if ($SaleSlipList->sale_submit_type == 4) $text = '請求書印刷';
+                         ?>
+                        <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="{{$text}}" readonly>
                     </td>
                     <td class="width-50">
                         <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
@@ -415,6 +421,9 @@
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
                             $('#sale_submit_type_text').val("一時保存");
+                            $('#register-btn').focus();
+                        } else if (submit_type == 4) {
+                            $('#sale_submit_type_text').val("請求書印刷");
                             $('#register-btn').focus();
                         } else {
                             alert("存在しない登録番号です。");
@@ -1245,6 +1254,8 @@
                     $('#sale-slip-create-form').submit();
                 } else if (this_val == "3") {
                     $('#sale-slip-create-form').submit();
+                } else if (this_val == "4") {
+                    $('#sale-slip-create-form').submit();
                 } else {
                     return false;
                 }
@@ -1261,6 +1272,8 @@
                     $('#sale_submit_type_text').val('一時保存');
                 } else if (submitType == 3) {
                     $('#sale_submit_type_text').val('削除');
+                } else if (submitType == 4) {
+                    $('#sale_submit_type_text').val('請求書印刷');
                 } else {
                     alert("存在しない登録番号です。");
                 }

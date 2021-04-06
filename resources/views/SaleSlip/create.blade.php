@@ -419,6 +419,9 @@
                         } else if (submit_type == 2) {
                             $('#sale_submit_type_text').val("一時保存");
                             $('#register-btn').focus();
+                        } else if (submit_type == 4) {
+                            $('#sale_submit_type_text').val("請求書印刷");
+                            $('#register-btn').focus();
                         } else {
                             alert("存在しない登録番号です。");
                         }
@@ -1221,6 +1224,8 @@
                     $('#sale-slip-create-form').submit();
                 } else if (this_val == "2") {
                     $('#sale-slip-create-form').submit();
+                } else if (this_val == "4") {
+                    $('#sale-slip-create-form').submit();
                 } else {
                     return false;
                 }
@@ -1235,6 +1240,8 @@
                     $('#sale_submit_type_text').val('登録');
                 } else if (submitType == 2) {
                     $('#sale_submit_type_text').val('一時保存');
+                } else if (submitType == 4) {
+                    $('#sale_submit_type_text').val('請求書印刷');
                 } else {
                     alert("存在しない登録番号です。");
                 }

@@ -172,7 +172,7 @@
                 <tbody>
                     <tr>
                         <!--種別-->
-                        @if ($saleSlips->sale_submit_type == 1)
+                        @if ($saleSlips->sale_submit_type == 1 || $saleSlips->sale_submit_type == 4)
                         <td class="regis-complete" rowspan="<?php echo ($sale_slip_detail_count_arr[$saleSlips->sale_slip_id] + 2); ?>">登録済</td>
                         @else
                         <td class="regis-temp" rowspan="<?php echo ($sale_slip_detail_count_arr[$saleSlips->sale_slip_id] + 2); ?>">一時保存</td>

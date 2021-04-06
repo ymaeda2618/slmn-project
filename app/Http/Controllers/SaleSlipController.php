@@ -34,6 +34,18 @@ class SaleSlipController extends Controller
      */
     public function index(Request $request)
     {
+        $depositList = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+            ->select(
+                'DepositWithdrawalDetail.deposit_withdrawal_id AS deposit_id'
+            )
+            ->where([
+                ['supply_sale_slip_id', '=', '74'],
+                ['type', '=', '2'],
+                ['active', '=', '1']
+            ])
+            ->get();
+
+error_log(print_r(isset($depositList[0]->deposit_id), true), '3', '/home/xs662848/xs662848.xsrv.jp/public_html/laravel/storage/logs/error.log');
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);
@@ -217,7 +229,7 @@ class SaleSlipController extends Controller
                 'SaleSlipDetail.id            AS sale_slip_detail_id',
                 'SaleSlipDetail.unit_price    AS sale_slip_detail_unit_price',
                 'SaleSlipDetail.unit_num      AS sale_slip_detail_unit_num',
-                'Unit.name                      AS unit_name',
+                'Unit.name                      AS unit_name'
             )
             ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y/%m/%d")                AS sale_slip_date')
             ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y/%m/%d") AS sale_slip_delivery_date')
@@ -589,6 +601,7 @@ class SaleSlipController extends Controller
 
                 $sale_slip_detail = array();
                 $sort = 0;
+                $staffId = '';
 
                 $saleSlipDetailIds = array();
                 foreach($SaleSlipDetailData as $SaleSlipDetail){
@@ -628,6 +641,8 @@ class SaleSlipController extends Controller
                         DB::table('sale_slip_details')->insert($sale_slip_detail);
                         $saleSlipDetailIds[] = DB::getPdo()->lastInsertId();
                     }
+
+                    if (empty($staffId)) $staffId = $SaleSlipDetail['staff_id'];
                 }
 
                 // inventory_managesも物理削除して新規登録する
@@ -654,6 +669,7 @@ class SaleSlipController extends Controller
                             $inventoryManage[] = [
                                 "sale_detail_slip_id"       => $saleSlipDetailIds[$key],
                                 "supply_detail_slip_id"     => $supplySlipId,
+                                "inventory_type"            => 2,
                                 "unit_num"                  => $unitNum,
                                 "sort"                      => $supplySlipIdKey,
                                 "created_user_id"           => $user_info_id,
@@ -708,6 +724,16 @@ class SaleSlipController extends Controller
 
             // 問題なければコミット
             DB::connection()->commit();
+
+            // 登録のタイプが請求書印刷の場合(sale_submit_type:4)
+            if ($SaleSlipData['sale_submit_type'] == 4) {
+
+                // 入金登録をして入金一覧画面に遷移させる
+                $this->registerSaleDeposit($SaleSlip->id, $staffId);
+
+                return redirect('./DepositIndex');
+
+            }
 
         } catch (\Exception $e) {
 
@@ -1605,6 +1631,7 @@ class SaleSlipController extends Controller
             $SaleSlip = $this->SaleSlip->insertSaleSlip($SaleSlipData);
 
             $sort = 0;
+            $staffId = '';
 
             foreach ($SaleSlipDetailData as $SaleSlipDetailKey => $SaleSlipDetailVal) {
 
@@ -1669,6 +1696,7 @@ class SaleSlipController extends Controller
                         $inventoryManage[] = [
                             "sale_detail_slip_id"       => $sale_slip_detail_new_id,
                             "supply_detail_slip_id"     => $supply_slip_val,
+                            "inventory_type"            => 2,
                             "unit_num"                  => $unit_num,
                             "sort"                      => $supply_slip_key,
                             "created_user_id"           => $user_info_id,
@@ -1718,9 +1746,19 @@ class SaleSlipController extends Controller
                         DB::table('inventory_manages')->insert($inventoryManage);
                     }
                 }
+
+                if (empty($staffId)) $staffId = $SaleSlipDetailVal['staff_id'];
             }
 
             DB::connection()->commit();
+
+            // 登録のタイプが請求書印刷の場合(sale_submit_type:4)
+            if ($SaleSlipData['sale_submit_type'] == 4) {
+                // 入金登録をして入金一覧画面に遷移させる
+                $this->registerSaleDeposit($SaleSlip->id, $staffId);
+
+                return redirect('./DepositIndex');
+            }
 
         } catch (\Exception $e) {
 
@@ -2129,5 +2167,224 @@ class SaleSlipController extends Controller
 
         return $orderSaleUnitPirce;
 
+    }
+
+    /**
+     * 売上登録、入金登録して請求書印刷する
+     *
+     * @param int $saleSlipId
+     * @param int $staffId
+     */
+    private function registerSaleDeposit($saleSlipId, $staffId) {
+
+        // ユーザー情報の取得
+        $userInfo   = \Auth::user();
+        $userInfoId = $userInfo['id'];
+
+        // トランザクション開始
+        DB::connection()->beginTransaction();
+
+        try {
+            // --------------------------
+            // パラメータから売上データを取得
+            // --------------------------
+            $saleSlipLists = DB::table('sale_slips AS SaleSlip')
+            ->select(
+                'SaleSlip.date               AS sale_date',
+                'SaleSlip.sale_company_id    AS company_id',
+                'SaleSlip.sale_shop_id       AS shop_id',
+                'SaleSlip.notax_sub_total_8  AS notax_subtotal_8',
+                'SaleSlip.notax_sub_total_10 AS notax_subtotal_10',
+                'SaleSlip.notax_sub_total    AS notax_subtotal',
+                'SaleSlip.tax_total_8        AS tax_total_8',
+                'SaleSlip.tax_total_10       AS tax_total_10',
+                'SaleSlip.tax_total          AS tax_total',
+                'SaleSlip.sub_total_8        AS subtotal_8',
+                'SaleSlip.sub_total_10       AS subtotal_10',
+                'SaleSlip.sub_total          AS subtotal',
+                'SaleSlip.delivery_price     AS delivery_price',
+                'SaleSlip.adjust_price       AS adjust_price',
+                'SaleSlip.total              AS total'
+            )->where([
+                    ['SaleSlip.id', '=', $saleSlipId]
+            ])
+            ->get();
+
+            $saleSlipDatas = $saleSlipLists[0];
+
+            // deposit_idが存在するか確認
+            $depositList = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+            ->select(
+                'DepositWithdrawalDetail.deposit_withdrawal_id AS deposit_id'
+            )
+            ->where([
+                ['supply_sale_slip_id', '=', $saleSlipId],
+                ['type', '=', '2'],
+                ['active', '=', '1']
+            ])
+            ->get();
+
+            if (isset($depositList[0]->deposit_id)) {
+                // 入出金詳細テーブル(deposit_withdrawal_details)に存在したら更新
+                $depositId = $depositList[0]->deposit_id;
+
+                // -------------------
+                // 入出金詳細テーブル更新
+                // -------------------
+                $updateDetailParams = array(
+                    'deposit_withdrawal_date' => $saleSlipDatas->sale_date,
+                    'supply_sale_slip_date'   => $saleSlipDatas->sale_date,
+                    'notax_sub_total_8'       => $saleSlipDatas->notax_subtotal_8,
+                    'notax_sub_total_10'      => $saleSlipDatas->notax_subtotal_10,
+                    'sub_total'               => $saleSlipDatas->subtotal,
+                    'delivery_price'          => $saleSlipDatas->delivery_price,
+                    'adjust_price'            => $saleSlipDatas->adjust_price,
+                    'total'                   => $saleSlipDatas->total,
+                    'modified_user_id'        => $userInfoId,
+                    'modified'                => Carbon::now(),
+                );
+                // 更新処理
+                DB::table('deposit_withdrawal_details')
+                ->where([
+                    ['deposit_withdrawal_id', '=', $depositId],
+                    ['supply_sale_slip_id', '=', $saleSlipId],
+                    ['type', '=', '2'],
+                    ['active', '=', '1']
+                ])
+                ->update($updateDetailParams);
+
+                // ------------------------
+                // 詳細テーブルからデータを取得
+                // ------------------------
+                $depositDetailList = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+                ->select(
+                    'DepositWithdrawalDetail.sub_total    AS subtotal',
+                    'DepositWithdrawalDetail.adjust_price AS adjust_price',
+                    'DepositWithdrawalDetail.total        AS total'
+                )
+                ->where([
+                    ['deposit_withdrawal_id', '=', $depositId],
+                    ['type', '=', '2'],
+                    ['active', '=', '1']
+                ])
+                ->get();
+
+                // ---------------------
+                // 取得してきたデータを計算
+                // ---------------------
+                // 初期化
+                $subtotal    = 0;
+                $adjustPrice = 0;
+                $total       = 0;
+                foreach ($depositDetailList as $depositDetailDatas) {
+                    $subtotal    += $depositDetailDatas->subtotal;
+                    $adjustPrice += $depositDetailDatas->adjust_price;
+                    $total       += $depositDetailDatas->total;
+                }
+
+                // ---------------------
+                // 入金テーブルのデータ更新
+                // ---------------------
+                $updateParams = array(
+                    'sale_company_id'   => $saleSlipDatas->company_id,
+                    'sale_shop_id'      => $saleSlipDatas->shop_id,
+                    'date'              => $saleSlipDatas->sale_date,
+                    'staff_id'          => $staffId,
+                    'sub_total'         => $subtotal,
+                    'adjustment_amount' => $adjustPrice,
+                    'amount'            => $total,
+                    'deposit_method_id' => 6,
+                    'updated_at'        => $userInfoId,
+                    'modified'          => Carbon::now()
+                );
+
+                // 更新処理
+                DB::table('deposits')
+                ->where('id', '=', $depositId)
+                ->update($updateParams);
+
+                $sessionDepositId = $depositId;
+
+            } else {
+
+                // 入出金詳細テーブル(deposit_withdrawal_details)に存在しなかったら新規登録
+                // ----------------
+                // 入金テーブルに登録
+                // ----------------
+                // 配列に値を格納
+                $insertDepositColumns = array(
+                    'sale_company_id'   => $saleSlipDatas->company_id,
+                    'sale_shop_id'      => $saleSlipDatas->shop_id,
+                    'date'              => $saleSlipDatas->sale_date,
+                    'sale_from_date'    => $saleSlipDatas->sale_date,
+                    'sale_to_date'      => $saleSlipDatas->sale_date,
+                    'staff_id'          => $staffId,
+                    'sub_total'         => $saleSlipDatas->subtotal,
+                    'adjustment_amount' => $saleSlipDatas->adjust_price,
+                    'amount'            => $saleSlipDatas->total,
+                    'deposit_method_id' => 6,
+                    'active'            => 1,
+                    'created_at'        => $userInfoId,
+                    'created'           => Carbon::now(),
+                    'updated_at'        => $userInfoId,
+                    'modified'          => Carbon::now()
+                );
+
+                // データインサート
+                $depositNewId = DB::table('deposits')->insertGetId($insertDepositColumns);
+
+                // -----------------
+                // 入出金テーブルに登録
+                // -----------------
+                // 配列に値格納
+                $insertDepositDetails = array(
+                    'deposit_withdrawal_id'   => $depositNewId,
+                    'supply_sale_slip_id'     => $saleSlipId,
+                    'deposit_withdrawal_date' => $saleSlipDatas->sale_date,
+                    'supply_sale_slip_date'   => $saleSlipDatas->sale_date,
+                    'type'                    => 2,
+                    'notax_sub_total_8'       => $saleSlipDatas->notax_subtotal_8,
+                    'notax_sub_total_10'      => $saleSlipDatas->notax_subtotal_10,
+                    'sub_total'               => $saleSlipDatas->subtotal,
+                    'delivery_price'          => $saleSlipDatas->delivery_price,
+                    'adjust_price'            => $saleSlipDatas->adjust_price,
+                    'total'                   => $saleSlipDatas->total,
+                    'active'                  => 1,
+                    'created_user_id'         => $userInfoId,
+                    'created'                 => Carbon::now(),
+                    'modified_user_id'        => $userInfoId,
+                    'modified'                => Carbon::now(),
+                );
+
+                // データインサート
+                DB::table('deposit_withdrawal_details')->insert($insertDepositDetails);
+
+                $sessionDepositId = $depositNewId;
+
+            }
+
+            // -----------------------------
+            // 売上データのフラグを売上済みにする
+            // -----------------------------
+            DB::table('sale_slips')
+            ->where('id', '=', $saleSlipId)
+            ->update(array('sale_flg' => 1));
+
+            // 問題なければコミット
+            DB::connection()->commit();
+
+        } catch (\Exception $e) {
+
+            DB::rollback();
+
+            dd($e);
+
+        }
+
+        // セッションにデータ書き込み
+        session()->regenerate();
+        session(['deposit_condition_id' => $sessionDepositId]);
+
+        return;
     }
 }

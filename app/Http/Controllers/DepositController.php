@@ -41,6 +41,7 @@ class DepositController extends Controller
         if ($_SERVER["REQUEST_METHOD"] != "POST"
         ) { // ページング処理
 
+            $condition_id             = $request->session()->get('deposit_condition_id');
             $condition_date_type      = $request->session()->get('deposit_condition_date_from');
             $condition_date_from      = $request->session()->get('deposit_condition_date_from');
             $condition_date_to        = $request->session()->get('deposit_condition_date_to');
@@ -52,6 +53,7 @@ class DepositController extends Controller
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
+                $condition_id           = $request->data['Deposit']['id'];
                 $condition_date_type    = $request->data['Deposit']['date_type'];
                 $condition_company_code = $request->data['Deposit']['deposit_company_code'];
                 $condition_company_id   = $request->data['Deposit']['deposit_company_id'];
@@ -68,6 +70,7 @@ class DepositController extends Controller
                     $condition_date_from = $condition_date_to;
                 }
 
+                $request->session()->put('deposit_condition_id', $condition_id);
                 $request->session()->put('deposit_condition_date_type', $condition_date_type);
                 $request->session()->put('deposit_condition_date_from', $condition_date_from);
                 $request->session()->put('deposit_condition_date_to', $condition_date_to);
@@ -77,6 +80,7 @@ class DepositController extends Controller
 
             } else { // リセットボタンが押された時の処理
 
+                $condition_id             = null;
                 $condition_date_type      = null;
                 $condition_date_from      = null;
                 $condition_date_to        = null;
@@ -85,6 +89,7 @@ class DepositController extends Controller
                 $condition_company_code   = null;
                 $condition_company_id     = null;
                 $condition_company_text   = null;
+                $request->session()->forget('deposit_condition_id');
                 $request->session()->forget('deposit_condition_date_type');
                 $request->session()->forget('deposit_condition_date_from');
                 $request->session()->forget('deposit_condition_date_to');
@@ -124,6 +129,9 @@ class DepositController extends Controller
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('Deposit.sale_company_id', '=', $condition_company_id);
             })
+            ->if(!empty($condition_id), function ($query) use ($condition_id) {
+                return $query->where('Deposit.id', '=', $condition_id);
+            })
             ->where('Deposit.active', '=', '1')
             ->orderBy('Deposit.date', 'desc')->paginate(20);
 
@@ -146,6 +154,7 @@ class DepositController extends Controller
             "search_action"            => $search_action,
             "check_str_slip_date"      => $check_str_slip_date,
             "check_str_deposit_date"   => $check_str_deposit_date,
+            "condition_id"             => $condition_id,
             "condition_date_from"      => $condition_date_from,
             "condition_date_to"        => $condition_date_to,
             "condition_company_code"   => $condition_company_code,

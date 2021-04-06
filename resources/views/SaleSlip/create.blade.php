@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">売上伝票 新規成画面</div>
+        <div class="top-title">売上伝票 新規作成画面</div>
 
         <form class="smn-form" id="sale-slip-create-form" method="post" action="./registerSaleSlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}

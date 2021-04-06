@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">仕入伝票 新規成画面</div>
+        <div class="top-title">仕入伝票 編集画面</div>
 
         <form class="smn-form" id="supply-slip-create-form" method="post" action="./../editRegisterSupplySlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}

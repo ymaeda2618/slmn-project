@@ -3,7 +3,7 @@
     <input type="hidden" id="sale_slip_id" value="{{$sale_slip_id}}">
     <div class="row justify-content-center">
 
-        <div class="top-title">売上伝票 新規成画面</div>
+        <div class="top-title">売上伝票 編集画面</div>
 
         <form class="smn-form" id="sale-slip-create-form" method="post" action="./../editRegisterSaleSlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}

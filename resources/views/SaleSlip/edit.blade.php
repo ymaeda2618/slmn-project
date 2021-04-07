@@ -3,7 +3,7 @@
     <input type="hidden" id="sale_slip_id" value="{{$sale_slip_id}}">
     <div class="row justify-content-center">
 
-        <div class="top-title">売上伝票 新規成画面</div>
+        <div class="top-title">売上伝票 編集画面</div>
 
         <form class="smn-form" id="sale-slip-create-form" method="post" action="./../editRegisterSaleSlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
@@ -103,8 +103,8 @@
                         <input type="text" class="form-control" id="staff_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_text]" value="{{$SaleSlipDetails->staff_name}}" placeholder="担当欄" readonly>
                     </td>
                     <td class="width-15">
-                        <input type="text" class="form-control" id="tax_text_0" name="data[SaleSlipDetail][0][tax_text]" readonly>
-                        <input type='hidden' id='tax_id_0' name="data[SaleSlipDetail][0][tax_id]" value="0">
+                        <input type="text" class="form-control" id="tax_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_text]" value="{{$SaleSlipDetails->tax_name}}" readonly>
+                        <input type='hidden' id="tax_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_id]" value="{{$SaleSlipDetails->tax_id}}">
                     </td>
                     <td rowspan="4" class="width-5">
                         <button id="remove-slip-btn" type="button" class="btn remove-slip-btn btn-secondary" onclick='javascript:removeSlip({{$SaleSlipDetails->sort}}) '>削除</button>
@@ -301,7 +301,13 @@
                         <input type="number" class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]" value="{{$SaleSlipList->sale_submit_type}}">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="登録" readonly>
+                        <?php
+                            $text = '';
+                            if ($SaleSlipList->sale_submit_type == 1) $text = '登録';
+                            if ($SaleSlipList->sale_submit_type == 2) $text = '一時保存';
+                            if ($SaleSlipList->sale_submit_type == 4) $text = '請求書印刷';
+                         ?>
+                        <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="{{$text}}" readonly>
                     </td>
                     <td class="width-50">
                         <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
@@ -415,6 +421,9 @@
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
                             $('#sale_submit_type_text').val("一時保存");
+                            $('#register-btn').focus();
+                        } else if (submit_type == 4) {
+                            $('#sale_submit_type_text').val("請求書印刷");
                             $('#register-btn').focus();
                         } else {
                             alert("存在しない登録番号です。");
@@ -1245,6 +1254,8 @@
                     $('#sale-slip-create-form').submit();
                 } else if (this_val == "3") {
                     $('#sale-slip-create-form').submit();
+                } else if (this_val == "4") {
+                    $('#sale-slip-create-form').submit();
                 } else {
                     return false;
                 }
@@ -1261,6 +1272,8 @@
                     $('#sale_submit_type_text').val('一時保存');
                 } else if (submitType == 3) {
                     $('#sale_submit_type_text').val('削除');
+                } else if (submitType == 4) {
+                    $('#sale_submit_type_text').val('請求書印刷');
                 } else {
                     alert("存在しない登録番号です。");
                 }
@@ -1684,17 +1697,27 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code; // 売上企業
-        var sale_shop_code; // 売上店舗
-        var product_code; // 製品ID
-        var unit_price; // 単価
-        var unit_num; // 数量
-        var staff_code; // 担当
-        var inventory_unit_num // 発注数量
+        var sale_company_code;  // 売上企業
+        var sale_shop_code;     // 売上店舗
+        var product_code;       // 製品ID
+        var unit_price;         // 単価
+        var unit_num;           // 数量
+        var staff_code;         // 担当
+        var inventory_unit_num  // 発注数量
 
         // -----------
         // 入力チェック
         // -----------
+        // 伝票数を確認
+        var slip_num = 0;
+        $('.partition-area').each(function(index, element){
+            slip_num++;
+        });
+        if (slip_num <= 0) {
+            alert('伝票は1つ以上登録してください。');
+            return false;
+        }
+
         sale_company_code = $("#sale_company_code").val();
         sale_shop_code = $("#sale_shop_code").val();
         if (sale_company_code == '') {

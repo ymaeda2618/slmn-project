@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">売上伝票 新規成画面</div>
+        <div class="top-title">売上伝票 新規作成画面</div>
 
         <form class="smn-form" id="sale-slip-create-form" method="post" action="./registerSaleSlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
@@ -418,6 +418,9 @@
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
                             $('#sale_submit_type_text').val("一時保存");
+                            $('#register-btn').focus();
+                        } else if (submit_type == 4) {
+                            $('#sale_submit_type_text').val("請求書印刷");
                             $('#register-btn').focus();
                         } else {
                             alert("存在しない登録番号です。");
@@ -1221,6 +1224,8 @@
                     $('#sale-slip-create-form').submit();
                 } else if (this_val == "2") {
                     $('#sale-slip-create-form').submit();
+                } else if (this_val == "4") {
+                    $('#sale-slip-create-form').submit();
                 } else {
                     return false;
                 }
@@ -1235,6 +1240,8 @@
                     $('#sale_submit_type_text').val('登録');
                 } else if (submitType == 2) {
                     $('#sale_submit_type_text').val('一時保存');
+                } else if (submitType == 4) {
+                    $('#sale_submit_type_text').val('請求書印刷');
                 } else {
                     alert("存在しない登録番号です。");
                 }
@@ -1590,17 +1597,27 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code; // 売上企業
-        var sale_shop_code; // 売上店舗
-        var product_code; // 製品ID
-        var unit_price; // 単価
-        var unit_num; // 数量
-        var staff_code; // 担当
-        var inventory_unit_num // 発注数量
+        var sale_company_code;  // 売上企業
+        var sale_shop_code;     // 売上店舗
+        var product_code;       // 製品ID
+        var unit_price;         // 単価
+        var unit_num;           // 数量
+        var staff_code;         // 担当
+        var inventory_unit_num  // 発注数量
 
         // -----------
         // 入力チェック
         // -----------
+        // 伝票数を確認
+        var slip_num = 0;
+        $('.partition-area').each(function(index, element){
+            slip_num++;
+        });
+        if (slip_num <= 0) {
+            alert('伝票は1つ以上登録してください。');
+            return false;
+        }
+
         sale_company_code = $("#sale_company_code").val();
         sale_shop_code = $("#sale_shop_code").val();
         if (sale_company_code == '') {

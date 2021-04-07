@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">仕入伝票 新規成画面</div>
+        <div class="top-title">仕入伝票 新規作成画面</div>
 
         <form class="smn-form" id="supply-slip-create-form" method="post" action="./registerSupplySlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
@@ -1405,17 +1405,27 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code; // 仕入企業
-        var supply_shop_code; // 仕入店舗
-        var product_code; // 製品ID
-        var unit_price; // 単価
-        var unit_num; // 受注数量
-        var staff_code; // 担当
-        var inventory_unit_num; // 仕入単位
+        var supply_company_code;    // 仕入企業
+        var supply_shop_code;       // 仕入店舗
+        var product_code;           // 製品ID
+        var unit_price;             // 単価
+        var unit_num;               // 受注数量
+        var staff_code;             // 担当
+        var inventory_unit_num;     // 仕入単位
 
         // -----------
         // 入力チェック
         // -----------
+        // 伝票数を確認
+        var slip_num = 0;
+        $('.partition-area').each(function(index, element){
+            slip_num++;
+        });
+        if (slip_num <= 0) {
+            alert('伝票は1つ以上登録してください。');
+            return false;
+        }
+
         supply_company_code = $("#supply_company_code").val();
         supply_shop_code = $("#supply_shop_code").val();
         if (supply_company_code == '') {

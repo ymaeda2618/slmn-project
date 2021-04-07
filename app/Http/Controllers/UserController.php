@@ -91,8 +91,6 @@ class UserController extends Controller
             })
             ->orderBy('User.created_at', 'asc')
             ->paginate(20);
-            // ->toSql();
-// error_log(print_r($userList, true), '3', '/home/xs662848/xs662848.xsrv.jp/public_html/laravel/storage/logs/error.log');
 
         } catch (\Exception $e) {
 
@@ -239,7 +237,7 @@ class UserController extends Controller
 
         // リクエストパラメータを取得
         $requestParams = $request->data['User'];
-error_log(print_r($requestParams, true), '3', '/home/xs662848/xs662848.xsrv.jp/public_html/laravel/storage/logs/error.log');
+
         // ユーザー情報の取得
         $user_info    = \Auth::user();
         $user_info_id = $user_info['id'];

@@ -26,9 +26,13 @@
                         </tr>
                         <tr>
                             <td>
+                                <div class="table-th">伝票NO</div>
+                                <div class="table-td table-code-td slip-td">
+                                    <input type="number" class="search-control" id="deposit_id" name="data[Deposit][id]" value="{{$condition_id}}" tabindex="3">
+                                </div>
                                 <div class="table-th">取引先企業</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" value="{{$condition_company_code}}" tabindex="3">
+                                    <input type="text" class="search-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" value="{{$condition_company_code}}" tabindex="4">
                                     <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]" value="{{$condition_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
@@ -40,8 +44,8 @@
                 </table>
                 <div class="btn-area ">
                     <div class='search-btn-area'>
-                        <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索' tabindex="4">
-                        <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット' tabindex="5">
+                        <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索' tabindex="5">
+                        <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット' tabindex="6">
                     </div>
                 </div>
             </form>
@@ -53,6 +57,7 @@
                 <table class='index-table'>
                     <tbody>
                         <tr>
+                            <th>伝票NO</th>
                             <th>入金日付</th>
                             <th>伝票日付</th>
                             <th class="width-15">企業</th>
@@ -62,13 +67,13 @@
                         </tr>
                         @foreach ($depositList as $deposit)
                         <tr>
+                            <td>{{$deposit->deposit_id}}</td>
                             <td>{{$deposit->deposit_date}}</td>
                             <td>{{$deposit->sale_from_date}}~{{$deposit->sale_to_date}}</td>
                             <td>{{$deposit->sale_company_name}}</td>
                             <td>{{number_format($deposit->amount)}}</td>
                             @if (Home::authClerkCheck()) <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
-                            {{--  <td><input type='submit' class='output-btn btn btn-primary' name='output-btn' id="output-btn-{{$deposit->deposit_id}}" value='印刷'></td>  --}}
-                            <td><button type="submit" class="output-btn btn btn-primary" name="data[Deposit][{{$deposit->deposit_id}}][id]" id="output-btn-{{$deposit->deposit_id}}" value="{{$deposit->deposit_id}}">印刷</button></td>
+                            <td><a class='output-btn btn btn-primary' href='./invoiceOutput/{{$deposit->deposit_id}}' target='_blank' rel='noopener noreferrer'>印刷</a></td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -420,6 +425,10 @@
 
     #pdf-output-form {
         width: 100%;
+    }
+
+    .slip-td {
+        margin-right: 20%;
     }
 
 </style>

@@ -322,7 +322,10 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
+
+
+                alert(event.keyCod);
 
                 if (event.keyCode === 13) { // Enterが押された時
 

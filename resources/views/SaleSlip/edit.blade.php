@@ -103,8 +103,8 @@
                         <input type="text" class="form-control" id="staff_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_text]" value="{{$SaleSlipDetails->staff_name}}" placeholder="担当欄" readonly>
                     </td>
                     <td class="width-15">
-                        <input type="text" class="form-control" id="tax_text_0" name="data[SaleSlipDetail][0][tax_text]" readonly>
-                        <input type='hidden' id='tax_id_0' name="data[SaleSlipDetail][0][tax_id]" value="0">
+                        <input type="text" class="form-control" id="tax_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_text]" value="{{$SaleSlipDetails->tax_name}}" readonly>
+                        <input type='hidden' id="tax_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_id]" value="{{$SaleSlipDetails->tax_id}}">
                     </td>
                     <td rowspan="4" class="width-5">
                         <button id="remove-slip-btn" type="button" class="btn remove-slip-btn btn-secondary" onclick='javascript:removeSlip({{$SaleSlipDetails->sort}}) '>削除</button>

@@ -1405,20 +1405,20 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code;    // 仕入企業
-        var supply_shop_code;       // 仕入店舗
-        var product_code;           // 製品ID
-        var unit_price;             // 単価
-        var unit_num;               // 受注数量
-        var staff_code;             // 担当
-        var inventory_unit_num;     // 仕入単位
+        var supply_company_code; // 仕入企業
+        var supply_shop_code; // 仕入店舗
+        var product_code; // 製品ID
+        var unit_price; // 単価
+        var unit_num; // 受注数量
+        var staff_code; // 担当
+        var inventory_unit_num; // 仕入単位
 
         // -----------
         // 入力チェック
         // -----------
         // 伝票数を確認
         var slip_num = 0;
-        $('.partition-area').each(function(index, element){
+        $('.partition-area').each(function(index, element) {
             slip_num++;
         });
         if (slip_num <= 0) {

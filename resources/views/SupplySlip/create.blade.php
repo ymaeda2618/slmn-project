@@ -297,9 +297,6 @@
     var adjust_price;
     var total;
 
-    // 処理キャンセルのフラグを定義：0…処理可能　1…キャンセル
-    var cancelFlag = 0;
-
     (function($) {
         jQuery(window).load(function() {
 
@@ -325,14 +322,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
-
-                if (cancelFlag == 1) {
-
-                    return false;
-                }
-
-                cancelFlag = 1;
+            $(document).on("keydown", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -378,7 +368,6 @@
                         // 現在のtabIndex取得
                         var tabindex = parseInt($(this).attr('tabindex'), 10);
                         if (isNaN(tabindex)) {
-                            cancelFlag = 0;
                             return false;
                         }
 
@@ -419,7 +408,6 @@
                         }
                     }
 
-                    cancelFlag = 0;
                     return false;
 
                 } else if (event.keyCode === 47) { // スラッシュが押された時
@@ -468,7 +456,6 @@
                         // 現在のtabIndex取得
                         var tabindex = parseInt($(this).attr('tabindex'), 10);
                         if (isNaN(tabindex)) {
-                            cancelFlag = 0;
                             return false;
                         }
 
@@ -505,7 +492,6 @@
                         }
                     }
 
-                    cancelFlag = 0;
                     return false;
                 } else if (event.keyCode === 43) { // プラスが押された時
 
@@ -514,7 +500,6 @@
                     if (this_id.match(/memo/)) {
 
                         $('#add-slip-btn').trigger('click');
-                        cancelFlag = 0;
                         return false;
                     }
 
@@ -524,7 +509,6 @@
                     $('#supply_submit_type').val("");
                     $('#supply_submit_type').focus();
                     $('#supply_submit_type').val(this_val);
-                    cancelFlag = 0;
                     return false;
                 }
 

@@ -297,6 +297,9 @@
     var adjust_price;
     var total;
 
+    // 処理キャンセルのフラグを定義：0…処理可能　1…キャンセル
+    var cancelFlag = 0;
+
     (function($) {
         jQuery(window).load(function() {
 
@@ -318,9 +321,6 @@
 
             adjust_price = 0;
             total = 0;
-
-            // 処理キャンセルのフラグを定義：0…処理可能　1…キャンセル
-            var cancelFlag = 0;
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理

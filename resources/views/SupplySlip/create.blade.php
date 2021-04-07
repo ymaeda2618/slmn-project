@@ -325,7 +325,7 @@
             $(document).on("keyup", "input", function(event) {
 
 
-                alert(event.keyCod);
+                alert(event.keyCode);
 
                 if (event.keyCode === 13) { // Enterが押された時
 

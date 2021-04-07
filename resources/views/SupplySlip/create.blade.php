@@ -327,12 +327,12 @@
             //-------------------------------------
             $(document).on("keypress", "input", function(event) {
 
-                if (ancelFlag == 1) {
+                if (cancelFlag == 1) {
 
                     return false;
                 }
 
-                ancelFlag = 1;
+                cancelFlag = 1;
 
                 if (event.keyCode === 13) { // Enterが押された時
 

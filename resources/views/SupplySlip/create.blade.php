@@ -324,6 +324,8 @@
             //-------------------------------------
             $(document).on("keydown", "input", function(event) {
 
+                alert(event.keyCode);
+
                 if (event.keyCode === 13) { // Enterが押された時
 
                     var this_id = $(this).attr('id');

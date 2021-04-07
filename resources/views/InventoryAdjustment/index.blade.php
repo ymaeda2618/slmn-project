@@ -2,7 +2,7 @@
 <div class="container">
     <div class="row justify-content-center">
 
-    <div class="top-title">在庫一覧</div>
+        <div class="top-title">在庫一覧</div>
 
         <div class='search-area'>
             <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
@@ -94,9 +94,8 @@
                 </tbody>
             </table>
 
-            @foreach ($supplySlipList as $supplySlips)
-                @if ($supplySlips->remaining_quantity > 0)
-                <?php
+            @foreach ($supplySlipList as $supplySlips) @if ($supplySlips->remaining_quantity > 0)
+            <?php
                     // --------------
                     // リンク用のID作成
                     // --------------
@@ -145,27 +144,26 @@
                     }
 
                 ?>
-                    <table class='index-table'>
-                        <tbody>
-                            <tr>
-                                <td>{{$supplySlips->product_code}}</td>
-                                <td class="double-width" colspan="2">{{$supplySlips->product_name}}</td>
-                                <td>{{$supplySlips->standard_name}}</td>
-                                <td>{{$supplySlips->unit_name}}</td>
-                                <td rowspan="2">
-                                    <a class='detail-btn' href='./InventoryAdjustmentDetail/{{$link_id}}'>伝票詳細</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>{{$supplySlips->oldest_date}}</td>
-                                <td>{{$supplySlips->latest_date}}</td>
-                                <td>{{$supplySlips->remaining_quantity}}</td>
-                                <td class="double-width" colspan="2">{{$supplySlips->balanced_amount}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                @endif
-            @endforeach
+                <table class='index-table'>
+                    <tbody>
+                        <tr>
+                            <td>{{$supplySlips->product_code}}</td>
+                            <td class="double-width" colspan="2">{{$supplySlips->product_name}}</td>
+                            <td>{{$supplySlips->standard_name}}</td>
+                            <td>{{$supplySlips->unit_name}}</td>
+                            <td rowspan="2">
+                                <a class='detail-btn' href='./InventoryAdjustmentDetail/{{$link_id}}'>伝票詳細</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>{{$supplySlips->oldest_date}}</td>
+                            <td>{{$supplySlips->latest_date}}</td>
+                            <td>{{$supplySlips->remaining_quantity}}</td>
+                            <td class="double-width" colspan="2">{{$supplySlips->balanced_amount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                @endif @endforeach
         </div>
 
         <div class="d-flex justify-content-center">
@@ -190,7 +188,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -218,7 +216,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -612,5 +610,4 @@
         text-align: center;
         padding: 10px;
     }
-
 </style>

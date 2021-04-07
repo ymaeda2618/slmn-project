@@ -324,9 +324,6 @@
             //-------------------------------------
             $(document).on("keyup", "input", function(event) {
 
-
-                alert(event.keyCode);
-
                 if (event.keyCode === 13) { // Enterが押された時
 
                     var this_id = $(this).attr('id');
@@ -411,7 +408,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -492,7 +489,7 @@
                     }
 
                     return false;
-                } else if (event.keyCode === 43) { // プラスが押された時
+                } else if (event.keyCode === 107) { // プラスが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -503,7 +500,7 @@
                         return false;
                     }
 
-                } else if (event.keyCode === 42) { // *が押された時
+                } else if (event.keyCode === 106) { // *が押された時
 
                     var this_val = $('#supply_submit_type').val();
                     $('#supply_submit_type').val("");

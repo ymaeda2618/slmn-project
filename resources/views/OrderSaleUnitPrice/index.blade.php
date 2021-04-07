@@ -96,9 +96,9 @@
                             <!--更新日-->{{date('Y-m-d H:i', strtotime($orderSaleUnitPrices->modified))}}
                         </td>
                         @if (Home::authClerkCheck())
-                            <td rowspan={{count($order_sale_unit_price_detail_arr[$orderSaleUnitPrices->order_sale_unit_price_id])+1}}>
-                                <!--編集ボタン--><a class='edit-btn' href='./OrderSaleUnitPriceEdit/{{$orderSaleUnitPrices->order_sale_unit_price_id}}'>編集</a>
-                            </td>
+                        <td rowspan={{count($order_sale_unit_price_detail_arr[$orderSaleUnitPrices->order_sale_unit_price_id])+1}}>
+                            <!--編集ボタン--><a class='edit-btn' href='./OrderSaleUnitPriceEdit/{{$orderSaleUnitPrices->order_sale_unit_price_id}}'>編集</a>
+                        </td>
                         @endif
                     </tr>
                     @foreach ($order_sale_unit_price_detail_arr[$orderSaleUnitPrices->order_sale_unit_price_id] as $order_sale_unit_price_detail_key => $order_sale_unit_price_detail_val)
@@ -144,7 +144,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -172,7 +172,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -290,7 +290,7 @@
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
                 // 全角数字を半角に変換
-                set_val = set_val.replace( /[０-９]/g, function(s) {
+                set_val = set_val.replace(/[０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
                 $(this).val(set_val);

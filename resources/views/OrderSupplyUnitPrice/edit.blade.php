@@ -43,27 +43,26 @@
                 @foreach ($orderSupplyUnitPriceDetailList as $orderSupplyUnitPriceDetails)
                 <tr id="product-partition-{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" class="partition-area"></tr>
                 <tr id="product-upper-{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}">
-                    <input type="hidden" id="order_supply_unit_price_detail_id" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][id]" value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}">
-                    {{-- 製品 START --}}
+                    <input type="hidden" id="order_supply_unit_price_detail_id" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][id]" value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}">                    {{-- 製品 START --}}
                     <td class="width-10">
-                        <input type="text" class="form-control product_code_input" id="product_code_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_code]" value="{{$orderSupplyUnitPriceDetails->product_code}}" tabindex="3">
+                        <input type="text" class="form-control product_code_input" id="product_code_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_code]"
+                            value="{{$orderSupplyUnitPriceDetails->product_code}}" tabindex="3">
                         <input type="hidden" id="product_id_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_id]" value="{{$orderSupplyUnitPriceDetails->product_id}}">
                     </td>
                     <td class="width-20">
-                        <input type="text" class="form-control" id="product_text_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_text]" value="{{$orderSupplyUnitPriceDetails->product_name}}" placeholder="製品欄" readonly>
+                        <input type="text" class="form-control" id="product_text_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][product_text]" value="{{$orderSupplyUnitPriceDetails->product_name}}"
+                            placeholder="製品欄" readonly>
                     </td>
-                    {{-- 製品 END --}}
-                    {{-- 金額 START --}}
+                    {{-- 製品 END --}} {{-- 金額 START --}}
                     <td class="width-10">
-                        <input type="number" class="form-control" id="order_unit_price_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][order_unit_price]" value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_price}}" tabindex="4">
+                        <input type="number" class="form-control" id="order_unit_price_{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][order_unit_price]"
+                            value="{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_price}}" tabindex="4">
                     </td>
-                    {{-- 金額 END --}}
-                    {{-- 適用開始日 START --}}
+                    {{-- 金額 END --}} {{-- 適用開始日 START --}}
                     <td class="width-10">
                         <input type="date" class="form-control" id="apply_from" name="data[OrderSupplyUnitPriceDetail][{{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}][apply_from]" value="{{$orderSupplyUnitPriceDetails->apply_from}}" tabindex="5">
                     </td>
-                    {{-- 適用開始日 END --}}
-                    {{-- 削除 START --}}
+                    {{-- 適用開始日 END --}} {{-- 削除 START --}}
                     <td class="width-5">
                         <button id="remove-product-btn" type="button" class="btn remove-product-btn btn-secondary" onclick='javascript:removeProduct({{$orderSupplyUnitPriceDetails->order_supply_unit_price_detail_id}}) '>削除</button>
                     </td>
@@ -99,7 +98,6 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
-
     (function($) {
         jQuery(window).load(function() {
 
@@ -109,7 +107,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -149,7 +147,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -181,7 +179,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 43) { // プラスが押された時
+                } else if (event.keyCode === 107) { // プラスが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -204,7 +202,7 @@
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
                 // 全角数字を半角に変換
-                set_val = set_val.replace( /[０-９]/g, function(s) {
+                set_val = set_val.replace(/[０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
                 $(this).val(set_val);
@@ -452,9 +450,9 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code;    // 仕入企業
-        var product_code;           // 製品ID
-        var order_unit_price;       // 金額
+        var supply_company_code; // 仕入企業
+        var product_code; // 製品ID
+        var order_unit_price; // 金額
 
         // -----------
         // 入力チェック
@@ -485,10 +483,10 @@
 
         }
     }
-
 </script>
 <style>
     /* 共通 */
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;

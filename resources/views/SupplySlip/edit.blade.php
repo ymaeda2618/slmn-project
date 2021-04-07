@@ -328,7 +328,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -415,7 +415,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -496,7 +496,7 @@
                     }
 
                     return false;
-                } else if (event.keyCode === 43) { // プラスが押された時
+                } else if (event.keyCode === 107) { // プラスが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -507,7 +507,7 @@
                         return false;
                     }
 
-                } else if (event.keyCode === 42) { // *が押された時
+                } else if (event.keyCode === 106) { // *が押された時
 
                     var this_val = $('#supply_submit_type').val();
                     $('#supply_submit_type').val("");
@@ -1413,20 +1413,20 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code;    // 仕入企業
-        var supply_shop_code;       // 仕入店舗
-        var product_code;           // 製品ID
-        var unit_price;             // 単価
-        var unit_num;               // 受注数量
-        var staff_code;             // 担当
-        var inventory_unit_num;     // 仕入単位
+        var supply_company_code; // 仕入企業
+        var supply_shop_code; // 仕入店舗
+        var product_code; // 製品ID
+        var unit_price; // 単価
+        var unit_num; // 受注数量
+        var staff_code; // 担当
+        var inventory_unit_num; // 仕入単位
 
         // -----------
         // 入力チェック
         // -----------
         // 伝票数を確認
         var slip_num = 0;
-        $('.partition-area').each(function(index, element){
+        $('.partition-area').each(function(index, element) {
             slip_num++;
         });
         if (slip_num <= 0) {

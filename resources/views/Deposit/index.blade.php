@@ -62,7 +62,8 @@
                             <th>伝票日付</th>
                             <th class="width-15">企業</th>
                             <th>入金金額</th>
-                            @if (Home::authClerkCheck()) <th>編集</th> @endif
+                            @if (Home::authClerkCheck())
+                            <th>編集</th> @endif
                             <th>印刷</th>
                         </tr>
                         @foreach ($depositList as $deposit)
@@ -72,7 +73,8 @@
                             <td>{{$deposit->sale_from_date}}~{{$deposit->sale_to_date}}</td>
                             <td>{{$deposit->sale_company_name}}</td>
                             <td>{{number_format($deposit->amount)}}</td>
-                            @if (Home::authClerkCheck()) <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
+                            @if (Home::authClerkCheck())
+                            <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
                             <td><a class='output-btn btn btn-primary' href='./invoiceOutput/{{$deposit->deposit_id}}' target='_blank' rel='noopener noreferrer'>印刷</a></td>
                         </tr>
                         @endforeach
@@ -92,7 +94,7 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
-(function($) {
+    (function($) {
         jQuery(window).load(function() {
 
             // 検索されて選択状態の企業を取得
@@ -103,7 +105,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -131,7 +133,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -197,7 +199,7 @@
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
                 // 全角数字を半角に変換
-                set_val = set_val.replace( /[０-９]/g, function(s) {
+                set_val = set_val.replace(/[０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
                 $(this).val(set_val);
@@ -228,7 +230,7 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } 
+                }
             });
 
 
@@ -238,6 +240,7 @@
 
 <style>
     /* 共通 */
+
     .search-control {
         display: block;
         width: 100%;
@@ -430,5 +433,4 @@
     .slip-td {
         margin-right: 20%;
     }
-
 </style>

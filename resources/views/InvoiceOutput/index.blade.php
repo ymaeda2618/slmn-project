@@ -81,8 +81,7 @@
 
             <div id="target-id-area"></div>
             <div class="output-btn-area">
-                <input type='submit' class='output-btn btn btn-primary width-30' name='output-btn' id="output-btn" value='印刷' tabindex="9">
-                {{--  <button id="output-btn" class="output-btn btn btn-primary width-30" type="button" tabindex="9">印刷</button>  --}}
+                <input type='submit' class='output-btn btn btn-primary width-30' name='output-btn' id="output-btn" value='印刷' tabindex="9"> {{-- <button id="output-btn" class="output-btn btn btn-primary width-30" type="button" tabindex="9">印刷</button>                --}}
             </div>
         </form>
 
@@ -104,7 +103,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -135,7 +134,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -267,7 +266,6 @@
             return false;
         }
     }
-
 </script>
 <style>
     /* 共通 */

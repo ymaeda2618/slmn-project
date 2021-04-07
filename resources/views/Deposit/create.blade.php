@@ -51,7 +51,7 @@
                 <input type="hidden" id="calc-flg" value="0">
             </div>
 
-            {{--  抽出結果表示欄 開始  --}}
+            {{-- 抽出結果表示欄 開始 --}}
             <div id="result-area" class="result-area">
                 <table class="result-table" onchange="javascript:changeCalcFlg()">
                     <tr>
@@ -70,7 +70,7 @@
                 </table>
                 <div id="sale-slip-area"></div>
             </div>
-            {{--  抽出結果表示欄 終了  --}}
+            {{-- 抽出結果表示欄 終了 --}}
 
             <table class="deposit-table">
                 <tr>
@@ -185,578 +185,576 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
+    var notax_sub_total_8;
+    var tax_total_8;
+    var sub_total_8;
 
-var notax_sub_total_8;
-var tax_total_8;
-var sub_total_8;
+    var notax_sub_total_10;
+    var tax_total_10;
+    var sub_total_10;
 
-var notax_sub_total_10;
-var tax_total_10;
-var sub_total_10;
+    var notax_sub_total;
+    var tax_total;
+    var sub_total;
 
-var notax_sub_total;
-var tax_total;
-var sub_total;
+    var adjust_price;
+    var total;
 
-var adjust_price;
-var total;
+    (function($) {
+        jQuery(window).load(function() {
 
-(function($) {
-    jQuery(window).load(function() {
+            // 一番最初は売上先企業にフォーカスする
+            $('#sale_company_code').focus();
 
-        // 一番最初は売上先企業にフォーカスする
-        $('#sale_company_code').focus();
+            // 初期化処理
+            notax_sub_total_8 = 0;
+            tax_total_8 = 0;
+            sub_total_8 = 0;
 
-        // 初期化処理
-        notax_sub_total_8 = 0;
-        tax_total_8 = 0;
-        sub_total_8 = 0;
+            notax_sub_total_10 = 0;
+            tax_total_10 = 0;
+            sub_total_10 = 0;
 
-        notax_sub_total_10 = 0;
-        tax_total_10 = 0;
-        sub_total_10 = 0;
+            notax_sub_total = 0;
+            tax_total = 0;
+            sub_total = 0;
 
-        notax_sub_total = 0;
-        tax_total = 0;
-        sub_total = 0;
+            adjust_price = 0;
+            total = 0;
 
-        adjust_price = 0;
-        total = 0;
+            //-------------------------------------
+            // Enterと-を押したときにタブ移動する処理
+            //-------------------------------------
+            $(document).on("keyup", "input", function(event) {
 
-        //-------------------------------------
-        // Enterと-を押したときにタブ移動する処理
-        //-------------------------------------
-        $(document).on("keypress", "input", function(event) {
+                if (event.keyCode === 13) { // Enterが押された時
 
-            if (event.keyCode === 13) { // Enterが押された時
+                    var this_id = $(this).attr('id');
 
-                var this_id = $(this).attr('id');
+                    // 現在のtabIndex取得
+                    var tabindex = parseInt($(this).attr('tabindex'), 10);
+                    if (isNaN(tabindex)) return false;
 
-                // 現在のtabIndex取得
-                var tabindex = parseInt($(this).attr('tabindex'), 10);
-                if (isNaN(tabindex)) return false;
+                    // ひとつ前のタブの最小値を取得
+                    var min = 0;
+                    $("#deposit-create-form [tabindex]").attr("tabindex", function(a, b) {
 
-                // ひとつ前のタブの最小値を取得
-                var min = 0;
-                $("#deposit-create-form [tabindex]").attr("tabindex", function(a, b) {
-
-                    b = parseInt(b, 10);
-                    if (tabindex < b) {
-                        if (min == 0) min = b;
-                        else if (min > b) min = b;
-                    }
-                });
-
-                tabindex = min;
-
-                if ($('input[tabindex="' + tabindex + '"]').length) {
-
-                    var this_val = $('input[tabindex="' + tabindex + '"]').val();
-                    $('input[tabindex="' + tabindex + '"]').val("");
-                    $('input[tabindex="' + tabindex + '"]').focus();
-                    $('input[tabindex="' + tabindex + '"]').val(this_val);
-
-                } else {
-
-                    var this_val = $('#delivery_code').val();
-                    $('#delivery_code').val("");
-                    $('#delivery_code').focus();
-                    $('#delivery_code').val(this_val);
-                }
-
-                return false;
-
-            } else if (event.keyCode === 47) { // スラッシュが押された時
-
-                var this_id = $(this).attr('id');
-
-                // 現在のtabIndex取得
-                var tabindex = parseInt($(this).attr('tabindex'), 10);
-                if (isNaN(tabindex)) return false;
-
-                // ひとつ前のタブの最大値を取得
-                var max = 0;
-                $("#sale-slip-create-form [tabindex]").attr("tabindex", function(a, b) {
-
-                    b = parseInt(b, 10);
-                    if (tabindex > b) {
-                        if (max == 0) max = b;
-                        else if (max < b) {
-                            max = b;
+                        b = parseInt(b, 10);
+                        if (tabindex < b) {
+                            if (min == 0) min = b;
+                            else if (min > b) min = b;
                         }
+                    });
+
+                    tabindex = min;
+
+                    if ($('input[tabindex="' + tabindex + '"]').length) {
+
+                        var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                        $('input[tabindex="' + tabindex + '"]').val("");
+                        $('input[tabindex="' + tabindex + '"]').focus();
+                        $('input[tabindex="' + tabindex + '"]').val(this_val);
+
+                    } else {
+
+                        var this_val = $('#delivery_code').val();
+                        $('#delivery_code').val("");
+                        $('#delivery_code').focus();
+                        $('#delivery_code').val(this_val);
                     }
-                });
 
-                tabindex = max;
+                    return false;
 
-                if ($('input[tabindex="' + tabindex + '"]').length) {
-                    var this_val = $('input[tabindex="' + tabindex + '"]').val();
-                    $('input[tabindex="' + tabindex + '"]').val("");
-                    $('input[tabindex="' + tabindex + '"]').focus();
-                    $('input[tabindex="' + tabindex + '"]').val(this_val);
+                } else if (event.keyCode === 111) { // スラッシュが押された時
+
+                    var this_id = $(this).attr('id');
+
+                    // 現在のtabIndex取得
+                    var tabindex = parseInt($(this).attr('tabindex'), 10);
+                    if (isNaN(tabindex)) return false;
+
+                    // ひとつ前のタブの最大値を取得
+                    var max = 0;
+                    $("#sale-slip-create-form [tabindex]").attr("tabindex", function(a, b) {
+
+                        b = parseInt(b, 10);
+                        if (tabindex > b) {
+                            if (max == 0) max = b;
+                            else if (max < b) {
+                                max = b;
+                            }
+                        }
+                    });
+
+                    tabindex = max;
+
+                    if ($('input[tabindex="' + tabindex + '"]').length) {
+                        var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                        $('input[tabindex="' + tabindex + '"]').val("");
+                        $('input[tabindex="' + tabindex + '"]').focus();
+                        $('input[tabindex="' + tabindex + '"]').val(this_val);
+                    }
+
+                    return false;
+
                 }
 
-                return false;
-
-            }
-
-        });
-
-        //-------------------------------------
-        // フォーカスアウトしたときの処理
-        //-------------------------------------
-        $(document).on("blur", 'input[name!="data[Deposit][search_date]"]', function(event) {
-
-            var tabindex = parseInt($(this).attr('tabindex'), 10);
-            var set_val = $(this).val();
-            // 全角数字を半角に変換
-            set_val = set_val.replace( /[０-９]/g, function(s) {
-                return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
             });
-            $(this).val(set_val);
-            var selector_code = $(this).attr('id');
-            var selector_id = selector_code.replace('_code', '_id');
-            var selector_text = selector_code.replace('_code', '_text');
 
-            var fd = new FormData();
-            fd.append("inputText", set_val);
+            //-------------------------------------
+            // フォーカスアウトしたときの処理
+            //-------------------------------------
+            $(document).on("blur", 'input[name!="data[Deposit][search_date]"]', function(event) {
 
-            if (selector_code.match(/deposit_company/)) { // 売上企業
+                var tabindex = parseInt($(this).attr('tabindex'), 10);
+                var set_val = $(this).val();
+                // 全角数字を半角に変換
+                set_val = set_val.replace(/[０-９]/g, function(s) {
+                    return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                });
+                $(this).val(set_val);
+                var selector_code = $(this).attr('id');
+                var selector_id = selector_code.replace('_code', '_id');
+                var selector_text = selector_code.replace('_code', '_text');
 
-                $.ajax({
+                var fd = new FormData();
+                fd.append("inputText", set_val);
+
+                if (selector_code.match(/deposit_company/)) { // 売上企業
+
+                    $.ajax({
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetSaleCompany",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
+
+                            $("#" + selector_code).val(data[0]);
+                            $("#" + selector_id).val(data[1]);
+                            $("#" + selector_text).val(data[2]);
+                        });
+
+                } else if (selector_code.match(/deposit_shop/)) { // 売上店舗
+
+                    $.ajax({
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetSaleShop",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
+
+                            $("#" + selector_code).val(data[0]);
+                            $("#" + selector_id).val(data[1]);
+                            $("#" + selector_text).val(data[2]);
+                        });
+
+                } else if (selector_code.match(/staff/)) { // 担当者IDの部分
+
+                    $.ajax({
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetStaff",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
+
+                            $("#" + selector_code).val(data[0]);
+                            $("#" + selector_id).val(data[1]);
+                            $("#" + selector_text).val(data[2]);
+                        });
+                }
+            });
+
+            //-------------------------------------
+            // autocomplete処理 売上企業ID
+            //-------------------------------------
+            $(".deposit_company_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxSetSaleCompany",
+                        url: "./AjaxAutoCompleteSaleCompany",
                         type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data) {
-
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
                     });
+                }
+            });
 
-            } else if (selector_code.match(/deposit_shop/)) { // 売上店舗
-
-                $.ajax({
+            //-------------------------------------
+            // autocomplete処理 売上店舗ID
+            //-------------------------------------
+            $(".deposit_shop_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxSetSaleShop",
+                        url: "./AjaxAutoCompleteSaleShop",
                         type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data) {
-
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
                     });
+                }
+            });
 
-            } else if (selector_code.match(/staff/)) { // 担当者IDの部分
-
-                $.ajax({
+            //-------------------------------------
+            // autocomplete処理 担当者ID
+            //-------------------------------------
+            $(".staff_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxSetStaff",
+                        url: "./AjaxAutoCompleteStaff",
                         type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data) {
-
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
                     });
-            }
+                }
+            });
+
+            //-------------------------------------
+            // Enterと-を押したときにタブ移動する処理
+            //-------------------------------------
+            $(document).on("click", ".register-btn", function() {
+
+                var this_val = $("#sale_submit_type").val();
+
+                if (this_val == "1") {
+                    $('#sale-slip-create-form').submit();
+                } else if (this_id == "2") {
+                    $('#sale-slip-create-form').submit();
+                } else {
+                    return false;
+                }
+            });
         });
+    })(jQuery);
 
-        //-------------------------------------
-        // autocomplete処理 売上企業ID
-        //-------------------------------------
-        $(".deposit_company_code_input").autocomplete({
-            source: function(req, resp) {
-                $.ajax({
-                    headers: {
-                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                    },
-                    url: "./AjaxAutoCompleteSaleCompany",
-                    type: "POST",
-                    cache: false,
-                    dataType: "json",
-                    data: {
-                        inputText: req.term
-                    },
-                    success: function(o) {
-                        resp(o);
-                    },
-                    error: function(xhr, ts, err) {
-                        resp(['']);
-                    }
-                });
-            }
-        });
+    // -----------
+    // 売上金額計算
+    // -----------
+    function searchSaleSlips() {
 
-        //-------------------------------------
-        // autocomplete処理 売上店舗ID
-        //-------------------------------------
-        $(".deposit_shop_code_input").autocomplete({
-            source: function(req, resp) {
-                $.ajax({
-                    headers: {
-                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                    },
-                    url: "./AjaxAutoCompleteSaleShop",
-                    type: "POST",
-                    cache: false,
-                    dataType: "json",
-                    data: {
-                        inputText: req.term
-                    },
-                    success: function(o) {
-                        resp(o);
-                    },
-                    error: function(xhr, ts, err) {
-                        resp(['']);
-                    }
-                });
-            }
-        });
+        // 入力値取得
+        var sales_from_date = $('#sales_from_date').val();
+        var sales_to_date = $('#sales_to_date').val();
+        var sales_company = $('#deposit_company_id').val();
+        var search_date_val = $('input:radio[name="data[Deposit][search_date]"]:checked').val();
+        var action = 'create';
 
-        //-------------------------------------
-        // autocomplete処理 担当者ID
-        //-------------------------------------
-        $(".staff_code_input").autocomplete({
-            source: function(req, resp) {
-                $.ajax({
-                    headers: {
-                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                    },
-                    url: "./AjaxAutoCompleteStaff",
-                    type: "POST",
-                    cache: false,
-                    dataType: "json",
-                    data: {
-                        inputText: req.term
-                    },
-                    success: function(o) {
-                        resp(o);
-                    },
-                    error: function(xhr, ts, err) {
-                        resp(['']);
-                    }
-                });
-            }
-        });
-
-        //-------------------------------------
-        // Enterと-を押したときにタブ移動する処理
-        //-------------------------------------
-        $(document).on("click", ".register-btn", function() {
-
-            var this_val = $("#sale_submit_type").val();
-
-            if (this_val == "1") {
-                $('#sale-slip-create-form').submit();
-            } else if (this_id == "2") {
-                $('#sale-slip-create-form').submit();
-            } else {
-                return false;
-            }
-        });
-    });
-})(jQuery);
-
-// -----------
-// 売上金額計算
-// -----------
-function searchSaleSlips() {
-
-    // 入力値取得
-    var sales_from_date = $('#sales_from_date').val();
-    var sales_to_date   = $('#sales_to_date').val();
-    var sales_company   = $('#deposit_company_id').val();
-    var search_date_val = $('input:radio[name="data[Deposit][search_date]"]:checked').val();
-    var action = 'create';
-
-    if (!search_date_val) {
-        alert('抽出日付を選択してください。');
-        return;
-    }
-
-    if (sales_from_date == '' && sales_to_date == '') {
-        alert('日付を入力してください。');
-        return;
-    }
-
-    if (sales_company == '') {
-        alert('売上企業を入力してください。');
-        return;
-    }
-
-    var fd = new FormData();
-    fd.append("sales_from_date", sales_from_date);
-    fd.append("sales_to_date", sales_to_date);
-    fd.append("sales_company", sales_company);
-    fd.append("search_date_val", search_date_val);
-    fd.append("action", action);
-
-    // ajaxで対象範囲の売上金額を計算して持ってくる
-    $.ajax({
-        headers: {
-            "X-CSRF-TOKEN": $("[name='_token']").val()
-        },
-        url: "./AjaxSearchSaleSlips",
-        type: "POST",
-        dataType: "JSON",
-        data: fd,
-        processData: false,
-        contentType: false
-    })
-    .done(function(data) {
-
-        if (data != '') {
-            $(".result-table").html(data[0]);
-        } else {
-            alert("抽出対象が存在しません。");
+        if (!search_date_val) {
+            alert('抽出日付を選択してください。');
+            return;
         }
 
-    })
-    .fail(function(XMLHttpRequest, textStatus, errorThrown) {
-        alert(XMLHttpRequest);
-        alert(textStatus);
-        alert(errorThrown);
-        // 送信失敗
-        alert("失敗しました。");
-    });
+        if (sales_from_date == '' && sales_to_date == '') {
+            alert('日付を入力してください。');
+            return;
+        }
 
-}
+        if (sales_company == '') {
+            alert('売上企業を入力してください。');
+            return;
+        }
 
-// ------------------------
-// 選択された値の売上金額の計算
-// ------------------------
-function calcSalesPrice() {
+        var fd = new FormData();
+        fd.append("sales_from_date", sales_from_date);
+        fd.append("sales_to_date", sales_to_date);
+        fd.append("sales_company", sales_company);
+        fd.append("search_date_val", search_date_val);
+        fd.append("action", action);
 
-    if(!$('.result-table').length) {
-        alert("抽出してから計算ボタンを押してください。");
-        return;
+        // ajaxで対象範囲の売上金額を計算して持ってくる
+        $.ajax({
+                headers: {
+                    "X-CSRF-TOKEN": $("[name='_token']").val()
+                },
+                url: "./AjaxSearchSaleSlips",
+                type: "POST",
+                dataType: "JSON",
+                data: fd,
+                processData: false,
+                contentType: false
+            })
+            .done(function(data) {
+
+                if (data != '') {
+                    $(".result-table").html(data[0]);
+                } else {
+                    alert("抽出対象が存在しません。");
+                }
+
+            })
+            .fail(function(XMLHttpRequest, textStatus, errorThrown) {
+                alert(XMLHttpRequest);
+                alert(textStatus);
+                alert(errorThrown);
+                // 送信失敗
+                alert("失敗しました。");
+            });
+
     }
 
-    var total           = 0;
-    var notaxSubTotal8  = 0;
-    var subTotal8       = 0;
-    var notaxSubTotal10 = 0;
-    var subTotal10      = 0;
-    var deliveryPrice   = 0;
-    var adjustPrice     = 0;
-    var tax8            = 0;
-    var tax10           = 0;
+    // ------------------------
+    // 選択された値の売上金額の計算
+    // ------------------------
+    function calcSalesPrice() {
 
-    // チェックボックスの値を取得して計算
-    $('.result-table input:checked').each(function(){
+        if (!$('.result-table').length) {
+            alert("抽出してから計算ボタンを押してください。");
+            return;
+        }
 
-        // idを取得
-        var id = $(this).val();
+        var total = 0;
+        var notaxSubTotal8 = 0;
+        var subTotal8 = 0;
+        var notaxSubTotal10 = 0;
+        var subTotal10 = 0;
+        var deliveryPrice = 0;
+        var adjustPrice = 0;
+        var tax8 = 0;
+        var tax10 = 0;
 
+        // チェックボックスの値を取得して計算
+        $('.result-table input:checked').each(function() {
+
+            // idを取得
+            var id = $(this).val();
+
+            // 8%税抜額
+            notaxSubTotal8 += parseInt($('#sale-slip-subTotal8-' + id).val());
+
+            // 10%税抜額
+            notaxSubTotal10 += parseInt($('#sale-slip-subTotal10-' + id).val());
+
+            // 配送額
+            deliveryPrice += parseInt($('#sale-slip-deliveryPrice-' + id).val());
+
+            // 調整額
+            adjustPrice += parseInt($('#sale-slip-adjustPrice-' + id).val());
+
+        });
+
+        // 8%税込額
+        subTotal8 = Math.round(notaxSubTotal8 * 1.08);
+
+        // 8%消費税額
+        tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
+
+        // 10%税込額
+        subTotal10 = Math.round(notaxSubTotal10 * 1.1);
+
+        // 10%消費税額
+        tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);
+
+        // 合計金額計算
+        total = parseInt(subTotal8) + parseInt(subTotal10) + parseInt(deliveryPrice) + parseInt(adjustPrice);
+
+        // ------------
+        // 計算結果を表示
+        // ------------
         // 8%税抜額
-        notaxSubTotal8 += parseInt($('#sale-slip-subTotal8-' + id).val());
+        $('#notax_sub_total_8').val(parseInt(notaxSubTotal8));
+
+        // 8%消費税額
+        $('#tax_total_8').val(parseInt(tax8));
+
+        // 8%税込額
+        $('#sub_total_8').val(parseInt(subTotal8));
 
         // 10%税抜額
-        notaxSubTotal10 += parseInt($('#sale-slip-subTotal10-' + id).val());
+        $('#notax_sub_total_10').val(parseInt(notaxSubTotal10));
 
-        // 配送額
-        deliveryPrice += parseInt($('#sale-slip-deliveryPrice-' + id).val());
+        // 10%消費税額
+        $('#tax_total_10').val(parseInt(tax10));
 
-        // 調整額
-        adjustPrice += parseInt($('#sale-slip-adjustPrice-' + id).val());
+        // 10%税込額
+        $('#sub_total_10').val(parseInt(subTotal10));
 
-    });
+        // 税抜小計
+        $('#notax_sub_total').val(parseInt(notaxSubTotal8 + notaxSubTotal10));
 
-    // 8%税込額
-    subTotal8 = Math.round(notaxSubTotal8 * 1.08);
+        // 税額
+        $('#tax_total').val(parseInt(tax8 + tax10));
 
-    // 8%消費税額
-    tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
+        // 税込小計
+        $('#sub_total').val(parseInt(subTotal8 + subTotal10));
 
-    // 10%税込額
-    subTotal10 = Math.round(notaxSubTotal10 * 1.1);
+        // 配送額総計
+        $('#delivery_total_price').val(parseInt(deliveryPrice));
 
-    // 10%消費税額
-    tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);
+        // 伝票調整額総計
+        $('#slip_adjust_total_price').val(parseInt(adjustPrice));
 
-    // 合計金額計算
-    total = parseInt(subTotal8) + parseInt(subTotal10) + parseInt(deliveryPrice) + parseInt(adjustPrice);
+        // 調整額含む前の計算結果
+        $('#price').val(parseInt(total));
 
-    // ------------
-    // 計算結果を表示
-    // ------------
-    // 8%税抜額
-    $('#notax_sub_total_8').val(parseInt(notaxSubTotal8));
-
-    // 8%消費税額
-    $('#tax_total_8').val(parseInt(tax8));
-
-    // 8%税込額
-    $('#sub_total_8').val(parseInt(subTotal8));
-
-    // 10%税抜額
-    $('#notax_sub_total_10').val(parseInt(notaxSubTotal10));
-
-    // 10%消費税額
-    $('#tax_total_10').val(parseInt(tax10));
-
-    // 10%税込額
-    $('#sub_total_10').val(parseInt(subTotal10));
-
-    // 税抜小計
-    $('#notax_sub_total').val(parseInt(notaxSubTotal8 + notaxSubTotal10));
-
-    // 税額
-    $('#tax_total').val(parseInt(tax8 + tax10));
-
-    // 税込小計
-    $('#sub_total').val(parseInt(subTotal8 + subTotal10));
-
-    // 配送額総計
-    $('#delivery_total_price').val(parseInt(deliveryPrice));
-
-    // 伝票調整額総計
-    $('#slip_adjust_total_price').val(parseInt(adjustPrice));
-
-    // 調整額含む前の計算結果
-    $('#price').val(parseInt(total));
-
-    calcTotalSalesPrice();
-}
-
-// --------------
-// 調整後売上金額の計算
-// --------------
-function calcTotalSalesPrice() {
-
-    // 入力値取得
-    var adjust_price = $('#adjustment_price').val();
-    if (adjust_price == '') adjust_price = 0;
-    $('#adjust_total_price').val(parseInt(adjust_price));
-
-    // 売上金額に値があるか確認なければ何もしない
-    var sales_price = $('#price').val();
-    if (sales_price == '') {
-        return;
+        calcTotalSalesPrice();
     }
 
-    // -----------------
-    // 調整金額も含めて計算
-    // -----------------
+    // --------------
+    // 調整後売上金額の計算
+    // --------------
+    function calcTotalSalesPrice() {
 
-    // 総合計計算
-    var total_sales_price = 0;
-    total_sales_price = parseInt(sales_price) + parseInt(adjust_price);
+        // 入力値取得
+        var adjust_price = $('#adjustment_price').val();
+        if (adjust_price == '') adjust_price = 0;
+        $('#adjust_total_price').val(parseInt(adjust_price));
 
-    $("#total_price").val(total_sales_price);
+        // 売上金額に値があるか確認なければ何もしない
+        var sales_price = $('#price').val();
+        if (sales_price == '') {
+            return;
+        }
 
-    // 計算フラグを更新する
-    $("#calc-flg").val(1);
+        // -----------------
+        // 調整金額も含めて計算
+        // -----------------
 
-}
+        // 総合計計算
+        var total_sales_price = 0;
+        total_sales_price = parseInt(sales_price) + parseInt(adjust_price);
 
-// --------------
-// 登録時のチェック
-// --------------
-function submitCheck() {
+        $("#total_price").val(total_sales_price);
 
-    // ---------
-    // 変数初期化
-    // ---------
-    var deposit_date   = '';
-    var sales_from_date = '';
-    var sales_to_date   = '';
-    var sales_company   = '';
-    var sales_shop      = '';
-    var staff_code        = '';
-    var total_price       = '';
+        // 計算フラグを更新する
+        $("#calc-flg").val(1);
 
-    // ----------
-    // 入力チェック
-    // ----------
-    deposit_date = $("#deposit_date").val();
-    if (deposit_date == '') {
-        alert('入金日付を入力してください');
-        return false;
     }
 
-    sales_from_date = $("#sales_from_date").val();
-    sales_to_date = $("#sales_to_date").val();
-    if (sales_from_date == '' || sales_to_date == '') {
-        alert('伝票日付を入力してください');
-        return false;
+    // --------------
+    // 登録時のチェック
+    // --------------
+    function submitCheck() {
+
+        // ---------
+        // 変数初期化
+        // ---------
+        var deposit_date = '';
+        var sales_from_date = '';
+        var sales_to_date = '';
+        var sales_company = '';
+        var sales_shop = '';
+        var staff_code = '';
+        var total_price = '';
+
+        // ----------
+        // 入力チェック
+        // ----------
+        deposit_date = $("#deposit_date").val();
+        if (deposit_date == '') {
+            alert('入金日付を入力してください');
+            return false;
+        }
+
+        sales_from_date = $("#sales_from_date").val();
+        sales_to_date = $("#sales_to_date").val();
+        if (sales_from_date == '' || sales_to_date == '') {
+            alert('伝票日付を入力してください');
+            return false;
+        }
+
+        sales_company = $("#deposit_company_code").val();
+        if (sales_company == '') {
+            alert('売上企業を入力してください');
+            return false;
+        }
+
+        staff_code = $("#staff_code").val();
+        if (staff_code == '') {
+            alert('担当者を入力してください');
+            return false;
+        }
+
+        total_price = $("#total_price").val();
+        if (total_price == '') {
+            alert('調整後入金金額が空白です');
+            return false;
+        }
+
+        // 売上日付を変更した場合に、「抽出」ボタンを押して売上金額の計算をしたか確認する
+        var calc_flg = $("#calc-flg").val();
+        if (calc_flg == '0') {
+            alert('売上伝票のチェックボックスが変更されています。計算ボタンを押してください。');
+            return false;
+        }
+
     }
 
-    sales_company = $("#deposit_company_code").val();
-    if (sales_company == '') {
-        alert('売上企業を入力してください');
-        return false;
+    // --------------
+    // 計算フラグの変更
+    // --------------
+    function changeCalcFlg() {
+
+        $("#calc-flg").val(0);
+
     }
 
-    staff_code = $("#staff_code").val();
-    if (staff_code == '') {
-        alert('担当者を入力してください');
-        return false;
+    // -------------------
+    // sale_slip_idの取得
+    // -------------------
+    function discardSaleSlipId(id) {
+
+        // 対象IDのチェック状態を取得
+        var isCheck = $('#sale-slip-id-' + id).prop('checked');
+
+        if (isCheck) {
+            // チェックしたら詳細エリアにIDを追加
+            $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
+        } else {
+            // チェック外れたらIDを詳細エリアから外す
+            $('#sale-slip-detail-id-' + id).remove();
+        }
     }
-
-    total_price = $("#total_price").val();
-    if (total_price == '') {
-        alert('調整後入金金額が空白です');
-        return false;
-    }
-
-    // 売上日付を変更した場合に、「抽出」ボタンを押して売上金額の計算をしたか確認する
-    var calc_flg = $("#calc-flg").val();
-    if (calc_flg == '0') {
-        alert('売上伝票のチェックボックスが変更されています。計算ボタンを押してください。');
-        return false;
-    }
-
-}
-
-// --------------
-// 計算フラグの変更
-// --------------
-function changeCalcFlg() {
-
-    $("#calc-flg").val(0);
-
-}
-
-// -------------------
-// sale_slip_idの取得
-// -------------------
-function discardSaleSlipId(id) {
-
-    // 対象IDのチェック状態を取得
-    var isCheck = $('#sale-slip-id-' + id).prop('checked');
-
-    if (isCheck) {
-        // チェックしたら詳細エリアにIDを追加
-        $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
-    } else {
-        // チェック外れたらIDを詳細エリアから外す
-        $('#sale-slip-detail-id-' + id).remove();
-    }
-}
-
 </script>
 <style>
     /* 共通 */
@@ -891,7 +889,7 @@ function discardSaleSlipId(id) {
         border-bottom: 1px solid #bbb;
     }
 
-    .result-table tr:last-child{
+    .result-table tr:last-child {
         border-bottom: none
     }
 
@@ -902,7 +900,7 @@ function discardSaleSlipId(id) {
     }
 
     .result-table th:last-child,
-        .result-table td:last-child{
+    .result-table td:last-child {
         border: none;
     }
 
@@ -925,5 +923,4 @@ function discardSaleSlipId(id) {
     .register-btn {
         width: 40%;
     }
-
 </style>

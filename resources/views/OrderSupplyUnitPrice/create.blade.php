@@ -50,18 +50,15 @@
                     <td class="width-20">
                         <input type="text" class="form-control" id="product_text_0" name="data[OrderSupplyUnitPriceDetail][0][product_text]" placeholder="製品欄" readonly>
                     </td>
-                    {{-- 製品 END --}}
-                    {{-- 金額 START --}}
+                    {{-- 製品 END --}} {{-- 金額 START --}}
                     <td class="width-10">
                         <input type="number" class="form-control" id="order_unit_price_0" name="data[OrderSupplyUnitPriceDetail][0][order_unit_price]" tabindex="4">
                     </td>
-                    {{-- 金額 END --}}
-                    {{-- 適用開始日 START --}}
+                    {{-- 金額 END --}} {{-- 適用開始日 START --}}
                     <td class="width-10">
                         <input type="date" class="form-control " id="apply_from" name="data[OrderSupplyUnitPriceDetail][0][apply_from]" value="<?php echo date('Y-m-d');?>" tabindex="5">
                     </td>
-                    {{-- 適用開始日 END --}}
-                    {{-- 削除 START --}}
+                    {{-- 適用開始日 END --}} {{-- 削除 START --}}
                     <td class="width-5">
                         <button id="remove-product-btn" type="button" class="btn remove-product-btn btn-secondary" onclick='javascript:removeProduct(0) '>削除</button>
                     </td>
@@ -120,7 +117,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -160,7 +157,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -192,7 +189,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 43) { // プラスが押された時
+                } else if (event.keyCode === 107) { // プラスが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -215,7 +212,7 @@
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
                 // 全角数字を半角に変換
-                set_val = set_val.replace( /[０-９]/g, function(s) {
+                set_val = set_val.replace(/[０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
                 $(this).val(set_val);
@@ -463,10 +460,10 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code;    // 仕入企業
-        var product_code;           // 製品ID
-        var order_unit_price;       // 金額
-        var staff_code;             // 担当
+        var supply_company_code; // 仕入企業
+        var product_code; // 製品ID
+        var order_unit_price; // 金額
+        var staff_code; // 担当
 
         // -----------
         // 入力チェック
@@ -497,10 +494,10 @@
 
         }
     }
-
 </script>
 <style>
     /* 共通 */
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;

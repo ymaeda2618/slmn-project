@@ -307,7 +307,7 @@
                             if ($SaleSlipList->sale_submit_type == 2) $text = '一時保存';
                             if ($SaleSlipList->sale_submit_type == 4) $text = '請求書印刷';
                          ?>
-                        <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="{{$text}}" readonly>
+                            <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="{{$text}}" readonly>
                     </td>
                     <td class="width-50">
                         <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
@@ -385,7 +385,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -476,7 +476,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -556,7 +556,7 @@
                     }
 
                     return false;
-                } else if (event.keyCode === 43) { // プラスが押された時
+                } else if (event.keyCode === 107) { // プラスが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -567,7 +567,7 @@
                         return false;
                     }
 
-                } else if (event.keyCode === 42) { // *が押された時
+                } else if (event.keyCode === 106) { // *が押された時
 
                     var this_val = $('#sale_submit_type').val();
                     $('#sale_submit_type').val("");
@@ -1697,20 +1697,20 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code;  // 売上企業
-        var sale_shop_code;     // 売上店舗
-        var product_code;       // 製品ID
-        var unit_price;         // 単価
-        var unit_num;           // 数量
-        var staff_code;         // 担当
-        var inventory_unit_num  // 発注数量
+        var sale_company_code; // 売上企業
+        var sale_shop_code; // 売上店舗
+        var product_code; // 製品ID
+        var unit_price; // 単価
+        var unit_num; // 数量
+        var staff_code; // 担当
+        var inventory_unit_num // 発注数量
 
         // -----------
         // 入力チェック
         // -----------
         // 伝票数を確認
         var slip_num = 0;
-        $('.partition-area').each(function(index, element){
+        $('.partition-area').each(function(index, element) {
             slip_num++;
         });
         if (slip_num <= 0) {

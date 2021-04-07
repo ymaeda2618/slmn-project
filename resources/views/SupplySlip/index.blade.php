@@ -78,6 +78,15 @@
             </form>
         </div>
 
+        <!--総計表示エリア-->
+        <div class='sum-display-area'>
+            <div class='sum-display-div' id='supply-slip-count-div'>伝票件数:{{$supply_slip_num}}件</div>
+            <div class='sum-display-div' id='delivery-price-amount-div'>総配送額:{{$delivery_price_amount}}円</div>
+            <div class='sum-display-div' id='adjust-price-amount-div'>総調整額:{{$adjust_price_amount}}円</div>
+            <div class='sum-display-div' id='notax-sub-total-amount-div'>総税抜額:{{$notax_sub_total_amount}}円</div>
+            <div class='sum-display-div' id='supply-slip-amount-div'>総額:{{$supply_slip_amount}}円</div>
+        </div>
+
         <!--一覧表示エリア-->
         <div class='list-area'>
             <table class='index-table'>
@@ -121,10 +130,10 @@
                         <td class="forth-width bold-tr" colspan="4">
                             <!--取引先名-->{{$supplySlips->supply_company_name}}
                         </td>
-                        @if (Home::authClerkCheck()) 
-                            <td class="double-width" colspan="2" rowspan="2">
-                                <!--編集ボタン--><a class='edit-btn' href='./SupplySlipEdit/{{$supplySlips->supply_slip_id}}'>編集</a>
-                            </td>
+                        @if (Home::authClerkCheck())
+                        <td class="double-width" colspan="2" rowspan="2">
+                            <!--編集ボタン--><a class='edit-btn' href='./SupplySlipEdit/{{$supplySlips->supply_slip_id}}'>編集</a>
+                        </td>
                         @endif
                     </tr>
                     <tr>
@@ -193,7 +202,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keypress", "input", function(event) {
+            $(document).on("keyup", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -221,7 +230,7 @@
 
                     return false;
 
-                } else if (event.keyCode === 47) { // スラッシュが押された時
+                } else if (event.keyCode === 111) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -339,7 +348,7 @@
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
                 var set_val = $(this).val();
                 // 全角数字を半角に変換
-                set_val = set_val.replace( /[０-９]/g, function(s) {
+                set_val = set_val.replace(/[０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
                 $(this).val(set_val);

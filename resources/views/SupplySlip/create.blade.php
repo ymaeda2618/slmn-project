@@ -319,10 +319,20 @@
             adjust_price = 0;
             total = 0;
 
+            // 処理キャンセルのフラグを定義：0…処理可能　1…キャンセル
+            var cancelFlag = 0;
+
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keyup", "input", function(event) {
+            $(document).on("keypress", "input", function(event) {
+
+                if (ancelFlag == 1) {
+
+                    return false;
+                }
+
+                ancelFlag = 1;
 
                 if (event.keyCode === 13) { // Enterが押された時
 
@@ -367,7 +377,10 @@
 
                         // 現在のtabIndex取得
                         var tabindex = parseInt($(this).attr('tabindex'), 10);
-                        if (isNaN(tabindex)) return false;
+                        if (isNaN(tabindex)) {
+                            cancelFlag = 0;
+                            return false;
+                        }
 
                         // ひとつ前のタブの最小値を取得
                         var min = 0;
@@ -406,9 +419,10 @@
                         }
                     }
 
+                    cancelFlag = 0;
                     return false;
 
-                } else if (event.keyCode === 111) { // スラッシュが押された時
+                } else if (event.keyCode === 47) { // スラッシュが押された時
 
                     var this_id = $(this).attr('id');
 
@@ -453,7 +467,10 @@
 
                         // 現在のtabIndex取得
                         var tabindex = parseInt($(this).attr('tabindex'), 10);
-                        if (isNaN(tabindex)) return false;
+                        if (isNaN(tabindex)) {
+                            cancelFlag = 0;
+                            return false;
+                        }
 
                         // ひとつ前のタブの最大値を取得
                         var max = 0;
@@ -488,25 +505,26 @@
                         }
                     }
 
+                    cancelFlag = 0;
                     return false;
-                } else if (event.keyCode === 107) { // プラスが押された時
+                } else if (event.keyCode === 43) { // プラスが押された時
 
                     var this_id = $(this).attr('id');
 
                     if (this_id.match(/memo/)) {
 
                         $('#add-slip-btn').trigger('click');
-
+                        cancelFlag = 0;
                         return false;
                     }
 
-                } else if (event.keyCode === 106) { // *が押された時
+                } else if (event.keyCode === 42) { // *が押された時
 
                     var this_val = $('#supply_submit_type').val();
                     $('#supply_submit_type').val("");
                     $('#supply_submit_type').focus();
                     $('#supply_submit_type').val(this_val);
-
+                    cancelFlag = 0;
                     return false;
                 }
 

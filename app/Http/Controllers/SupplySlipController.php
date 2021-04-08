@@ -194,6 +194,44 @@ class SupplySlipController extends Controller
             ->orderBy('SupplySlip.date', 'desc')->paginate(10);
 
 
+            //---------------------
+            // 仕入れ一覧の総額集計
+            //---------------------
+            $supplySlipSumList = DB::table('supply_slips AS SupplySlip')
+            ->selectRaw('COUNT(SupplySlip.id) AS supply_slip_num')
+            ->selectRaw('SUM(SupplySlip.delivery_price) AS delivery_price_sum')
+            ->selectRaw('SUM(SupplySlip.adjust_price) AS adjust_price_sum')
+            ->selectRaw('SUM(SupplySlip.notax_sub_total) AS notax_sub_total_sum')
+
+            ->join('supply_companies AS SupplyCompany', function ($join) {
+                $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id');
+            })
+            ->leftJoin('supply_shops AS SupplyShop', function ($join) {
+                $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
+            })
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('SupplySlip.date', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 2, function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('SupplySlip.delivery_date', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
+                return $query->where('SupplySlip.supply_company_id', '=', $condition_company_id);
+            })
+            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
+                return $query->where('SupplySlip.supply_shop_id', '=', $condition_shop_id);
+            })
+            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+                return $query
+                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
+                       ->mergeBindings($product_sub_query);
+            })
+            ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
+                return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
+            })
+            ->where('SupplySlip.active', '=', '1')
+            ->get();
+
             // 全体で何件伝票があるのかカウント
             $supply_slip_num = 0;
             // 全体の配送金額をカウント
@@ -205,7 +243,19 @@ class SupplySlipController extends Controller
             // 全体の総額をカウント
             $supply_slip_amount = 0;
 
-            foreach ($supplySlipList as $supplySlipVal) {
+            if(!empty($supplySlipSumList)) {
+
+                // 最初の要素を取得
+                $supplySlipSumVal = current($supplySlipSumList);
+
+                $supply_slip_num        = $supplySlipSumVal->supply_slip_num;
+                $delivery_price_amount  = $supplySlipSumVal->delivery_price_sum;
+                $adjust_price_amount    = $supplySlipSumVal->adjust_price_sum;
+                $notax_sub_total_amount = $supplySlipSumVal->notax_sub_total_sum;
+                $supply_slip_amount     = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
+            }
+
+            /*foreach ($supplySlipList as $supplySlipVal) {
 
                 $delivery_price  = 0;
                 $adjust_price    = 0;
@@ -231,7 +281,7 @@ class SupplySlipController extends Controller
                 $adjust_price_amount    += $adjust_price;
                 $notax_sub_total_amount += $notax_sub_total;
                 $supply_slip_amount     += ($delivery_price + $adjust_price + $notax_sub_total);
-            }
+            }*/
 
             //---------------------
             // 伝票詳細を取得

@@ -212,18 +212,18 @@ class SupplySlipController extends Controller
                 $notax_sub_total = 0;
 
                 // 配送額
-                if (isset($supplySlipVal['delivery_price']) && !empty($supplySlipVal['delivery_price'])) {
-                    $delivery_price  = $supplySlipVal['delivery_price'];
+                if (isset($supplySlipVal->delivery_price) && !empty($supplySlipVal->delivery_price)) {
+                    $delivery_price  = $supplySlipVal->delivery_price;
                 }
 
                 // 調整額
-                if (isset($supplySlipVal['adjust_price']) && !empty($supplySlipVal['adjust_price'])) {
-                    $adjust_price  = $supplySlipVal['adjust_price'];
+                if (isset($supplySlipVal->adjust_price) && !empty($supplySlipVal->adjust_price)) {
+                    $adjust_price  = $supplySlipVal->adjust_price;
                 }
 
                 // 税抜額
-                if (isset($supplySlipVal['notax_sub_total']) && !empty($supplySlipVal['notax_sub_total'])) {
-                    $notax_sub_total  = $supplySlipVal['notax_sub_total'];
+                if (isset($supplySlipVal->notax_sub_total) && !empty($supplySlipVal->notax_sub_total)) {
+                    $notax_sub_total  = $supplySlipVal->notax_sub_total;
                 }
 
                 $supply_slip_num        += 1;

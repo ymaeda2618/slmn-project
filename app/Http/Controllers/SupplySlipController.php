@@ -248,10 +248,10 @@ class SupplySlipController extends Controller
                 // 最初の要素を取得
                 $supplySlipSumVal = current($supplySlipSumList);
 
-                $supply_slip_num        = $supplySlipSumVal->supply_slip_num;
-                $delivery_price_amount  = $supplySlipSumVal->delivery_price_sum;
-                $adjust_price_amount    = $supplySlipSumVal->adjust_price_sum;
-                $notax_sub_total_amount = $supplySlipSumVal->notax_sub_total_sum;
+                $supply_slip_num        = $supplySlipSumVal['supply_slip_num'];
+                $delivery_price_amount  = $supplySlipSumVal['delivery_price_sum'];
+                $adjust_price_amount    = $supplySlipSumVal['adjust_price_sum'];
+                $notax_sub_total_amount = $supplySlipSumVal['notax_sub_total_sum'];
                 $supply_slip_amount     = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
             }
 

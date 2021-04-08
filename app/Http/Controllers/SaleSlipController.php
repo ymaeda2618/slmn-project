@@ -241,7 +241,7 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->where('SaleSlip.active', '=', '1')
-            ->orderBy('SaleSlip.date', 'desc')->paginate(10);
+            ->get();
 
             // 全体で何件伝票があるのかカウント
             $sale_slip_num = 0;

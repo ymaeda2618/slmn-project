@@ -255,34 +255,6 @@ class SupplySlipController extends Controller
                 $supply_slip_amount     = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
             }
 
-            /*foreach ($supplySlipList as $supplySlipVal) {
-
-                $delivery_price  = 0;
-                $adjust_price    = 0;
-                $notax_sub_total = 0;
-
-                // 配送額
-                if (isset($supplySlipVal->delivery_price) && !empty($supplySlipVal->delivery_price)) {
-                    $delivery_price  = $supplySlipVal->delivery_price;
-                }
-
-                // 調整額
-                if (isset($supplySlipVal->adjust_price) && !empty($supplySlipVal->adjust_price)) {
-                    $adjust_price  = $supplySlipVal->adjust_price;
-                }
-
-                // 税抜額
-                if (isset($supplySlipVal->notax_sub_total) && !empty($supplySlipVal->notax_sub_total)) {
-                    $notax_sub_total  = $supplySlipVal->notax_sub_total;
-                }
-
-                $supply_slip_num        += 1;
-                $delivery_price_amount  += $delivery_price;
-                $adjust_price_amount    += $adjust_price;
-                $notax_sub_total_amount += $notax_sub_total;
-                $supply_slip_amount     += ($delivery_price + $adjust_price + $notax_sub_total);
-            }*/
-
             //---------------------
             // 伝票詳細を取得
             //---------------------

@@ -78,73 +78,14 @@
             </form>
         </div>
 
-        <!--<div class='search-area'>
-            <div class='div-st'>売上先店舗 検索エリア</div>
-            <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
-                {{ csrf_field() }}
-                <table>
-                    <tbody>
-                        <tr>
-                            <th>売上日付</th>
-                            <td>
-                                <input type="date" class="form-control" id="sale_date_from" name="data[SaleSlip][sale_date_from]" value="{{$condition_date_from}}" tabindex="1">
-                            </td>
-                            <td>
-                                <input type="date" class="form-control" id="sale_date_to" name="data[SaleSlip][sale_date_to]" value="{{$condition_date_to}}" tabindex="2">
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>売上企業</th>
-                            <td class="width-20">
-                                <input type="text" class="form-control sale_company_code_input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" value="{{$condition_company_code}}" tabindex="3">
-                                <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]" value="{{$condition_company_id}}">
-                            </td>
-                            <td class="width-30">
-                                <input type="text" class="form-control" id="sale_company_text" name="data[SaleSlip][sale_company_text]" value="{{$condition_company_text}}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>売上店舗</th>
-                            <td class="width-20">
-                                <input type="text" class="form-control sale_shop_code_input" id="sale_shop_code" name="data[SaleSlip][sale_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                <input type="hidden" id="sale_shop_id" name="data[SaleSlip][sale_shop_id]" value="{{$condition_shop_id}}">
-                            </td>
-                            <td class="width-30">
-                                <input type="text" class="form-control" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$condition_shop_text}}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>売上製品</th>
-                            <td class="width-10">
-                                <input type="text" class="form-control product_code_input" id="product_code" name="data[SaleSlipDetail][product_code]" value="{{$condition_product_code}}" tabindex="5">
-                                <input type="hidden" id="product_id" name="data[SaleSlipDetail][product_id]" value="{{$condition_product_id}}">
-                            </td>
-                            <td class="width-20">
-                                <input type="text" class="form-control" id="product_text" name="data[SaleSlipDetail][product_text]" value="{{$condition_product_text}}" readonly>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>状態</th>
-                            <td class="width-10" colspan="2">
-                                <select class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]">
-                                    <option value="0" selected>全て</option>
-                                    <option value="1">登録済</option>
-                                    <option value="2">一時保存</option>
-                                    <option value="3">仕入伝票未設定</option>
-                                </select>
-                                <input type='hidden' id='sale_submit_type_selected' value='{{$condition_submit_type}}'>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class='search-btn-area'>
-                    <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索'>
-                </div>
-                <div class='initial-btn-area'>
-                    <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット'>
-                </div>
-            </form>
-        </div>-->
+        <!--総計表示エリア-->
+        <div class='sum-display-area'>
+            <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_num)}}件</div>
+            <div class='sum-display-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
+            <div class='sum-display-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>
+            <div class='sum-display-div'>総税抜額:{{number_format($notax_sub_total_amount)}}円</div>
+            <div class='sum-display-div'>総額:{{number_format($sale_slip_amount)}}円</div>
+        </div>
 
         <!--一覧表示エリア-->
         <div class='list-area'>
@@ -599,6 +540,22 @@
         border-radius: 10px;
         margin-left: 2%;
     }
+    /*総額エリア*/
+
+    .sum-display-area {
+        max-width: 1300px;
+        width: 90%;
+        padding-top: 20px;
+        padding-left: 20px;
+    }
+
+    .sum-display-div {
+        float: left;
+        margin-right: 1rem;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    /*伝票表示エリア*/
 
     .list-area {
         max-width: 1300px;

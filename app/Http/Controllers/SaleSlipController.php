@@ -157,7 +157,9 @@ class SaleSlipController extends Controller
                 ->groupBy('SubTable.sale_slip_id');
             }
 
+            //---------------------
             // 売上一覧を取得
+            //---------------------
             $saleSlipList = DB::table('sale_slips AS SaleSlip')
             ->select(
                 'SaleSlip.id                  AS sale_slip_id',
@@ -202,7 +204,71 @@ class SaleSlipController extends Controller
             ->where('SaleSlip.active', '=', '1')
             ->orderBy('SaleSlip.date', 'desc')->paginate(10);
 
+            //---------------------
+            // 売上一覧を総額集計
+            //---------------------
+            $saleSlipSumList = DB::table('sale_slips AS SaleSlip')
+
+            ->selectRaw('COUNT(SaleSlip.id) AS sale_slip_num')
+            ->selectRaw('SUM(SaleSlip.delivery_price) AS delivery_price_sum')
+            ->selectRaw('SUM(SaleSlip.adjust_price) AS adjust_price_sum')
+            ->selectRaw('SUM(SaleSlip.notax_sub_total) AS notax_sub_total_sum')
+
+            ->join('sale_companies AS SaleCompany', function ($join) {
+                $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
+            })
+            ->leftJoin('sale_shops AS SaleShop', function ($join) {
+                $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
+            })
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('SaleSlip.date', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 2, function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('SaleSlip.delivery_date', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
+                return $query->where('SaleSlip.sale_company_id', '=', $condition_company_id);
+            })
+            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
+                return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
+            })
+            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+                return $query
+                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+                       ->mergeBindings($product_sub_query);
+            })
+            ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
+                return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
+            })
+            ->where('SaleSlip.active', '=', '1')
+            ->orderBy('SaleSlip.date', 'desc')->paginate(10);
+
+            // 全体で何件伝票があるのかカウント
+            $sale_slip_num = 0;
+            // 全体の配送金額をカウント
+            $delivery_price_amount = 0;
+            // 全体の調整額をカウント
+            $adjust_price_amount = 0;
+            // 全体の税抜小計額をカウント
+            $notax_sub_total_amount = 0;
+            // 全体の総額をカウント
+            $sale_slip_amount = 0;
+
+            if(!empty($saleSlipSumList)) {
+
+                // 最初の要素を取得
+                $saleSlipSumVal = current($saleSlipSumList);
+
+                $sale_slip_num          = $saleSlipSumVal[0]->sale_slip_num;
+                $delivery_price_amount  = $saleSlipSumVal[0]->delivery_price_sum;
+                $adjust_price_amount    = $saleSlipSumVal[0]->adjust_price_sum;
+                $notax_sub_total_amount = $saleSlipSumVal[0]->notax_sub_total_sum;
+                $sale_slip_amount       = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
+            }
+
+            //---------------------
             // 伝票詳細を取得
+            //---------------------
             $SaleSlipDetailList = DB::table('sale_slip_details AS SaleSlipDetail')
             ->select(
                 'SaleSlip.id                  AS sale_slip_id',
@@ -315,6 +381,11 @@ class SaleSlipController extends Controller
             "condition_submit_type"      => $condition_submit_type,
             "saleSlipList"               => $saleSlipList,
             "SaleSlipDetailList"         => $SaleSlipDetailList,
+            "sale_slip_num"              => $sale_slip_num,
+            "delivery_price_amount"      => $delivery_price_amount,
+            "adjust_price_amount"        => $adjust_price_amount,
+            "notax_sub_total_amount"     => $notax_sub_total_amount,
+            "sale_slip_amount"           => $sale_slip_amount,
             "sale_slip_detail_arr"       => $sale_slip_detail_arr,
             "sale_slip_detail_count_arr" => $sale_slip_detail_count_arr
         ]);

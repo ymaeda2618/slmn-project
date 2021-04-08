@@ -80,11 +80,11 @@
 
         <!--総計表示エリア-->
         <div class='sum-display-area'>
-            <div class='sum-display-div' id='supply-slip-count-div'>伝票件数:{{number_format($supply_slip_num)}}件</div>
-            <div class='sum-display-div' id='delivery-price-amount-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
-            <div class='sum-display-div' id='adjust-price-amount-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>
-            <div class='sum-display-div' id='notax-sub-total-amount-div'>総税抜額:{{number_format($notax_sub_total_amount)}}円</div>
-            <div class='sum-display-div' id='supply-slip-amount-div'>総額:{{number_format($supply_slip_amount)}}円</div>
+            <div class='sum-display-div'>伝票件数:{{number_format($supply_slip_num)}}件</div>
+            <div class='sum-display-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
+            <div class='sum-display-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>
+            <div class='sum-display-div'>総税抜額:{{number_format($notax_sub_total_amount)}}円</div>
+            <div class='sum-display-div'>総額:{{number_format($supply_slip_amount)}}円</div>
         </div>
 
         <!--一覧表示エリア-->
@@ -542,30 +542,14 @@
     .sum-display-area {
         max-width: 1300px;
         width: 90%;
-        padding: 20px 0px;
+        padding-top: 20px;
+        padding-left: 20px;
     }
 
     .sum-display-div {
         float: left;
-    }
-
-    #supply-slip-count-div {
-        font-size: 14px;
-    }
-
-    #delivery-price-amount-div {
-        font-size: 14px;
-    }
-
-    #adjust-price-amount-div {
-        font-size: 14px;
-    }
-
-    #notax-sub-total-amount-div {
-        font-size: 14px;
-    }
-
-    #supply-slip-amount-div {
+        margin-right: 1rem;
+        font-weight: bold;
         font-size: 14px;
     }
     /*伝票表示エリア*/

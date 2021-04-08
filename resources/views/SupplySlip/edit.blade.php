@@ -419,6 +419,9 @@
 
                     var this_id = $(this).attr('id');
 
+                    // 文字列の最後の文字を削除
+                    $(this).val($(this).val().slice(0, -1));
+
                     if (this_id == "delivery_code") { // 配送コードの場合
 
                         var max = -1;
@@ -500,6 +503,9 @@
 
                     var this_id = $(this).attr('id');
 
+                    // 文字列の最後の文字を削除
+                    $(this).val($(this).val().slice(0, -1));
+
                     if (this_id.match(/memo/)) {
 
                         $('#add-slip-btn').trigger('click');
@@ -508,6 +514,9 @@
                     }
 
                 } else if (event.keyCode === 106) { // *が押された時
+
+                    // 文字列の最後の文字を削除
+                    $(this).val($(this).val().slice(0, -1));
 
                     var this_val = $('#supply_submit_type').val();
                     $('#supply_submit_type').val("");

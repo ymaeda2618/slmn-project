@@ -269,6 +269,9 @@
 
                     var this_id = $(this).attr('id');
 
+                    // 文字列の最後の文字を削除
+                    $(this).val($(this).val().slice(0, -1));
+
                     // 現在のtabIndex取得
                     var tabindex = parseInt($(this).attr('tabindex'), 10);
                     if (isNaN(tabindex)) return false;

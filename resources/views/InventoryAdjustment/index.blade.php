@@ -220,6 +220,9 @@
 
                     var this_id = $(this).attr('id');
 
+                    // 文字列の最後の文字を削除
+                    $(this).val($(this).val().slice(0, -1));
+
                     if (this_id == "search-btn") { // 検索ボタンの場合
 
                         var this_val = $('input[tabindex="3"]').val();

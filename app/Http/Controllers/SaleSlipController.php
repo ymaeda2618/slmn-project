@@ -181,6 +181,11 @@ class SaleSlipController extends Controller
             ->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
             })
+            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+                return $query
+                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+                       ->mergeBindings($product_sub_query);
+            })
             ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
                 return $query->whereBetween('SaleSlip.date', [$condition_date_from, $condition_date_to]);
             })
@@ -192,11 +197,6 @@ class SaleSlipController extends Controller
             })
             ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
-            })
-            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
-                return $query
-                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                       ->mergeBindings($product_sub_query);
             })
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);

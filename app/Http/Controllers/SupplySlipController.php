@@ -170,6 +170,11 @@ class SupplySlipController extends Controller
             ->leftJoin('supply_shops AS SupplyShop', function ($join) {
                 $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
             })
+            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+                return $query
+                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
+                       ->mergeBindings($product_sub_query);
+            })
             ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
                 return $query->whereBetween('SupplySlip.date', [$condition_date_from, $condition_date_to]);
             })
@@ -181,11 +186,6 @@ class SupplySlipController extends Controller
             })
             ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
                 return $query->where('SupplySlip.supply_shop_id', '=', $condition_shop_id);
-            })
-            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
-                return $query
-                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
-                       ->mergeBindings($product_sub_query);
             })
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);

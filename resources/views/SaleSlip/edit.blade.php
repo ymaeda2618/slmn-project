@@ -298,7 +298,7 @@
             <table class="register-btn-table">
                 <tr>
                     <td class="width-20">
-                        <input type="number" class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]" value="{{$SaleSlipList->sale_submit_type}}">
+                        <input type="tel" class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]" value="{{$SaleSlipList->sale_submit_type}}">
                     </td>
                     <td class="width-30">
                         <?php
@@ -415,18 +415,31 @@
                     } else if (this_id == "sale_submit_type") {
 
                         var submit_type = $(this).val();
+                        // 全角数字を半角に変換
+                        submit_type = submit_type.replace(/[０-９]/g, function(s) {
+                            return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                        });
+                        $(this).val(submit_type);
 
                         if (submit_type == 1) {
                             $('#sale_submit_type_text').val("登録");
+                            $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
                             $('#sale_submit_type_text').val("一時保存");
+                            $('#register-btn').prop('disabled', false);
+                            $('#register-btn').focus();
+                        } else if (submit_type == 3) {
+                            $('#sale_submit_type_text').val("削除");
+                            $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 4) {
                             $('#sale_submit_type_text').val("請求書印刷");
+                            $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else {
-                            alert("存在しない登録番号です。");
+                            $('#sale_submit_type_text').val("存在しない登録番号です。");
+                            $('#register-btn').prop('disabled', true);
                         }
 
                     } else {
@@ -1274,17 +1287,32 @@
             // submit_typeのフォーカスが外れた時
             // ------------------------------
             $('#sale_submit_type').blur(function() {
-                var submitType = $('#sale_submit_type').val();
-                if (submitType == 1) {
-                    $('#sale_submit_type_text').val('登録');
-                } else if (submitType == 2) {
-                    $('#sale_submit_type_text').val('一時保存');
-                } else if (submitType == 3) {
-                    $('#sale_submit_type_text').val('削除');
-                } else if (submitType == 4) {
-                    $('#sale_submit_type_text').val('請求書印刷');
+                var submit_type = $(this).val();
+                // 全角数字を半角に変換
+                submit_type = submit_type.replace(/[０-９]/g, function(s) {
+                    return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                });
+                $(this).val(submit_type);
+
+                if (submit_type == 1) {
+                    $('#sale_submit_type_text').val("登録");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 2) {
+                    $('#sale_submit_type_text').val("一時保存");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 3) {
+                    $('#sale_submit_type_text').val("削除");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 4) {
+                    $('#sale_submit_type_text').val("請求書印刷");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
                 } else {
-                    alert("存在しない登録番号です。");
+                    $('#sale_submit_type_text').val("存在しない登録番号です。");
+                    $('#register-btn').prop('disabled', true);
                 }
             });
 

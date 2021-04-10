@@ -1769,28 +1769,28 @@
             // 製品ID
             product_code = $("#product_code_" + i).val();
             if (product_code == '') {
-                alert('「製品ID」を入力してください。');
+                alert('「製品ID」を入力してください。(' + i + '行目)');
                 return false;
             }
 
             // 単価
             unit_price = $("#unit_price_" + i).val();
             if (unit_price == '') {
-                alert('「単価」を入力してください。');
+                alert('「単価」を入力してください。(' + i + '行目)');
                 return false;
             }
 
             // 数量
             unit_num = $("#unit_num_" + i).val();
             if (unit_num == '') {
-                alert('「数量」を入力してください。');
+                alert('「数量」を入力してください。(' + i + '行目)');
                 return false;
             }
 
             // 担当
             staff_code = $("#staff_code_" + i).val();
             if (staff_code == '') {
-                alert('「担当」を入力してください。');
+                alert('「担当」を入力してください。(' + i + '行目)');
                 return false;
             }
 

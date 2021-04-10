@@ -57,29 +57,39 @@
                 <table class='index-table'>
                     <tbody>
                         <tr>
-                            <th>伝票NO</th>
+                            <th class="width-10">種別.</th>
+                            <th class="width-10">伝票NO</th>
                             <th>入金日付</th>
-                            <th>伝票日付</th>
+                            <th class="width-20">伝票日付</th>
                             <th class="width-15">企業</th>
                             <th>入金金額</th>
                             @if (Home::authClerkCheck())
                             <th>編集</th> @endif
                             <th>印刷</th>
                         </tr>
-                        @foreach ($depositList as $deposit)
+                    </tbody>
+                </table>
+                @foreach ($depositList as $deposit)
+                <table class="index-table">
+                    <tbody>
                         <tr>
-                            <td>{{$deposit->deposit_id}}</td>
+                            @if ($deposit->deposit_submit_type == 1 || $deposit->deposit_submit_type == 4)
+                            <td class="regis-complete width-10">登録済</td>
+                            @else
+                            <td class="regis-temp width-10">一時保存</td>
+                            @endif
+                            <td class="width-10">{{$deposit->deposit_id}}</td>
                             <td>{{$deposit->deposit_date}}</td>
-                            <td>{{$deposit->sale_from_date}}~{{$deposit->sale_to_date}}</td>
-                            <td>{{$deposit->sale_company_name}}</td>
+                            <td class="width-20">{{$deposit->sale_from_date}}~{{$deposit->sale_to_date}}</td>
+                            <td class="width-15">{{$deposit->sale_company_name}}</td>
                             <td>{{number_format($deposit->amount)}}</td>
                             @if (Home::authClerkCheck())
                             <td><a class='edit-btn' href='./DepositEdit/{{$deposit->deposit_id}}'>編集</a></td> @endif
                             <td><a class='output-btn btn btn-primary' href='./invoiceOutput/{{$deposit->deposit_id}}' target='_blank' rel='noopener noreferrer'>印刷</a></td>
                         </tr>
-                        @endforeach
                     </tbody>
                 </table>
+                @endforeach
             </div>
         </form>
 
@@ -436,4 +446,19 @@
     .slip-td {
         margin-right: 20%;
     }
+
+    .regis-complete {
+        background-color: #D2F0F0;
+        font-weight: bold;
+        border-left: 3px solid #0099CB!important;
+        text-align: center;
+    }
+
+    .regis-temp {
+        background-color: #f0d2d2;
+        font-weight: bold;
+        border-left: 3px solid #cb0000!important;
+        text-align: center;
+    }
+
 </style>

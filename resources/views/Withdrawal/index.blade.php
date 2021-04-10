@@ -51,6 +51,7 @@
             <table class='index-table'>
                 <tbody>
                     <tr>
+                        <th>種別.</th>
                         <th>支払日付</th>
                         <th class="width-15">伝票日付</th>
                         <th>企業</th>
@@ -58,18 +59,27 @@
                         @if (Home::authClerkCheck())
                         <th>編集</th> @endif
                     </tr>
-                    @foreach ($withdrawalList as $withdrawal)
+                </tbody>
+            </table>
+            @foreach ($withdrawalList as $withdrawal)
+            <table class='index-table'>
+                <tbody>
                     <tr>
+                        @if ($withdrawal->withdrawal_submit_type == 1 || $withdrawal->withdrawal_submit_type == 4)
+                        <td class="regis-complete">登録済</td>
+                        @else
+                        <td class="regis-temp">一時保存</td>
+                        @endif
                         <td>{{$withdrawal->withdrawal_date}}</td>
-                        <td>{{$withdrawal->payment_from_date}}~{{$withdrawal->payment_to_date}}</td>
+                        <td class="width-15">{{$withdrawal->payment_from_date}}~{{$withdrawal->payment_to_date}}</td>
                         <td>{{$withdrawal->supply_company_name}}</td>
                         <td>{{number_format($withdrawal->amount)}}</td>
                         @if (Home::authClerkCheck())
                         <td><a class='edit-btn' href='./WithdrawalEdit/{{$withdrawal->withdrawal_id}}'>編集</a></td> @endif
                     </tr>
-                    @endforeach
                 </tbody>
             </table>
+            @endforeach
         </div>
 
         <div class="d-flex justify-content-center">
@@ -372,10 +382,6 @@
         width: 10%;
     }
 
-    .index-table td:first-of-type {
-        padding-top: 20px;
-    }
-
     .width-10 {
         width: 10%!important;
     }
@@ -402,4 +408,19 @@
         text-align: center;
         padding: 10px;
     }
+
+    .regis-complete {
+        background-color: #D2F0F0;
+        font-weight: bold;
+        border-left: 3px solid #0099CB!important;
+        text-align: center;
+    }
+
+    .regis-temp {
+        background-color: #f0d2d2;
+        font-weight: bold;
+        border-left: 3px solid #cb0000!important;
+        text-align: center;
+    }
+
 </style>

@@ -232,6 +232,17 @@
 
             <table class="register-btn-table">
                 <tr>
+                    <td class="width-20">
+                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="{{$depositDatas->deposit_submit_type}}">
+                    </td>
+                    <?php
+                        $text = '';
+                        if ($depositDatas->deposit_submit_type == 1) $text = '登録';
+                        if ($depositDatas->deposit_submit_type == 2) $text = '一時保存';
+                    ?>
+                    <td class="width-30">
+                        <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="{{$text}}" readonly>
+                    </td>
                     <td class="width-50">
                         <input type="submit" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="9">
                     </td>
@@ -535,6 +546,36 @@
                     return false;
                 }
             });
+
+            // ------------------------------
+            // submit_typeのフォーカスが外れた時
+            // ------------------------------
+            $('#deposit_submit_type').blur(function() {
+                var submit_type = $(this).val();
+                // 全角数字を半角に変換
+                submit_type = submit_type.replace(/[０-９]/g, function(s) {
+                    return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                });
+                $(this).val(submit_type);
+
+                if (submit_type == 1) {
+                    $('#deposit_submit_type_text').val("登録");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 2) {
+                    $('#deposit_submit_type_text').val("一時保存");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 3) {
+                    $('#deposit_submit_type_text').val("削除");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else {
+                    $('#deposit_submit_type_text').val("存在しない登録番号です。");
+                    $('#register-btn').prop('disabled', true);
+                }
+            });
+
         });
         $(function() {
             $('.result-table input:checked').each(function() {
@@ -998,6 +1039,6 @@
     }
 
     .register-btn {
-        width: 40%;
+        width: 85%;
     }
 </style>

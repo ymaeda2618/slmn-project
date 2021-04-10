@@ -270,8 +270,13 @@
                     <td class="width-20">
                         <input type="tel" class="form-control" id="supply_submit_type" name="data[SupplySlip][supply_submit_type]" value="{{$SupplySlipList->supply_submit_type}}">
                     </td>
+                    <?php
+                        $text = '';
+                        if ($SupplySlipList->supply_submit_type == 1) $text = '登録';
+                        if ($SupplySlipList->supply_submit_type == 2) $text = '一時保存';
+                    ?>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="supply_submit_type_text" name="data[SupplySlip][supply_submit_type_text]" value="登録" readonly>
+                        <input type="text" class="form-control" id="supply_submit_type_text" name="data[SupplySlip][supply_submit_type_text]" value="{{$text}}" readonly>
                     </td>
                     <td class="width-50">
                         <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>

@@ -28,11 +28,7 @@ class WithdrawalController extends Controller
      */
     public function index(Request $request)
     {
-        // $data = session()->all();
-        // error_log(print_r($data, true), '3', '/home/gfproject/mizucho.com/public_html/laravel/storage/logs/error.log');
 
-        // $user_info    = \Auth::user();
-        // error_log(print_r($user_info, true), '3', '/home/gfproject/mizucho.com/public_html/laravel/storage/logs/error.log');
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);
@@ -54,9 +50,6 @@ class WithdrawalController extends Controller
             $condition_company_code      = $request->session()->get('withdrawal_condition_company_code');
             $condition_company_id        = $request->session()->get('withdrawal_condition_company_id');
             $condition_company_text      = $request->session()->get('withdrawal_condition_company_text');
-            // $condition_shop_code         = $request->session()->get('condition_shop_code');
-            // $condition_shop_id           = $request->session()->get('condition_shop_id');
-            // $condition_shop_text         = $request->session()->get('condition_shop_text');
 
         } else { // POST時の処理
 
@@ -66,9 +59,6 @@ class WithdrawalController extends Controller
                 $condition_company_code  = $request->data['Withdrawal']['withdrawal_company_code'];
                 $condition_company_id    = $request->data['Withdrawal']['withdrawal_company_id'];
                 $condition_company_text  = $request->data['Withdrawal']['withdrawal_company_text'];
-                // $condition_shop_code     = $request->data['Withdrawal']['withdrawal_shop_code'];
-                // $condition_shop_id       = $request->data['Withdrawal']['withdrawal_shop_id'];
-                // $condition_shop_text     = $request->data['Withdrawal']['withdrawal_shop_text'];
 
                 // 日付の設定
                 $condition_date_from = $request->data['Withdrawal']['withdrawal_date_from'];
@@ -87,9 +77,6 @@ class WithdrawalController extends Controller
                 $request->session()->put('withdrawal_condition_company_code', $condition_company_code);
                 $request->session()->put('withdrawal_condition_company_id', $condition_company_id);
                 $request->session()->put('withdrawal_condition_company_text', $condition_company_text);
-                // $request->session()->put('condition_shop_code', $condition_shop_code);
-                // $request->session()->put('condition_shop_id', $condition_shop_id);
-                // $request->session()->put('condition_shop_text', $condition_shop_text);
 
             } else { // リセットボタンが押された時の処理
 
@@ -99,18 +86,12 @@ class WithdrawalController extends Controller
                 $condition_company_code      = null;
                 $condition_company_id        = null;
                 $condition_company_text      = null;
-                // $condition_shop_code         = null;
-                // $condition_shop_id           = null;
-                // $condition_shop_text         = null;
                 $request->session()->forget('withdrawal_condition_date_type');
                 $request->session()->forget('withdrawal_condition_date_from');
                 $request->session()->forget('withdrawal_condition_date_to');
                 $request->session()->forget('withdrawal_condition_company_code');
                 $request->session()->forget('withdrawal_condition_company_id');
                 $request->session()->forget('withdrawal_condition_company_text');
-                // $request->session()->forget('condition_shop_code');
-                // $request->session()->forget('condition_shop_id');
-                // $request->session()->forget('condition_shop_text');
 
             }
         }
@@ -120,12 +101,13 @@ class WithdrawalController extends Controller
             // 出金一覧を取得
             $withdrawalList = DB::table('withdrawals AS Withdrawal')
             ->select(
-                'Withdrawal.id                AS withdrawal_id',
-                'Withdrawal.date              AS withdrawal_date',
-                'Withdrawal.payment_from_date AS payment_from_date',
-                'Withdrawal.payment_to_date   AS payment_to_date',
-                'Withdrawal.amount            AS amount',
-                'SupplyCompany.name           AS supply_company_name'
+                'Withdrawal.id                     AS withdrawal_id',
+                'Withdrawal.date                   AS withdrawal_date',
+                'Withdrawal.payment_from_date      AS payment_from_date',
+                'Withdrawal.payment_to_date        AS payment_to_date',
+                'Withdrawal.amount                 AS amount',
+                'Withdrawal.withdrawal_submit_type AS withdrawal_submit_type',
+                'SupplyCompany.name                AS supply_company_name'
             )
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'Withdrawal.supply_company_id');
@@ -196,24 +178,25 @@ class WithdrawalController extends Controller
         // 出金データ取得
         $withdrawalDatas = DB::table('withdrawals AS Withdrawal')
         ->select(
-            'Withdrawal.id                AS withdrawal_id',
-            'Withdrawal.date              AS withdrawal_date',
-            'Withdrawal.payment_from_date AS payment_from_date',
-            'Withdrawal.payment_to_date   AS payment_to_date',
-            'Withdrawal.sub_total         AS sub_total',
-            'Withdrawal.adjustment_amount AS adjustment_amount',
-            'Withdrawal.tax_id            AS tax_id',
-            'Withdrawal.amount            AS amount',
-            'Withdrawal.payment_method_id AS payment_method_id',
-            'Withdrawal.staff_id          AS staff_id',
-            'Withdrawal.remarks           AS remarks',
-            'Withdrawal.supply_company_id AS supply_company_id',
-            'Withdrawal.supply_shop_id    AS supply_shop_id',
-            'SupplyCompany.name           AS supply_company_name',
-            'SupplyCompany.code           AS supply_company_code',
-            'SupplyShop.name              AS supply_shop_name',
-            'SupplyShop.code              AS supply_shop_code',
-            'Staff.code                   AS staff_code'
+            'Withdrawal.id                     AS withdrawal_id',
+            'Withdrawal.date                   AS withdrawal_date',
+            'Withdrawal.payment_from_date      AS payment_from_date',
+            'Withdrawal.payment_to_date        AS payment_to_date',
+            'Withdrawal.sub_total              AS sub_total',
+            'Withdrawal.adjustment_amount      AS adjustment_amount',
+            'Withdrawal.tax_id                 AS tax_id',
+            'Withdrawal.amount                 AS amount',
+            'Withdrawal.payment_method_id      AS payment_method_id',
+            'Withdrawal.staff_id               AS staff_id',
+            'Withdrawal.remarks                AS remarks',
+            'Withdrawal.supply_company_id      AS supply_company_id',
+            'Withdrawal.supply_shop_id         AS supply_shop_id',
+            'Withdrawal.withdrawal_submit_type AS withdrawal_submit_type',
+            'SupplyCompany.name                AS supply_company_name',
+            'SupplyCompany.code                AS supply_company_code',
+            'SupplyShop.name                   AS supply_shop_name',
+            'SupplyShop.code                   AS supply_shop_code',
+            'Staff.code                        AS staff_code'
         )
         ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
         ->join('supply_companies AS SupplyCompany', function ($join) {
@@ -273,7 +256,7 @@ class WithdrawalController extends Controller
 
     /**
      * 出金登録処理
-     * 
+     *
      */
     public function registerWithdrawal(Request $request) {
 
@@ -289,25 +272,26 @@ class WithdrawalController extends Controller
             // リクエストパラメータ取得
             $withdrawalDatas       = $request->data['Withdrawal'];
             $withdrawalDetailDatas = $request->data['WithdrawalDetail'];
-// error_log(print_r($withdrawalDetailDatas, true), '3', '/home/gfproject/mizucho.com/public_html/laravel/storage/logs/error.log');
+
             // 入力値を配列に格納する
             $insertParams = array(
-                'supply_company_id' => $withdrawalDatas['withdrawal_company_id'],
-                'supply_shop_id'    => $withdrawalDatas['withdrawal_shop_id'],
-                'date'              => $withdrawalDatas['withdrawal_date'],
-                'payment_from_date' => $withdrawalDatas['payment_from_date'],
-                'payment_to_date'   => $withdrawalDatas['payment_to_date'],
-                'staff_id'          => $withdrawalDatas['staff_id'],
-                'sub_total'         => $withdrawalDatas['price'],
-                'adjustment_amount' => $withdrawalDatas['adjustment_price'],
-                'tax_id'            => 1,
-                'amount'            => $withdrawalDatas['total_price'],
-                'payment_method_id' => $withdrawalDatas['payment_method_id'],
-                'remarks'           => $withdrawalDatas['memo'],
-                'created_at'        => $user_info_id,
-                'created'           => Carbon::now(),
-                'updated_at'        => $user_info_id,
-                'modified'          => Carbon::now()
+                'supply_company_id'      => $withdrawalDatas['withdrawal_company_id'],
+                'supply_shop_id'         => $withdrawalDatas['withdrawal_shop_id'],
+                'date'                   => $withdrawalDatas['withdrawal_date'],
+                'payment_from_date'      => $withdrawalDatas['payment_from_date'],
+                'payment_to_date'        => $withdrawalDatas['payment_to_date'],
+                'staff_id'               => $withdrawalDatas['staff_id'],
+                'sub_total'              => $withdrawalDatas['price'],
+                'adjustment_amount'      => $withdrawalDatas['adjustment_price'],
+                'tax_id'                 => 1,
+                'amount'                 => $withdrawalDatas['total_price'],
+                'payment_method_id'      => $withdrawalDatas['payment_method_id'],
+                'remarks'                => $withdrawalDatas['memo'],
+                'withdrawal_submit_type' => $withdrawalDatas['withdrawal_submit_type'],
+                'created_user_id'        => $user_info_id,
+                'created'                => Carbon::now(),
+                'modified_user_id'       => $user_info_id,
+                'modified'               => Carbon::now()
             );
 
             $withdrawalNewId = DB::table('withdrawals')->insertGetId($insertParams);
@@ -374,7 +358,7 @@ class WithdrawalController extends Controller
 
     /**
      * 出金編集処理
-     * 
+     *
      */
     public function editRegisterWithdrawal(Request $request) {
 
@@ -391,213 +375,233 @@ class WithdrawalController extends Controller
             $withdrawalDatas       = $request->data['Withdrawal'];
             $withdrawalDetailDatas = $request->data['WithdrawalDetail'];
 
-            // 入力値を配列に格納する
-            $updateParams = array(
-                'supply_company_id' => $withdrawalDatas['withdrawal_company_id'],
-                'supply_shop_id'    => $withdrawalDatas['withdrawal_shop_id'],
-                'date'              => $withdrawalDatas['withdrawal_date'],
-                'payment_from_date' => $withdrawalDatas['payment_from_date'],
-                'payment_to_date'   => $withdrawalDatas['payment_to_date'],
-                'staff_id'          => $withdrawalDatas['staff_id'],
-                'sub_total'         => $withdrawalDatas['price'],
-                'adjustment_amount' => $withdrawalDatas['adjustment_price'],
-                'tax_id'            => 1,
-                'amount'            => $withdrawalDatas['total_price'],
-                'payment_method_id' => $withdrawalDatas['payment_method_id'],
-                'remarks'           => $withdrawalDatas['memo'],
-                'updated_at'        => $user_info_id,
-                'modified'          => Carbon::now()
-            );
+            if ($withdrawalDatas['withdrawal_submit_type'] == 3) {
 
-            // 更新処理
-            DB::table('withdrawals')
-            ->where('id', '=', $withdrawalDatas['id'])
-            ->update($updateParams);
-
-            // -------------------------------------
-            // 入出金詳細テーブルのデータを削除して新規登録
-            // -------------------------------------
-            // データ削除前に支払フラグ戻すように仕入IDを取得しておく
-            $delBeforeSupplySlipIds = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
-            ->select(
-                'DepositWithdrawalDetail.supply_sale_slip_id As supply_slip_id'
-            )
-            ->where([
-                ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $withdrawalDatas['id']],
-                ['DepositWithdrawalDetail.type', '=', '1'],
-                ['DepositWithdrawalDetail.active', '=', '1']
-            ])
-            ->get();
-
-            // データ削除
-            \App\DepositWithdrawalDetail::where('deposit_withdrawal_id', $withdrawalDatas['id'])->delete();
-
-            // -------
-            // 新規登録
-            // -------
-            // supply_slip_idの数ループさせる
-            foreach ($withdrawalDetailDatas['supply_slip_ids'] as $supplySlipId) {
-
-                // 仕入伝票データ取得
-                $supplySlipDate  = $withdrawalDetailDatas[$supplySlipId]['date'];
-                $notaxSubTotal8  = $withdrawalDetailDatas[$supplySlipId]['notax_subTotal_8'];
-                $notaxSubTotal10 = $withdrawalDetailDatas[$supplySlipId]['notax_subTotal_10'];
-                $subTotal        = $withdrawalDetailDatas[$supplySlipId]['subTotal'];
-                $deliveryPrice   = $withdrawalDetailDatas[$supplySlipId]['delivery_price'];
-                $adjustPrice     = $withdrawalDetailDatas[$supplySlipId]['adjust_price'];
-                $total           = $withdrawalDetailDatas[$supplySlipId]['total'];
-
-                // 登録データ格納
-                $insertDetailParams[] = array(
-                    'deposit_withdrawal_id'   => $withdrawalDatas['id'],
-                    'supply_sale_slip_id'     => $supplySlipId,
-                    'deposit_withdrawal_date' => $withdrawalDatas['withdrawal_date'],
-                    'supply_sale_slip_date'   => $supplySlipDate,
-                    'type'                    => 1,
-                    'notax_sub_total_8'       => $notaxSubTotal8,
-                    'notax_sub_total_10'      => $notaxSubTotal10,
-                    'sub_total'               => $subTotal,
-                    'delivery_price'          => $deliveryPrice,
-                    'adjust_price'            => $adjustPrice,
-                    'total'                   => $total,
-                    'active'                  => 1,
-                    'created_user_id'         => $user_info_id,
-                    'created'                 => Carbon::now(),
-                    'modified_user_id'        => $user_info_id,
-                    'modified'                => Carbon::now(),
+                // -----------------
+                // 伝票を論理削除させる
+                // -----------------
+                $updateParams = array(
+                    'active'           => 0,                // アクティブフラグ
+                    'modified_user_id' => $user_info_id,    // 更新者ユーザーID
+                    'modified'         => Carbon::now()     // 更新時間
                 );
-            }
 
-            if (!empty($insertDetailParams)) {
-                DB::table('deposit_withdrawal_details')->insert($insertDetailParams);
-            }
+                // 更新処理
+                DB::table('withdrawals')
+                ->where('id', '=', $withdrawalDatas['id'])
+                ->update($updateParams);
 
-            // -----------------------------
-            // 支払データのフラグを支払済みにする
-            // -----------------------------
-            // 一旦対象データの支払フラグを未払いに戻す
-            foreach ($delBeforeSupplySlipIds as $delBeforeSupplySlipId) {
-                $supplySlipIds[] = $delBeforeSupplySlipId->supply_slip_id;
-            }
-            DB::table('supply_slips')
-            ->whereIn('id', $supplySlipIds)
-            ->update(array('payment_flg' => 0));
+            } else {
 
-            // その後支払済みに更新する
-            DB::table('supply_slips')
-            ->whereIn('id', $withdrawalDetailDatas['supply_slip_ids'])
-            ->update(array('payment_flg' => 1));
+                // 入力値を配列に格納する
+                $updateParams = array(
+                    'supply_company_id'      => $withdrawalDatas['withdrawal_company_id'],
+                    'supply_shop_id'         => $withdrawalDatas['withdrawal_shop_id'],
+                    'date'                   => $withdrawalDatas['withdrawal_date'],
+                    'payment_from_date'      => $withdrawalDatas['payment_from_date'],
+                    'payment_to_date'        => $withdrawalDatas['payment_to_date'],
+                    'staff_id'               => $withdrawalDatas['staff_id'],
+                    'sub_total'              => $withdrawalDatas['price'],
+                    'adjustment_amount'      => $withdrawalDatas['adjustment_price'],
+                    'tax_id'                 => 1,
+                    'amount'                 => $withdrawalDatas['total_price'],
+                    'payment_method_id'      => $withdrawalDatas['payment_method_id'],
+                    'remarks'                => $withdrawalDatas['memo'],
+                    'withdrawal_submit_type' => $withdrawalDatas['withdrawal_submit_type'],
+                    'modified_user_id'       => $user_info_id,
+                    'modified'               => Carbon::now()
+                );
 
-            // --------------------------------------------
-            // 出金詳細テーブルに重複しているIDが存在しているか確認
-            // --------------------------------------------
-            $delTargetDatas = array();
-            foreach ($withdrawalDetailDatas['supply_slip_ids'] as $supplySlipId) {
-                // 編集対象のID以外のものを抽出
-                $delTargetDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+                // 更新処理
+                DB::table('withdrawals')
+                ->where('id', '=', $withdrawalDatas['id'])
+                ->update($updateParams);
+
+                // -------------------------------------
+                // 入出金詳細テーブルのデータを削除して新規登録
+                // -------------------------------------
+                // データ削除前に支払フラグ戻すように仕入IDを取得しておく
+                $delBeforeSupplySlipIds = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
                 ->select(
-                    'DepositWithdrawalDetail.id As id',
-                    'DepositWithdrawalDetail.deposit_withdrawal_id As deposit_withdrawal_id'
+                    'DepositWithdrawalDetail.supply_sale_slip_id As supply_slip_id'
                 )
-                ->join('supply_slips As SupplySlip', function ($join){
-                    $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SupplySlip.id');
-                })
                 ->where([
-                    ['DepositWithdrawalDetail.deposit_withdrawal_id', '<>', $withdrawalDatas['id']],
-                    ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $supplySlipId],
-                    ['SupplySlip.withdrawal_flg', '=', '0'],
-                    ['DepositWithdrawalDetail.active', '=', '1'],
-                    ['SupplySlip.active', '=', '1']
+                    ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $withdrawalDatas['id']],
+                    ['DepositWithdrawalDetail.type', '=', '1'],
+                    ['DepositWithdrawalDetail.active', '=', '1']
                 ])
                 ->get();
 
-                // ----------------------------------------
-                // 存在していれば編集対象以外のデータを削除、再計算
-                // ----------------------------------------
-                if (!$delTargetDatas->isEmpty()) {
+                // データ削除
+                \App\DepositWithdrawalDetail::where('deposit_withdrawal_id', $withdrawalDatas['id'])->delete();
 
-                    // 削除対象データを削除
-                    \App\DepositWithdrawalDetail::where('id', $delTargetDatas[0]->id)->delete();
+                // -------
+                // 新規登録
+                // -------
+                // supply_slip_idの数ループさせる
+                foreach ($withdrawalDetailDatas['supply_slip_ids'] as $supplySlipId) {
 
-                    // ------------------------
-                    // 削除された出金IDの再計算する
-                    // ------------------------
-                    // まずは計算データ取得
-                    $withdrawalDetailCalcDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
-                    ->select(
-                        'DepositWithdrawalDetail.notax_sub_total_8 As notax_sub_total_8',
-                        'DepositWithdrawalDetail.notax_sub_total_10 As notax_sub_total_10',
-                        'DepositWithdrawalDetail.delivery_price As delivery_price',
-                        'DepositWithdrawalDetail.adjust_price As adjust_price'
-                    )
-                    ->where([
-                        ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $delTargetDatas[0]->deposit_withdrawal_id],
-                        ['DepositWithdrawalDetail.active', '=', '1']
-                    ])
-                    ->get();
+                    // 仕入伝票データ取得
+                    $supplySlipDate  = $withdrawalDetailDatas[$supplySlipId]['date'];
+                    $notaxSubTotal8  = $withdrawalDetailDatas[$supplySlipId]['notax_subTotal_8'];
+                    $notaxSubTotal10 = $withdrawalDetailDatas[$supplySlipId]['notax_subTotal_10'];
+                    $subTotal        = $withdrawalDetailDatas[$supplySlipId]['subTotal'];
+                    $deliveryPrice   = $withdrawalDetailDatas[$supplySlipId]['delivery_price'];
+                    $adjustPrice     = $withdrawalDetailDatas[$supplySlipId]['adjust_price'];
+                    $total           = $withdrawalDetailDatas[$supplySlipId]['total'];
 
-                    $withdrawalCalcDatas = DB::table('withdrawals AS Withdrawal')
-                    ->select(
-                        'Withdrawal.adjustment_amount As adjustment_amount'
-                    )
-                    ->where([
-                        ['Withdrawal.id', '=', $delTargetDatas[0]->deposit_withdrawal_id],
-                        ['Withdrawal.active', '=', '1']
-                    ])
-                    ->get();
-
-                    // ---------
-                    // データ計算
-                    // ---------
-                    $notaxSubTotal8   = 0;
-                    $notaxSubTotal10  = 0;
-                    $subTotal8        = 0;
-                    $subTotal10       = 0;
-                    $deliveryPrice    = 0;
-                    $adjustTotalPrice = 0;
-                    $adjustPrice      = 0;
-                    $subTotal         = 0;
-                    $total            = 0;
-                    foreach ($withdrawalDetailCalcDatas as $withdrawalDetailCalcData) {
-
-                        // 税抜8％額
-                        $notaxSubTotal8 += $withdrawalDetailCalcData->notax_sub_total_8;
-
-                        // 税抜10％額
-                        $notaxSubTotal10 += $withdrawalDetailCalcData->notax_sub_total_10;
-
-                        // 配送額
-                        $deliveryPrice += $withdrawalDetailCalcData->delivery_price;
-
-                        // 調整額
-                        $adjustTotalPrice += $withdrawalDetailCalcData->adjust_price;
-
-                    }
-
-                    // 税込8%
-                    $subTotal8 = round($notaxSubTotal8 * 1.08);
-
-                    // 税込10%
-                    $subTotal10 = round($notaxSubTotal10 * 1.1);
-
-                    // 小計(調整額含まない)
-                    $subTotal = $subTotal8 + $subTotal10 + $deliveryPrice + $adjustTotalPrice;
-
-                    // 総合計
-                    if (!empty($withdrawalCalcDatas[0]->adjustment_amount)) $adjustPrice = $withdrawalCalcDatas[0]->adjustment_amount;
-                    $total = $subTotal + $adjustPrice;
-
-                    // -----------------------------
-                    // 計算結果を出金テーブルに更新させる
-                    // -----------------------------
-                    DB::table('withdrawals')
-                    ->where('id', $delTargetDatas[0]->deposit_withdrawal_id)
-                    ->update(array(
-                        'sub_total' => $subTotal,
-                        'amount'    => $total
-                    ));
+                    // 登録データ格納
+                    $insertDetailParams[] = array(
+                        'deposit_withdrawal_id'   => $withdrawalDatas['id'],
+                        'supply_sale_slip_id'     => $supplySlipId,
+                        'deposit_withdrawal_date' => $withdrawalDatas['withdrawal_date'],
+                        'supply_sale_slip_date'   => $supplySlipDate,
+                        'type'                    => 1,
+                        'notax_sub_total_8'       => $notaxSubTotal8,
+                        'notax_sub_total_10'      => $notaxSubTotal10,
+                        'sub_total'               => $subTotal,
+                        'delivery_price'          => $deliveryPrice,
+                        'adjust_price'            => $adjustPrice,
+                        'total'                   => $total,
+                        'active'                  => 1,
+                        'created_user_id'         => $user_info_id,
+                        'created'                 => Carbon::now(),
+                        'modified_user_id'        => $user_info_id,
+                        'modified'                => Carbon::now(),
+                    );
                 }
 
+                if (!empty($insertDetailParams)) {
+                    DB::table('deposit_withdrawal_details')->insert($insertDetailParams);
+                }
+
+                // -----------------------------
+                // 支払データのフラグを支払済みにする
+                // -----------------------------
+                // 一旦対象データの支払フラグを未払いに戻す
+                foreach ($delBeforeSupplySlipIds as $delBeforeSupplySlipId) {
+                    $supplySlipIds[] = $delBeforeSupplySlipId->supply_slip_id;
+                }
+                DB::table('supply_slips')
+                ->whereIn('id', $supplySlipIds)
+                ->update(array('payment_flg' => 0));
+
+                // その後支払済みに更新する
+                DB::table('supply_slips')
+                ->whereIn('id', $withdrawalDetailDatas['supply_slip_ids'])
+                ->update(array('payment_flg' => 1));
+
+                // --------------------------------------------
+                // 出金詳細テーブルに重複しているIDが存在しているか確認
+                // --------------------------------------------
+                $delTargetDatas = array();
+                foreach ($withdrawalDetailDatas['supply_slip_ids'] as $supplySlipId) {
+                    // 編集対象のID以外のものを抽出
+                    $delTargetDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+                    ->select(
+                        'DepositWithdrawalDetail.id As id',
+                        'DepositWithdrawalDetail.deposit_withdrawal_id As deposit_withdrawal_id'
+                    )
+                    ->join('supply_slips As SupplySlip', function ($join){
+                        $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SupplySlip.id');
+                    })
+                    ->where([
+                        ['DepositWithdrawalDetail.deposit_withdrawal_id', '<>', $withdrawalDatas['id']],
+                        ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $supplySlipId],
+                        ['SupplySlip.withdrawal_flg', '=', '0'],
+                        ['DepositWithdrawalDetail.active', '=', '1'],
+                        ['SupplySlip.active', '=', '1']
+                    ])
+                    ->get();
+
+                    // ----------------------------------------
+                    // 存在していれば編集対象以外のデータを削除、再計算
+                    // ----------------------------------------
+                    if (!$delTargetDatas->isEmpty()) {
+
+                        // 削除対象データを削除
+                        \App\DepositWithdrawalDetail::where('id', $delTargetDatas[0]->id)->delete();
+
+                        // ------------------------
+                        // 削除された出金IDの再計算する
+                        // ------------------------
+                        // まずは計算データ取得
+                        $withdrawalDetailCalcDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+                        ->select(
+                            'DepositWithdrawalDetail.notax_sub_total_8 As notax_sub_total_8',
+                            'DepositWithdrawalDetail.notax_sub_total_10 As notax_sub_total_10',
+                            'DepositWithdrawalDetail.delivery_price As delivery_price',
+                            'DepositWithdrawalDetail.adjust_price As adjust_price'
+                        )
+                        ->where([
+                            ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $delTargetDatas[0]->deposit_withdrawal_id],
+                            ['DepositWithdrawalDetail.active', '=', '1']
+                        ])
+                        ->get();
+
+                        $withdrawalCalcDatas = DB::table('withdrawals AS Withdrawal')
+                        ->select(
+                            'Withdrawal.adjustment_amount As adjustment_amount'
+                        )
+                        ->where([
+                            ['Withdrawal.id', '=', $delTargetDatas[0]->deposit_withdrawal_id],
+                            ['Withdrawal.active', '=', '1']
+                        ])
+                        ->get();
+
+                        // ---------
+                        // データ計算
+                        // ---------
+                        $notaxSubTotal8   = 0;
+                        $notaxSubTotal10  = 0;
+                        $subTotal8        = 0;
+                        $subTotal10       = 0;
+                        $deliveryPrice    = 0;
+                        $adjustTotalPrice = 0;
+                        $adjustPrice      = 0;
+                        $subTotal         = 0;
+                        $total            = 0;
+                        foreach ($withdrawalDetailCalcDatas as $withdrawalDetailCalcData) {
+
+                            // 税抜8％額
+                            $notaxSubTotal8 += $withdrawalDetailCalcData->notax_sub_total_8;
+
+                            // 税抜10％額
+                            $notaxSubTotal10 += $withdrawalDetailCalcData->notax_sub_total_10;
+
+                            // 配送額
+                            $deliveryPrice += $withdrawalDetailCalcData->delivery_price;
+
+                            // 調整額
+                            $adjustTotalPrice += $withdrawalDetailCalcData->adjust_price;
+
+                        }
+
+                        // 税込8%
+                        $subTotal8 = round($notaxSubTotal8 * 1.08);
+
+                        // 税込10%
+                        $subTotal10 = round($notaxSubTotal10 * 1.1);
+
+                        // 小計(調整額含まない)
+                        $subTotal = $subTotal8 + $subTotal10 + $deliveryPrice + $adjustTotalPrice;
+
+                        // 総合計
+                        if (!empty($withdrawalCalcDatas[0]->adjustment_amount)) $adjustPrice = $withdrawalCalcDatas[0]->adjustment_amount;
+                        $total = $subTotal + $adjustPrice;
+
+                        // -----------------------------
+                        // 計算結果を出金テーブルに更新させる
+                        // -----------------------------
+                        DB::table('withdrawals')
+                        ->where('id', $delTargetDatas[0]->deposit_withdrawal_id)
+                        ->update(array(
+                            'sub_total' => $subTotal,
+                            'amount'    => $total
+                        ));
+                    }
+
+                }
             }
 
             // 問題なければコミット
@@ -616,7 +620,7 @@ class WithdrawalController extends Controller
     /**
      * ajax処理
      * 指定された範囲の出金金額を計算して返す
-     * 
+     *
      */
     public function AjaxSearchSupplySlips(Request $request) {
 

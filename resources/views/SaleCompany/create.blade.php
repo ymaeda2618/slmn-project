@@ -8,8 +8,16 @@
         <form class="smn-form" id="event-create-form" method="post" action="./SaleCompanyConfirm" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="form-group">
+                <label class="column-label" for="code">コード番号<font color="red">※任意</font></label>
+                <input type="tel" class="form-control" id="code" name="data[SaleCompany][code]">
+            </div>
+            <div class="form-group">
                 <label class="column-label" for="sale_company_name">売上先企業名</label>
                 <input type="text" class="form-control" id="sale_company_name" name="data[SaleCompany][sale_company_name]">
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="yomi">ヨミガナ</label>
+                <input type="text" class="form-control" id="yomi" name="data[SaleCompany][yomi]">
             </div>
             <div class="form-group">
                 <label class="column-label" for="closing_date">締め日</label>
@@ -47,31 +55,31 @@
                 </select>
             </div>
             <div class="form-group">
-                <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ</label>
+                <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="postal_code" name="data[SaleCompany][postal_code]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="address">住所</label>
+                <label class="column-label" for="address">住所<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="address" name="data[SaleCompany][address]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="bank_code">金融機関コード</label>
+                <label class="column-label" for="bank_code">金融機関コード<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="bank_code" name="data[SaleCompany][bank_code]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="bank_name">銀行名</label>
+                <label class="column-label" for="bank_name">銀行名<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="bank_name" name="data[SaleCompany][bank_name]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="branch_code">支店コード</label>
+                <label class="column-label" for="branch_code">支店コード<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="branch_code" name="data[SaleCompany][branch_code]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="branch_name">支店名</label>
+                <label class="column-label" for="branch_name">支店名<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="branch_name" name="data[SaleCompany][branch_name]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="bank_type">口座種別</label>
+                <label class="column-label" for="bank_type">口座種別<font color="red">※任意</font></label>
                 <select class="file-control" id="bank_type" name="data[SaleCompany][bank_type]">
                     <option value="0">-</option>
                     <option value="1">普通</option>
@@ -80,7 +88,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label class="column-label" for="bank_account">口座番号</label>
+                <label class="column-label" for="bank_account">口座番号<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="bank_account" name="data[SaleCompany][bank_account]">
             </div>
             <br>

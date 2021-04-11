@@ -112,7 +112,9 @@ class SaleCompanyController extends Controller
         $editSaleCompany = DB::table('sale_companies AS SaleCompany')
         ->select(
             'SaleCompany.id            AS sale_company_id',
+            'SaleCompany.code          AS code',
             'SaleCompany.name          AS sale_company_name',
+            'SaleCompany.yomi          AS yomi',
             'SaleCompany.closing_date  AS closing_date',
             'SaleCompany.postal_code   AS postal_code',
             'SaleCompany.address       AS address',
@@ -186,7 +188,9 @@ class SaleCompanyController extends Controller
             // 保存処理を行う
             //---------------
             $SaleCompany = \App\SaleCompany::find($request->data['SaleCompany']['sale_company_id']);
+            $SaleCompany->code              = $request->data['SaleCompany']['code'];
             $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
+            $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
             $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
             $SaleCompany->postal_code       = $request->data['SaleCompany']['postal_code'];
             $SaleCompany->address           = $request->data['SaleCompany']['address'];
@@ -240,7 +244,9 @@ class SaleCompanyController extends Controller
             // 保存処理を行う
             //---------------
             $SaleCompany = new SaleCompany;
+            $SaleCompany->code              = $request->data['SaleCompany']['code'];
             $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
+            $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
             $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
             $SaleCompany->postal_code       = $request->data['SaleCompany']['postal_code'];
             $SaleCompany->address           = $request->data['SaleCompany']['address'];

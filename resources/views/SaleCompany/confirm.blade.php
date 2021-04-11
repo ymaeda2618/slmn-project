@@ -9,7 +9,7 @@
             {{ csrf_field() }}
             <div class="form-group">
                 <label class="column-label" for="code">コード番号<font color="red">※任意</font></label>
-                <input type="tel" class="form-control" id="code" name="data[SaleCompany][code]">
+                <input type="tel" class="form-control" id="code" name="data[SaleCompany][code]" value="{{$request->data['SaleCompany']['code']}}" readonly>
             </div>
             <div class="form-group">
                 <label class="column-label" for="sale_company_name">売上先企業名</label>
@@ -17,7 +17,7 @@
             </div>
             <div class="form-group">
                 <label class="column-label" for="yomi">ヨミガナ</label>
-                <input type="text" class="form-control" id="yomi" name="data[SaleCompany][yomi]">
+                <input type="text" class="form-control" id="yomi" name="data[SaleCompany][yomi]" value="{{$request->data['SaleCompany']['yomi']}}" readonly>
             </div>
             <div class="form-group">
                 <label class="column-label" for="closing_date_text">締め日<font color="red">※任意</font></label> @if($request->data['SaleCompany']['closing_date'] == 99)
@@ -73,7 +73,7 @@
 
 <style>
     /* 共通 */
-    
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -81,7 +81,7 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .confirm-title {
         font-size: 0.9em;
         font-weight: bold;
@@ -90,23 +90,23 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-    
+
     .form-group {
         margin-bottom: 3rem !important;
     }
-    
+
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-    
+
     .column-label {
         font-size: 0.9em;
         font-weight: bold;

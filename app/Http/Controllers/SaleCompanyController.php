@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\SaleCompany;
 use Carbon\Carbon;
+use Exception;
 
 class SaleCompanyController extends Controller
 {

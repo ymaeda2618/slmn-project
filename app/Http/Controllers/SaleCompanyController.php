@@ -107,7 +107,7 @@ class SaleCompanyController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function edit($sale_company_id)
+    public function edit(Request $request, $sale_company_id)
     {
         // 売上先企業を取得
         $editSaleCompany = DB::table('sale_companies AS SaleCompany')
@@ -132,8 +132,13 @@ class SaleCompanyController extends Controller
         ])
         ->first();
 
+        // エラーメッセージ取得
+        $error_message       = $request->session()->get('error_message');
+        $request->session()->forget('error_message');
+
         return view('SaleCompany.edit')->with([
             "editSaleCompany" => $editSaleCompany,
+            "error_message"   => $error_message,
         ]);
     }
 
@@ -143,9 +148,15 @@ class SaleCompanyController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('SaleCompany.create');
+        // エラーメッセージ取得
+        $error_message       = $request->session()->get('error_message');
+        $request->session()->forget('error_message');
+
+        return view('SaleCompany.create')->with([
+            "error_message" => $error_message,
+        ]);;
     }
 
      /**

@@ -5,6 +5,10 @@
 
         <div class="top-title">売上先企業 編集画面</div>
 
+        @if(!empty($error_message))
+        <div class="error-alert">{{$error_message}}</div>
+        @endif
+
         <form class="event-form" id="event-create-form" method="post" action="../SaleCompanyConfirm" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="form-group">
@@ -130,6 +134,11 @@
         width: 100%;
         text-align: center;
         padding: 25px 0px;
+    }
+
+    .error-alert {
+        color: red;
+        font-weight: bold;
     }
 
     .event-form {

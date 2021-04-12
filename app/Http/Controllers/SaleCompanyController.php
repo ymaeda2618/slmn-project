@@ -168,7 +168,7 @@ class SaleCompanyController extends Controller
     }
 
     /**
-     * スタッフ編集登録
+     * 編集登録
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -196,7 +196,7 @@ class SaleCompanyController extends Controller
                 'SaleCompany.code AS code'
             )
             ->where([
-                ['SaleCompany.id', '!=', $request->data['SaleCompany']['product_id']],
+                ['SaleCompany.id', '!=', $request->data['SaleCompany']['sale_company_id']],
                 ['SaleCompany.active', '=', '1'],
                 ['SaleCompany.code', '=', $sale_company_code],
             ])->orderBy('id', 'desc')->first();

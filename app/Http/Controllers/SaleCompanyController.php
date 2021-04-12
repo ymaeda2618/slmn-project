@@ -182,13 +182,37 @@ class SaleCompanyController extends Controller
         // トランザクション処理
         DB::beginTransaction();
 
+        // エラータイプを初期化
+        $exception_type = 0;
+
         try {
+
+            // リクエストされたコードを格納
+            $sale_company_code = $request->data['SaleCompany']['code'];
+
+            // codeが存在するかチェック
+            $SaleCompanyCodeCheck = DB::table('sale_companies AS SaleCompany')
+            ->select(
+                'SaleCompany.code AS code'
+            )
+            ->where([
+                ['SaleCompany.id', '!=', $request->data['SaleCompany']['product_id']],
+                ['SaleCompany.active', '=', '1'],
+                ['SaleCompany.code', '=', $sale_company_code],
+            ])->orderBy('id', 'desc')->first();
+
+            if (!empty($SaleCompanyCodeCheck)){
+
+                $exception_type = 1;
+
+                throw new Exception();
+            }
 
             //---------------
             // 保存処理を行う
             //---------------
             $SaleCompany = \App\SaleCompany::find($request->data['SaleCompany']['sale_company_id']);
-            $SaleCompany->code              = $request->data['SaleCompany']['code'];
+            $SaleCompany->code              = $sale_company_code;
             $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
             $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
             $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
@@ -210,7 +234,13 @@ class SaleCompanyController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
+
+                $errorMsg = "指定のコードは既に登録済みです。";
+                $request->session()->put('error_message', $errorMsg);
+
+                return redirect('./SaleCompanyEdit/'.$request->data['SaleCompany']['sale_company_id']);
+            }
 
             return view('SaleCompany.complete')->with([
                 'errorMessage' => $e
@@ -238,13 +268,67 @@ class SaleCompanyController extends Controller
         // トランザクション処理
         DB::beginTransaction();
 
+        // エラータイプを初期化
+        $exception_type = 0;
+
         try {
+
+            // codeが入力されていない場合
+            if(empty($request->data['SaleCompany']['code'])){
+
+                do {
+
+                    // codeのMAX値を取得
+                    $SaleCompanyCode = DB::table('sale_companies AS SaleCompany')
+                    ->select(
+                        'SaleCompany.code AS code'
+                    )
+                    ->where([
+                        ['SaleCompany.active', '=', '1'],
+                    ])->orderBy('id', 'desc')->first();
+
+                    $sale_company_code = $SaleCompanyCode->code + 1;
+
+                    // codeが存在するかチェック
+                    $SaleCompanyCodeCheck = DB::table('sale_companies AS SaleCompany')
+                    ->select(
+                        'SaleCompany.code AS code'
+                    )
+                    ->where([
+                        ['SaleCompany.active', '=', '1'],
+                        ['SaleCompany.code', '=', $sale_company_code],
+                    ])->orderBy('id', 'desc')->first();
+
+                } while (!empty($SaleCompanyCodeCheck));
+
+            } else {
+
+                // リクエストされたコードを格納
+                $sale_company_code = $request->data['SaleCompany']['code'];
+
+                // codeが存在するかチェック
+                $SaleCompanyCodeCheck = DB::table('sale_companies AS SaleCompany')
+                ->select(
+                    'SaleCompany.code AS code'
+                )
+                ->where([
+                    ['SaleCompany.active', '=', '1'],
+                    ['SaleCompany.code', '=', $sale_company_code],
+                ])->orderBy('id', 'desc')->first();
+
+                if (!empty($SaleCompanyCodeCheck)){
+
+                    $exception_type = 1;
+
+                    throw new Exception();
+                }
+            }
 
             //---------------
             // 保存処理を行う
             //---------------
             $SaleCompany = new SaleCompany;
-            $SaleCompany->code              = $request->data['SaleCompany']['code'];
+            $SaleCompany->code              = $sale_company_code;
             $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
             $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
             $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
@@ -270,7 +354,13 @@ class SaleCompanyController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
+
+                $errorMsg = "指定のコードは既に登録済みです。";
+                $request->session()->put('error_message', $errorMsg);
+
+                return redirect('./SaleCompanyCreate');
+            }
 
             return view('SaleCompany.complete')->with([
                 'errorMessage' => $e

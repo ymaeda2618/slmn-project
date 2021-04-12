@@ -177,7 +177,7 @@
                         <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="登録" readonly>
                     </td>
                     <td class="width-50">
-                        <input type="submit" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="9">
+                        <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="9">
                     </td>
                 </tr>
             </table>
@@ -237,36 +237,61 @@
 
                     var this_id = $(this).attr('id');
 
-                    // 現在のtabIndex取得
-                    var tabindex = parseInt($(this).attr('tabindex'), 10);
-                    if (isNaN(tabindex)) return false;
+                    if (this_id == 'deposit_submit_type') {
 
-                    // ひとつ前のタブの最小値を取得
-                    var min = 0;
-                    $("#deposit-create-form [tabindex]").attr("tabindex", function(a, b) {
+                        var submit_type = $(this).val();
+                        // 全角数字を半角に変換
+                        submit_type = submit_type.replace(/[０-９]/g, function(s) {
+                            return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
+                        });
+                        $(this).val(submit_type);
 
-                        b = parseInt(b, 10);
-                        if (tabindex < b) {
-                            if (min == 0) min = b;
-                            else if (min > b) min = b;
+                        if (submit_type == 1) {
+                            $('#deposit_submit_type_text').val("登録");
+                            $('#register-btn').prop('disabled', false);
+                            $('#register-btn').focus();
+                        } else if (submit_type == 2) {
+                            $('#deposit_submit_type_text').val("一時保存");
+                            $('#register-btn').prop('disabled', false);
+                            $('#register-btn').focus();
+                        } else {
+                            $('#deposit_submit_type_text').val("存在しない登録番号です。");
+                            $('#register-btn').prop('disabled', true);
                         }
-                    });
-
-                    tabindex = min;
-
-                    if ($('input[tabindex="' + tabindex + '"]').length) {
-
-                        var this_val = $('input[tabindex="' + tabindex + '"]').val();
-                        $('input[tabindex="' + tabindex + '"]').val("");
-                        $('input[tabindex="' + tabindex + '"]').focus();
-                        $('input[tabindex="' + tabindex + '"]').val(this_val);
 
                     } else {
 
-                        var this_val = $('#delivery_code').val();
-                        $('#delivery_code').val("");
-                        $('#delivery_code').focus();
-                        $('#delivery_code').val(this_val);
+                        // 現在のtabIndex取得
+                        var tabindex = parseInt($(this).attr('tabindex'), 10);
+                        if (isNaN(tabindex)) return false;
+
+                        // ひとつ前のタブの最小値を取得
+                        var min = 0;
+                        $("#deposit-create-form [tabindex]").attr("tabindex", function(a, b) {
+
+                            b = parseInt(b, 10);
+                            if (tabindex < b) {
+                                if (min == 0) min = b;
+                                else if (min > b) min = b;
+                            }
+                        });
+
+                        tabindex = min;
+
+                        if ($('input[tabindex="' + tabindex + '"]').length) {
+
+                            var this_val = $('input[tabindex="' + tabindex + '"]').val();
+                            $('input[tabindex="' + tabindex + '"]').val("");
+                            $('input[tabindex="' + tabindex + '"]').focus();
+                            $('input[tabindex="' + tabindex + '"]').val(this_val);
+
+                        } else {
+
+                            var this_val = $('#delivery_code').val();
+                            $('#delivery_code').val("");
+                            $('#delivery_code').focus();
+                            $('#delivery_code').val(this_val);
+                        }
                     }
 
                     return false;
@@ -284,7 +309,7 @@
 
                     // ひとつ前のタブの最大値を取得
                     var max = 0;
-                    $("#sale-slip-create-form [tabindex]").attr("tabindex", function(a, b) {
+                    $("#deposit-create-form [tabindex]").attr("tabindex", function(a, b) {
 
                         b = parseInt(b, 10);
                         if (tabindex > b) {
@@ -474,12 +499,14 @@
             //-------------------------------------
             $(document).on("click", ".register-btn", function() {
 
-                var this_val = $("#sale_submit_type").val();
+                var this_val = $("#deposit_submit_type").val();
 
                 if (this_val == "1") {
-                    $('#sale-slip-create-form').submit();
-                } else if (this_id == "2") {
-                    $('#sale-slip-create-form').submit();
+                    $('#deposit-create-form').submit();
+                } else if (this_val == "2") {
+                    $('#deposit-create-form').submit();
+                } else if (this_val == "3") {
+                    $('#deposit-create-form').submit();
                 } else {
                     return false;
                 }

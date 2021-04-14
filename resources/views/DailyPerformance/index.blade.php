@@ -66,7 +66,7 @@
                             <td>
                                 <div class="table-th">売上先企業</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[DailyPerformance][sale_company_code]" value="{{$dp_sale_company_code}}" tabindex="3">
+                                    <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[DailyPerformance][sale_company_code]" value="{{$dp_sale_company_code}}" tabindex="5">
                                     <input type="hidden" id="sale_company_id" name="data[DailyPerformance][sale_company_id]" value="{{$dp_sale_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
@@ -74,7 +74,7 @@
                                 </div>
                                 <div class="table-th">売上先店舗</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[DailyPerformance][sale_shop_code]" value="{{$dp_sale_shop_code}}" tabindex="4">
+                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[DailyPerformance][sale_shop_code]" value="{{$dp_sale_shop_code}}" tabindex="6">
                                     <input type="hidden" id="sale_shop_id" name="data[DailyPerformance][sale_shop_id]" value="{{$dp_sale_shop_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
@@ -86,7 +86,7 @@
                             <td>
                                 <div class="table-th">製品</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[DailyPerformance][product_code]" value="{{$dp_product_code}}" tabindex="5">
+                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[DailyPerformance][product_code]" value="{{$dp_product_code}}" tabindex="7">
                                     <input type="hidden" id="product_id" name="data[DailyPerformance][product_id]" value="{{$dp_product_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
@@ -131,10 +131,10 @@
                             <!--日付-->{{$key_date}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{number_format($daily_performance_val['supply_daily_amount'])}}
+                            <!--仕入金額-->{{number_format($daily_performance_val['supply_daily_amount'])}}円
                         </td>
                         <td>
-                            <!--売上金額-->{{number_format($daily_performance_val['sale_daily_amount'])}}
+                            <!--売上金額-->{{number_format($daily_performance_val['sale_daily_amount'])}}円
                         </td>
                     </tr>
                 </tbody>
@@ -654,12 +654,23 @@
         border: 1px solid #bcbcbc;
     }
     
-    .index-table td {
-        font-size: 10px;
+    .index-table td:first-of-type {
+        font-size: 12px;
         padding-left: 20px;
         padding: 8px;
         border: 1px solid #bcbcbc;
         border-top: none;
         width: 10%;
+    }
+    
+    .index-table td {
+        font-size: 12px;
+        padding-right: 20px;
+        padding: 8px;
+        border: 1px solid #bcbcbc;
+        border-top: none;
+        width: 10%;
+        text-align: right;
+        font-weight: bold;
     }
 </style>

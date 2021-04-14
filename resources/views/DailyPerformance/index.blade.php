@@ -368,15 +368,12 @@
     .list-area {
         max-width: 1300px;
         width: 90%;
-        margin: 25px auto 50px;
+        margin: 20px auto 50px;
     }
     
     .index-table {
         width: 100%;
         letter-spacing: 2px;
-        border-top: solid 1px #ccc;
-        border-bottom: solid 2px #ccc;
-        margin: 5px 0px;
     }
     
     .index-table th {
@@ -396,6 +393,7 @@
         padding-left: 20px;
         padding: 8px;
         border: 1px solid #bcbcbc;
+        border-top: none;
         width: 10%;
     }
 </style>

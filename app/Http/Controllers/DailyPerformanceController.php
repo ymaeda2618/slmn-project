@@ -204,8 +204,8 @@ class DailyPerformanceController extends Controller
             //---------------------
             $supplySlipList = DB::table('supply_slips AS SupplySlip')
 
-            ->selectRaw('DATE_FORMAT(SupplySlip.date, "Y-m-d")          AS supply_slip_date')
-            ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "Y-m-d") AS supply_slip_delivery_date')
+            ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
+            ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
             ->selectRaw('SUM(COALESCE(SupplySlip.total,0))              AS supply_daily_amount')
 
             ->join('supply_companies AS SupplyCompany', function ($join) {
@@ -263,8 +263,8 @@ class DailyPerformanceController extends Controller
             //---------------------
             $saleSlipList = DB::table('sale_slips AS SaleSlip')
 
-            ->selectRaw('DATE_FORMAT(SaleSlip.date, "Y-m-d")          AS sale_slip_date')
-            ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "Y-m-d") AS sale_slip_delivery_date')
+            ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
+            ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
             ->selectRaw('SUM(COALESCE(SaleSlip.total,0))              AS sale_daily_amount')
 
             ->join('sale_companies AS SaleCompany', function ($join) {

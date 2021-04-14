@@ -383,4 +383,416 @@ class DailyPerformanceController extends Controller
             "daily_performance_arr"             => $daily_performance_arr,
         ]);
     }
+
+    /**
+     * 仕入企業ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteSupplyCompany(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            $supplyCompanyList = DB::table('supply_companies AS SupplyCompany')
+            ->select(
+                'SupplyCompany.name  AS supply_company_name'
+            )->where([
+                    ['SupplyCompany.active', '=', '1']
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('SupplyCompany.name', 'like', "%{$input_text}%")
+                ->orWhere('SupplyCompany.yomi', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($supplyCompanyList)) {
+
+                foreach ($supplyCompanyList as $supply_company_val) {
+
+                    array_push($auto_complete_array, $supply_company_val->supply_company_name);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
+    }
+
+    /**
+     * 仕入先企業更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetSupplyCompany(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // すべて数字かどうかチェック
+        if (is_numeric($input_text)) {
+            $input_code = $input_text;
+            $input_name = null;
+        } else {
+            $input_code = null;
+            $input_name = $input_text;
+        }
+
+        // 初期化
+        $output_code = null;
+        $output_id   = null;
+        $output_name = null;
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            // 製品一覧を取得
+            $supplyCompanyList = DB::table('supply_companies AS SupplyCompany')
+            ->select(
+                'SupplyCompany.code  AS code',
+                'SupplyCompany.id    AS id',
+                'SupplyCompany.name  AS name'
+            )
+            ->if(!empty($input_code), function ($query) use ($input_code) {
+                return $query->where('SupplyCompany.code', '=', $input_code);
+            })
+            ->if(!empty($input_name), function ($query) use ($input_name) {
+                return $query->where('SupplyCompany.name', 'like', $input_name);
+            })
+            ->first();
+
+            if (!empty($supplyCompanyList)) {
+                $output_code = $supplyCompanyList->code;
+                $output_id   = $supplyCompanyList->id;
+                $output_name = $supplyCompanyList->name;
+            }
+        }
+
+        $returnArray = array($output_code, $output_id, $output_name);
+
+        return json_encode($returnArray);
+    }
+
+    /**
+     * 仕入店舗ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteSupplyShop(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            $supplyShopList = DB::table('supply_shops AS SupplyShop')
+            ->select(
+                'SupplyShop.name  AS supply_shop_name'
+            )->where([
+                    ['SupplyShop.active', '=', '1']
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('SupplyShop.name', 'like', "%{$input_text}%")
+                ->orWhere('SupplyShop.yomi', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($supplyShopList)) {
+
+                foreach ($supplyShopList as $supply_shop_val) {
+
+                    array_push($auto_complete_array, $supply_shop_val->supply_shop_name);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
+    }
+
+    /**
+     * 仕入先店舗更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetSupplyShop(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // すべて数字かどうかチェック
+        if (is_numeric($input_text)) {
+            $input_code = $input_text;
+            $input_name = null;
+        } else {
+            $input_code = null;
+            $input_name = $input_text;
+        }
+
+        // 初期化
+        $output_code = null;
+        $output_id   = null;
+        $output_name = null;
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            // 製品一覧を取得
+            $supplyShopList = DB::table('supply_shops AS SupplyShop')
+            ->select(
+                'SupplyShop.code  AS code',
+                'SupplyShop.id    AS id',
+                'SupplyShop.name  AS name'
+            )
+            ->if(!empty($input_code), function ($query) use ($input_code) {
+                return $query->where('SupplyShop.code', '=', $input_code);
+            })
+            ->if(!empty($input_name), function ($query) use ($input_name) {
+                return $query->where('SupplyShop.name', 'like', $input_name);
+            })
+            ->first();
+
+            if (!empty($supplyShopList)) {
+                $output_code = $supplyShopList->code;
+                $output_id   = $supplyShopList->id;
+                $output_name = $supplyShopList->name;
+            }
+        }
+
+        $returnArray = array($output_code, $output_id, $output_name);
+
+        return json_encode($returnArray);
+    }
+
+    /**
+     * 売上店舗ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteSaleShop(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            $saleShopList = DB::table('sale_shops AS SaleShop')
+            ->select(
+                'SaleShop.name  AS sale_shop_name'
+            )->where([
+                    ['SaleShop.active', '=', '1'],
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('SaleShop.name', 'like', "%{$input_text}%")
+                ->orWhere('SaleShop.yomi', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($saleShopList)) {
+
+                foreach ($saleShopList as $sale_shop_val) {
+
+                    array_push($auto_complete_array, $sale_shop_val->sale_shop_name);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
+    }
+
+    /**
+     * 売上先店舗更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetSaleShop(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // すべて数字かどうかチェック
+        if (is_numeric($input_text)) {
+            $input_code = $input_text;
+            $input_name = null;
+        } else {
+            $input_code = null;
+            $input_name = $input_text;
+        }
+
+        // 初期化
+        $output_code = null;
+        $output_id   = null;
+        $output_name = null;
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            // 製品一覧を取得
+            $saleShopList = DB::table('sale_shops AS SaleShop')
+            ->select(
+                'SaleShop.code  AS code',
+                'SaleShop.id    AS id',
+                'SaleShop.name  AS name'
+            )
+            ->if(!empty($input_code), function ($query) use ($input_code) {
+                return $query->where('SaleShop.code', '=', $input_code);
+            })
+            ->if(!empty($input_name), function ($query) use ($input_name) {
+                return $query->where('SaleShop.name', 'like', $input_name);
+            })
+            ->first();
+
+            if (!empty($saleShopList)) {
+                $output_code = $saleShopList->code;
+                $output_id   = $saleShopList->id;
+                $output_name = $saleShopList->name;
+            }
+        }
+
+        $returnArray = array($output_code, $output_id, $output_name);
+
+        return json_encode($returnArray);
+    }
+
+    /**
+     * 製品ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteProduct(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            $productList = DB::table('products AS Product')
+            ->select(
+                'Product.name  AS product_name'
+            )->where([
+                    ['Product.active', '=', '1'],
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('Product.name', 'like', "%{$input_text}%")
+                ->orWhere('Product.yomi', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($productList)) {
+
+                foreach ($productList as $product_val) {
+
+                    array_push($auto_complete_array, $product_val->product_name);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
+    }
+
+    /**
+     * 製品ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetProduct(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // すべて数字かどうかチェック
+        if (is_numeric($input_text)) {
+            $product_code = $input_text;
+            $product_name = null;
+        } else {
+            $product_code = null;
+            $product_name = $input_text;
+        }
+
+        // 初期化
+        $output_product_code        = null;
+        $output_product_id          = null;
+        $output_product_name        = null;
+        $output_tax_id              = null;
+        $output_tax_name            = null;
+        $output_unit_id             = null;
+        $output_unit_name           = null;
+        $output_inventory_unit_id   = null;
+        $output_inventory_unit_name = null;
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            // 製品一覧を取得
+            $productList = DB::table('products AS Product')
+            ->select(
+                'Product.code       AS code',
+                'Product.id         AS id',
+                'Product.name       AS product_name',
+                'Tax.id             AS tax_id',
+                'Tax.name           AS tax_name',
+                'Unit.id            AS unit_id',
+                'Unit.name          AS unit_name',
+                'InventoryUnit.id   AS inventory_unit_id',
+                'InventoryUnit.name AS inventory_unit_name'
+            )->join('taxes AS Tax', function ($join) {
+                $join->on('Tax.id', '=', 'Product.tax_id');
+            }
+            )->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
+            }
+            )->join('units AS InventoryUnit', function ($join) {
+                $join->on('InventoryUnit.id', '=', 'Product.inventory_unit_id');
+            })
+            ->if(!empty($product_code), function ($query) use ($product_code) {
+                return $query->where('Product.code', '=', $product_code);
+            })
+            ->if(!empty($product_name), function ($query) use ($product_name) {
+                return $query->where('Product.name', 'like', $product_name);
+            })
+            ->first();
+
+            if (!empty($productList)) {
+                $output_product_code        = $productList->code;
+                $output_product_id          = $productList->id;
+                $output_product_name        = $productList->product_name;
+                $output_tax_id              = $productList->tax_id;
+                $output_tax_name            = $productList->tax_name;
+                $output_unit_id             = $productList->unit_id;
+                $output_unit_name           = $productList->unit_name;
+                $output_inventory_unit_id   = $productList->inventory_unit_id;
+                $output_inventory_unit_name = $productList->inventory_unit_name;
+            }
+        }
+
+        $returnArray = array(
+            $output_product_code,
+            $output_product_id,
+            $output_product_name,
+            $output_tax_id,
+            $output_tax_name,
+            $output_unit_id,
+            $output_unit_name,
+            $output_inventory_unit_id,
+            $output_inventory_unit_name
+        );
+
+        return json_encode($returnArray);
+    }
 }

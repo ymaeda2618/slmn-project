@@ -86,11 +86,11 @@
                             <td>
                                 <div class="table-th">製品</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[DailyPerformanceDetail][product_code]" value="{{$dp_product_code}}" tabindex="5">
-                                    <input type="hidden" id="product_id" name="data[DailyPerformanceDetail][product_id]" value="{{$dp_product_id}}">
+                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[DailyPerformance][product_code]" value="{{$dp_product_code}}" tabindex="5">
+                                    <input type="hidden" id="product_id" name="data[DailyPerformance][product_id]" value="{{$dp_product_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="product_text" name="data[DailyPerformanceDetail][product_text]" value="{{$dp_product_text}}" readonly>
+                                    <input type="text" class="search-control" id="product_text" name="data[DailyPerformance][product_text]" value="{{$dp_product_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -194,6 +194,84 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSupplyShop",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
+            //-------------------------------------
+            // autocomplete処理 売上企業ID
+            //-------------------------------------
+            $(".sale_company_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteSaleCompany",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
+            //-------------------------------------
+            // autocomplete処理 売上店舗ID
+            //-------------------------------------
+            $(".sale_shop_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteSaleShop",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
+            //-------------------------------------
+            // autocomplete処理 製品ID
+            //-------------------------------------
+            $(".product_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteProduct",
                         type: "POST",
                         cache: false,
                         dataType: "json",

@@ -7,7 +7,7 @@
 
         <!--検索エリア-->
         <div class='search-area'>
-            <form id="index-search-form" method="post" action='./DailyPerformanceIndex' enctype="multipart/form-data">
+            <form id="index-search-form" method="post" action='./DailyPerformanceIndex' enctype="multipart/form-data" onsubmit="return false;">
                 {{ csrf_field() }}
                 <table>
                     <tbody>
@@ -98,8 +98,8 @@
                 </table>
                 <div class="btn-area ">
                     <div class='search-btn-area'>
-                        <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索'>
-                        <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット'>
+                        <input type='button' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索' onclick="submit();">
+                        <input type='button' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット' onclick="submit();">
                     </div>
                 </div>
             </form>
@@ -151,6 +151,16 @@
 <script type="text/javascript">
     (function($) {
         jQuery(window).load(function() {
+
+            //-------------------------------------
+            // Enterと-を押したときにタブ移動する処理
+            //-------------------------------------
+            $(document).on("keypress", "input", function(event) {
+
+                if (event.keyCode === 13) { // Enterが押された時
+                    return false;
+                }
+            });
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
@@ -643,7 +653,7 @@
     }
     
     .index-table th {
-        width: 10%;
+        width: 40%;
         padding: 10px;
         padding-left: 10px;
         background-color: #57595b;
@@ -654,23 +664,28 @@
         border: 1px solid #bcbcbc;
     }
     
-    .index-table td:first-of-type {
-        font-size: 12px;
-        padding-left: 20px;
-        padding: 8px;
-        border: 1px solid #bcbcbc;
-        border-top: none;
-        width: 10%;
+    .index-table th:first-of-type {
+        width: 20%;
     }
     
     .index-table td {
         font-size: 12px;
-        padding-right: 20px;
         padding: 8px;
+        padding-right: 20px;
         border: 1px solid #bcbcbc;
         border-top: none;
-        width: 10%;
+        width: 40%;
         text-align: right;
         font-weight: bold;
+    }
+    
+    .index-table td:first-of-type {
+        font-size: 12px;
+        padding: 8px;
+        padding-left: 20px;
+        border: 1px solid #bcbcbc;
+        border-top: none;
+        text-align: left;
+        width: 20%;
     }
 </style>

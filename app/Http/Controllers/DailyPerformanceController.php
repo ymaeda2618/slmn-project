@@ -328,8 +328,8 @@ class DailyPerformanceController extends Controller
                 $supply_daily_amount = 0;
                 $sale_daily_amount   = 0;
 
-                if ($supply_date_arr[$date_val]) $supply_daily_amount = $supply_date_arr[$sale_date]["supply_daily_amount"];
-                if ($sale_date_arr[$date_val])   $sale_daily_amount   = $sale_date_arr[$sale_date]["sale_daily_amount"];
+                if ($supply_date_arr[$date_val]) $supply_daily_amount = $supply_date_arr[$sale_date]->supply_daily_amount;
+                if ($sale_date_arr[$date_val])   $sale_daily_amount   = $sale_date_arr[$sale_date]->sale_daily_amount;
 
                 $daily_performance_arr = [
                     "date"                => $date_val,

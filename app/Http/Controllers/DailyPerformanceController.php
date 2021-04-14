@@ -241,17 +241,20 @@ class DailyPerformanceController extends Controller
 
             // 配列を組みなおす
             $supply_date_arr = array();
-            foreach($supplySlipList as $supplySlipVal){
 
-                if($dp_date_type == 1){
-                    $supply_date = $supplySlipVal['supply_slip_date'];
-                } else {
-                    $supply_date = $supplySlipVal['supply_slip_delivery_date'];
+            if (!empty($supplySlipList)) {
+                foreach ($supplySlipList as $supplySlipVal) {
+
+                    if ($dp_date_type == 1) {
+                        $supply_date = $supplySlipVal['supply_slip_date'];
+                    } else {
+                        $supply_date = $supplySlipVal['supply_slip_delivery_date'];
+                    }
+
+                    $supply_date_arr[$supply_date] = [
+                        "supply_daily_amount"  => $supplySlipVal['supply_daily_amount']
+                    ];
                 }
-
-                $supply_date_arr[$supply_date] = [
-                    "supply_daily_amount"  => $supplySlipVal['supply_daily_amount']
-                ];
             }
 
 
@@ -297,17 +300,19 @@ class DailyPerformanceController extends Controller
 
             // 配列を組みなおす
             $sale_date_arr = array();
-            foreach($saleSlipList as $saleSlipVal){
+            if (!empty($saleSlipList)) {
+                foreach ($saleSlipList as $saleSlipVal) {
 
-                if($dp_date_type == 1){
-                    $sale_date = $saleSlipVal['sale_slip_date'];
-                } else {
-                    $sale_date = $saleSlipVal['sale_slip_delivery_date'];
+                    if ($dp_date_type == 1) {
+                        $sale_date = $saleSlipVal['sale_slip_date'];
+                    } else {
+                        $sale_date = $saleSlipVal['sale_slip_delivery_date'];
+                    }
+
+                    $sale_date_arr[$sale_date] = [
+                        "sale_daily_amount"  => $saleSlipVal['sale_daily_amount']
+                    ];
                 }
-
-                $sale_date_arr[$sale_date] = [
-                    "sale_daily_amount"  => $saleSlipVal['sale_daily_amount']
-                ];
             }
 
             //---------------------

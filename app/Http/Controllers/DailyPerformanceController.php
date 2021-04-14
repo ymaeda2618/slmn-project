@@ -354,7 +354,6 @@ class DailyPerformanceController extends Controller
         return view('DailyPerformance.index')->with([
             "year_arr"                          => $year_arr,
             "month_arr"                         => $month_arr,
-            "date_arr"                          => $date_arr,
 
             "dp_check_str_slip_date"            => $dp_check_str_slip_date,
             "dp_check_str_deliver_date"         => $dp_check_str_deliver_date,
@@ -367,6 +366,13 @@ class DailyPerformanceController extends Controller
             "dp_supply_shop_code"               => $dp_supply_shop_code,
             "dp_supply_shop_id"                 => $dp_supply_shop_id,
             "dp_supply_shop_text"               => $dp_supply_shop_text,
+
+            "dp_sale_company_code"              => $dp_sale_company_code,
+            "dp_sale_company_id"                => $dp_sale_company_id,
+            "dp_sale_company_text"              => $dp_sale_company_text,
+            "dp_sale_shop_code"                 => $dp_sale_shop_code,
+            "dp_sale_shop_id"                   => $dp_sale_shop_id,
+            "dp_sale_shop_text"                 => $dp_sale_shop_text,
 
             "dp_product_code"                   => $dp_product_code,
             "dp_product_id"                     => $dp_product_id,

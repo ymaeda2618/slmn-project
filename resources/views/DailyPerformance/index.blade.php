@@ -21,7 +21,7 @@
                                 <div class="table-td">
                                     <select class="search-control " id="daily_performance_target_year" name="data[DailyPerformance][target_year]">
                                         @foreach ($year_arr as $year_key => $year_val)
-                                        @if ($year_key == $daily_performance_target_year)
+                                        @if ($year_key == $dp_daily_performance_target_year)
                                         <option value="{{$year_key}}" selected>{{$year_val}}</option>
                                         @else
                                         <option value="{{$year_key}}">{{$year_val}}</option>
@@ -32,7 +32,7 @@
                                 <div class="table-td">
                                     <select class="search-control " id="daily_performance_target_month " name="data[DailyPerformance][target_month]">
                                         @foreach ($month_arr as $month_key => $month_val)
-                                        @if ($year_key == $daily_performance_target_month)
+                                        @if ($month_key == $dp_daily_performance_target_month)
                                         <option value="{{$month_key}}" selected>{{$month_val}}</option>
                                         @else
                                         <option value="{{$month_key}}">{{$month_val}}</option>

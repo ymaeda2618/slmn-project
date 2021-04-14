@@ -107,8 +107,8 @@
 
         <!--総計表示エリア-->
         <div class='sum-display-area'>
-            <div class='sum-display-div'>仕入総額:{{number_format($supply_total_amount, 2)}}円</div>
-            <div class='sum-display-div'>売上総額:{{number_format($sale_total_amount, 2)}}円</div>
+            <div class='sum-display-div'>仕入総額:{{preg_replace("/\.?0+$/","",number_format($supply_total_amount, 2))}}円</div>
+            <div class='sum-display-div'>売上総額:{{preg_replace("/\.?0+$/","",number_format($sale_total_amount, 2))}}円</div>
         </div>
 
         <!--一覧表示エリア-->
@@ -131,10 +131,10 @@
                             <!--日付-->{{$key_date}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{number_format($daily_performance_val['supply_daily_amount'], 2)}}円
+                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['supply_daily_amount'], 2))}}円
                         </td>
                         <td>
-                            <!--売上金額-->{{number_format($daily_performance_val['sale_daily_amount'], 2)}}円
+                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount'], 2))}}円
                         </td>
                     </tr>
                 </tbody>

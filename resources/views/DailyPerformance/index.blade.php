@@ -7,7 +7,7 @@
 
         <!--検索エリア-->
         <div class='search-area'>
-            <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
+            <form id="index-search-form" method="post" action='./DailyPerformanceIndex' enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <table>
                     <tbody>

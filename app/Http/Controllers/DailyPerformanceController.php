@@ -215,6 +215,11 @@ class DailyPerformanceController extends Controller
             ->leftJoin('supply_shops AS SupplyShop', function ($join) {
                 $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
             })
+            ->if(!empty($dp_product_id), function ($query) use ($product_supply_sub_query) {
+                return $query
+                       ->join(DB::raw('('. $product_supply_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
+                       ->mergeBindings($product_supply_sub_query);
+            })
             ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
                 return $query->whereBetween('SupplySlip.date', [$first_date, $last_date]);
             })
@@ -226,11 +231,6 @@ class DailyPerformanceController extends Controller
             })
             ->if(!empty($dp_supply_shop_id), function ($query) use ($dp_supply_shop_id) {
                 return $query->where('SupplySlip.supply_shop_id', '=', $dp_supply_shop_id);
-            })
-            ->if(!empty($dp_product_id), function ($query) use ($product_supply_sub_query) {
-                return $query
-                       ->join(DB::raw('('. $product_supply_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
-                       ->mergeBindings($product_supply_sub_query);
             })
             ->where('SupplySlip.active', '=', '1')
             ->if($dp_date_type == 1, function ($query) {
@@ -283,6 +283,11 @@ class DailyPerformanceController extends Controller
             ->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
             })
+            ->if(!empty($dp_product_id), function ($query) use ($product_sale_sub_query) {
+                return $query
+                       ->join(DB::raw('('. $product_sale_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+                       ->mergeBindings($product_sale_sub_query);
+            })
             ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
                 return $query->whereBetween('SaleSlip.date', [$first_date, $last_date]);
             })
@@ -294,11 +299,6 @@ class DailyPerformanceController extends Controller
             })
             ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
-            })
-            ->if(!empty($dp_product_id), function ($query) use ($product_sale_sub_query) {
-                return $query
-                       ->join(DB::raw('('. $product_sale_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                       ->mergeBindings($product_sale_sub_query);
             })
             ->where('SaleSlip.active', '=', '1')
             ->if($dp_date_type == 1, function ($query) {

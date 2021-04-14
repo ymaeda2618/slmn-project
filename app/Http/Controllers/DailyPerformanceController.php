@@ -205,7 +205,7 @@ class DailyPerformanceController extends Controller
 
             $supplySlipList = DB::table('supply_slips AS SupplySlip')
 
-            ->selectRaw('DATE_FORMAT(SSupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
+            ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
             ->selectRaw('SUM(COALESCE(SupplySlip.total,0))              AS supply_daily_amount')
 

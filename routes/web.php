@@ -214,6 +214,10 @@ Route::get('OrderSaleUnitPriceRegister', 'OrderSaleUnitPriceController@register'
 Route::post('OrderSaleUnitPriceRegister', 'OrderSaleUnitPriceController@register');
 Route::post('OrderSaleUnitPriceEditRegister', 'OrderSaleUnitPriceController@editRegister');
 
+// 日別一覧
+Route::get('DailyPerformanceIndex', 'DailyPerformanceController@index');
+Route::post('DailyPerformanceIndex', 'DailyPerformanceController@index');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

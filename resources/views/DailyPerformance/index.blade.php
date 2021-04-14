@@ -131,10 +131,10 @@
                             <!--日付-->{{$key_date}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{number_format($daily_performance_val['supply_daily_amount'])}}円
+                            <!--仕入金額-->{{number_format($daily_performance_val['supply_daily_amount'], 2)}}円
                         </td>
                         <td>
-                            <!--売上金額-->{{number_format($daily_performance_val['sale_daily_amount'])}}円
+                            <!--売上金額-->{{number_format($daily_performance_val['sale_daily_amount'], 2)}}円
                         </td>
                     </tr>
                 </tbody>

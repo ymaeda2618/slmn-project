@@ -285,6 +285,15 @@ class DailyPerformanceController extends Controller
 
                 $product_sale_sub_query = DB::table('sale_slip_details as SaleSubTable')
                 ->select('SaleSubTable.sale_slip_id AS sale_slip_id')
+                ->selectRaw(
+                    'CASE
+                       WHEN SubProduct.tax_id = 1 THEN SUM(COALESCE(SaleSubTable.notax_price,0))*1.08
+                       WHEN SubProduct.tax_id = 2 THEN SUM(COALESCE(SaleSubTable.notax_price,0))*1.10
+                     END AS sub_sale_detail_daily_amount'
+                    )
+                ->join('products AS SubProduct', function ($join) {
+                    $join->on('SubProduct.id', '=', 'SaleSubTable.product_id');
+                })
                 ->where('SaleSubTable.product_id', '=', $dp_product_id)
                 ->groupBy('SaleSubTable.sale_slip_id');
             }
@@ -293,8 +302,10 @@ class DailyPerformanceController extends Controller
 
             ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
             ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
-            ->selectRaw('SUM(COALESCE(SaleSlip.total,0))              AS sale_daily_amount')
-
+            ->selectRaw('SUM(COALESCE(SaleSlip.total,0))                 AS sale_daily_amount')
+            ->if(!empty($dp_product_id), function ($query) {
+                return $query->selectRaw('SUM(COALESCE(SaleSlipDetail.sub_sale_detail_daily_amount,0)) AS sale_detail_daily_amount');
+            })
             ->join('sale_companies AS SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
             })
@@ -337,8 +348,14 @@ class DailyPerformanceController extends Controller
                         $sale_date = $saleSlipVal->sale_slip_delivery_date;
                     }
 
+                    if(!empty($dp_product_id)){
+                        $sale_daily_amount  = $supplySlipVal->sale_detail_daily_amount;
+                    } else {
+                        $sale_daily_amount  = $supplySlipVal->sale_daily_amount;
+                    }
+
                     $sale_date_arr[$sale_date] = [
-                        "sale_daily_amount"  => $saleSlipVal->sale_daily_amount
+                        "sale_daily_amount"  => $sale_daily_amount
                     ];
                 }
             }

@@ -107,8 +107,8 @@
 
         <!--総計表示エリア-->
         <div class='sum-display-area'>
-            <div class='sum-display-div'>仕入総額:{{number_format($supply_total_amount)}}円</div>
-            <div class='sum-display-div'>売上総額:{{number_format($sale_total_amount)}}円</div>
+            <div class='sum-display-div'>仕入総額:{{number_format($supply_total_amount, 2)}}円</div>
+            <div class='sum-display-div'>売上総額:{{number_format($sale_total_amount, 2)}}円</div>
         </div>
 
         <!--一覧表示エリア-->

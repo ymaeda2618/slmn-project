@@ -67,7 +67,7 @@
                                 <div class="table-th">売上先企業</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[DailyPerformance][sale_company_code]" value="{{$dp_sale_company_code}}" tabindex="3">
-                                    <input type="hidden" id="sale_company_id" name="data[DailyPerformance][sale_company_id]" value="{{$sale_company_id}}">
+                                    <input type="hidden" id="sale_company_id" name="data[DailyPerformance][sale_company_id]" value="{{$dp_sale_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="sale_company_text" name="data[DailyPerformance][sale_company_text]" value="{{$dp_sale_company_text}}" readonly>

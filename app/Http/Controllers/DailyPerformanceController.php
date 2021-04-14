@@ -189,19 +189,20 @@ class DailyPerformanceController extends Controller
                 $date_arr[] = date('Y-m-d', strtotime($first_date . '+' . $d . 'days'));
             }
 
-            // supply_slip_detailsのサブクエリを作成
-            $product_sub_query = null;
-            if(!empty($product_id)) {
-
-                $product_sub_query = DB::table('supply_slip_details as SubTable')
-                ->select('SubTable.supply_slip_id AS supply_slip_id')
-                ->where('SubTable.product_id', '=', $product_id)
-                ->groupBy('SubTable.supply_slip_id');
-            }
-
             //---------------------
             // 仕入額を取得
             //---------------------
+
+            // supply_slip_detailsのサブクエリを作成
+            $product_sub_query = null;
+            if(!empty($dp_product_id)) {
+
+                $product_sub_query = DB::table('supply_slip_details as SubTable')
+                ->select('SubTable.supply_slip_id AS supply_slip_id')
+                ->where('SubTable.product_id', '=', $dp_product_id)
+                ->groupBy('SubTable.supply_slip_id');
+            }
+
             $supplySlipList = DB::table('supply_slips AS SupplySlip')
 
             ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
@@ -220,13 +221,13 @@ class DailyPerformanceController extends Controller
             ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 2, function ($query) use ($first_date, $last_date) {
                 return $query->whereBetween('SupplySlip.delivery_date', [$first_date, $last_date]);
             })
-            ->if(!empty($supply_company_id), function ($query) use ($dp_supply_company_id) {
+            ->if(!empty($dp_supply_company_id), function ($query) use ($dp_supply_company_id) {
                 return $query->where('SupplySlip.supply_company_id', '=', $dp_supply_company_id);
             })
-            ->if(!empty($supply_shop_id), function ($query) use ($dp_supply_shop_id) {
+            ->if(!empty($dp_supply_shop_id), function ($query) use ($dp_supply_shop_id) {
                 return $query->where('SupplySlip.supply_shop_id', '=', $dp_supply_shop_id);
             })
-            ->if(!empty($product_id), function ($query) use ($product_sub_query) {
+            ->if(!empty($dp_product_id), function ($query) use ($product_sub_query) {
                 return $query
                        ->join(DB::raw('('. $product_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
                        ->mergeBindings($product_sub_query);
@@ -257,10 +258,19 @@ class DailyPerformanceController extends Controller
                 }
             }
 
-
             //---------------------
             // 売上額を取得
             //---------------------
+            // supply_slip_detailsのサブクエリを作成
+            $product_sub_query = null;
+            if(!empty($dp_product_id)) {
+
+                $product_sub_query = DB::table('sale_slip_details as SubTable')
+                ->select('SubTable.sale_slip_id AS sale_slip_id')
+                ->where('SubTable.product_id', '=', $dp_product_id)
+                ->groupBy('SubTable.sale_slip_id');
+            }
+
             $saleSlipList = DB::table('sale_slips AS SaleSlip')
 
             ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
@@ -285,7 +295,7 @@ class DailyPerformanceController extends Controller
             ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
             })
-            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+            ->if(!empty($dp_product_id), function ($query) use ($product_sub_query) {
                 return $query
                        ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
                        ->mergeBindings($product_sub_query);

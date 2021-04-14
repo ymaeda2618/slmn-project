@@ -349,9 +349,9 @@ class DailyPerformanceController extends Controller
                     }
 
                     if(!empty($dp_product_id)){
-                        $sale_daily_amount  = $supplySlipVal->sale_detail_daily_amount;
+                        $sale_daily_amount  = $saleSlipVal->sale_detail_daily_amount;
                     } else {
-                        $sale_daily_amount  = $supplySlipVal->sale_daily_amount;
+                        $sale_daily_amount  = $saleSlipVal->sale_daily_amount;
                     }
 
                     $sale_date_arr[$sale_date] = [

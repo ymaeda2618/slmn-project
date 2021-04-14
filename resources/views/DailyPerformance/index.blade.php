@@ -128,7 +128,7 @@
                 <tbody>
                     <tr>
                         <td>
-                            <!--日付-->{{$daily_performance_val->date}}
+                            <!--日付-->{{$daily_performance_val->daily_performance_date}}
                         </td>
                         <td>
                             <!--仕入金額-->{{number_format($daily_performance_val->supply_daily_amount)}}

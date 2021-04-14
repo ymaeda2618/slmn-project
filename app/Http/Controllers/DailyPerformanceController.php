@@ -246,13 +246,13 @@ class DailyPerformanceController extends Controller
                 foreach ($supplySlipList as $supplySlipVal) {
 
                     if ($dp_date_type == 1) {
-                        $supply_date = $supplySlipVal['supply_slip_date'];
+                        $supply_date = $supplySlipVal->supply_slip_date;
                     } else {
-                        $supply_date = $supplySlipVal['supply_slip_delivery_date'];
+                        $supply_date = $supplySlipVal->supply_slip_delivery_date;
                     }
 
                     $supply_date_arr[$supply_date] = [
-                        "supply_daily_amount"  => $supplySlipVal['supply_daily_amount']
+                        "supply_daily_amount"  => $supplySlipVal->supply_daily_amount->
                     ];
                 }
             }
@@ -304,13 +304,13 @@ class DailyPerformanceController extends Controller
                 foreach ($saleSlipList as $saleSlipVal) {
 
                     if ($dp_date_type == 1) {
-                        $sale_date = $saleSlipVal['sale_slip_date'];
+                        $sale_date = $saleSlipVal->sale_slip_date;
                     } else {
-                        $sale_date = $saleSlipVal['sale_slip_delivery_date'];
+                        $sale_date = $saleSlipVal->sale_slip_delivery_date;
                     }
 
                     $sale_date_arr[$sale_date] = [
-                        "sale_daily_amount"  => $saleSlipVal['sale_daily_amount']
+                        "sale_daily_amount"  => $saleSlipVal->sale_daily_amount
                     ];
                 }
             }

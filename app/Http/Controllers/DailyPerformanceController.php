@@ -31,12 +31,12 @@ class DailyPerformanceController extends Controller
 
             $dp_date_type     = $request->session()->get('dp_date_type');
             $dp_daily_performance_target_year     = $request->session()->get('dp_daily_performance_target_year');
-            $dp_daily_performance_target_month       = $request->session()->get('dp_daily_performance_target_month');
+            $dp_daily_performance_target_month    = $request->session()->get('dp_daily_performance_target_month');
 
             // 空値の場合は初期値を設定
             if(empty($dp_date_type)) $dp_date_type = 1;
-            if(empty($dp_daily_performance_target_year)) $dp_daily_performance_target_year = date('Y-m-d');
-            if(empty($dp_daily_performance_target_month)) $dp_daily_performance_target_month     = date('Y-m-d');
+            if(empty($dp_daily_performance_target_year))  $dp_daily_performance_target_year    = date('Y');
+            if(empty($dp_daily_performance_target_month)) $dp_daily_performance_target_month  = date('m');
 
             $dp_supply_company_code  = $request->session()->get('dp_supply_company_code');
             $dp_supply_company_id    = $request->session()->get('dp_supply_company_id');
@@ -237,8 +237,7 @@ class DailyPerformanceController extends Controller
             })
             ->if($dp_date_type == 2, function ($query) {
                 return $query->groupBy('SupplySlip.delivery_date');
-            })
-            ->orderBy('SupplySlip.date', 'desc')->get();
+            })->get();
 
             // 配列を組みなおす
             $supply_date_arr = array();

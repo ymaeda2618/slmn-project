@@ -252,7 +252,7 @@ class DailyPerformanceController extends Controller
                     }
 
                     $supply_date_arr[$supply_date] = [
-                        "supply_daily_amount"  => $supplySlipVal->supply_daily_amount->
+                        "supply_daily_amount"  => $supplySlipVal->supply_daily_amount
                     ];
                 }
             }

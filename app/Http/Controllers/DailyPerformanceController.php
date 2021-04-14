@@ -85,27 +85,27 @@ class DailyPerformanceController extends Controller
                 $dp_daily_performance_target_year     = $request->data['DailyPerformance']['target_year'];
                 $dp_daily_performance_target_month    = $request->data['DailyPerformance']['target_month'];
 
-                $request->session()->put('date_type', $dp_date_type);
-                $request->session()->put('daily_performance_target_year', $dp_daily_performance_target_year);
-                $request->session()->put('daily_performance_target_month', $dp_daily_performance_target_month);
+                $request->session()->put('dp_date_type', $dp_date_type);
+                $request->session()->put('dp_daily_performance_target_year', $dp_daily_performance_target_year);
+                $request->session()->put('dp_daily_performance_target_month', $dp_daily_performance_target_month);
 
-                $request->session()->put('supply_company_code', $dp_supply_company_code);
-                $request->session()->put('supply_company_id', $dp_supply_company_id);
-                $request->session()->put('supply_company_text', $dp_supply_company_text);
-                $request->session()->put('supply_shop_code', $dp_supply_shop_code);
-                $request->session()->put('supply_shop_id', $dp_supply_shop_id);
-                $request->session()->put('supply_shop_text', $dp_supply_shop_text);
+                $request->session()->put('dp_supply_company_code', $dp_supply_company_code);
+                $request->session()->put('dp_supply_company_id', $dp_supply_company_id);
+                $request->session()->put('dp_supply_company_text', $dp_supply_company_text);
+                $request->session()->put('dp_supply_shop_code', $dp_supply_shop_code);
+                $request->session()->put('dp_supply_shop_id', $dp_supply_shop_id);
+                $request->session()->put('dp_supply_shop_text', $dp_supply_shop_text);
 
-                $request->session()->put('sale_company_code', $dp_sale_company_code);
-                $request->session()->put('sale_company_id', $dp_sale_company_id);
-                $request->session()->put('sale_company_text', $dp_sale_company_text);
-                $request->session()->put('sale_shop_code', $dp_sale_shop_code);
-                $request->session()->put('sale_shop_id', $dp_sale_shop_id);
-                $request->session()->put('sale_shop_text', $dp_sale_shop_text);
+                $request->session()->put('dp_sale_company_code', $dp_sale_company_code);
+                $request->session()->put('dp_sale_company_id', $dp_sale_company_id);
+                $request->session()->put('dp_sale_company_text', $dp_sale_company_text);
+                $request->session()->put('dp_sale_shop_code', $dp_sale_shop_code);
+                $request->session()->put('dp_sale_shop_id', $dp_sale_shop_id);
+                $request->session()->put('dp_sale_shop_text', $dp_sale_shop_text);
 
-                $request->session()->put('product_code', $dp_product_code);
-                $request->session()->put('product_id', $dp_product_id);
-                $request->session()->put('product_text', $dp_product_text);
+                $request->session()->put('dp_product_code', $dp_product_code);
+                $request->session()->put('dp_product_id', $dp_product_id);
+                $request->session()->put('dp_product_text', $dp_product_text);
 
             } else { // リセットボタンが押された時の処理
 
@@ -194,10 +194,10 @@ class DailyPerformanceController extends Controller
             //---------------------
 
             // supply_slip_detailsのサブクエリを作成
-            $product_sub_query = null;
+            $product_supply_sub_query = null;
             if(!empty($dp_product_id)) {
 
-                $product_sub_query = DB::table('supply_slip_details as SubTable')
+                $product_supply_sub_query = DB::table('supply_slip_details as SubTable')
                 ->select('SubTable.supply_slip_id AS supply_slip_id')
                 ->where('SubTable.product_id', '=', $dp_product_id)
                 ->groupBy('SubTable.supply_slip_id');
@@ -205,7 +205,7 @@ class DailyPerformanceController extends Controller
 
             $supplySlipList = DB::table('supply_slips AS SupplySlip')
 
-            ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
+            ->selectRaw('DATE_FORMAT(SSupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
             ->selectRaw('SUM(COALESCE(SupplySlip.total,0))              AS supply_daily_amount')
 
@@ -227,10 +227,10 @@ class DailyPerformanceController extends Controller
             ->if(!empty($dp_supply_shop_id), function ($query) use ($dp_supply_shop_id) {
                 return $query->where('SupplySlip.supply_shop_id', '=', $dp_supply_shop_id);
             })
-            ->if(!empty($dp_product_id), function ($query) use ($product_sub_query) {
+            ->if(!empty($dp_product_id), function ($query) use ($product_supply_sub_query) {
                 return $query
-                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
-                       ->mergeBindings($product_sub_query);
+                       ->join(DB::raw('('. $product_supply_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
+                       ->mergeBindings($product_supply_sub_query);
             })
             ->where('SupplySlip.active', '=', '1')
             ->if($dp_date_type == 1, function ($query) {
@@ -262,13 +262,13 @@ class DailyPerformanceController extends Controller
             // 売上額を取得
             //---------------------
             // supply_slip_detailsのサブクエリを作成
-            $product_sub_query = null;
+            $product_sale_sub_query = null;
             if(!empty($dp_product_id)) {
 
-                $product_sub_query = DB::table('sale_slip_details as SubTable')
-                ->select('SubTable.sale_slip_id AS sale_slip_id')
-                ->where('SubTable.product_id', '=', $dp_product_id)
-                ->groupBy('SubTable.sale_slip_id');
+                $product_sale_sub_query = DB::table('sale_slip_details as SaleSubTable')
+                ->select('SaleSubTable.sale_slip_id AS sale_slip_id')
+                ->where('SaleSubTable.product_id', '=', $dp_product_id)
+                ->groupBy('SaleSubTable.sale_slip_id');
             }
 
             $saleSlipList = DB::table('sale_slips AS SaleSlip')
@@ -295,10 +295,10 @@ class DailyPerformanceController extends Controller
             ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
             })
-            ->if(!empty($dp_product_id), function ($query) use ($product_sub_query) {
+            ->if(!empty($dp_product_id), function ($query) use ($product_sale_sub_query) {
                 return $query
-                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                       ->mergeBindings($product_sub_query);
+                       ->join(DB::raw('('. $product_sale_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+                       ->mergeBindings($product_sale_sub_query);
             })
             ->where('SaleSlip.active', '=', '1')
             ->if($dp_date_type == 1, function ($query) {

@@ -123,18 +123,18 @@
                 </tbody>
             </table>
 
-            @foreach ($daily_performance_arr as $daily_performance_date => $daily_performance_val)
+            @foreach ($daily_performance_arr as $key_date => $daily_performance_val)
             <table class='index-table'>
                 <tbody>
                     <tr>
                         <td>
-                            <!--日付-->{{$daily_performance_date}}
+                            <!--日付-->{{$key_date}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{number_format($daily_performance_val->supply_daily_amount)}}
+                            <!--仕入金額-->{{number_format($daily_performance_val['supply_daily_amount'])}}
                         </td>
                         <td>
-                            <!--売上金額-->{{number_format($daily_performance_val->sale_daily_amount)}}
+                            <!--売上金額-->{{number_format($daily_performance_val['sale_daily_amount'])}}
                         </td>
                     </tr>
                 </tbody>

@@ -199,6 +199,15 @@ class DailyPerformanceController extends Controller
 
                 $product_supply_sub_query = DB::table('supply_slip_details as SubTable')
                 ->select('SubTable.supply_slip_id AS supply_slip_id')
+                ->selectRaw(
+                    'CASE
+                       WHEN SubProduct.tax_id = 1 THEN SUM(COALESCE(SubTable.notax_price,0))*1.08
+                       WHEN SubProduct.tax_id = 2 THEN SUM(COALESCE(SubTable.notax_price,0))*1.10
+                     END AS sub_supply_detail_daily_amount'
+                    )
+                ->join('products AS SubProduct', function ($join) {
+                    $join->on('SubProduct.id', '=', 'SubTable.product_id');
+                })
                 ->where('SubTable.product_id', '=', $dp_product_id)
                 ->groupBy('SubTable.supply_slip_id');
             }
@@ -208,6 +217,9 @@ class DailyPerformanceController extends Controller
             ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
             ->selectRaw('SUM(COALESCE(SupplySlip.total,0))              AS supply_daily_amount')
+            ->if(!empty($dp_product_id), function ($query) {
+                return $query->selectRaw('SUM(COALESCE(SupplySlipDetail.sub_supply_detail_daily_amount,0)) AS supply_detail_daily_amount');
+            })
 
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id');
@@ -252,8 +264,14 @@ class DailyPerformanceController extends Controller
                         $supply_date = $supplySlipVal->supply_slip_delivery_date;
                     }
 
+                    if(!empty($dp_product_id)){
+                        $supply_daily_amount  = $supplySlipVal->supply_detail_daily_amount;
+                    } else {
+                        $supply_daily_amount  = $supplySlipVal->supply_daily_amount;
+                    }
+
                     $supply_date_arr[$supply_date] = [
-                        "supply_daily_amount"  => $supplySlipVal->supply_daily_amount
+                        "supply_daily_amount"  => $supply_daily_amount
                     ];
                 }
             }

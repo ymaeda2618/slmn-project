@@ -203,8 +203,8 @@ class SaleSlipController extends Controller
             })
             ->where('SaleSlip.active', '=', '1')
             ->orderBy([
-                'SaleSlip.date', 'desc',
-                'SaleSlip.id', 'desc',
+                ['SaleSlip.date', 'desc'],
+                ['SaleSlip.id', 'desc'],
             ])->paginate(10);
 
             //---------------------

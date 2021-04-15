@@ -191,7 +191,9 @@ class SupplySlipController extends Controller
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
             })
             ->where('SupplySlip.active', '=', '1')
-            ->orderByRaw('SupplySlip.date', 'SupplySlip.id')->paginate(10);
+            ->orderBy('SupplySlip.date', 'desc')
+            ->orderBy('SupplySlip.id', 'desc')
+            ->paginate(10);
 
 
             //---------------------

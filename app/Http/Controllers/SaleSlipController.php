@@ -202,7 +202,9 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->where('SaleSlip.active', '=', '1')
-            ->orderByRaw('SaleSlip.date', 'SaleSlip.id')->paginate(10);
+            ->orderBy('SaleSlip.date', 'desc')
+            ->orderBy('SaleSlip.id', 'desc')
+            ->paginate(10);
 
             //---------------------
             // 売上一覧を総額集計

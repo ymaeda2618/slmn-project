@@ -695,13 +695,13 @@ class SaleSlipController extends Controller
 
                     $sort ++;
 
-                    if(!empty($sale_slip_detail)) {
-
-                        DB::table('sale_slip_details')->insert($sale_slip_detail);
-                        $saleSlipDetailIds[] = DB::getPdo()->lastInsertId();
-                    }
-
                     if (empty($staffId)) $staffId = $SaleSlipDetail['staff_id'];
+                }
+
+                if(!empty($sale_slip_detail)) {
+
+                    DB::table('sale_slip_details')->insert($sale_slip_detail);
+                    $saleSlipDetailIds[] = DB::getPdo()->lastInsertId();
                 }
 
                 // inventory_managesも物理削除して新規登録する

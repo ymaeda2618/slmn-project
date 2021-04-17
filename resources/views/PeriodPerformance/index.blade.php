@@ -696,7 +696,7 @@
     }
 
     .index-table th {
-        width: 25%;
+        width: 20%;
         padding: 10px;
         padding-left: 10px;
         background-color: #57595b;
@@ -725,7 +725,7 @@
         padding-right: 20px;
         border: 1px solid #bcbcbc;
         border-top: none;
-        width: 25%;
+        width: 20%;
         text-align: right;
         font-weight: bold;
     }

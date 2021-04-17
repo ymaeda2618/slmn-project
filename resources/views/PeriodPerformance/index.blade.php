@@ -7,7 +7,7 @@
 
         <!--検索エリア-->
         <div class='search-area'>
-            <form id="index-search-form" method="post" action='./DailyPerformanceIndex' enctype="multipart/form-data">
+            <form id="index-search-form" method="post" action='./PeriodPerformanceIndex' enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <table>
                     <tbody>
@@ -704,7 +704,7 @@
         width: 10%;
     }
 
-    .index-table th:nth-of-type(2)e {
+    .index-table th:nth-of-type(2) {
         width: 15%;
     }
 

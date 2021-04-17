@@ -128,13 +128,13 @@
                             <!--商品名-->{{$period_performance_val['name']}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_daily_amount'], 2))}}円
+                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_product_amount'], 2))}}円
                         </td>
                         <td>
-                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_daily_amount'], 2))}}円
+                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_product_amount'], 2))}}円
                         </td>
                         <td>
-                            <!--利益金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_daily_amount'], 2))}}円
+                            <!--利益金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['profit'], 2))}}円
                         </td>
                     </tr>
                 </tbody>

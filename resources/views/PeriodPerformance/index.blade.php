@@ -112,8 +112,10 @@
                         <th>コード</th>
                         <th>商品名</th>
                         <th>仕入数量</th>
+                        <th>単位</th>
                         <th>仕入金額</th>
                         <th>売上数量</th>
+                        <th>単位</th>
                         <th>売上金額</th>
                         <th>利益金額</th>
                     </tr>
@@ -136,13 +138,19 @@
                             <!--商品名-->{{$period_performance_val['name']}}
                         </td>
                         <td>
-                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2)). $period_performance_val['unit_name']}}
+                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2))}}
+                        </td>
+                        <td>
+                            <!--単位-->{{$period_performance_val['unit_name']}}
                         </td>
                         <td>
                             <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_product_amount'], 2))}}円
                         </td>
                         <td>
-                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_sum_unit_num'], 2)) . $period_performance_val['unit_name']}}
+                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_sum_unit_num'], 2))}}
+                        </td>
+                        <td>
+                            <!--単位-->{{$period_performance_val['unit_name']}}
                         </td>
                         <td>
                             <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_product_amount'], 2))}}円
@@ -712,6 +720,7 @@
         font-size: 10px;
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
+        width:14%;
     }
 
     .index-table th:first-of-type {
@@ -727,13 +736,18 @@
     }
 
     .index-table th:nth-of-type(4),
-    .index-table th:nth-of-type(6) {
-        width: 7%;
+    .index-table th:nth-of-type(7) {
+        width: 4%;
     }
 
     .index-table th:nth-of-type(5),
-    .index-table th:nth-of-type(7) {
-        width: 13%;
+    .index-table th:nth-of-type(8) {
+        width: 4%;
+    }
+
+    .index-table th:nth-of-type(6),
+    .index-table th:nth-of-type(9) {
+        width: 15%;
     }
 
     .index-table td {
@@ -742,6 +756,9 @@
         border: 1px solid #bcbcbc;
         border-top: none;
         font-weight: bold;
+        padding-right: 20px;
+        text-align: right;
+        width:14%;
     }
 
     .index-table td:first-of-type {
@@ -763,14 +780,20 @@
         width: 25%;
     }
     .index-table td:nth-of-type(4),
-    .index-table td:nth-of-type(6) {
+    .index-table td:nth-of-type(7) {
         text-align: right;
-        width: 7%;
+        width: 4%;
     }
     .index-table td:nth-of-type(5),
-    .index-table td:nth-of-type(7) {
+    .index-table td:nth-of-type(8) {
         padding-right: 20px;
         text-align: right;
-        width: 13%;
+        width: 4%;
+    }
+    .index-table td:nth-of-type(6),
+    .index-table td:nth-of-type(9) {
+        padding-right: 20px;
+        text-align: right;
+        width: 15%;
     }
 </style>

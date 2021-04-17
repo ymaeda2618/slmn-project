@@ -293,13 +293,13 @@ class PeriodPerformanceController extends Controller
             // 仕入実績を抽出
             foreach ($supplySlipDetailList as $supplySlipDetailVal) {
 
-                $product_id            = $supplySlipDetailVal['product_id'];
-                $supply_product_amount = $supplySlipDetailVal['supply_product_amount'];
+                $product_id            = $supplySlipDetailVal->product_id;
+                $supply_product_amount = $supplySlipDetailVal->supply_product_amount;
                 $profit                = $supply_product_amount * -1;
 
                 $period_performance_arr[$product_id] =[
-                    'code'                  => $supplySlipDetailVal['product_code'],
-                    'name'                  => $supplySlipDetailVal['product_name'],
+                    'code'                  => $supplySlipDetailVal->product_code,
+                    'name'                  => $supplySlipDetailVal->product_name,
                     'supply_product_amount' => $supply_product_amount,
                     'sale_product_amount'   => 0,
                     'profit'                => $profit
@@ -311,15 +311,15 @@ class PeriodPerformanceController extends Controller
             // 売上実績を抽出
             foreach ($saleSlipDetailList as $saleSlipDetailVal) {
 
-                $product_id            = $saleSlipDetailVal['product_id'];
-                $sale_product_amount   = $saleSlipDetailVal['sale_product_amount'];
+                $product_id            = $saleSlipDetailVal->product_id;
+                $sale_product_amount   = $saleSlipDetailVal->sale_product_amount;
                 $profit                = $sale_product_amount;
 
                 if(!isset($period_performance_arr[$product_id])) {
 
                     $period_performance_arr[$product_id] =[
-                        'code'                  => $saleSlipDetailVal['product_code'],
-                        'name'                  => $saleSlipDetailVal['product_name'],
+                        'code'                  => $saleSlipDetailVal->product_code,
+                        'name'                  => $saleSlipDetailVal->product_name,
                         'supply_product_amount' => 0,
                         'sale_product_amount'   => $sale_product_amount,
                         'profit'                => $profit

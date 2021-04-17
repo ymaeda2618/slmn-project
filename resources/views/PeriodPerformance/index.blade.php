@@ -136,7 +136,7 @@
                             <!--商品名-->{{$period_performance_val['name']}}
                         </td>
                         <td>
-                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2)). $period_performance_val['unit_name']}}円
+                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2)). $period_performance_val['unit_name']}}
                         </td>
                         <td>
                             <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_product_amount'], 2))}}円

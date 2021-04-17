@@ -337,6 +337,9 @@ class PeriodPerformanceController extends Controller
                 $sale_total_amount   += $sale_product_amount;
             }
 
+            // ksortでキーを昇順でソート
+            ksort($period_performance_arr);
+
         } catch (\Exception $e) {
 
             dd($e);

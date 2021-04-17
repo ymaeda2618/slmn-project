@@ -326,7 +326,7 @@ class PeriodPerformanceController extends Controller
             foreach ($saleSlipDetailList as $saleSlipDetailVal) {
 
                 $product_id            = $saleSlipDetailVal->product_id;
-                $sale_sum_unit_num     = $supplySlipDetailVal->sale_sum_unit_num;
+                $sale_sum_unit_num     = $saleSlipDetailVal->sale_sum_unit_num;
                 $sale_product_amount   = $saleSlipDetailVal->sale_product_amount;
                 $profit                = $sale_product_amount;
 

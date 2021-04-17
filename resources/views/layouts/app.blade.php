@@ -57,6 +57,7 @@
                                 </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a href="{{ asset('/') }}DailyPerformanceIndex" class="dropdown-item">日別一覧</a>
+                                <a href="{{ asset('/') }}PeriodPerformanceIndex" class="dropdown-item">期間実績一覧</a>
                                 @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SupplySlipCreate" class="dropdown-item">仕入登録</a> @endif
                                 <a href="{{ asset('/') }}SupplySlipIndex" class="dropdown-item">仕入一覧</a>
                                 @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SaleSlipCreate" class="dropdown-item">売上登録</a> @endif

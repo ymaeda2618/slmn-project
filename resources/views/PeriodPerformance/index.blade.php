@@ -108,6 +108,7 @@
             <table class='index-table'>
                 <tbody>
                     <tr>
+                        <th>No.</th>
                         <th>コード</th>
                         <th>商品名</th>
                         <th>仕入金額</th>
@@ -117,10 +118,15 @@
                 </tbody>
             </table>
 
+            <?php $no = 1; ?>
+
             @foreach ($period_performance_arr as $period_performance_val)
             <table class='index-table'>
                 <tbody>
                     <tr>
+                        <td>
+                            <!--No.-->{{$no}}
+                        </td>
                         <td>
                             <!--製品コード-->{{$period_performance_val['code']}}
                         </td>
@@ -139,6 +145,7 @@
                     </tr>
                 </tbody>
             </table>
+            <?php $no += 1;?>
             @endforeach
         </div>
 
@@ -701,10 +708,14 @@
     }
 
     .index-table th:first-of-type {
-        width: 10%;
+        width: 3%;
     }
 
     .index-table th:nth-of-type(2) {
+        width: 7%;
+    }
+
+    .index-table th:nth-of-type(3) {
         width: 15%;
     }
 
@@ -722,9 +733,14 @@
     .index-table td:first-of-type {
         padding-left: 20px;
         text-align: left;
-        width: 10%;
+        width: 3%;
     }
     .index-table td:nth-of-type(2) {
+        padding-left: 20px;
+        text-align: left;
+        width: 7%;
+    }
+    .index-table td:nth-of-type(3) {
         padding-left: 20px;
         text-align: left;
         width: 15%;

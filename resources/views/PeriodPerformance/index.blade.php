@@ -768,7 +768,7 @@
     .index-table td:nth-of-type(4),
     .index-table td:nth-of-type(7) {
         text-align: right;
-        width: 6%;
+        width: 7%;
         padding: 0px;
         padding-right: 1%;
     }
@@ -776,7 +776,7 @@
     .index-table td:nth-of-type(8) {
         padding-right: 20px;
         text-align: center;
-        width: 6%;
+        width: 5%;
         padding: 0px;
     }
     .index-table td:nth-of-type(6),

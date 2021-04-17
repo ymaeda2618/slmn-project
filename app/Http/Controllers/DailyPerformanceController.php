@@ -57,6 +57,11 @@ class DailyPerformanceController extends Controller
             $dp_product_id    = $request->session()->get('dp_product_id');
             $dp_product_text  = $request->session()->get('dp_product_text');
 
+
+            $dp_staff_code  = $request->session()->get('dp_staff_code');
+            $dp_staff_id    = $request->session()->get('dp_staff_id');
+            $dp_staff_text  = $request->session()->get('dp_staff_text');
+
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
@@ -77,9 +82,13 @@ class DailyPerformanceController extends Controller
                 $dp_sale_shop_id       = $request->data['DailyPerformance']['sale_shop_id'];
                 $dp_sale_shop_text     = $request->data['DailyPerformance']['sale_shop_text'];
 
-                $dp_product_code  = $request->data['DailyPerformance']['product_code'];
-                $dp_product_id    = $request->data['DailyPerformance']['product_id'];
-                $dp_product_text  = $request->data['DailyPerformance']['product_text'];
+                $dp_product_code       = $request->data['DailyPerformance']['product_code'];
+                $dp_product_id         = $request->data['DailyPerformance']['product_id'];
+                $dp_product_text       = $request->data['DailyPerformance']['product_text'];
+
+                $dp_staff_code         = $request->data['DailyPerformance']['staff_code'];
+                $dp_staff_id           = $request->data['DailyPerformance']['staff_id'];
+                $dp_staff_text         = $request->data['DailyPerformance']['staff_text'];
 
                 // 日付の設定
                 $dp_daily_performance_target_year     = $request->data['DailyPerformance']['target_year'];
@@ -107,6 +116,10 @@ class DailyPerformanceController extends Controller
                 $request->session()->put('dp_product_id', $dp_product_id);
                 $request->session()->put('dp_product_text', $dp_product_text);
 
+                $request->session()->put('dp_staff_code', $dp_staff_code);
+                $request->session()->put('dp_staff_id', $dp_staff_id);
+                $request->session()->put('dp_staff_text', $dp_staff_text);
+
             } else { // リセットボタンが押された時の処理
 
                 $dp_date_type     = 1;
@@ -127,9 +140,14 @@ class DailyPerformanceController extends Controller
                 $dp_sale_shop_id       = null;
                 $dp_sale_shop_text     = null;
 
-                $dp_product_code  = null;
-                $dp_product_id    = null;
-                $dp_product_text  = null;
+                $dp_product_code       = null;
+                $dp_product_id         = null;
+                $dp_product_text       = null;
+
+                $dp_staff_code         = null;
+                $dp_staff_id           = null;
+                $dp_staff_text         = null;
+
                 $request->session()->forget('dp_date_type');
                 $request->session()->forget('dp_daily_performance_target_year');
                 $request->session()->forget('dp_daily_performance_target_month');
@@ -151,6 +169,10 @@ class DailyPerformanceController extends Controller
                 $request->session()->forget('dp_product_code');
                 $request->session()->forget('dp_product_id');
                 $request->session()->forget('dp_product_text');
+
+                $request->session()->forget('dp_staff_code');
+                $request->session()->forget('dp_staff_id');
+                $request->session()->forget('dp_staff_text');
             }
         }
 
@@ -194,10 +216,10 @@ class DailyPerformanceController extends Controller
             //---------------------
 
             // supply_slip_detailsのサブクエリを作成
-            $product_supply_sub_query = null;
-            if(!empty($dp_product_id)) {
+            $dp_supply_sub_query = null;
+            if(!empty($dp_product_id) || !empty($dp_staff_id)) {
 
-                $product_supply_sub_query = DB::table('supply_slip_details as SubTable')
+                $dp_supply_sub_query = DB::table('supply_slip_details as SubTable')
                 ->select('SubTable.supply_slip_id AS supply_slip_id')
                 ->selectRaw(
                     'CASE
@@ -208,7 +230,12 @@ class DailyPerformanceController extends Controller
                 ->join('products AS SubProduct', function ($join) {
                     $join->on('SubProduct.id', '=', 'SubTable.product_id');
                 })
-                ->where('SubTable.product_id', '=', $dp_product_id)
+                ->if(!empty($dp_product_id), function ($dp_supply_sub_query) use ($dp_product_id) {
+                    return $dp_supply_sub_query->where('SubTable.product_id', '=', $dp_product_id);
+                })
+                ->if(!empty($dp_staff_id), function ($dp_supply_sub_query) use ($dp_staff_id) {
+                    return $dp_supply_sub_query->where('SubTable.staff_id', '=', $dp_staff_id);
+                })
                 ->groupBy('SubTable.supply_slip_id');
             }
 
@@ -227,10 +254,10 @@ class DailyPerformanceController extends Controller
             ->leftJoin('supply_shops AS SupplyShop', function ($join) {
                 $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
             })
-            ->if(!empty($dp_product_id), function ($query) use ($product_supply_sub_query) {
+            ->if(!empty($dp_supply_sub_query), function ($query) use ($dp_supply_sub_query) {
                 return $query
-                       ->join(DB::raw('('. $product_supply_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
-                       ->mergeBindings($product_supply_sub_query);
+                       ->join(DB::raw('('. $dp_supply_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
+                       ->mergeBindings($dp_supply_sub_query);
             })
             ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
                 return $query->whereBetween('SupplySlip.date', [$first_date, $last_date]);
@@ -280,10 +307,10 @@ class DailyPerformanceController extends Controller
             // 売上額を取得
             //---------------------
             // supply_slip_detailsのサブクエリを作成
-            $product_sale_sub_query = null;
-            if(!empty($dp_product_id)) {
+            $dp_sale_sub_query = null;
+            if(!empty($dp_product_id) || !empty($dp_staff_id)) {
 
-                $product_sale_sub_query = DB::table('sale_slip_details as SaleSubTable')
+                $dp_sale_sub_query = DB::table('sale_slip_details as SaleSubTable')
                 ->select('SaleSubTable.sale_slip_id AS sale_slip_id')
                 ->selectRaw(
                     'CASE
@@ -294,7 +321,12 @@ class DailyPerformanceController extends Controller
                 ->join('products AS SubProduct', function ($join) {
                     $join->on('SubProduct.id', '=', 'SaleSubTable.product_id');
                 })
-                ->where('SaleSubTable.product_id', '=', $dp_product_id)
+                ->if(!empty($dp_product_id), function ($dp_sale_sub_query) use ($dp_product_id) {
+                    return $dp_sale_sub_query->where('SaleSubTable.product_id', '=', $dp_product_id);
+                })
+                ->if(!empty($dp_staff_id), function ($dp_sale_sub_query) use ($dp_staff_id) {
+                    return $dp_sale_sub_query->where('SaleSubTable.staff_id', '=', $dp_staff_id);
+                })
                 ->groupBy('SaleSubTable.sale_slip_id');
             }
 
@@ -303,7 +335,7 @@ class DailyPerformanceController extends Controller
             ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
             ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
             ->selectRaw('SUM(COALESCE(SaleSlip.total,0))                 AS sale_daily_amount')
-            ->if(!empty($dp_product_id), function ($query) {
+            ->if(!empty($dp_sale_sub_query), function ($query) {
                 return $query->selectRaw('SUM(COALESCE(SaleSlipDetail.sub_sale_detail_daily_amount,0)) AS sale_detail_daily_amount');
             })
             ->join('sale_companies AS SaleCompany', function ($join) {
@@ -312,10 +344,10 @@ class DailyPerformanceController extends Controller
             ->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
             })
-            ->if(!empty($dp_product_id), function ($query) use ($product_sale_sub_query) {
+            ->if(!empty($dp_sale_sub_query), function ($query) use ($dp_sale_sub_query) {
                 return $query
-                       ->join(DB::raw('('. $product_sale_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                       ->mergeBindings($product_sale_sub_query);
+                       ->join(DB::raw('('. $dp_sale_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+                       ->mergeBindings($dp_sale_sub_query);
             })
             ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
                 return $query->whereBetween('SaleSlip.date', [$first_date, $last_date]);
@@ -421,6 +453,10 @@ class DailyPerformanceController extends Controller
             "dp_product_code"                   => $dp_product_code,
             "dp_product_id"                     => $dp_product_id,
             "dp_product_text"                   => $dp_product_text,
+
+            "dp_staff_code"                     => $dp_staff_code,
+            "dp_staff_id"                       => $dp_staff_id,
+            "dp_staff_text"                     => $dp_staff_text,
 
             "supply_total_amount"               => $supply_total_amount,
             "sale_total_amount"                 => $sale_total_amount,
@@ -836,6 +872,104 @@ class DailyPerformanceController extends Controller
             $output_unit_name,
             $output_inventory_unit_id,
             $output_inventory_unit_name
+        );
+
+        return json_encode($returnArray);
+    }
+
+    /**
+     * 担当者ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteStaff(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 担当者DB取得
+            $staffList = DB::table('staffs AS Staff')
+            ->select(
+                'Staff.name  AS staff_name'
+            )->where([
+                    ['Staff.active', '=', '1'],
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('Staff.name_sei', 'like', "%{$input_text}%")
+                ->orWhere('Staff.name_mei', 'like', "%{$input_text}%")
+                ->orWhere('Staff.yomi_sei', 'like', "%{$input_text}%")
+                ->orWhere('Staff.yomi_mei', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($staffList)) {
+
+                foreach ($staffList as $staff_val) {
+
+                    array_push($auto_complete_array, $staff_val->staff_name);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
+    }
+
+    /**
+     * 担当者ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetStaff(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // すべて数字かどうかチェック
+        if (is_numeric($input_text)) {
+            $staff_code = $input_text;
+            $staff_name = null;
+        } else {
+            $staff_code = null;
+            $staff_name = $input_text;
+        }
+
+        // 初期化
+        $output_staff_code          = null;
+        $output_staff_id            = null;
+        $output_staff_name          = null;
+
+        if (!empty($input_text)) {
+
+            // 担当者DB取得
+            // 担当者一覧を取得
+            $staffList = DB::table('staffs AS Staff')
+            ->select(
+                'Staff.code       AS code',
+                'Staff.id         AS id'
+            ) ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name'
+            )->if(!empty($staff_code), function ($query) use ($staff_code) {
+                return $query->where('Staff.code', '=', $staff_code);
+            })
+            ->if(!empty($staff_name), function ($query) use ($staff_name) {
+                return $query->whereRaw('CONCAT(Staff.name_sei,Staff.name_mei) like "%'.$staff_name.'%"');
+            })->first();
+
+            if (!empty($staffList)) {
+                $output_staff_code        = $staffList->code;
+                $output_staff_id          = $staffList->id;
+                $output_staff_name        = $staffList->staff_name;
+            }
+        }
+
+        $returnArray = array(
+            $output_staff_code,
+            $output_staff_id,
+            $output_staff_name
         );
 
         return json_encode($returnArray);

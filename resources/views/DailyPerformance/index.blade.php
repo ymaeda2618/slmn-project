@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">日別売上一覧</div>
+        <div class="top-title">日別仕入・売上一覧</div>
 
         <!--検索エリア-->
         <div class='search-area'>
@@ -91,6 +91,14 @@
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="product_text" name="data[DailyPerformance][product_text]" value="{{$dp_product_text}}" readonly>
+                                </div>
+                                <div class="table-th">担当者</div>
+                                <div class="table-td table-code-td">
+                                    <input type="text" class="search-control staff_code_input" id="staff_code" name="data[DailyPerformance][staff_code]" value="{{$dp_staff_code}}" tabindex="7">
+                                    <input type="hidden" id="staff_id" name="data[DailyPerformance][staff_id]" value="{{$dp_staff_id}}">
+                                </div>
+                                <div class="table-td table-name-td">
+                                    <input type="text" class="search-control" id="staff_text" name="data[DailyPerformance][staff_text]" value="{{$dp_staff_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -379,6 +387,32 @@
             });
 
             //-------------------------------------
+            // autocomplete処理 担当者ID
+            //-------------------------------------
+            $(".staff_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteStaff",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
+            //-------------------------------------
             // フォーカスアウトしたときの処理
             //-------------------------------------
             $(document).on("blur", "input", function(event) {
@@ -499,6 +533,26 @@
                             $("#" + selector_text).val(data[2]);
 
                         });
+                } else if (selector_code.match(/staff/)) { // 担当者IDの部分
+
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxSetStaff",
+                        type: "POST",
+                        dataType: "JSON",
+                        data: fd,
+                        processData: false,
+                        contentType: false
+                    })
+                    .done(function (data) {
+
+                        $("#" + selector_code).val(data[0]);
+                        $("#" + selector_id).val(data[1]);
+                        $("#" + selector_text).val(data[2]);
+
+                    });
                 }
             });
 

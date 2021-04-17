@@ -111,12 +111,8 @@
                         <th>No.</th>
                         <th>コード</th>
                         <th>商品名</th>
-                        <th>仕入数量</th>
-                        <th>単位</th>
-                        <th>仕入金額</th>
-                        <th>売上数量</th>
-                        <th>単位</th>
-                        <th>売上金額</th>
+                        <th colspan="3">仕入</th>
+                        <th colspan="3">売上</th>
                         <th>利益金額</th>
                     </tr>
                 </tbody>
@@ -736,27 +732,17 @@
     }
 
     .index-table th:nth-of-type(4),
-    .index-table th:nth-of-type(7) {
-        width: 4%;
-    }
-
-    .index-table th:nth-of-type(5),
-    .index-table th:nth-of-type(8) {
-        width: 4%;
-    }
-
-    .index-table th:nth-of-type(6),
-    .index-table th:nth-of-type(9) {
-        width: 15%;
+    .index-table th:nth-of-type(5) {
+        width: 23%;
     }
 
     .index-table td {
-        font-size: 12px;
+        font-size: 10px;
         padding: 8px;
         border: 1px solid #bcbcbc;
         border-top: none;
         font-weight: bold;
-        padding-right: 20px;
+        padding-right: 1%;
         text-align: right;
         width:14%;
     }
@@ -782,18 +768,21 @@
     .index-table td:nth-of-type(4),
     .index-table td:nth-of-type(7) {
         text-align: right;
-        width: 4%;
+        width: 6%;
+        padding: 0px;
+        padding-right: 1%;
     }
     .index-table td:nth-of-type(5),
     .index-table td:nth-of-type(8) {
         padding-right: 20px;
-        text-align: right;
-        width: 4%;
+        text-align: center;
+        width: 6%;
+        padding: 0px;
     }
     .index-table td:nth-of-type(6),
     .index-table td:nth-of-type(9) {
-        padding-right: 20px;
+        padding-right: 1%;
         text-align: right;
-        width: 15%;
+        width: 11%;
     }
 </style>

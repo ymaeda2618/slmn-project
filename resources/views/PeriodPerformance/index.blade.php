@@ -15,8 +15,8 @@
                             <td>
                                 <div class="table-th">対象日付</div>
                                 <div class="table-td radio_box">
-                                    <label class="radio-label"><input type="radio" name="data[PeriodPerformance][date_type]" value="1" {{$dp_check_str_slip_date}}> 伝票日付</label>
-                                    <label class="radio-label"><input type="radio" name="data[PeriodPerformance][date_type]" value="2" {{$dp_check_str_deliver_date}}> 納品日付</label>
+                                    <label class="radio-label"><input type="radio" name="data[PeriodPerformance][date_type]" value="1" {{$pp_check_str_slip_date}}> 伝票日付</label>
+                                    <label class="radio-label"><input type="radio" name="data[PeriodPerformance][date_type]" value="2" {{$pp_check_str_deliver_date}}> 納品日付</label>
                                 </div>
                                 <div class="table-td">
                                     <input type="date" class="search-control" id="sale_date_from" name="data[PeriodPerformance][date_from]" value="{{$pp_date_from}}" tabindex="1">
@@ -30,19 +30,19 @@
                             <td>
                                 <div class="table-th">仕入先企業</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[PeriodPerformance][supply_company_code]" value="{{$dp_supply_company_code}}" tabindex="3">
-                                    <input type="hidden" id="supply_company_id" name="data[PeriodPerformance][supply_company_id]" value="{{$dp_supply_company_id}}">
+                                    <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[PeriodPerformance][supply_company_code]" value="{{$pp_supply_company_code}}" tabindex="3">
+                                    <input type="hidden" id="supply_company_id" name="data[PeriodPerformance][supply_company_id]" value="{{$pp_supply_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="supply_company_text" name="data[PeriodPerformance][supply_company_text]" value="{{$dp_supply_company_text}}" readonly>
+                                    <input type="text" class="search-control" id="supply_company_text" name="data[PeriodPerformance][supply_company_text]" value="{{$pp_supply_company_text}}" readonly>
                                 </div>
                                 <div class="table-th">仕入先店舗</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[PeriodPerformance][supply_shop_code]" value="{{$dp_supply_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="supply_shop_id" name="data[PeriodPerformance][supply_shop_id]" value="{{$dp_supply_shop_id}}">
+                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[PeriodPerformance][supply_shop_code]" value="{{$pp_supply_shop_code}}" tabindex="4">
+                                    <input type="hidden" id="supply_shop_id" name="data[PeriodPerformance][supply_shop_id]" value="{{$pp_supply_shop_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[PeriodPerformance][supply_shop_text]" value="{{$dp_supply_shop_text}}" readonly>
+                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[PeriodPerformance][supply_shop_text]" value="{{$pp_supply_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -50,19 +50,19 @@
                             <td>
                                 <div class="table-th">売上先企業</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[PeriodPerformance][sale_company_code]" value="{{$dp_sale_company_code}}" tabindex="5">
-                                    <input type="hidden" id="sale_company_id" name="data[PeriodPerformance][sale_company_id]" value="{{$dp_sale_company_id}}">
+                                    <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[PeriodPerformance][sale_company_code]" value="{{$pp_sale_company_code}}" tabindex="5">
+                                    <input type="hidden" id="sale_company_id" name="data[PeriodPerformance][sale_company_id]" value="{{$pp_sale_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="sale_company_text" name="data[PeriodPerformance][sale_company_text]" value="{{$dp_sale_company_text}}" readonly>
+                                    <input type="text" class="search-control" id="sale_company_text" name="data[PeriodPerformance][sale_company_text]" value="{{$pp_sale_company_text}}" readonly>
                                 </div>
                                 <div class="table-th">売上先店舗</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[PeriodPerformance][sale_shop_code]" value="{{$dp_sale_shop_code}}" tabindex="6">
-                                    <input type="hidden" id="sale_shop_id" name="data[PeriodPerformance][sale_shop_id]" value="{{$dp_sale_shop_id}}">
+                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[PeriodPerformance][sale_shop_code]" value="{{$pp_sale_shop_code}}" tabindex="6">
+                                    <input type="hidden" id="sale_shop_id" name="data[PeriodPerformance][sale_shop_id]" value="{{$pp_sale_shop_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[PeriodPerformance][sale_shop_text]" value="{{$dp_sale_shop_text}}" readonly>
+                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[PeriodPerformance][sale_shop_text]" value="{{$pp_sale_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -70,19 +70,19 @@
                             <td>
                                 <div class="table-th">製品</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[PeriodPerformance][product_code]" value="{{$dp_product_code}}" tabindex="7">
-                                    <input type="hidden" id="product_id" name="data[PeriodPerformance][product_id]" value="{{$dp_product_id}}">
+                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[PeriodPerformance][product_code]" value="{{$pp_product_code}}" tabindex="7">
+                                    <input type="hidden" id="product_id" name="data[PeriodPerformance][product_id]" value="{{$pp_product_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="product_text" name="data[PeriodPerformance][product_text]" value="{{$dp_product_text}}" readonly>
+                                    <input type="text" class="search-control" id="product_text" name="data[PeriodPerformance][product_text]" value="{{$pp_product_text}}" readonly>
                                 </div>
                                 <div class="table-th">担当者</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control staff_code_input" id="staff_code" name="data[PeriodPerformance][staff_code]" value="{{$dp_staff_code}}" tabindex="7">
-                                    <input type="hidden" id="staff_id" name="data[PeriodPerformance][staff_id]" value="{{$dp_staff_id}}">
+                                    <input type="text" class="search-control staff_code_input" id="staff_code" name="data[PeriodPerformance][staff_code]" value="{{$pp_staff_code}}" tabindex="7">
+                                    <input type="hidden" id="staff_id" name="data[PeriodPerformance][staff_id]" value="{{$pp_staff_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control" id="staff_text" name="data[PeriodPerformance][staff_text]" value="{{$dp_staff_text}}" readonly>
+                                    <input type="text" class="search-control" id="staff_text" name="data[PeriodPerformance][staff_text]" value="{{$pp_staff_text}}" readonly>
                                 </div>
                             </td>
                         </tr>

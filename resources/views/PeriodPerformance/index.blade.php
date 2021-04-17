@@ -111,7 +111,9 @@
                         <th>No.</th>
                         <th>コード</th>
                         <th>商品名</th>
+                        <th>仕入数量</th>
                         <th>仕入金額</th>
+                        <th>売上数量</th>
                         <th>売上金額</th>
                         <th>利益金額</th>
                     </tr>
@@ -134,7 +136,13 @@
                             <!--商品名-->{{$period_performance_val['name']}}
                         </td>
                         <td>
+                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2)). $period_performance_val['unit_name']}}円
+                        </td>
+                        <td>
                             <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_product_amount'], 2))}}円
+                        </td>
+                        <td>
+                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_sum_unit_num'], 2)) . $period_performance_val['unit_name']}}
                         </td>
                         <td>
                             <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_product_amount'], 2))}}円
@@ -696,7 +704,6 @@
     }
 
     .index-table th {
-        width: 20%;
         padding: 10px;
         padding-left: 10px;
         background-color: #57595b;
@@ -719,14 +726,21 @@
         width: 25%;
     }
 
+    .index-table th:nth-of-type(4),
+    .index-table th:nth-of-type(6) {
+        width: 7%;
+    }
+
+    .index-table th:nth-of-type(5),
+    .index-table th:nth-of-type(7) {
+        width: 13%;
+    }
+
     .index-table td {
         font-size: 12px;
         padding: 8px;
-        padding-right: 20px;
         border: 1px solid #bcbcbc;
         border-top: none;
-        width: 20%;
-        text-align: right;
         font-weight: bold;
     }
 
@@ -747,5 +761,16 @@
         padding-left: 20px;
         text-align: left;
         width: 25%;
+    }
+    .index-table td:nth-of-type(4),
+    .index-table td:nth-of-type(6) {
+        text-align: right;
+        width: 7%;
+    }
+    .index-table td:nth-of-type(5),
+    .index-table td:nth-of-type(7) {
+        padding-right: 20px;
+        text-align: right;
+        width: 13%;
     }
 </style>

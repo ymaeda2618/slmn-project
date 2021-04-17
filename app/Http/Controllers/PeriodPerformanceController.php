@@ -190,9 +190,11 @@ class PeriodPerformanceController extends Controller
             $supplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
             ->select(
                 'SupplySlipDetail.product_id  AS product_id',
+                'Unit.name                    AS unit_name',
                 'Product.code                 AS product_code',
                 'Product.name                 AS product_name',
             )
+            ->selectRaw('SUM(COALESCE(SupplySlipDetail.unit_num,0)) AS supply_sum_unit_num')
             ->selectRaw(
                 'CASE
                    WHEN Product.tax_id = 1 THEN SUM(COALESCE(SupplySlipDetail.notax_price,0))*1.08
@@ -201,6 +203,9 @@ class PeriodPerformanceController extends Controller
             )
             ->join('products AS Product', function ($join) {
                     $join->on('Product.id', '=', 'SupplySlipDetail.product_id');
+            })
+            ->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'SupplySlipDetail.unit_id');
             })
             ->join('supply_slips AS SupplySlip', function ($join) {
                  $join->on('SupplySlip.id', '=', 'SupplySlipDetail.supply_slip_id');
@@ -239,9 +244,11 @@ class PeriodPerformanceController extends Controller
             $saleSlipDetailList = DB::table('sale_slip_details AS SaleSlipDetail')
             ->select(
                 'SaleSlipDetail.product_id    AS product_id',
+                'Unit.name                    AS unit_name',
                 'Product.code                 AS product_code',
                 'Product.name                 AS product_name',
             )
+            ->selectRaw('SUM(COALESCE(SaleSlipDetail.unit_num,0)) AS sale_sum_unit_num')
             ->selectRaw(
                 'CASE
                    WHEN Product.tax_id = 1 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.08
@@ -250,6 +257,9 @@ class PeriodPerformanceController extends Controller
             )
             ->join('products AS Product', function ($join) {
                 $join->on('Product.id', '=', 'SaleSlipDetail.product_id');
+            })
+            ->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'SaleSlipDetail.unit_id');
             })
             ->join('sale_slips AS SaleSlip', function ($join) {
                 $join->on('SaleSlip.id', '=', 'SaleSlipDetail.sale_slip_id');
@@ -294,13 +304,17 @@ class PeriodPerformanceController extends Controller
             foreach ($supplySlipDetailList as $supplySlipDetailVal) {
 
                 $product_id            = $supplySlipDetailVal->product_id;
+                $supply_sum_unit_num   = $supplySlipDetailVal->supply_sum_unit_num;
                 $supply_product_amount = $supplySlipDetailVal->supply_product_amount;
                 $profit                = $supply_product_amount * -1;
 
                 $period_performance_arr[$product_id] =[
                     'code'                  => $supplySlipDetailVal->product_code,
                     'name'                  => $supplySlipDetailVal->product_name,
+                    'unit_name'             => $supplySlipDetailVal->unit_name,
+                    'supply_sum_unit_num'   => $supply_sum_unit_num,
                     'supply_product_amount' => $supply_product_amount,
+                    'sale_sum_unit_num'     => 0,
                     'sale_product_amount'   => 0,
                     'profit'                => $profit
                 ];
@@ -312,6 +326,7 @@ class PeriodPerformanceController extends Controller
             foreach ($saleSlipDetailList as $saleSlipDetailVal) {
 
                 $product_id            = $saleSlipDetailVal->product_id;
+                $sale_sum_unit_num     = $supplySlipDetailVal->sale_sum_unit_num;
                 $sale_product_amount   = $saleSlipDetailVal->sale_product_amount;
                 $profit                = $sale_product_amount;
 
@@ -320,11 +335,17 @@ class PeriodPerformanceController extends Controller
                     $period_performance_arr[$product_id] =[
                         'code'                  => $saleSlipDetailVal->product_code,
                         'name'                  => $saleSlipDetailVal->product_name,
+                        'unit_name'             => $saleSlipDetailVal->unit_name,
+                        'supply_sum_unit_num'   => 0,
                         'supply_product_amount' => 0,
+                        'sale_sum_unit_num'     => $sale_sum_unit_num,
                         'sale_product_amount'   => $sale_product_amount,
                         'profit'                => $profit
                     ];
                 } else {
+
+                    // 売上数量を格納
+                    $period_performance_arr[$product_id]['sale_sum_unit_num']   = $sale_sum_unit_num;
 
                     // 売上額を格納
                     $period_performance_arr[$product_id]['sale_product_amount'] = $sale_product_amount;

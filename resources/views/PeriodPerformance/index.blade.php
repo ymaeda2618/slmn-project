@@ -708,15 +708,15 @@
     }
 
     .index-table th:first-of-type {
-        width: 3%;
+        width: 5%;
     }
 
     .index-table th:nth-of-type(2) {
-        width: 7%;
+        width: 10%;
     }
 
     .index-table th:nth-of-type(3) {
-        width: 15%;
+        width: 25%;
     }
 
     .index-table td {
@@ -731,18 +731,21 @@
     }
 
     .index-table td:first-of-type {
-        padding-left: 20px;
-        text-align: left;
-        width: 3%;
+        padding: 0px;
+        text-align: center;
+        width: 5%;
+        background-color: #efefef;
+        font-weight: unset;
     }
+
     .index-table td:nth-of-type(2) {
         padding-left: 20px;
         text-align: left;
-        width: 7%;
+        width: 10%;
     }
     .index-table td:nth-of-type(3) {
         padding-left: 20px;
         text-align: left;
-        width: 15%;
+        width: 25%;
     }
 </style>

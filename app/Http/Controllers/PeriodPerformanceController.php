@@ -235,10 +235,11 @@ class PeriodPerformanceController extends Controller
                 return $query->where('SupplySlipDetail.staff_id', '=', $pp_staff_id);
             })
             ->where('SupplySlipDetail.active', '=', '1')
-            ->groupBy('SupplySlipDetail.product_id')
+            ->groupBy('SupplySlipDetail.product_id');
+            /*
             ->orderBy('SupplySlipDetail.product_id')
             ->limit(300)
-            ->get();
+            ->get();*/
 
             //---------------------
             // 売上額を取得
@@ -291,22 +292,24 @@ class PeriodPerformanceController extends Controller
                 return $query->where('SaleSlipDetail.staff_id', '=', $pp_staff_id);
             })
             ->where('SaleSlip.active', '=', '1')
-            ->groupBy('SaleSlipDetail.product_id')
+            ->groupBy('SaleSlipDetail.product_id');
+            /*
             ->orderBy('SaleSlipDetail.product_id')
             ->limit(300)
-            ->get();
+            ->get();*/
 
 
-            /*$saleSlipDetailList = DB::table('products AS Product')
+            $productlList = DB::table('products AS Product')
             ->select(
                 'Product.id    AS product_id',
                 'Product.code  AS product_code',
                 'Product.name  AS product_name',
             )
             ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
-            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
-            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
-            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
+            ->selectRaw('COALESCE(SupplySlipDetail.supply_product_amount,0) AS supply_product_amount')
+            ->selectRaw('COALESCE(SaleSlipDetail.sale_sum_unit_num,0) AS sale_sum_unit_num')
+            ->selectRaw('COALESCE(SaleSlipDetail.sale_product_amount,0) AS sale_product_amount')
+            ->selectRaw('COALESCE(SaleSlipDetail.sale_product_amount,0) - COALESCE(SupplySlipDetail.supply_product_amount,0) AS profit')
             ->if(!empty($supplySlipDetailList), function ($query) use ($supplySlipDetailList) {
                 return $query
                        ->leftJoin(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'Product.id')
@@ -318,10 +321,16 @@ class PeriodPerformanceController extends Controller
                        ->mergeBindings($saleSlipDetailList);
             })
             ->where('Product.active', '=', '1')
+            ->where(function($query) {
+                $query
+                ->orWhereNotNull('SupplySlipDetail.supply_sum_unit_num')
+                ->orWhereNotNull('SaleSlipDetail.sale_sum_unit_num');
+            })
             ->groupBy('Product.id')
             ->orderBy('Product.id')
-            ->limit(300)
-            ->get();*/
+            ->get();
+
+            dd($productlList);
 
 
             //---------------------

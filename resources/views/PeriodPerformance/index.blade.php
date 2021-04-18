@@ -128,31 +128,31 @@
                             <!--No.-->{{$no}}
                         </td>
                         <td>
-                            <!--製品コード-->{{$period_performance_val['product_code']}}
+                            <!--製品コード-->{{$period_performance_val->product_code}}
                         </td>
                         <td>
-                            <!--商品名-->{{$period_performance_val['product_name']}}
+                            <!--商品名-->{{$period_performance_val->product_name}}
                         </td>
                         <td>
-                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2))}}
+                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->supply_sum_unit_num, 2))}}
                         </td>
                         <td>
-                            <!--単位-->{{$period_performance_val['unit_name']}}
+                            <!--単位-->{{$period_performance_val->unit_name}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_product_amount'], 2))}}円
+                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->supply_product_amount, 2))}}円
                         </td>
                         <td>
-                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_sum_unit_num'], 2))}}
+                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->sale_sum_unit_num, 2))}}
                         </td>
                         <td>
-                            <!--単位-->{{$period_performance_val['unit_name']}}
+                            <!--単位-->{{$period_performance_val->unit_name']}}
                         </td>
                         <td>
-                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['sale_product_amount'], 2))}}円
+                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->sale_product_amount, 2))}}円
                         </td>
                         <td>
-                            <!--利益金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['profit'], 2))}}円
+                            <!--利益金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->profit, 2))}}円
                         </td>
                     </tr>
                 </tbody>

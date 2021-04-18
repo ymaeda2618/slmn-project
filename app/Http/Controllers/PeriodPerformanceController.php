@@ -312,13 +312,11 @@ class PeriodPerformanceController extends Controller
             ->selectRaw('COALESCE(SaleSlipDetail.sale_product_amount,0) - COALESCE(SupplySlipDetail.supply_product_amount,0) AS profit')
             ->if(!empty($supplySlipDetailList), function ($query) use ($supplySlipDetailList) {
                 return $query
-                       ->leftJoin(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'Product.id')
-                       ->mergeBindings($supplySlipDetailList);
+                       ->leftJoin(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'Product.id');
             })
             ->if(!empty($saleSlipDetailList), function ($query) use ($saleSlipDetailList) {
                 return $query
-                       ->leftJoin(DB::raw('('. $saleSlipDetailList->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.product_id', '=', 'Product.id')
-                       ->mergeBindings($saleSlipDetailList);
+                       ->leftJoin(DB::raw('('. $saleSlipDetailList->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.product_id', '=', 'Product.id');
             })
             ->where('Product.active', '=', '1')
             ->where(function($query) {

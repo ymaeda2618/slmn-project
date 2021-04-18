@@ -194,11 +194,11 @@ class PeriodPerformanceController extends Controller
                 'Product.code                 AS product_code',
                 'Product.name                 AS product_name',
             )
-            ->selectRaw('SUM(COALESCE(SupplySlipDetail.unit_num,0)) AS supply_sum_unit_num')
+            ->selectRaw('CAST(SUM(COALESCE(SupplySlipDetail.unit_num,0)) AS DECIMAL(10,2)) AS supply_sum_unit_num')
             ->selectRaw(
                 'CASE
-                   WHEN Product.tax_id = 1 THEN SUM(COALESCE(SupplySlipDetail.notax_price,0))*1.08
-                   WHEN Product.tax_id = 2 THEN SUM(COALESCE(SupplySlipDetail.notax_price,0))*1.10
+                   WHEN Product.tax_id = 1 THEN CAST(SUM(COALESCE(SupplySlipDetail.notax_price,0))*1.08 AS DECIMAL(10,2))
+                   WHEN Product.tax_id = 2 THEN CAST(SUM(COALESCE(SupplySlipDetail.notax_price,0))*1.10 AS DECIMAL(10,2))
                  END AS supply_product_amount'
             )
             ->join('products AS Product', function ($join) {
@@ -251,11 +251,11 @@ class PeriodPerformanceController extends Controller
                 'Product.code                 AS product_code',
                 'Product.name                 AS product_name',
             )
-            ->selectRaw('SUM(COALESCE(SaleSlipDetail.unit_num,0)) AS sale_sum_unit_num')
+            ->selectRaw('CAST(SUM(COALESCE(SaleSlipDetail.unit_num,0)) AS DECIMAL(10,2)) AS sale_sum_unit_num')
             ->selectRaw(
                 'CASE
-                   WHEN Product.tax_id = 1 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.08
-                   WHEN Product.tax_id = 2 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.10
+                   WHEN Product.tax_id = 1 THEN CAST(SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.08 AS DECIMAL(10,2))
+                   WHEN Product.tax_id = 2 THEN CAST(SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.10 AS DECIMAL(10,2))
                  END AS sale_product_amount'
             )
             ->join('products AS Product', function ($join) {
@@ -301,7 +301,7 @@ class PeriodPerformanceController extends Controller
 
             $productlList = DB::table('products AS Product')
             ->select(
-                'Product.aid    AS product_id',
+                'Product.id    AS product_id',
                 'Product.code  AS product_code',
                 'Product.name  AS product_name',
             )
@@ -309,7 +309,7 @@ class PeriodPerformanceController extends Controller
             ->selectRaw('COALESCE(SupplySlipDetail.supply_product_amount,0) AS supply_product_amount')
             ->selectRaw('COALESCE(SaleSlipDetail.sale_sum_unit_num,0) AS sale_sum_unit_num')
             ->selectRaw('COALESCE(SaleSlipDetail.sale_product_amount,0) AS sale_product_amount')
-            ->selectRaw('COALESCE(SaleSlipDetail.sale_product_amount,0) - COALESCE(SupplySlipDetail.supply_product_amount,0) AS profit')
+            ->selectRaw('CAST(COALESCE(SaleSlipDetail.sale_product_amount,0) - COALESCE(SupplySlipDetail.supply_product_amount,0) AS DECIMAL(10,2)) AS profit')
             ->if(!empty($supplySlipDetailList), function ($query) use ($supplySlipDetailList, $pp_date_from, $pp_date_to) {
                 return $query
                        ->leftJoin(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'Product.id')
@@ -329,9 +329,6 @@ class PeriodPerformanceController extends Controller
             ->groupBy('Product.id')
             ->orderBy('Product.id')
             ->get();
-
-            dd($productlList);
-
 
             //---------------------
             // 日別仕入売上額配列を取得
@@ -400,10 +397,10 @@ class PeriodPerformanceController extends Controller
             }
 
             // ksortでキーを昇順でソート
-            ksort($period_performance_arr);
+            /*ksort($period_performance_arr);
 
             // 配列数の条件を設定※表示上限は300件
-            $period_performance_arr = array_slice( $period_performance_arr, 0, 300 ) ;
+            $period_performance_arr = array_slice( $period_performance_arr, 0, 300 ) ;*/
 
         } catch (\Exception $e) {
 
@@ -446,7 +443,7 @@ class PeriodPerformanceController extends Controller
             "supply_total_amount"               => $supply_total_amount,
             "sale_total_amount"                 => $sale_total_amount,
 
-            "period_performance_arr"           => $period_performance_arr,
+            "period_performance_arr"           => $productlList,
         ]);
     }
 

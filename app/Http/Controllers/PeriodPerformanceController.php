@@ -236,6 +236,7 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SupplySlipDetail.active', '=', '1')
             ->groupBy('SupplySlipDetail.product_id')
+            ->orderBy('SupplySlipDetail.product_id')
             ->limit(300)
             ->get();
 
@@ -256,6 +257,8 @@ class PeriodPerformanceController extends Controller
                    WHEN Product.tax_id = 2 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.10
                  END AS sale_product_amount'
             )
+            ->selectRaw( 'COALESCE(SupplySlipDetail.supply_sum_unit_num, 0)    AS supply_sum_unit_num')
+            ->selectRaw( 'COALESCE(SupplySlipDetail.supply_product_amount, 0)  AS supply_product_amount')
             ->join('products AS Product', function ($join) {
                 $join->on('Product.id', '=', 'SaleSlipDetail.product_id');
             })
@@ -270,6 +273,11 @@ class PeriodPerformanceController extends Controller
             })
             ->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
+            })
+            ->if(!empty($supplySlipDetailList), function ($query) use ($supplySlipDetailList) {
+                return $query
+                       ->join(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'SaleSlipDetail.product_id')
+                       ->mergeBindings($supplySlipDetailList);
             })
             ->if(!empty($pp_date_from) && !empty($pp_date_to) && $pp_date_type == 1, function ($query) use ($pp_date_from, $pp_date_to) {
                 return $query->whereBetween('SaleSlip.date', [$pp_date_from, $pp_date_to]);
@@ -291,9 +299,10 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SaleSlip.active', '=', '1')
             ->groupBy('SaleSlipDetail.product_id')
-            ->limit(300)
+            ->orderBy('SaleSlipDetail.product_id')
             ->get();
 
+            dd($saleSlipDetailList);
 
             //---------------------
             // 日別仕入売上額配列を取得
@@ -364,8 +373,8 @@ class PeriodPerformanceController extends Controller
             // ksortでキーを昇順でソート
             ksort($period_performance_arr);
 
-            // 配列数の条件を設定
-            $period_performance_arr = array_slice( $period_performance_arr, 0, 10 ) ;
+            // 配列数の条件を設定※表示上限は300件
+            $period_performance_arr = array_slice( $period_performance_arr, 0, 300 ) ;
 
         } catch (\Exception $e) {
 

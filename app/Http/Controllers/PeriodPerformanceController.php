@@ -411,6 +411,8 @@ class PeriodPerformanceController extends Controller
             ]);
         }
 
+        dd($productlList);
+
         return view('PeriodPerformance.index')->with([
 
             "pp_check_str_slip_date"            => $pp_check_str_slip_date,

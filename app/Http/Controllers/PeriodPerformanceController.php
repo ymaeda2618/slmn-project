@@ -236,6 +236,7 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SupplySlipDetail.active', '=', '1')
             ->groupBy('SupplySlipDetail.product_id')
+            ->limit(300)
             ->get();
 
             //---------------------
@@ -290,7 +291,9 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SaleSlip.active', '=', '1')
             ->groupBy('SaleSlipDetail.product_id')
+            ->limit(300)
             ->get();
+
 
             //---------------------
             // 日別仕入売上額配列を取得
@@ -360,6 +363,9 @@ class PeriodPerformanceController extends Controller
 
             // ksortでキーを昇順でソート
             ksort($period_performance_arr);
+
+            // 配列数の条件を設定
+            $period_performance_arr = array_slice( $period_performance_arr, 0, 10 ) ;
 
         } catch (\Exception $e) {
 

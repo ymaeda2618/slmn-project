@@ -128,10 +128,10 @@
                             <!--No.-->{{$no}}
                         </td>
                         <td>
-                            <!--製品コード-->{{$period_performance_val['code']}}
+                            <!--製品コード-->{{$period_performance_val['product_code']}}
                         </td>
                         <td>
-                            <!--商品名-->{{$period_performance_val['name']}}
+                            <!--商品名-->{{$period_performance_val['product_name']}}
                         </td>
                         <td>
                             <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val['supply_sum_unit_num'], 2))}}

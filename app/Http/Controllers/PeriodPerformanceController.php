@@ -304,6 +304,7 @@ class PeriodPerformanceController extends Controller
                 'Product.id    AS product_id',
                 'Product.code  AS product_code',
                 'Product.name  AS product_name',
+                'Unit.name     AS unit_name'
             )
             ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
             ->selectRaw('COALESCE(SupplySlipDetail.supply_product_amount,0) AS supply_product_amount')
@@ -319,6 +320,9 @@ class PeriodPerformanceController extends Controller
                 return $query
                        ->leftJoin(DB::raw('('. $saleSlipDetailList->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.product_id', '=', 'Product.id')
                        ->mergeBindings($saleSlipDetailList);
+            })
+            ->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
             })
             ->where('Product.active', '=', '1')
             ->where(function($query) {

@@ -235,10 +235,7 @@ class PeriodPerformanceController extends Controller
                 return $query->where('SupplySlipDetail.staff_id', '=', $pp_staff_id);
             })
             ->where('SupplySlipDetail.active', '=', '1')
-            ->groupBy('SupplySlipDetail.product_id')
-            ->orderBy('SupplySlipDetail.product_id')
-            ->limit(300)
-            ->get();
+            ->groupBy('SupplySlipDetail.product_id');
 
             //---------------------
             // 売上額を取得

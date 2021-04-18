@@ -334,7 +334,7 @@ class PeriodPerformanceController extends Controller
             // 日別仕入売上額配列を取得
             //---------------------
 
-            $period_performance_arr = array();
+            /*$period_performance_arr = array();
             $supply_total_amount   = 0;
             $sale_total_amount     = 0;
 
@@ -397,7 +397,7 @@ class PeriodPerformanceController extends Controller
             }
 
             // ksortでキーを昇順でソート
-            /*ksort($period_performance_arr);
+            ksort($period_performance_arr);
 
             // 配列数の条件を設定※表示上限は300件
             $period_performance_arr = array_slice( $period_performance_arr, 0, 300 ) ;*/

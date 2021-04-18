@@ -146,7 +146,7 @@
                             <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->sale_sum_unit_num, 2))}}
                         </td>
                         <td>
-                            <!--単位-->{{$period_performance_val->unit_name']}}
+                            <!--単位-->{{$period_performance_val->unit_name}}
                         </td>
                         <td>
                             <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->sale_product_amount, 2))}}円

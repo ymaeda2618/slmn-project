@@ -315,7 +315,7 @@ class PeriodPerformanceController extends Controller
                        ->leftJoin(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'Product.id')
                        ->mergeBindings($supplySlipDetailList);
             })
-            ->if(!empty($condition_product_id), function ($query) use ($saleSlipDetailList) {
+            ->if(!empty($saleSlipDetailList), function ($query) use ($saleSlipDetailList) {
                 return $query
                        ->leftJoin(DB::raw('('. $saleSlipDetailList->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.product_id', '=', 'Product.id')
                        ->mergeBindings($saleSlipDetailList);

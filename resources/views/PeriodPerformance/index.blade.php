@@ -12,7 +12,7 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td><div class="table-th">>最大表示件数は300件</div></td>
+                            <td><div class="table-attention-th">最大表示件数は300件</div></td>
                         </tr>
                         <tr>
                             <td>
@@ -620,6 +620,17 @@
     .search-area table {
         margin: auto;
         width: 100%;
+    }
+
+    .table-attention-th{
+        width: 100%;
+        font-size: 12px;
+        color: red;
+        text-align: right;
+        padding: 15px 0px 0px 10px;
+        padding-right: 5%;
+        float: left;
+        font-weight: bolder;
     }
 
     .table-th {

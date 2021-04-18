@@ -440,8 +440,10 @@ class PeriodPerformanceController extends Controller
             "pp_staff_id"                       => $pp_staff_id,
             "pp_staff_text"                     => $pp_staff_text,
 
-            "supply_total_amount"               => $supply_total_amount,
-            "sale_total_amount"                 => $sale_total_amount,
+            /*"supply_total_amount"               => $supply_total_amount,
+            "sale_total_amount"                 => $sale_total_amount,*/
+            "supply_total_amount"               => 0,
+            "sale_total_amount"                 => 0,
 
             "period_performance_arr"           => $productlList,
         ]);

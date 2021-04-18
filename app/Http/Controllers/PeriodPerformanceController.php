@@ -235,7 +235,12 @@ class PeriodPerformanceController extends Controller
                 return $query->where('SupplySlipDetail.staff_id', '=', $pp_staff_id);
             })
             ->where('SupplySlipDetail.active', '=', '1')
-            ->groupBy('SupplySlipDetail.product_id');
+            ->groupBy('SupplySlipDetail.product_id')
+
+
+            ->orderBy('SupplySlipDetail.product_id')
+            ->limit(300)
+            ->get();
 
             //---------------------
             // 売上額を取得
@@ -247,15 +252,13 @@ class PeriodPerformanceController extends Controller
                 'Product.code                 AS product_code',
                 'Product.name                 AS product_name',
             )
-            ->selectRaw('SUM(COALESCE(SaleSlipDetail.unit_num,0)) AS sale_sum_unit_num')
+            ->selectRaw('SUM(COALESCE(SaleSlipDetail.supply_sum_unit_num,0)) AS sale_sum_unit_num')
             ->selectRaw(
                 'CASE
                    WHEN Product.tax_id = 1 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.08
                    WHEN Product.tax_id = 2 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.10
                  END AS sale_product_amount'
             )
-            ->selectRaw( 'COALESCE(SupplySlipDetail.supply_sum_unit_num, 0)    AS supply_sum_unit_num')
-            ->selectRaw( 'COALESCE(SupplySlipDetail.supply_product_amount, 0)  AS supply_product_amount')
             ->join('products AS Product', function ($join) {
                 $join->on('Product.id', '=', 'SaleSlipDetail.product_id');
             })
@@ -270,11 +273,6 @@ class PeriodPerformanceController extends Controller
             })
             ->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
-            })
-            ->if(!empty($supplySlipDetailList), function ($query) use ($supplySlipDetailList) {
-                return $query
-                       ->join(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'SaleSlipDetail.product_id')
-                       ->mergeBindings($supplySlipDetailList);
             })
             ->if(!empty($pp_date_from) && !empty($pp_date_to) && $pp_date_type == 1, function ($query) use ($pp_date_from, $pp_date_to) {
                 return $query->whereBetween('SaleSlip.date', [$pp_date_from, $pp_date_to]);
@@ -296,10 +294,39 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SaleSlip.active', '=', '1')
             ->groupBy('SaleSlipDetail.product_id')
+
+
             ->orderBy('SaleSlipDetail.product_id')
+            ->limit(300)
             ->get();
 
-            dd($saleSlipDetailList);
+
+            /*$saleSlipDetailList = DB::table('products AS Product')
+            ->select(
+                'Product.id    AS product_id',
+                'Product.code  AS product_code',
+                'Product.name  AS product_name',
+            )
+            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
+            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
+            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
+            ->selectRaw('COALESCE(SupplySlipDetail.supply_sum_unit_num,0) AS supply_sum_unit_num')
+            ->if(!empty($supplySlipDetailList), function ($query) use ($supplySlipDetailList) {
+                return $query
+                       ->leftJoin(DB::raw('('. $supplySlipDetailList->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.product_id', '=', 'Product.id')
+                       ->mergeBindings($supplySlipDetailList);
+            })
+            ->if(!empty($condition_product_id), function ($query) use ($saleSlipDetailList) {
+                return $query
+                       ->leftJoin(DB::raw('('. $saleSlipDetailList->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.product_id', '=', 'Product.id')
+                       ->mergeBindings($saleSlipDetailList);
+            })
+            ->where('Product.active', '=', '1')
+            ->groupBy('Product.id')
+            ->orderBy('Product.id')
+            ->limit(300)
+            ->get();*/
+
 
             //---------------------
             // 日別仕入売上額配列を取得

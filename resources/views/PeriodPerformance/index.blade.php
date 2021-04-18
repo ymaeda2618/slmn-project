@@ -12,6 +12,9 @@
                 <table>
                     <tbody>
                         <tr>
+                            <td><div class="table-th">>最大表示件数は300件</div></td>
+                        </tr>
+                        <tr>
                             <td>
                                 <div class="table-th">対象日付</div>
                                 <div class="table-td radio_box">
@@ -97,12 +100,6 @@
             </form>
         </div>
 
-        <!--総計表示エリア-->
-        <div class='sum-display-area'>
-            <div class='sum-display-div'>仕入総額:{{preg_replace("/\.?0+$/","",number_format($supply_total_amount, 2))}}円</div>
-            <div class='sum-display-div'>売上総額:{{preg_replace("/\.?0+$/","",number_format($sale_total_amount, 2))}}円</div>
-        </div>
-
         <!--一覧表示エリア-->
         <div class='list-area'>
             <table class='index-table'>
@@ -120,7 +117,7 @@
 
             <?php $no = 1; ?>
 
-            @foreach ($period_performance_arr as $period_performance_val)
+            @foreach ($productlList as $productVal)
             <table class='index-table'>
                 <tbody>
                     <tr>
@@ -128,31 +125,35 @@
                             <!--No.-->{{$no}}
                         </td>
                         <td>
-                            <!--製品コード-->{{$period_performance_val->product_code}}
+                            <!--製品コード-->{{$productVal->product_code}}
                         </td>
                         <td>
-                            <!--商品名-->{{$period_performance_val->product_name}}
+                            <!--商品名-->{{$productVal->product_name}}
                         </td>
                         <td>
-                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->supply_sum_unit_num, 2))}}
+                            <!--仕入数量-->{{preg_replace("/\.?0+$/","",number_format($productVal->supply_sum_unit_num, 2))}}
                         </td>
                         <td>
-                            <!--単位-->{{$period_performance_val->unit_name}}
+                            <!--単位-->{{$productVal->unit_name}}
                         </td>
                         <td>
-                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->supply_product_amount, 2))}}円
+                            <!--仕入金額-->{{preg_replace("/\.?0+$/","",number_format($productVal->supply_product_amount, 2))}}円
                         </td>
                         <td>
-                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->sale_sum_unit_num, 2))}}
+                            <!--売上数量-->{{preg_replace("/\.?0+$/","",number_format($productVal->sale_sum_unit_num, 2))}}
                         </td>
                         <td>
-                            <!--単位-->{{$period_performance_val->unit_name}}
+                            <!--単位-->{{$productVal->unit_name}}
                         </td>
                         <td>
-                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->sale_product_amount, 2))}}円
+                            <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($productVal->sale_product_amount, 2))}}円
                         </td>
                         <td>
-                            <!--利益金額-->{{preg_replace("/\.?0+$/","",number_format($period_performance_val->profit, 2))}}円
+                            @if (0 > $productVal->profit)
+                            <!--利益金額--><font color="red">{{preg_replace("/\.?0+$/","",number_format($productVal->profit, 2))}}円</font>
+                            @else
+                            <!--利益金額-->{{preg_replace("/\.?0+$/","",number_format($productVal->profit, 2))}}円
+                            @endif
                         </td>
                     </tr>
                 </tbody>
@@ -679,21 +680,7 @@
         border-radius: 10px;
         margin-left: 2%;
     }
-    /*総額エリア*/
 
-    .sum-display-area {
-        max-width: 1300px;
-        width: 90%;
-        padding-top: 20px;
-        padding-left: 20px;
-    }
-
-    .sum-display-div {
-        float: left;
-        margin-right: 1rem;
-        font-weight: bold;
-        font-size: 14px;
-    }
     /*伝票表示エリア*/
 
     .list-area {

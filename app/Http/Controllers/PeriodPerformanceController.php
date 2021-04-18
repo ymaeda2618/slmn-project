@@ -185,7 +185,7 @@ class PeriodPerformanceController extends Controller
             else  $pp_check_str_deliver_date = "checked";
 
             //---------------------
-            // 仕入額を取得
+            // 仕入額のサブクエリ
             //---------------------
             $supplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
             ->select(
@@ -236,13 +236,9 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SupplySlipDetail.active', '=', '1')
             ->groupBy('SupplySlipDetail.product_id');
-            /*
-            ->orderBy('SupplySlipDetail.product_id')
-            ->limit(300)
-            ->get();*/
 
             //---------------------
-            // 売上額を取得
+            // 売上額のサブクエリ
             //---------------------
             $saleSlipDetailList = DB::table('sale_slip_details AS SaleSlipDetail')
             ->select(
@@ -293,12 +289,10 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SaleSlip.active', '=', '1')
             ->groupBy('SaleSlipDetail.product_id');
-            /*
-            ->orderBy('SaleSlipDetail.product_id')
-            ->limit(300)
-            ->get();*/
 
-
+            //---------------------
+            // 製品期間実績一覧
+            //---------------------
             $productlList = DB::table('products AS Product')
             ->select(
                 'Product.id    AS product_id',
@@ -332,79 +326,8 @@ class PeriodPerformanceController extends Controller
             })
             ->groupBy('Product.id')
             ->orderBy('Product.id')
+            ->limit(300)
             ->get();
-
-            //---------------------
-            // 日別仕入売上額配列を取得
-            //---------------------
-
-            /*$period_performance_arr = array();
-            $supply_total_amount   = 0;
-            $sale_total_amount     = 0;
-
-            // 仕入実績を抽出
-            foreach ($supplySlipDetailList as $supplySlipDetailVal) {
-
-                $product_id            = $supplySlipDetailVal->product_id;
-                $supply_sum_unit_num   = $supplySlipDetailVal->supply_sum_unit_num;
-                $supply_product_amount = $supplySlipDetailVal->supply_product_amount;
-                $profit                = $supply_product_amount * -1;
-
-                $period_performance_arr[$product_id] =[
-                    'code'                  => $supplySlipDetailVal->product_code,
-                    'name'                  => $supplySlipDetailVal->product_name,
-                    'unit_name'             => $supplySlipDetailVal->unit_name,
-                    'supply_sum_unit_num'   => $supply_sum_unit_num,
-                    'supply_product_amount' => $supply_product_amount,
-                    'sale_sum_unit_num'     => 0,
-                    'sale_product_amount'   => 0,
-                    'profit'                => $profit
-                ];
-
-                $supply_total_amount   += $supply_product_amount;
-            }
-
-            // 売上実績を抽出
-            foreach ($saleSlipDetailList as $saleSlipDetailVal) {
-
-                $product_id            = $saleSlipDetailVal->product_id;
-                $sale_sum_unit_num     = $saleSlipDetailVal->sale_sum_unit_num;
-                $sale_product_amount   = $saleSlipDetailVal->sale_product_amount;
-                $profit                = $sale_product_amount;
-
-                if(!isset($period_performance_arr[$product_id])) {
-
-                    $period_performance_arr[$product_id] =[
-                        'code'                  => $saleSlipDetailVal->product_code,
-                        'name'                  => $saleSlipDetailVal->product_name,
-                        'unit_name'             => $saleSlipDetailVal->unit_name,
-                        'supply_sum_unit_num'   => 0,
-                        'supply_product_amount' => 0,
-                        'sale_sum_unit_num'     => $sale_sum_unit_num,
-                        'sale_product_amount'   => $sale_product_amount,
-                        'profit'                => $profit
-                    ];
-                } else {
-
-                    // 売上数量を格納
-                    $period_performance_arr[$product_id]['sale_sum_unit_num']   = $sale_sum_unit_num;
-
-                    // 売上額を格納
-                    $period_performance_arr[$product_id]['sale_product_amount'] = $sale_product_amount;
-
-                    // 利益額を格納
-                    $period_performance_arr[$product_id]['profit']  += $profit;
-
-                }
-
-                $sale_total_amount   += $sale_product_amount;
-            }
-
-            // ksortでキーを昇順でソート
-            ksort($period_performance_arr);
-
-            // 配列数の条件を設定※表示上限は300件
-            $period_performance_arr = array_slice( $period_performance_arr, 0, 300 ) ;*/
 
         } catch (\Exception $e) {
 
@@ -444,12 +367,7 @@ class PeriodPerformanceController extends Controller
             "pp_staff_id"                       => $pp_staff_id,
             "pp_staff_text"                     => $pp_staff_text,
 
-            /*"supply_total_amount"               => $supply_total_amount,
-            "sale_total_amount"                 => $sale_total_amount,*/
-            "supply_total_amount"               => 0,
-            "sale_total_amount"                 => 0,
-
-            "period_performance_arr"           => $productlList,
+            "productlList"                      => $productlList,
         ]);
     }
 

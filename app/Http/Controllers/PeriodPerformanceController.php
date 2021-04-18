@@ -236,8 +236,6 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SupplySlipDetail.active', '=', '1')
             ->groupBy('SupplySlipDetail.product_id')
-
-
             ->orderBy('SupplySlipDetail.product_id')
             ->limit(300)
             ->get();
@@ -294,8 +292,6 @@ class PeriodPerformanceController extends Controller
             })
             ->where('SaleSlip.active', '=', '1')
             ->groupBy('SaleSlipDetail.product_id')
-
-
             ->orderBy('SaleSlipDetail.product_id')
             ->limit(300)
             ->get();

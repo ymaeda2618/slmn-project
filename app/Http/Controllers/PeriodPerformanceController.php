@@ -250,7 +250,7 @@ class PeriodPerformanceController extends Controller
                 'Product.code                 AS product_code',
                 'Product.name                 AS product_name',
             )
-            ->selectRaw('SUM(COALESCE(SaleSlipDetail.supply_sum_unit_num,0)) AS sale_sum_unit_num')
+            ->selectRaw('SUM(COALESCE(SaleSlipDetail.unit_num,0)) AS sale_sum_unit_num')
             ->selectRaw(
                 'CASE
                    WHEN Product.tax_id = 1 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0))*1.08

@@ -301,7 +301,7 @@ class PeriodPerformanceController extends Controller
 
             $productlList = DB::table('products AS Product')
             ->select(
-                'Product.id    AS product_id',
+                'Product.aid    AS product_id',
                 'Product.code  AS product_code',
                 'Product.name  AS product_name',
             )

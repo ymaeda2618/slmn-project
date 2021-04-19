@@ -255,6 +255,7 @@ class SupplyShopController extends Controller
             $SupplyShop->code              = $supply_shop_code;
             $SupplyShop->supply_company_id = $request->data['SupplyShop']['supply_company_id'];
             $SupplyShop->name              = $request->data['SupplyShop']['supply_shop_name'];
+            $SupplyShop->yomi              = $request->data['SupplyShop']['yomi'];
             $SupplyShop->postal_code       = $request->data['SupplyShop']['postal_code'];
             $SupplyShop->address           = $request->data['SupplyShop']['address'];
             $SupplyShop->modified_user_id  = $user_info_id;               // 更新者ユーザーID
@@ -362,6 +363,7 @@ class SupplyShopController extends Controller
             $SupplyShop = new SupplyShop;
             $SupplyShop->supply_company_id = $request->data['SupplyShop']['supply_company_id'];
             $SupplyShop->name              = $request->data['SupplyShop']['supply_company_name'];
+            $SupplyShop->yomi              = $request->data['SupplyShop']['yomi'];
             $SupplyShop->postal_code       = $request->data['SupplyShop']['postal_code'];
             $SupplyShop->address           = $request->data['SupplyShop']['address'];
             $SupplyShop->sort              = 100;

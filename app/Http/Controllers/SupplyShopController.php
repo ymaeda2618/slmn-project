@@ -317,8 +317,10 @@ class SupplyShopController extends Controller
                         'SupplyShop.code AS code'
                     )
                     ->where([
+                        ['SupplyShop.code', '!=', ''],
                         ['SupplyShop.active', '=', '1'],
-                    ])->orderBy('id', 'desc')->first();
+                    ])
+                    ->whereNotNull('SupplyShop.code')->orderBy('id', 'desc')->first();
 
                     $supply_shop_code = $supplyShopCode->code + 1;
 

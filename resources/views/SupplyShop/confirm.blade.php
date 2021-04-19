@@ -8,7 +8,7 @@
         <form class="event-form" id="event-create-form" method="post" action="{{$action_url}}" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="form-group">
-                <label class="column-label" for="code">コード</label>
+                <label class="column-label" for="code">コード<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="yomi" name="data[SupplyShop][code]" value="{{$request->data['SupplyShop']['code']}}" readonly>
             </div>
             <div class="form-group">
@@ -25,11 +25,11 @@
                 <input type="text" class="form-control" id="yomi" name="data[SupplyShop][yomi]" value="{{$request->data['SupplyShop']['yomi']}}" readonly>
             </div>
             <div class="form-group">
-                <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ</label>
+                <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="postal_code" name="data[SupplyShop][postal_code]" value="{{$request->data['SupplyShop']['postal_code']}}" readonly>
             </div>
             <div class="form-group">
-                <label class="column-label" for="address">住所</label>
+                <label class="column-label" for="address">住所<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="address" name="data[SupplyShop][address]" value="{{$request->data['SupplyShop']['address']}}" readonly>
             </div>
             <br>
@@ -43,7 +43,7 @@
 
 <style>
     /* 共通 */
-
+    
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -51,7 +51,7 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .confirm-title {
         font-size: 0.9em;
         font-weight: bold;
@@ -60,23 +60,23 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .form-group {
         margin-bottom: 3rem !important;
     }
-
+    
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-
+    
     .column-label {
         font-size: 0.9em;
         font-weight: bold;

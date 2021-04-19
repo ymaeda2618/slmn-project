@@ -12,7 +12,7 @@
         <form class="smn-form" id="event-create-form" method="post" action="./SupplyShopConfirm" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
             <div class="form-group">
-                <label class="column-label" for="code">コード<font color="red">※任意</font><</label>
+                <label class="column-label" for="code">コード<font color="red">※任意</font></label>
                 <input type="number" class="form-control" id="code" name="data[SupplyShop][code]">
             </div>
             <div class="form-group">
@@ -32,11 +32,11 @@
                 <input type="text" class="form-control" id="yomi" name="data[SupplyShop][yomi]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ<font color="red">※任意</font><</label>
+                <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="postal_code" name="data[SupplyShop][postal_code]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="address">住所<font color="red">※任意</font><</label>
+                <label class="column-label" for="address">住所<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="address" name="data[SupplyShop][address]">
             </div>
             <br>

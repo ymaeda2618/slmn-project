@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\SupplyShop;
 use App\SupplyCompany;
 use Carbon\Carbon;
+use Exception;
 
 class SupplyShopController extends Controller
 {
@@ -122,7 +123,7 @@ class SupplyShopController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function edit($supply_shop_id)
+    public function edit(Request $request, $supply_shop_id)
     {
         // 仕入先企業一覧を取得
         $SupplyCompanyList = SupplyCompany::where([
@@ -136,6 +137,7 @@ class SupplyShopController extends Controller
             'SupplyShop.code              AS code',
             'SupplyShop.supply_company_id AS supply_company_id',
             'SupplyShop.name              AS supply_shop_name',
+            'SupplyShop.yomi              AS yomi',
             'SupplyShop.postal_code       AS postal_code',
             'SupplyShop.address           AS address',
         )
@@ -145,9 +147,14 @@ class SupplyShopController extends Controller
         ])
         ->first();
 
+        // エラーメッセージ取得
+        $error_message       = $request->session()->get('error_message');
+        $request->session()->forget('error_message');
+
         return view('SupplyShop.edit')->with([
             "SupplyCompanyList" => $SupplyCompanyList,
             "editSupplyShop"    => $editSupplyShop,
+            "error_message"     => $error_message,
         ]);
     }
 
@@ -157,15 +164,20 @@ class SupplyShopController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function create()
+    public function create(Request $request)
     {
         // 仕入れ先企業一覧取得
         $SupplyCompanyList = SupplyCompany::where([
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
+        // エラーメッセージ取得
+        $error_message       = $request->session()->get('error_message');
+        $request->session()->forget('error_message');
+
         return view('SupplyShop.create')->with([
             "SupplyCompanyList"   => $SupplyCompanyList,
+            "error_message"       => $error_message,
         ]);
     }
 
@@ -210,12 +222,37 @@ class SupplyShopController extends Controller
         // トランザクション処理
         DB::beginTransaction();
 
+        // エラータイプを初期化
+        $exception_type = 0;
+
         try {
+
+            // リクエストされたコードを格納
+            $supply_shop_code = $request->data['SupplyShop']['code'];
+
+            // codeが存在するかチェック
+            $supplyShopCodeCheck = DB::table('supply_shops AS SupplyShop')
+            ->select(
+                'SupplyShop.code AS code'
+            )
+            ->where([
+                ['SupplyShop.id', '!=', $request->data['SupplyShop']['supply_shop_id']],
+                ['SupplyShop.active', '=', '1'],
+                ['SupplyShop.code', '=', $supply_shop_code],
+            ])->orderBy('id', 'desc')->first();
+
+            if (!empty($supplyShopCodeCheck)){
+
+                $exception_type = 1;
+
+                throw new Exception();
+            }
 
             //---------------
             // 保存処理を行う
             //---------------
             $SupplyShop = \App\SupplyShop::find($request->data['SupplyShop']['supply_shop_id']);
+            $SupplyShop->code              = $supply_shop_code;
             $SupplyShop->supply_company_id = $request->data['SupplyShop']['supply_company_id'];
             $SupplyShop->name              = $request->data['SupplyShop']['supply_shop_name'];
             $SupplyShop->postal_code       = $request->data['SupplyShop']['postal_code'];
@@ -230,7 +267,13 @@ class SupplyShopController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
+
+                $errorMsg = "指定のコードは既に登録済みです。";
+                $request->session()->put('error_message', $errorMsg);
+
+                return redirect('./SupplyShopEdit/'.$request->data['SupplyShop']['supply_shop_id']);
+            }
 
             return view('SupplyShop.complete')->with([
                 'errorMessage' => $e
@@ -258,7 +301,60 @@ class SupplyShopController extends Controller
         // トランザクション処理
         DB::beginTransaction();
 
+        // エラータイプを初期化
+        $exception_type = 0;
+
         try {
+
+            // codeが入力されていない場合
+            if(empty($request->data['SupplyShop']['code'])){
+
+                do {
+                    // codeのMAX値を取得
+                    $supplyShopCode = DB::table('supply_shops AS SupplyShop')
+                    ->select(
+                        'SupplyShop.code AS code'
+                    )
+                    ->where([
+                        ['SupplyShop.active', '=', '1'],
+                    ])->orderBy('id', 'desc')->first();
+
+                    $supply_shop_code = $supplyShopCode->code + 1;
+
+                    // codeが存在するかチェック
+                    $supplyShopCodeCheck = DB::table('supply_shops AS SupplyShop')
+                    ->select(
+                        'SupplyShop.code AS code'
+                    )
+                    ->where([
+                        ['SupplyShop.active', '=', '1'],
+                        ['SupplyShop.code', '=', $supply_shop_code],
+                    ])->orderBy('id', 'desc')->first();
+
+                } while (!empty($supplyShopCodeCheck));
+
+            } else {
+
+                // リクエストされたコードを格納
+                $supply_shop_code = $request->data['SupplyShop']['code'];
+
+                // codeが存在するかチェック
+                $supplyShopCodeCheck = DB::table('supply_shops AS SupplyShop')
+                ->select(
+                    'SupplyShop.code AS code'
+                )
+                ->where([
+                    ['SupplyShop.active', '=', '1'],
+                    ['SupplyShop.code', '=', $supply_shop_code],
+                ])->orderBy('id', 'desc')->first();
+
+                if (!empty($supplyShopCodeCheck)){
+
+                    $exception_type = 1;
+
+                    throw new Exception();
+                }
+            }
 
             //---------------
             // 保存処理を行う
@@ -282,7 +378,13 @@ class SupplyShopController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
+
+                $errorMsg = "指定のコードは既に登録済みです。";
+                $request->session()->put('error_message', $errorMsg);
+
+                return redirect('./SupplyShopCreate');
+            }
 
             return view('SupplyShop.complete')->with([
                 'errorMessage' => $e

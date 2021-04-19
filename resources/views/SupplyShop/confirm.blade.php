@@ -8,6 +8,10 @@
         <form class="event-form" id="event-create-form" method="post" action="{{$action_url}}" enctype="multipart/form-data">
             {{ csrf_field() }}
             <div class="form-group">
+                <label class="column-label" for="code">コード</label>
+                <input type="text" class="form-control" id="yomi" name="data[SupplyShop][code]" value="{{$request->data['SupplyShop']['code']}}" readonly>
+            </div>
+            <div class="form-group">
                 <label class="column-label" for="supply_company_name">仕入先企業名</label>
                 <input type="text" class="form-control" id="supply_company_name" name="data[SupplyShop][supply_company_name]" value="{{$supply_company_list->name}}" readonly>
                 <input type='hidden' name="data[SupplyShop][supply_company_id]" value="{{$request->data['SupplyShop']['supply_company_id']}}">
@@ -15,6 +19,10 @@
             <div class="form-group">
                 <label class="column-label" for="supply_shop_name">仕入先店舗名</label>
                 <input type="text" class="form-control" id="supply_shop_name" name="data[SupplyShop][supply_shop_name]" value="{{$request->data['SupplyShop']['supply_shop_name']}}" readonly>
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="yomi">ヨミガナ</label>
+                <input type="text" class="form-control" id="yomi" name="data[SupplyShop][yomi]" value="{{$request->data['SupplyShop']['yomi']}}" readonly>
             </div>
             <div class="form-group">
                 <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ</label>

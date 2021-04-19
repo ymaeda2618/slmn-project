@@ -361,6 +361,7 @@ class SupplyShopController extends Controller
             // 保存処理を行う
             //---------------
             $SupplyShop = new SupplyShop;
+            $SupplyShop->code              = $supply_shop_code;
             $SupplyShop->supply_company_id = $request->data['SupplyShop']['supply_company_id'];
             $SupplyShop->name              = $request->data['SupplyShop']['supply_company_name'];
             $SupplyShop->yomi              = $request->data['SupplyShop']['yomi'];

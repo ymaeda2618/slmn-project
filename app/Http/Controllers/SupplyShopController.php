@@ -383,8 +383,6 @@ class SupplyShopController extends Controller
 
             DB::rollback();
 
-            dd($e);
-
             if($exception_type == 1){ // 登録済みのコードを指定の場合
 
                 $errorMsg = "指定のコードは既に登録済みです。";

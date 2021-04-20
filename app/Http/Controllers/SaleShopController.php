@@ -130,7 +130,7 @@ class SaleShopController extends Controller
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
-        // 仕入れ先店舗を取得
+        // 売上先店舗を取得
         $editSaleShop = DB::table('sale_shops AS SaleShop')
         ->select(
             'SaleShop.id                AS sale_shop_id',
@@ -158,13 +158,13 @@ class SaleShopController extends Controller
 
 
     /**
-     * 仕入れ先店舗新規登録画面
+     * 売上先店舗新規登録画面
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function create(Request $request)
     {
-        // 仕入れ先企業一覧取得
+        // 売上先企業一覧取得
         $SaleCompanyList = SaleCompany::where([
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
@@ -180,7 +180,7 @@ class SaleShopController extends Controller
     }
 
      /**
-     * 仕入れ先店舗追加　確認
+     * 売上先店舗追加　確認
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -193,7 +193,7 @@ class SaleShopController extends Controller
             $action_url = './SaleShopEditComplete';
         }
 
-        // 仕入れ先企業名取得
+        // 売上先企業名取得
         $sale_company_list = SaleCompany::where([
             ['id', $request->data['SaleShop']['sale_company_id']],
         ])->first();
@@ -266,6 +266,8 @@ class SaleShopController extends Controller
 
             DB::rollback();
 
+            dd($e);
+
             if($exception_type == 1){ // 登録済みのコードを指定の場合
 
                 $errorMsg = "指定のコードは既に登録済みです。";
@@ -321,7 +323,11 @@ class SaleShopController extends Controller
                     ])
                     ->whereNotNull('SaleShop.code')->orderBy('id', 'desc')->first();
 
-                    $sale_shop_code = $saleShopCode->code + 1;
+                    if(empty($saleShopCode)) {
+                        $sale_shop_code = 1;
+                    } else {
+                        $sale_shop_code = $saleShopCode->code + 1;
+                    }
 
                     // codeが存在するかチェック
                     $saleShopCodeCheck = DB::table('sale_shops AS SaleShop')
@@ -381,6 +387,8 @@ class SaleShopController extends Controller
         } catch (\Exception $e) {
 
             DB::rollback();
+
+            dd($e);
 
             if($exception_type == 1){ // 登録済みのコードを指定の場合
 

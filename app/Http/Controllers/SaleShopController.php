@@ -134,8 +134,10 @@ class SaleShopController extends Controller
         $editSaleShop = DB::table('sale_shops AS SaleShop')
         ->select(
             'SaleShop.id                AS sale_shop_id',
+            'SaleShop.code              AS code',
             'SaleShop.sale_company_id AS sale_company_id',
             'SaleShop.name              AS sale_shop_name',
+            'SaleShop.yomi              AS yomi',
             'SaleShop.postal_code       AS postal_code',
             'SaleShop.address           AS address',
         )
@@ -266,8 +268,6 @@ class SaleShopController extends Controller
 
             DB::rollback();
 
-            dd($e);
-
             if($exception_type == 1){ // 登録済みのコードを指定の場合
 
                 $errorMsg = "指定のコードは既に登録済みです。";
@@ -387,8 +387,6 @@ class SaleShopController extends Controller
         } catch (\Exception $e) {
 
             DB::rollback();
-
-            dd($e);
 
             if($exception_type == 1){ // 登録済みのコードを指定の場合
 

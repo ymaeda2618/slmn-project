@@ -5,8 +5,16 @@
 
         <div class="top-title">売上先店舗 新規成画面</div>
 
-        <form class="smn-form" id="event-create-form" method="post" action="./SaleShopConfirm" enctype="multipart/form-data">
+        @if(!empty($error_message))
+        <div class="error-alert">{{$error_message}}</div>
+        @endif
+
+        <form class="smn-form" id="event-create-form" method="post" action="./SaleShopConfirm" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
+            <div class="form-group">
+                <label class="column-label" for="code">コード<font color="red">※任意</font></label>
+                <input type="number" class="form-control" id="code" name="data[SaleShop][code]">
+            </div>
             <div class="form-group">
                 <label class="column-label" for="sale_company_name">売上先企業</label>
                 <select class="form-control" id="sale_company_id" name="data[SaleShop][sale_company_id]">
@@ -18,6 +26,10 @@
             <div class="form-group">
                 <label class="column-label" for="sale_shop_name">売上先店舗名</label>
                 <input type="text" class="form-control" id="sale_shop_name" name="data[SaleShop][sale_shop_name]">
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="yomi">ヨミガナ</label>
+                <input type="text" class="form-control" id="yomi" name="data[SaleShop][yomi]">
             </div>
             <div class="form-group">
                 <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ</label>
@@ -34,7 +46,34 @@
     </div>
 </div>
 @endsection
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script type="text/javascript">
+    //------------
+    // 入力チェック
+    //------------
+    function inputCheck() {
 
+        var sale_shop_name = $('#sale_shop_name').val();
+
+        if (sale_shop_name == "") {
+            alert('売上先店舗名が入力されておりません。');
+            return false;
+        }
+
+        var yomi = $('#yomi').val();
+
+        if (yomi == "") {
+            alert('ヨミガナが入力されておりません。');
+            return false;
+        }
+        if (!yomi.match(/^[ァ-ヶー]+$/)) {
+            alert('ヨミガナは全角カタカナで入力してください。');
+            return false;
+        }
+
+        return true;
+    }
+</script>
 <style>
     /* 共通 */
 
@@ -44,6 +83,11 @@
         width: 100%;
         text-align: center;
         padding: 25px 0px;
+    }
+
+    .error-alert {
+        color: red;
+        font-weight: bold;
     }
 
     .smn-form {

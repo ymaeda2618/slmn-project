@@ -5,8 +5,16 @@
 
         <div class="top-title">売上先店舗 編集画面</div>
 
-        <form class="event-form" id="event-create-form" method="post" action="../SaleShopConfirm" enctype="multipart/form-data">
+        @if(!empty($error_message))
+        <div class="error-alert">{{$error_message}}</div>
+        @endif
+
+        <form class="event-form" id="event-create-form" method="post" action="../SaleShopConfirm" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
+            <div class="form-group">
+                <label class="column-label" for="code">コード<font color="red">※任意</font></label>
+                <input type="number" class="form-control" id="code" name="data[SaleShop][code]" value="{{$editSaleShop->code}}">
+            </div>
             <div class="form-group">
                 <label class="column-label" for="sale_shop_name">売上先企業名</label>
                 <select class="form-control" id="sale_company_id" name="data[SaleShop][sale_company_id]">
@@ -19,6 +27,10 @@
             <div class="form-group">
                 <label class="column-label" for="sale_shop_name">売上先店舗名</label>
                 <input type="text" class="form-control" id="sale_shop_name" name="data[SaleShop][sale_shop_name]" value="{{$editSaleShop->sale_shop_name}}">
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="yomi">ヨミガナ</label>
+                <input type="text" class="form-control" id="yomi" name="data[SaleShop][yomi]" value="{{$editSaleShop->yomi}}">
             </div>
             <div class="form-group">
                 <label class="column-label" for="postal_code">郵便番号※ハイフンなし数字のみ</label>
@@ -60,6 +72,11 @@
         width: 100%;
         text-align: center;
         padding: 25px 0px;
+    }
+
+    .error-alert {
+        color: red;
+        font-weight: bold;
     }
 
     .event-form {

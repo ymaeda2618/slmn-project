@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\SaleShop;
 use App\SaleCompany;
 use Carbon\Carbon;
+use Exception;
 
 class SaleShopController extends Controller
 {
@@ -122,7 +123,7 @@ class SaleShopController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function edit($sale_shop_id)
+    public function edit(Request $request, $sale_shop_id)
     {
         // 売上先企業一覧を取得
         $SaleCompanyList = SaleCompany::where([
@@ -144,9 +145,14 @@ class SaleShopController extends Controller
         ])
         ->first();
 
+        // エラーメッセージ取得
+        $error_message       = $request->session()->get('error_message');
+        $request->session()->forget('error_message');
+
         return view('SaleShop.edit')->with([
             "SaleCompanyList" => $SaleCompanyList,
             "editSaleShop"    => $editSaleShop,
+            "error_message"     => $error_message,
         ]);
     }
 
@@ -156,15 +162,20 @@ class SaleShopController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function create()
+    public function create(Request $request)
     {
         // 仕入れ先企業一覧取得
         $SaleCompanyList = SaleCompany::where([
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
+        // エラーメッセージ取得
+        $error_message       = $request->session()->get('error_message');
+        $request->session()->forget('error_message');
+
         return view('SaleShop.create')->with([
             "SaleCompanyList"   => $SaleCompanyList,
+            "error_message"       => $error_message,
         ]);
     }
 
@@ -209,14 +220,40 @@ class SaleShopController extends Controller
         // トランザクション処理
         DB::beginTransaction();
 
+        // エラータイプを初期化
+        $exception_type = 0;
+
         try {
+
+            // リクエストされたコードを格納
+            $sale_shop_code = $request->data['SaleShop']['code'];
+
+            // codeが存在するかチェック
+            $saleShopCodeCheck = DB::table('sale_shops AS SaleShop')
+            ->select(
+                'SaleShop.code AS code'
+            )
+            ->where([
+                ['SaleShop.id', '!=', $request->data['SaleShop']['sale_shop_id']],
+                ['SaleShop.active', '=', '1'],
+                ['SaleShop.code', '=', $sale_shop_code],
+            ])->orderBy('id', 'desc')->first();
+
+            if (!empty($saleShopCodeCheck)){
+
+                $exception_type = 1;
+
+                throw new Exception();
+            }
 
             //---------------
             // 保存処理を行う
             //---------------
             $SaleShop = \App\SaleShop::find($request->data['SaleShop']['sale_shop_id']);
-            $SaleShop->sale_company_id = $request->data['SaleShop']['sale_company_id'];
+            $SaleShop->code              = $sale_shop_code;
+            $SaleShop->sale_company_id   = $request->data['SaleShop']['sale_company_id'];
             $SaleShop->name              = $request->data['SaleShop']['sale_shop_name'];
+            $SaleShop->yomi              = $request->data['SaleShop']['yomi'];
             $SaleShop->postal_code       = $request->data['SaleShop']['postal_code'];
             $SaleShop->address           = $request->data['SaleShop']['address'];
             $SaleShop->modified_user_id  = $user_info_id;               // 更新者ユーザーID
@@ -229,7 +266,13 @@ class SaleShopController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
+
+                $errorMsg = "指定のコードは既に登録済みです。";
+                $request->session()->put('error_message', $errorMsg);
+
+                return redirect('./SaleShopEdit/'.$request->data['SaleShop']['sale_shop_id']);
+            }
 
             return view('SaleShop.complete')->with([
                 'errorMessage' => $e
@@ -257,14 +300,72 @@ class SaleShopController extends Controller
         // トランザクション処理
         DB::beginTransaction();
 
+        // エラータイプを初期化
+        $exception_type = 0;
+
+
         try {
+
+            // codeが入力されていない場合
+            if(empty($request->data['SaleShop']['code'])){
+
+                do {
+                    // codeのMAX値を取得
+                    $saleShopCode = DB::table('sale_shops AS SaleShop')
+                    ->select(
+                        'SaleShop.code AS code'
+                    )
+                    ->where([
+                        ['SaleShop.code', '!=', ''],
+                        ['SaleShop.active', '=', '1'],
+                    ])
+                    ->whereNotNull('SaleShop.code')->orderBy('id', 'desc')->first();
+
+                    $sale_shop_code = $saleShopCode->code + 1;
+
+                    // codeが存在するかチェック
+                    $saleShopCodeCheck = DB::table('sale_shops AS SaleShop')
+                    ->select(
+                        'SaleShop.code AS code'
+                    )
+                    ->where([
+                        ['SaleShop.active', '=', '1'],
+                        ['SaleShop.code', '=', $sale_shop_code],
+                    ])->orderBy('id', 'desc')->first();
+
+                } while (!empty($saleShopCodeCheck));
+
+            } else {
+
+                // リクエストされたコードを格納
+                $sale_shop_code = $request->data['SaleShop']['code'];
+
+                // codeが存在するかチェック
+                $saleShopCodeCheck = DB::table('sale_shops AS SaleShop')
+                ->select(
+                    'SaleShop.code AS code'
+                )
+                ->where([
+                    ['SaleShop.active', '=', '1'],
+                    ['SaleShop.code', '=', $sale_shop_code],
+                ])->orderBy('id', 'desc')->first();
+
+                if (!empty($saleShopCodeCheck)){
+
+                    $exception_type = 1;
+
+                    throw new Exception();
+                }
+            }
 
             //---------------
             // 保存処理を行う
             //---------------
             $SaleShop = new SaleShop;
-            $SaleShop->sale_company_id = $request->data['SaleShop']['sale_company_id'];
+            $SaleShop->code              = $sale_shop_code;
+            $SaleShop->sale_company_id   = $request->data['SaleShop']['sale_company_id'];
             $SaleShop->name              = $request->data['SaleShop']['sale_company_name'];
+            $SaleShop->yomi              = $request->data['SaleShop']['yomi'];
             $SaleShop->postal_code       = $request->data['SaleShop']['postal_code'];
             $SaleShop->address           = $request->data['SaleShop']['address'];
             $SaleShop->sort              = 100;
@@ -281,7 +382,13 @@ class SaleShopController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
+
+                $errorMsg = "指定のコードは既に登録済みです。";
+                $request->session()->put('error_message', $errorMsg);
+
+                return redirect('./SaleShopCreate');
+            }
 
             return view('SaleShop.complete')->with([
                 'errorMessage' => $e

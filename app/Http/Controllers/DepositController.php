@@ -178,8 +178,8 @@ class DepositController extends Controller
     }
 
     /**
-     * 出金登録処理
-     * 
+     * 入金登録処理
+     *
      */
     public function registerDeposit(Request $request) {
 
@@ -203,6 +203,7 @@ class DepositController extends Controller
                 'date'                => $depositDatas['deposit_date'],
                 'sale_from_date'      => $depositDatas['sales_from_date'],
                 'sale_to_date'        => $depositDatas['sales_to_date'],
+                'payment_date'        => $depositDatas['payment_date'],
                 'staff_id'            => $depositDatas['staff_id'],
                 'sub_total'           => $depositDatas['price'],
                 'adjustment_amount'   => $depositDatas['adjustment_price'],
@@ -292,6 +293,7 @@ class DepositController extends Controller
             'Deposit.date                AS deposit_date',
             'Deposit.sale_from_date      AS sale_from_date',
             'Deposit.sale_to_date        AS sale_to_date',
+            'Deposit.payment_date        AS payment_date',
             'Deposit.sub_total           AS sub_total',
             'Deposit.adjustment_amount   AS adjustment_amount',
             'Deposit.amount              AS amount',
@@ -407,6 +409,7 @@ class DepositController extends Controller
                     'date'                => $depositDatas['deposit_date'],
                     'sale_from_date'      => $depositDatas['sale_from_date'],
                     'sale_to_date'        => $depositDatas['sale_to_date'],
+                    'payment_date'        => $depositDatas['payment_date'],
                     'staff_id'            => $depositDatas['staff_id'],
                     'sub_total'           => $depositDatas['price'],
                     'adjustment_amount'   => $depositDatas['adjustment_price'],
@@ -783,6 +786,7 @@ class DepositController extends Controller
         $depositList = DB::table('deposits AS Deposit')
         ->select(
             'Deposit.id                                  AS deposit_id',
+            'Deposit.payment_date                        AS payment_date',
             'Deposit.adjustment_amount                   AS deposit_adjust_price',
             'Deposit.remarks                             AS remarks',
             'DepositWithdrawalDetail.supply_sale_slip_id AS sale_slip_id',
@@ -840,6 +844,8 @@ class DepositController extends Controller
                     $codeAfter  = substr($depositDatas->company_postal_code, 3, 4);
                     $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
                 }
+                // 支払期日もここで入れる
+                $calcDepositList['company_info']['payment_date'] = date('Y年m月d日', strtotime($depositDatas->payment_date));
             }
 
             // -------------------

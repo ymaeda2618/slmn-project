@@ -10,6 +10,9 @@
             <div class="form-group">
                 <label class="column-label" for="deposit_date">入金日付</label>
                 <input type="date" class="form-control " id="deposit_date" name="data[Deposit][deposit_date]" value="<?php echo date('Y-m-d');?>" tabindex="1">
+
+                <label class="column-label payment-date-label" for="payment_date">支払期日</label>
+                <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d');?>" tabindex="2">
             </div>
 
             <div class="search-area">
@@ -18,9 +21,9 @@
                         <label><input type="radio" name="data[Deposit][search_date]" value="1" checked> 伝票日付</label>
                         <label><input type="radio" name="data[Deposit][search_date]" value="2"> 納品日付</label>
                     </div>
-                    <input type="date" class="form-control width-45 sales_from_date" id="sales_from_date" name="data[Deposit][sales_from_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="2">
+                    <input type="date" class="form-control width-45 sales_from_date" id="sales_from_date" name="data[Deposit][sales_from_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="3">
                     <p class="sales-block">〜</p>
-                    <input type="date" class="form-control width-45 sales_to_date" id="sales_to_date" name="data[Deposit][sales_to_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="3">
+                    <input type="date" class="form-control width-45 sales_to_date" id="sales_to_date" name="data[Deposit][sales_to_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="4">
                 </div>
 
                 <table class="deposit-from-table">
@@ -30,14 +33,14 @@
                     </tr>
                     <tr>
                         <td class="width-20">
-                            <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='javascript:changeCalcFlg()' tabindex="4">
+                            <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='javascript:changeCalcFlg()' tabindex="5">
                             <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]">
                         </td>
                         <td class="width-30">
                             <input type="text" class="form-control" id="deposit_company_text" name="data[Deposit][deposit_company_text]" readonly>
                         </td>
                         <td class="width-20">
-                            <input type="text" class="form-control deposit_shop_code_input" id="deposit_shop_code" name="data[Deposit][deposit_shop_code]" tabindex="5">
+                            <input type="text" class="form-control deposit_shop_code_input" id="deposit_shop_code" name="data[Deposit][deposit_shop_code]" tabindex="6">
                             <input type="hidden" id="deposit_shop_id" name="data[Deposit][deposit_shop_id]">
                         </td>
                         <td class="width-30">
@@ -76,7 +79,7 @@
                 <tr>
                     <th class="width-5">担当者</th>
                     <td>
-                        <input type="text" class="form-control staff_code_input" id="staff_code" name="data[Deposit][staff_code]" value="1009" tabindex="6">
+                        <input type="text" class="form-control staff_code_input" id="staff_code" name="data[Deposit][staff_code]" value="1009" tabindex="7">
                         <input type="hidden" id="staff_id" name="data[Deposit][staff_id]" value="9">
                     </td>
                     <td class="width-30">
@@ -92,13 +95,13 @@
                 <tr>
                     <th>調整金額</th>
                     <td class="width-20">
-                        <input type="number" class="form-control" id="adjustment_price" name="data[Deposit][adjustment_price]" onchange='javascript:calcTotalSalesPrice()' tabindex="7">
+                        <input type="number" class="form-control" id="adjustment_price" name="data[Deposit][adjustment_price]" onchange='javascript:calcTotalSalesPrice()' tabindex="8">
                     </td>
                 </tr>
                 <tr>
                     <th>入金手段</th>
                     <td>
-                        <select class="form-control" name="data[Deposit][deposit_method_id]" tabindex="8">
+                        <select class="form-control" name="data[Deposit][deposit_method_id]" tabindex="9">
                             <option value="1">東信当座</option>
                             <option value="2">東信普通</option>
                             <option value="3">みずほ</option>
@@ -112,7 +115,7 @@
                 <tr>
                     <th>メモ</th>
                     <td colspan="5">
-                        <textarea class="form-control" id="memo" name="data[Deposit][memo]" row="5" tabindex="9" style="margin-top: 0px; margin-bottom: 0px; height: 150px;"></textarea>
+                        <textarea class="form-control" id="memo" name="data[Deposit][memo]" row="5" tabindex="10" style="margin-top: 0px; margin-bottom: 0px; height: 150px;"></textarea>
                     </td>
                 </tr>
             </table>
@@ -177,7 +180,7 @@
                         <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="登録" readonly>
                     </td>
                     <td class="width-50">
-                        <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="9">
+                        <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="11">
                     </td>
                 </tr>
             </table>
@@ -985,5 +988,9 @@
 
     .register-btn {
         width: 85%;
+    }
+
+    .payment-date-label {
+        margin-top: 2%;
     }
 </style>

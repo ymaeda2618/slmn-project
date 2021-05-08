@@ -16,7 +16,7 @@
                 </tr>
                 <tr>
                     <td>お支払期限</td>
-                    <td>2021年3月24日</td>
+                    <td>{{$depositList['company_info']['payment_date']}}</td>
                 </tr>
             </table>
         </div>

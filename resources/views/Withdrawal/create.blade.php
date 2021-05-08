@@ -15,7 +15,7 @@
             <div class="search-area">
                 <div class="payment-date-form">
                     <div class="radio_box">
-                        <label><input type="radio" name="data[Withdrawal][search_date]" value="1"> 伝票日付</label>
+                        <label><input type="radio" name="data[Withdrawal][search_date]" value="1" checked> 伝票日付</label>
                         <label><input type="radio" name="data[Withdrawal][search_date]" value="2"> 納品日付</label>
                     </div>
                     <input type="date" class="form-control width-45 payment_from_date" id="payment_from_date" name="data[Withdrawal][payment_from_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="2">

@@ -15,7 +15,7 @@
             <div class="search-area">
                 <div class="sales-date-form">
                     <div class="radio_box">
-                        <label><input type="radio" name="data[Deposit][search_date]" value="1"> 伝票日付</label>
+                        <label><input type="radio" name="data[Deposit][search_date]" value="1" checked> 伝票日付</label>
                         <label><input type="radio" name="data[Deposit][search_date]" value="2"> 納品日付</label>
                     </div>
                     <input type="date" class="form-control width-45 sales_from_date" id="sales_from_date" name="data[Deposit][sales_from_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="2">

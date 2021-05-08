@@ -174,10 +174,10 @@
             <table class="register-btn-table">
                 <tr>
                     <td class="width-20">
-                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="1">
+                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="0">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="登録" readonly>
+                        <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="入金済" readonly>
                     </td>
                     <td class="width-50">
                         <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="11">
@@ -249,12 +249,16 @@
                         });
                         $(this).val(submit_type);
 
-                        if (submit_type == 1) {
-                            $('#deposit_submit_type_text').val("登録");
+                        if (submit_type == 0) {
+                            $('#deposit_submit_type_text').val("入金済");
+                            $('#register-btn').prop('disabled', false);
+                            $('#register-btn').focus();
+                        } else if (submit_type == 1) {
+                            $('#deposit_submit_type_text').val("未入金");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
-                            $('#deposit_submit_type_text').val("一時保存");
+                            $('#deposit_submit_type_text').val("繰越");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else {
@@ -504,11 +508,11 @@
 
                 var this_val = $("#deposit_submit_type").val();
 
-                if (this_val == "1") {
+                if (this_val == "0") {
+                    $('#deposit-create-form').submit();
+                } else if (this_val == "1") {
                     $('#deposit-create-form').submit();
                 } else if (this_val == "2") {
-                    $('#deposit-create-form').submit();
-                } else if (this_val == "3") {
                     $('#deposit-create-form').submit();
                 } else {
                     return false;
@@ -526,12 +530,16 @@
                 });
                 $(this).val(submit_type);
 
-                if (submit_type == 1) {
-                    $('#deposit_submit_type_text').val("登録");
+                if (submit_type == 0) {
+                    $('#deposit_submit_type_text').val("入金済");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 1) {
+                    $('#deposit_submit_type_text').val("未入金");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else if (submit_type == 2) {
-                    $('#deposit_submit_type_text').val("一時保存");
+                    $('#deposit_submit_type_text').val("繰越");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else {

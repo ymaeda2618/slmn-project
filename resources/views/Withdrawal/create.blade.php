@@ -246,12 +246,16 @@
                         });
                         $(this).val(submit_type);
 
-                        if (submit_type == 1) {
-                            $('#withdrawal_submit_type_text').val("登録");
+                        if (submit_type == 0) {
+                            $('#withdrawal_submit_type_text').val("入金済");
+                            $('#register-btn').prop('disabled', false);
+                            $('#register-btn').focus();
+                        }else if (submit_type == 1) {
+                            $('#withdrawal_submit_type_text').val("未入金");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
-                            $('#withdrawal_submit_type_text').val("一時保存");
+                            $('#withdrawal_submit_type_text').val("繰越");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else {
@@ -501,7 +505,9 @@
 
                 var this_val = $("#withdrawal_submit_type").val();
 
-                if (this_val == "1") {
+                if (this_val == "0") {
+                    $('#withdrawal-create-form').submit();
+                }else if (this_val == "1") {
                     $('#withdrawal-create-form').submit();
                 } else if (this_val == "2") {
                     $('#withdrawal-create-form').submit();
@@ -521,12 +527,16 @@
                 });
                 $(this).val(submit_type);
 
-                if (submit_type == 1) {
-                    $('#withdrawal_submit_type_text').val("登録");
+                if (submit_type == 0) {
+                    $('#withdrawal_submit_type_text').val("入金済");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                }else if (submit_type == 1) {
+                    $('#withdrawal_submit_type_text').val("未入金");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else if (submit_type == 2) {
-                    $('#withdrawal_submit_type_text').val("一時保存");
+                    $('#withdrawal_submit_type_text').val("繰越");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else {

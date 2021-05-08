@@ -2347,16 +2347,17 @@ class SaleSlipController extends Controller
                 // 入金テーブルのデータ更新
                 // ---------------------
                 $updateParams = array(
-                    'sale_company_id'   => $saleSlipDatas->company_id,
-                    'sale_shop_id'      => $saleSlipDatas->shop_id,
-                    'date'              => $saleSlipDatas->sale_date,
-                    'staff_id'          => $staffId,
-                    'sub_total'         => $subtotal,
-                    'adjustment_amount' => $adjustPrice,
-                    'amount'            => $total,
-                    'deposit_method_id' => 6,
-                    'modified_user_id'  => $userInfoId,
-                    'modified'          => Carbon::now()
+                    'sale_company_id'     => $saleSlipDatas->company_id,
+                    'sale_shop_id'        => $saleSlipDatas->shop_id,
+                    'date'                => $saleSlipDatas->sale_date,
+                    'staff_id'            => $staffId,
+                    'sub_total'           => $subtotal,
+                    'adjustment_amount'   => $adjustPrice,
+                    'amount'              => $total,
+                    'deposit_method_id'   => 6,
+                    'deposit_submit_type' => 0,
+                    'modified_user_id'    => $userInfoId,
+                    'modified'            => Carbon::now()
                 );
 
                 // 更新処理
@@ -2374,21 +2375,23 @@ class SaleSlipController extends Controller
                 // ----------------
                 // 配列に値を格納
                 $insertDepositColumns = array(
-                    'sale_company_id'   => $saleSlipDatas->company_id,
-                    'sale_shop_id'      => $saleSlipDatas->shop_id,
-                    'date'              => $saleSlipDatas->sale_date,
-                    'sale_from_date'    => $saleSlipDatas->sale_date,
-                    'sale_to_date'      => $saleSlipDatas->sale_date,
-                    'staff_id'          => $staffId,
-                    'sub_total'         => $saleSlipDatas->subtotal,
-                    'adjustment_amount' => $saleSlipDatas->adjust_price,
-                    'amount'            => $saleSlipDatas->total,
-                    'deposit_method_id' => 6,
-                    'active'            => 1,
-                    'created_user_id'   => $userInfoId,
-                    'created'           => Carbon::now(),
-                    'modified_user_id'  => $userInfoId,
-                    'modified'          => Carbon::now()
+                    'sale_company_id'     => $saleSlipDatas->company_id,
+                    'sale_shop_id'        => $saleSlipDatas->shop_id,
+                    'date'                => $saleSlipDatas->sale_date,
+                    'sale_from_date'      => $saleSlipDatas->sale_date,
+                    'sale_to_date'        => $saleSlipDatas->sale_date,
+                    'payment_date'        => $saleSlipDatas->sale_date,
+                    'staff_id'            => $staffId,
+                    'sub_total'           => $saleSlipDatas->subtotal,
+                    'adjustment_amount'   => $saleSlipDatas->adjust_price,
+                    'amount'              => $saleSlipDatas->total,
+                    'deposit_method_id'   => 6,
+                    'deposit_submit_type' => 0,
+                    'active'              => 1,
+                    'created_user_id'     => $userInfoId,
+                    'created'             => Carbon::now(),
+                    'modified_user_id'    => $userInfoId,
+                    'modified'            => Carbon::now()
                 );
 
                 // データインサート

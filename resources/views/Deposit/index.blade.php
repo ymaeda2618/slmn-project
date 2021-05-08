@@ -73,10 +73,12 @@
                 <table class="index-table">
                     <tbody>
                         <tr>
-                            @if ($deposit->deposit_submit_type == 1 || $deposit->deposit_submit_type == 4)
-                            <td class="regis-complete width-10">登録済</td>
-                            @else
-                            <td class="regis-temp width-10">一時保存</td>
+                            @if ($deposit->deposit_submit_type == 0)
+                            <td class="regis-complete width-10">入金済</td>
+                            @elseif ($deposit->deposit_submit_type == 1)
+                            <td class="regis-temp width-10">未入金</td>
+                            @elseif ($deposit->deposit_submit_type == 2)
+                            <td class="regis-carry width-10">繰越</td>
                             @endif
                             <td class="width-10">{{$deposit->deposit_id}}</td>
                             <td>{{$deposit->deposit_date}}</td>
@@ -458,6 +460,13 @@
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
+        text-align: center;
+    }
+
+    .regis-carry {
+        background-color: #d5f0d2;
+        font-weight: bold;
+        border-left: 3px solid #18cb00!important;
         text-align: center;
     }
 

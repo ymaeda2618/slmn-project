@@ -65,10 +65,12 @@
             <table class='index-table'>
                 <tbody>
                     <tr>
-                        @if ($withdrawal->withdrawal_submit_type == 1 || $withdrawal->withdrawal_submit_type == 4)
-                        <td class="regis-complete">登録済</td>
-                        @else
-                        <td class="regis-temp">一時保存</td>
+                        @if ($withdrawal->withdrawal_submit_type == 0)
+                        <td class="regis-complete">入金済</td>
+                        @elseif ($withdrawal->withdrawal_submit_type == 1)
+                        <td class="regis-temp">未入金</td>
+                        @elseif ($withdrawal->withdrawal_submit_type == 2)
+                        <td class="regis-carry">繰越</td>
                         @endif
                         <td>{{$withdrawal->withdrawal_date}}</td>
                         <td class="width-15">{{$withdrawal->payment_from_date}}~{{$withdrawal->payment_to_date}}</td>
@@ -420,6 +422,13 @@
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
+        text-align: center;
+    }
+
+    .regis-carry {
+        background-color: #d5f0d2;
+        font-weight: bold;
+        border-left: 3px solid #18cb00!important;
         text-align: center;
     }
 

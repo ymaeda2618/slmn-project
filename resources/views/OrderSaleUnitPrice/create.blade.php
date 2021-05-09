@@ -38,6 +38,7 @@
                     <th colspan="2">製品ID</th>
                     <th>金額</th>
                     <th>適用開始日</th>
+                    <th colspan="2">担当者</th>
                     <th>削除</th>
                 </tr>
                 <tr id="product-partition-0" class="partition-area"></tr>
@@ -50,15 +51,26 @@
                     <td class="width-20">
                         <input type="text" class="form-control" id="product_text_0" name="data[OrderSaleUnitPriceDetail][0][product_text]" placeholder="製品欄" readonly>
                     </td>
-                    {{-- 製品 END --}} {{-- 金額 START --}}
+                    {{-- 製品 END --}}
+                    {{-- 金額 START --}}
                     <td class="width-10">
                         <input type="number" class="form-control" id="order_unit_price_0" name="data[OrderSaleUnitPriceDetail][0][order_unit_price]" tabindex="4">
                     </td>
-                    {{-- 金額 END --}} {{-- 適用開始日 START --}}
+                    {{-- 金額 END --}}
+                    {{-- 適用開始日 START --}}
                     <td class="width-10">
                         <input type="date" class="form-control " id="apply_from" name="data[OrderSaleUnitPriceDetail][0][apply_from]" value="<?php echo date('Y-m-d');?>" tabindex="5">
                     </td>
-                    {{-- 適用開始日 END --}} {{-- 削除 START --}}
+                    {{-- 適用開始日 END --}}
+                    {{-- 担当者 START --}}
+                    <td class="width-10">
+                        <input type="text" class="form-control staff_code_input" id="staff_code_0" name="data[OrderSaleUnitPriceDetail][0][staff_code]" value="1009" tabindex="6">
+                        <input type="hidden" id="staff_id_0" name="data[OrderSaleUnitPriceDetail][0][staff_id]" value="9">
+                    </td>
+                    <td class="width-20">
+                        <input type="text" class="form-control" id="staff_text_0" name="data[OrderSaleUnitPriceDetail][0][staff_text]" value="石塚 貞雄" placeholder="担当者" readonly>
+                    </td>
+                    {{-- 担当者 END --}}
                     <td class="width-5">
                         <button id="remove-product-btn" type="button" class="btn remove-product-btn btn-secondary" onclick='javascript:removeProduct(0) '>削除</button>
                     </td>
@@ -292,6 +304,25 @@
 
                         });
 
+                } else if (selector_code.match(/staff/)) { // 担当者IDの部分
+
+                    $.ajax({
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetStaff",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
+
+                            $("#" + selector_code).val(data[0]);
+                            $("#" + selector_id).val(data[1]);
+                            $("#" + selector_text).val(data[2]);
+                        });
                 }
             });
 
@@ -374,6 +405,32 @@
                 }
             });
 
+            //-------------------------------------
+            // autocomplete処理 担当者ID
+            //-------------------------------------
+            $(".staff_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteStaff",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
             //--------------------
             // 伝票追加処理
             //--------------------
@@ -429,6 +486,31 @@
                         });
                         $("#product-code-area-" + product_num).append(product_code_selector);
 
+                        // 担当ID
+                        let staff_code_selector = $(data[3]).autocomplete({
+                            source: function(req, resp) {
+                                $.ajax({
+                                    headers: {
+                                        "X-CSRF-TOKEN": $("[name='_token']").val()
+                                    },
+                                    url: "./AjaxAutoCompleteStaff",
+                                    type: "POST",
+                                    cache: false,
+                                    dataType: "json",
+                                    data: {
+                                        inputText: req.term
+                                    },
+                                    success: function(o) {
+                                        resp(o);
+                                    },
+                                    error: function(xhr, ts, err) {
+                                        resp(['']);
+                                    }
+                                });
+                            }
+                        });
+                        $("#staff-code-area-" + product_num).append(staff_code_selector);
+
                     })
                     .fail(function(XMLHttpRequest, textStatus, errorThrown) {
                         alert(XMLHttpRequest);
@@ -466,9 +548,10 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code; // 売上企業
-        var product_code; // 製品ID
-        var order_unit_price; // 金額
+        var sale_company_code;  // 売上企業
+        var product_code;       // 製品ID
+        var order_unit_price;   // 金額
+        var staff_code;         // 担当者
 
         // -----------
         // 入力チェック
@@ -480,8 +563,8 @@
         }
 
         // 複数データがある場合
-        var slip_num = $("#slip_num").val();
-        for (i = 0; i < slip_num; i++) {
+        var product_num = $("#product_num").val();
+        for (i = 0; i < product_num; i++) {
 
             // 製品ID
             product_code = $("#product_code_" + i).val();
@@ -494,6 +577,13 @@
             order_unit_price = $("#order_unit_price_" + i).val();
             if (order_unit_price == '') {
                 alert('「金額」を入力してください。');
+                return false;
+            }
+
+            // 担当者
+            staff_code = $("#staff_code_" + i).val();
+            if (staff_code == '') {
+                alert('「担当者」を入力してください。');
                 return false;
             }
 

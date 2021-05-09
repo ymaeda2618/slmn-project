@@ -324,6 +324,7 @@ class OrderSupplyUnitPriceController extends Controller
                 $insertDetailParams[] = [
                     'order_supply_unit_price_id' => $orderSupplyUnitPriceId,
                     'product_id'                 => $OrderSupplyUnitPriceDetail['product_id'],
+                    'staff_id'                   => $OrderSupplyUnitPriceDetail['staff_id'],
                     'apply_from'                 => $OrderSupplyUnitPriceDetail['apply_from'],
                     'notax_price'                => $OrderSupplyUnitPriceDetail['order_unit_price'],
                     'price'                      => $price,
@@ -393,10 +394,14 @@ class OrderSupplyUnitPriceController extends Controller
             'Product.code                           AS product_code',
             'Product.name                           AS product_name',
             'Product.id                             AS product_id',
+            'Staff.code                             AS staff_code',
+            'Staff.id                               AS staff_id',
             'OrderSupplyUnitPriceDetail.id          AS order_supply_unit_price_detail_id',
             'OrderSupplyUnitPriceDetail.notax_price AS order_supply_unit_price_detail_price',
-            'OrderSupplyUnitPriceDetail.apply_from  AS apply_from'
+            'OrderSupplyUnitPriceDetail.apply_from  AS apply_from',
+            'OrderSupplyUnitPriceDetail.staff_id    AS staff_id',
         )
+        ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
         ->join('order_supply_unit_prices as OrderSupplyUnitPrice', function ($join) {
             $join->on('OrderSupplyUnitPrice.id', '=', 'OrderSupplyUnitPriceDetail.order_supply_unit_price_id')
             ->where('OrderSupplyUnitPrice.active', '=', true);
@@ -404,6 +409,10 @@ class OrderSupplyUnitPriceController extends Controller
         ->join('products as Product', function ($join) {
             $join->on('Product.id', '=', 'OrderSupplyUnitPriceDetail.product_id')
             ->where('Product.active', '=', true);
+        })
+        ->join('staffs as Staff', function ($join) {
+            $join->on('Staff.id', '=', 'OrderSupplyUnitPriceDetail.staff_id')
+                 ->where('Staff.active', '=', true);
         })
         ->where('OrderSupplyUnitPriceDetail.order_supply_unit_price_id', '=', $order_supply_unit_price_id)
         ->get();
@@ -475,6 +484,7 @@ class OrderSupplyUnitPriceController extends Controller
                 $detail_datas[] = [
                     'order_supply_unit_price_id' => $OrderSupplyUnitPriceDatas['id'],
                     'product_id'                 => $OrderSupplyUnitPriceDetail['product_id'],
+                    'staff_id'                   => $OrderSupplyUnitPriceDetail['staff_id'],
                     'apply_from'                 => $OrderSupplyUnitPriceDetail['apply_from'],
                     'notax_price'                => $OrderSupplyUnitPriceDetail['order_unit_price'],
                     'price'                      => $price,
@@ -537,6 +547,12 @@ class OrderSupplyUnitPriceController extends Controller
         $ajaxHtml .= "     <td class='width-10'>";
         $ajaxHtml .= "         <input type='date' class='form-control' id='apply_from' name='data[OrderSupplyUnitPriceDetail][".$product_num."][apply_from]' value='" . $today ."' tabindex='".($tabInitialNum + 2)."'>";
         $ajaxHtml .= "     </td>";
+        $ajaxHtml .= "     <td class='width-10' id='staff-code-area-".$product_num."'>";
+        $ajaxHtml .= "         <input type='hidden' id='staff_id_".$product_num."' name='data[OrderSupplyUnitPriceDetail][".$product_num."][staff_id]' value='9'>";
+        $ajaxHtml .= "     </td>";
+        $ajaxHtml .= "     <td class='width-20'>";
+        $ajaxHtml .= "         <input type='text' class='form-control' id='staff_text_".$product_num."' name='data[OrderSupplyUnitPriceDetail][".$product_num."][staff_text]' value='石塚 貞雄' placeholder='担当者' readonly>";
+        $ajaxHtml .= "     </td>";
         $ajaxHtml .= "     <td rowspan='2' class='width-5'>";
         $ajaxHtml .= "         <button id='remove-product-btn' type='button' class='btn remove-product-btn btn-secondary' onclick='javascript:removeProduct(".$product_num.") '>削除</button>";
         $ajaxHtml .= "     </td>";
@@ -549,9 +565,12 @@ class OrderSupplyUnitPriceController extends Controller
         // 製品ID
         $autoCompleteProduct = "<input type='text' class='form-control product_code_input' id='product_code_".$product_num."' name='data[OrderSupplyUnitPrice][".$product_num."][product_code]' tabindex='".$tabInitialNum."''>";
 
+        // スタッフID
+        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$product_num."' name='data[OrderSupplyUnitPrice][".$product_num."][staff_code]' value='1009' tabindex='".($tabInitialNum + 3)."''>";
+
         $product_num = intval($product_num) + 1;
 
-        $returnArray = array($product_num, $ajaxHtml, $autoCompleteProduct);
+        $returnArray = array($product_num, $ajaxHtml, $autoCompleteProduct, $autoCompleteStaff);
 
         return $returnArray;
     }

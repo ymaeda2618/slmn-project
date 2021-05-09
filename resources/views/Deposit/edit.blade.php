@@ -19,7 +19,7 @@
             <div class="search-area">
                 <div class="sale-date-form">
                     <div class="radio_box">
-                        <label><input type="radio" name="data[Deposit][search_date]" value="1"> 伝票日付</label>
+                        <label><input type="radio" name="data[Deposit][search_date]" value="1" checked> 伝票日付</label>
                         <label><input type="radio" name="data[Deposit][search_date]" value="2"> 納品日付</label>
                     </div>
                     <input type="date" class="form-control width-45 sale_from_date" id="sale_from_date" name="data[Deposit][sale_from_date]" onchange='javascript:changeCalcFlg()' tabindex="3" value="{{$depositDatas->sale_from_date}}">

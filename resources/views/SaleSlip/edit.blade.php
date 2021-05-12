@@ -314,6 +314,7 @@
                     </td>
                 </tr>
             </table>
+            <input type="hidden" name="deposit_flg" id="deposit_flg" value="{{$depositFlg}}">
         </form>
 
         <!-- モーダル -->
@@ -1734,13 +1735,14 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code; // 売上企業
-        var sale_shop_code; // 売上店舗
-        var product_code; // 製品ID
-        var unit_price; // 単価
-        var unit_num; // 数量
-        var staff_code; // 担当
-        var inventory_unit_num // 発注数量
+        var sale_company_code;  // 売上企業
+        var sale_shop_code;     // 売上店舗
+        var product_code;       // 製品ID
+        var unit_price;         // 単価
+        var unit_num;           // 数量
+        var staff_code;         // 担当
+        var inventory_unit_num  // 発注数量
+        var deposit_flg         // 入金フラグ
 
         // -----------
         // 入力チェック
@@ -1794,6 +1796,12 @@
                 return false;
             }
 
+        }
+
+        deposit_flg = $("#deposit_flg").val();
+        if (deposit_flg == 0) {
+            alert('入金済みの伝票は編集できません。');
+            return false;
         }
     }
 

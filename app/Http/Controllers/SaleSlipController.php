@@ -580,11 +580,30 @@ class SaleSlipController extends Controller
             ];
         }
 
+        // 入金済みの伝票かチェック
+        $depositList = DB::table('deposits as Deposit')
+        ->select('Deposit.deposit_submit_type AS deposit_flg')
+        ->join('deposit_withdrawal_details as DepositWithdrawalDetail', function ($join) {
+            $join->on('Deposit.id', '=', 'DepositWithdrawalDetail.deposit_withdrawal_id');
+        })
+        ->where([
+            ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $sale_slip_id],
+            ['DepositWithdrawalDetail.type', '=', '2'],
+            ['DepositWithdrawalDetail.active', '=', true],
+            ['Deposit.active', '=', true]
+        ])
+        ->get();
+        $depositFlg = 99;
+        if (isset($depositList[0])) {
+            $depositFlg = $depositList[0]->deposit_flg;
+        }
+
         return view('SaleSlip.edit')->with([
             "sale_slip_id"        => $sale_slip_id,
             "SaleSlipList"        => $SaleSlipList,
             "SaleSlipDetailList"  => $SaleSlipDetailList,
             "inventoryManageArr"  => $inventoryManageArr,
+            "depositFlg"          => $depositFlg,
         ]);
     }
 
@@ -781,6 +800,37 @@ class SaleSlipController extends Controller
                         }
                     }
                 }
+            }
+
+            // ------------------------------------
+            // 編集した売上伝票に紐づく入金伝票を削除する
+            // ------------------------------------
+            // 入金伝票IDを取得
+            $depositDatas = DB::table('deposits AS Deposit')
+            ->select('Deposit.id AS deposit_id')
+            ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
+                $join->on('Deposit.id', '=', 'DepositWithdrawalDetail.deposit_withdrawal_id');
+            })
+            ->where([
+                ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $SaleSlipData['id']],
+                ['DepositWithdrawalDetail.type', '=', '2'],
+                ['DepositWithdrawalDetail.active', '=', true],
+                ['Deposit.active', '=', true]
+            ])
+            ->get();
+
+            // 取得してきた伝票IDを削除する
+            if (isset($depositDatas[0])) {
+                $updateParams = array(
+                    'active'           => 0,                // アクティブフラグ
+                    'modified_user_id' => $user_info_id,    // 更新者ユーザーID
+                    'modified'         => Carbon::now()     // 更新時間
+                );
+
+                // 更新処理
+                DB::table('deposits')
+                ->where('id', '=', $depositDatas[0]->deposit_id)
+                ->update($updateParams);
             }
 
             // 問題なければコミット
@@ -2278,10 +2328,14 @@ class SaleSlipController extends Controller
             ->select(
                 'DepositWithdrawalDetail.deposit_withdrawal_id AS deposit_id'
             )
+            ->join('deposits as Deposit', function ($join) {
+                $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id');
+            })
             ->where([
-                ['supply_sale_slip_id', '=', $saleSlipId],
-                ['type', '=', '2'],
-                ['active', '=', '1']
+                ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $saleSlipId],
+                ['DepositWithdrawalDetail.type', '=', '2'],
+                ['DepositWithdrawalDetail.active', '=', '1'],
+                ['Deposit.active', '=', '1']
             ])
             ->get();
 

@@ -629,7 +629,7 @@ class DepositController extends Controller
     /**
      * ajax処理
      * 指定された範囲の請求伝票一覧を返す
-     * 
+     *
      */
     public function AjaxSearchSaleSlips(Request $request) {
 
@@ -796,6 +796,8 @@ class DepositController extends Controller
             'SaleCompany.name                            AS company_name',
             'SaleCompany.postal_code                     AS company_postal_code',
             'SaleCompany.address                         AS company_address',
+            'SaleSlipDetail.unit_price                   AS unit_price',
+            'SaleSlipDetail.unit_num                     AS unit_num',
             'SaleSlipDetail.notax_price                  AS notax_price',
             'SaleSlipDetail.memo                         AS memo',
             'Product.name                                AS product_name',
@@ -854,6 +856,8 @@ class DepositController extends Controller
             // 初期化
             $calcDepositList['detail'][] = array(
                 'name'        => $depositDatas->product_name,
+                'unit_price'  => $depositDatas->unit_price,
+                'unit_num'    => $depositDatas->unit_nums,
                 'notax_price' => $depositDatas->notax_price,
                 'memo'        => $depositDatas->memo,
             );
@@ -903,6 +907,8 @@ class DepositController extends Controller
             if (!isset($calcDepositList['detail']['adjust_price'])) {
                 $calcDepositList['detail']['adjust_price'] = array(
                     'name'        => '調整額',
+                    'unit_price'  => '',
+                    'unit_num'    => '',
                     'notax_price' => 0,
                     'memo'        => '',
                 );
@@ -911,6 +917,8 @@ class DepositController extends Controller
             if (!isset($calcDepositList['detail']['delivery_price'])) {
                 $calcDepositList['detail']['delivery_price'] = array(
                     'name'        => '配送額',
+                    'unit_price'  => '',
+                    'unit_num'    => '',
                     'notax_price' => 0,
                     'memo'        => '',
                 );
@@ -938,6 +946,8 @@ class DepositController extends Controller
             for ($i=1;$i<=$addLine;$i++) {
                 $calcDepositList['detail'][] = array(
                     'name'        => '',
+                    'unit_price'  => '',
+                    'unit_num'    => '',
                     'notax_price' => '',
                     'memo'        => ''
                 );

@@ -53,7 +53,7 @@
                 @else
                 <td class="price-cell td-space">{{number_format($detailDatas['unit_price'])}}</td>
                 @endif
-                <td class="td-space">{{$detailDatas['unit_num']}}</td>
+                <td class="price-cell td-space">{{$detailDatas['unit_num']}}</td>
                 @if ($detailDatas['notax_price'] === '')
                 <td class="price-cell td-space brank-line">{{$detailDatas['notax_price']}}</td>
                 @else

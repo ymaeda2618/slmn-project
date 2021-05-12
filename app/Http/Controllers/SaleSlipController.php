@@ -831,6 +831,14 @@ class SaleSlipController extends Controller
                 DB::table('deposits')
                 ->where('id', '=', $depositDatas[0]->deposit_id)
                 ->update($updateParams);
+
+                // 対象の売上データのsale_flgを0に戻す
+                $SaleSlip = \App\SaleSlip::find($SaleSlipData['id']);
+                $SaleSlip->sale_flg         = 0;              // 売上フラグ
+                $SaleSlip->modified_user_id = $user_info_id;  // 更新者ユーザーID
+                $SaleSlip->modified         = Carbon::now();  // 更新時間
+
+                $SaleSlip->save();
             }
 
             // 問題なければコミット

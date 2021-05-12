@@ -52,11 +52,9 @@
                 <td class="price-cell td-space brank-line">{{$detailDatas['unit_price']}}</td>
                 @else
                 <td class="price-cell td-space">{{number_format($detailDatas['unit_price'])}}</td>
-                @endif @if ($detailDatas['unit_num'] === '')
-                <td class="price-cell td-space brank-line">{{$detailDatas['unit_num']}}</td>
-                @else
-                <td class="price-cell td-space">{{number_format($detailDatas['unit_num'])}}</td>
-                @endif @if ($detailDatas['notax_price'] === '')
+                @endif
+                <td class="td-space">{{$detailDatas['unit_num']}}</td>
+                @if ($detailDatas['notax_price'] === '')
                 <td class="price-cell td-space brank-line">{{$detailDatas['notax_price']}}</td>
                 @else
                 <td class="price-cell td-space">{{number_format($detailDatas['notax_price'])}}</td>

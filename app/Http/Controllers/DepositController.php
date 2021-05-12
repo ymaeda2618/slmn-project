@@ -857,7 +857,7 @@ class DepositController extends Controller
             $calcDepositList['detail'][] = array(
                 'name'        => $depositDatas->product_name,
                 'unit_price'  => $depositDatas->unit_price,
-                'unit_num'    => $depositDatas->unit_nums,
+                'unit_num'    => $depositDatas->unit_num,
                 'notax_price' => $depositDatas->notax_price,
                 'memo'        => $depositDatas->memo,
             );

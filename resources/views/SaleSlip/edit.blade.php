@@ -41,7 +41,9 @@
                         <input type="text" class="form-control" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$SaleSlipList->sale_shop_name}}" readonly>
                     </td>
                 </tr>
-
+                <tr>
+                    <td class='status-memo-area'>1:登録 2:一時保存 3:削除 4:請求書印刷</td>
+                </tr>
             </table>
 
             <!--<div class="add-slip-btn-area">
@@ -1735,14 +1737,14 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code;  // 売上企業
-        var sale_shop_code;     // 売上店舗
-        var product_code;       // 製品ID
-        var unit_price;         // 単価
-        var unit_num;           // 数量
-        var staff_code;         // 担当
-        var inventory_unit_num  // 発注数量
-        var deposit_flg         // 入金フラグ
+        var sale_company_code; // 売上企業
+        var sale_shop_code; // 売上店舗
+        var product_code; // 製品ID
+        var unit_price; // 単価
+        var unit_num; // 数量
+        var staff_code; // 担当
+        var inventory_unit_num // 発注数量
+        var deposit_flg // 入金フラグ
 
         // -----------
         // 入力チェック
@@ -2141,5 +2143,11 @@
     .delivery_date_box {
         width: 100%;
         padding-top: 3%;
+    }
+
+    .status-memo-area {
+        width: 100%;
+        float: left;
+        text-align: left;
     }
 </style>

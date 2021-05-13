@@ -307,6 +307,9 @@
                         <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
                     </td>
                 </tr>
+                <tr>
+                    <td class='status-memo-area'>1:登録 2:一時保存 3:削除 4:請求書印刷</td>
+                </tr>
             </table>
 
             <input type="hidden" name="submit_type" id="submit_type" value="1">
@@ -2090,5 +2093,11 @@
     .delivery_date_box {
         width: 100%;
         padding-top: 3%;
+    }
+
+    .status-memo-area {
+        width: 100%;
+        float: left;
+        text-align: left;
     }
 </style>

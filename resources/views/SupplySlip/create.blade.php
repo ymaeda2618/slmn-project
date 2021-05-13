@@ -261,6 +261,9 @@
             <br>
             <table class="register-btn-table">
                 <tr>
+                    <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除</td>
+                </tr>
+                <tr>
                     <td class="width-20">
                         <input type="tel" class="form-control" id="supply_submit_type" name="data[SupplySlip][supply_submit_type]" value="1">
                     </td>
@@ -1746,5 +1749,12 @@
 
     .subtotal-text {
         text-align: center;
+    }
+
+    .status-memo-area {
+        width: 100%;
+        padding: 20px 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
     }
 </style>

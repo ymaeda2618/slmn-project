@@ -292,9 +292,6 @@
                 <textarea id="remarks" class="form-control" name="data[SaleSlip][remarks]" rows="4" cols="40"></textarea>
             </div>
 
-
-            <br>
-            <br>
             <table class="register-btn-table">
                 <tr>
                     <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除 4:請求書印刷</td>

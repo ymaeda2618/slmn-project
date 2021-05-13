@@ -294,9 +294,6 @@
             <input type="hidden" name="data[SaleSlip][id]" value="{{$SaleSlipList->sale_slip_id}}">
             <input type='hidden' name="slip_num" id="slip_num" value="{{intval($SaleSlipDetails->sort) + 1}}">
 
-
-            <br>
-            <br>
             <table class="register-btn-table">
                 <tr>
                     <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除 4:請求書印刷</td>

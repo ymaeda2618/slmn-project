@@ -267,6 +267,9 @@
             <br>
             <table class="register-btn-table">
                 <tr>
+                    <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除</td>
+                </tr>
+                <tr>
                     <td class="width-20">
                         <input type="tel" class="form-control" id="supply_submit_type" name="data[SupplySlip][supply_submit_type]" value="{{$SupplySlipList->supply_submit_type}}">
                     </td>
@@ -275,12 +278,12 @@
                         if ($SupplySlipList->supply_submit_type == 1) $text = '登録';
                         if ($SupplySlipList->supply_submit_type == 2) $text = '一時保存';
                     ?>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="supply_submit_type_text" name="data[SupplySlip][supply_submit_type_text]" value="{{$text}}" readonly>
-                    </td>
-                    <td class="width-50">
-                        <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
-                    </td>
+                        <td class="width-30">
+                            <input type="text" class="form-control" id="supply_submit_type_text" name="data[SupplySlip][supply_submit_type_text]" value="{{$text}}" readonly>
+                        </td>
+                        <td class="width-50">
+                            <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
+                        </td>
                 </tr>
             </table>
 
@@ -1766,5 +1769,12 @@
 
     .subtotal-text {
         text-align: center;
+    }
+
+    .status-memo-area {
+        width: 100%;
+        padding: 20px 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
     }
 </style>

@@ -297,6 +297,9 @@
             <br>
             <table class="register-btn-table">
                 <tr>
+                    <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除 4:請求書印刷</td>
+                </tr>
+                <tr>
                     <td class="width-20">
                         <input type="tel" class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]" value="1">
                     </td>
@@ -306,9 +309,6 @@
                     <td class="width-50">
                         <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
                     </td>
-                </tr>
-                <tr>
-                    <td class='status-memo-area'>1:登録 2:一時保存 3:削除 4:請求書印刷</td>
                 </tr>
             </table>
 
@@ -2097,7 +2097,8 @@
 
     .status-memo-area {
         width: 100%;
-        float: left;
-        text-align: left;
+        padding: 20px 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
     }
 </style>

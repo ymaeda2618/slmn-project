@@ -173,8 +173,11 @@
             <br>
             <table class="register-btn-table">
                 <tr>
+                    <td class='status-memo-area' colspan="3">0:未入金 1:入金済 2:繰越</td>
+                </tr>
+                <tr>
                     <td class="width-20">
-                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="0">
+                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="1">
                     </td>
                     <td class="width-30">
                         <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="入金済" readonly>
@@ -250,11 +253,11 @@
                         $(this).val(submit_type);
 
                         if (submit_type == 0) {
-                            $('#deposit_submit_type_text').val("入金済");
+                            $('#deposit_submit_type_text').val("未入金");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 1) {
-                            $('#deposit_submit_type_text').val("未入金");
+                            $('#deposit_submit_type_text').val("入金済");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
@@ -531,11 +534,11 @@
                 $(this).val(submit_type);
 
                 if (submit_type == 0) {
-                    $('#deposit_submit_type_text').val("入金済");
+                    $('#deposit_submit_type_text').val("未入金");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else if (submit_type == 1) {
-                    $('#deposit_submit_type_text').val("未入金");
+                    $('#deposit_submit_type_text').val("入金済");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else if (submit_type == 2) {
@@ -1000,5 +1003,13 @@
 
     .payment-date-label {
         margin-top: 2%;
+    }
+
+    .status-memo-area {
+        width: 100%;
+        padding: 20px 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-align: left;
     }
 </style>

@@ -74,9 +74,9 @@
                     <tbody>
                         <tr>
                             @if ($deposit->deposit_submit_type == 0)
-                            <td class="regis-complete width-10">入金済</td>
-                            @elseif ($deposit->deposit_submit_type == 1)
                             <td class="regis-temp width-10">未入金</td>
+                            @elseif ($deposit->deposit_submit_type == 1)
+                            <td class="regis-complete width-10">入金済</td>
                             @elseif ($deposit->deposit_submit_type == 2)
                             <td class="regis-carry width-10">繰越</td>
                             @endif

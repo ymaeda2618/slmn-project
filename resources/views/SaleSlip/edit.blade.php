@@ -1801,7 +1801,7 @@
         }
 
         deposit_flg = $("#deposit_flg").val();
-        if (deposit_flg == 0) {
+        if (deposit_flg == 1) {
             alert('入金済みの伝票は編集できません。');
             return false;
         }

@@ -66,9 +66,9 @@
                 <tbody>
                     <tr>
                         @if ($withdrawal->withdrawal_submit_type == 0)
-                        <td class="regis-complete">入金済</td>
+                        <td class="regis-temp">未支払</td>
                         @elseif ($withdrawal->withdrawal_submit_type == 1)
-                        <td class="regis-temp">未入金</td>
+                        <td class="regis-complete">支払済</td>
                         @elseif ($withdrawal->withdrawal_submit_type == 2)
                         <td class="regis-carry">繰越</td>
                         @endif

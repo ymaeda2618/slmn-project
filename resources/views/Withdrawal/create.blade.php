@@ -170,11 +170,14 @@
             <br>
             <table class="register-btn-table">
                 <tr>
+                    <td class='status-memo-area' colspan="3">0:未支払 1:支払済 2:繰越</td>
+                </tr>
+                <tr>
                     <td class="width-20">
                         <input type="tel" class="form-control" id="withdrawal_submit_type" name="data[Withdrawal][withdrawal_submit_type]" value="1">
                     </td>
                     <td class="width-30">
-                        <input type="text" class="form-control" id="withdrawal_submit_type_text" name="data[Withdrawal][withdrawal_submit_type_text]" value="登録" readonly>
+                        <input type="text" class="form-control" id="withdrawal_submit_type_text" name="data[Withdrawal][withdrawal_submit_type_text]" value="支払済" readonly>
                     </td>
                     <td class="width-50">
                         <input type="button" id="register-btn" class="register-btn btn btn-primary" value="支払登録" tabindex="9">
@@ -247,11 +250,11 @@
                         $(this).val(submit_type);
 
                         if (submit_type == 0) {
-                            $('#withdrawal_submit_type_text').val("入金済");
+                            $('#withdrawal_submit_type_text').val("未支払");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         }else if (submit_type == 1) {
-                            $('#withdrawal_submit_type_text').val("未入金");
+                            $('#withdrawal_submit_type_text').val("支払済");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
                         } else if (submit_type == 2) {
@@ -528,11 +531,11 @@
                 $(this).val(submit_type);
 
                 if (submit_type == 0) {
-                    $('#withdrawal_submit_type_text').val("入金済");
+                    $('#withdrawal_submit_type_text').val("未支払");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 }else if (submit_type == 1) {
-                    $('#withdrawal_submit_type_text').val("未入金");
+                    $('#withdrawal_submit_type_text').val("支払済");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else if (submit_type == 2) {
@@ -992,5 +995,13 @@
 
     .register-btn {
         width: 85%;
+    }
+
+    .status-memo-area {
+        width: 100%;
+        padding: 20px 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-align: left;
     }
 </style>

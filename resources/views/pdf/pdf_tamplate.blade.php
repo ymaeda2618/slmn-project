@@ -48,7 +48,7 @@
             </tr>
             @foreach ($depositList['detail'] as $detailDatas)
             <tr class='page'>
-                <td class="td-space">{{$detailDatas['date']}}</td>
+                <td class="date-cell td-space">{{$detailDatas['date']}}</td>
                 <td class="td-space">{{$detailDatas['name']}}</td>
                 @if ($detailDatas['unit_price'] === '')
                 <td class="price-cell td-space brank-line">{{$detailDatas['unit_price']}}</td>
@@ -162,6 +162,10 @@
         width: 100%;
         border: solid 2px #999999;
         border-collapse: collapse;
+    }
+
+    .date-cell {
+        text-align: center;
     }
 
     .price-cell {

@@ -803,7 +803,7 @@ class DepositController extends Controller
             'Product.name                                AS product_name',
             'Product.tax_id                              AS tax_id'
         )
-        ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m-%d") AS sale_slip_delivery_date')
+        ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
         ->join('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
         })

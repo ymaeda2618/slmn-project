@@ -38,7 +38,7 @@
     <br>
     <div id='details'>
         <table id="detail-table" border='1'>
-            <tr>
+            <tr class='header'>
                 <th class="width-10 td-space">納品日</th>
                 <th class="width-20 td-space">商品名</th>
                 <th class="width-5 td-space">個数</th>
@@ -237,6 +237,10 @@
 
     .width-5 {
         width: 5%;
+    }
+
+    .header {
+        font-size: 16px;
     }
 
     .page {

@@ -242,7 +242,7 @@
     .page {
         page-break-after: always;
         page-break-inside: avoid;
-        font-size: 14px;
+        font-size: 12px;
     }
 
     .page:last-child {

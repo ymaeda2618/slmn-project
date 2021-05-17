@@ -803,6 +803,7 @@ class DepositController extends Controller
             'Product.name                                AS product_name',
             'Product.tax_id                              AS tax_id'
         )
+        ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m-%d") AS sale_slip_delivery_date')
         ->join('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
         })
@@ -824,6 +825,7 @@ class DepositController extends Controller
             ['Deposit.id', '=', $depositId],
             ['Deposit.active', '=', '1']
         ])
+        ->orderBy('SaleSlip.delivery_date', 'asc')
         ->get();
 
         // ------------------------
@@ -855,6 +857,7 @@ class DepositController extends Controller
             // -------------------
             // 初期化
             $calcDepositList['detail'][] = array(
+                'date'        => $depositDatas->sale_slip_delivery_date,
                 'name'        => $depositDatas->product_name,
                 'unit_price'  => $depositDatas->unit_price,
                 'unit_num'    => $depositDatas->unit_num,
@@ -906,6 +909,7 @@ class DepositController extends Controller
             // 初期化
             if (!isset($calcDepositList['detail']['adjust_price'])) {
                 $calcDepositList['detail']['adjust_price'] = array(
+                    'date'        => '',
                     'name'        => '調整額',
                     'unit_price'  => '',
                     'unit_num'    => '',
@@ -916,6 +920,7 @@ class DepositController extends Controller
 
             if (!isset($calcDepositList['detail']['delivery_price'])) {
                 $calcDepositList['detail']['delivery_price'] = array(
+                    'date'        => '',
                     'name'        => '配送額',
                     'unit_price'  => '',
                     'unit_num'    => '',
@@ -945,6 +950,7 @@ class DepositController extends Controller
             $addLine = 15 - $detailCnt;
             for ($i=1;$i<=$addLine;$i++) {
                 $calcDepositList['detail'][] = array(
+                    'date'        => '',
                     'name'        => '',
                     'unit_price'  => '',
                     'unit_num'    => '',

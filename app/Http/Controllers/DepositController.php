@@ -796,12 +796,14 @@ class DepositController extends Controller
             'SaleCompany.name                            AS company_name',
             'SaleCompany.postal_code                     AS company_postal_code',
             'SaleCompany.address                         AS company_address',
+            'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
             'SaleSlipDetail.unit_price                   AS unit_price',
             'SaleSlipDetail.unit_num                     AS unit_num',
             'SaleSlipDetail.notax_price                  AS notax_price',
             'SaleSlipDetail.memo                         AS memo',
             'Product.name                                AS product_name',
-            'Product.tax_id                              AS tax_id'
+            'Product.tax_id                              AS tax_id',
+            'Unit.name                                   AS unit_name'
         )
         ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
         ->join('sale_companies AS SaleCompany', function ($join) {
@@ -820,6 +822,9 @@ class DepositController extends Controller
         })
         ->join('products AS Product', function ($join) {
             $join->on('SaleSlipDetail.product_id', '=', 'Product.id');
+        })
+        ->join('units AS Unit', function ($join) {
+            $join->on('Product.unit_id', '=', 'Unit.id');
         })
         ->where([
             ['Deposit.id', '=', $depositId],
@@ -857,12 +862,14 @@ class DepositController extends Controller
             // -------------------
             // 初期化
             $calcDepositList['detail'][] = array(
-                'date'        => $depositDatas->sale_slip_delivery_date,
-                'name'        => $depositDatas->product_name,
-                'unit_price'  => $depositDatas->unit_price,
-                'unit_num'    => $depositDatas->unit_num,
-                'notax_price' => $depositDatas->notax_price,
-                'memo'        => $depositDatas->memo,
+                'date'                => $depositDatas->sale_slip_delivery_date,
+                'name'                => $depositDatas->product_name,
+                'inventory_unit_num'  => $depositDatas->inventory_unit_num,
+                'unit_price'          => $depositDatas->unit_price,
+                'unit_num'            => $depositDatas->unit_num,
+                'unit_name'           => $depositDatas->unit_name,
+                'notax_price'         => $depositDatas->notax_price,
+                'memo'                => $depositDatas->memo,
             );
 
             if (!isset($calcDepositList['total'])) {
@@ -909,23 +916,27 @@ class DepositController extends Controller
             // 初期化
             if (!isset($calcDepositList['detail']['adjust_price'])) {
                 $calcDepositList['detail']['adjust_price'] = array(
-                    'date'        => '',
-                    'name'        => '調整額',
-                    'unit_price'  => '',
-                    'unit_num'    => '',
-                    'notax_price' => 0,
-                    'memo'        => '',
+                    'date'               => '',
+                    'name'                => '調整額',
+                    'inventory_unit_num'  => '',
+                    'unit_price'         => '',
+                    'unit_num'           => '',
+                    'unit_name'          => '',
+                    'notax_price'        => 0,
+                    'memo'               => '',
                 );
             }
 
             if (!isset($calcDepositList['detail']['delivery_price'])) {
                 $calcDepositList['detail']['delivery_price'] = array(
-                    'date'        => '',
-                    'name'        => '配送額',
-                    'unit_price'  => '',
-                    'unit_num'    => '',
-                    'notax_price' => 0,
-                    'memo'        => '',
+                    'date'                => '',
+                    'name'                => '配送額',
+                    'inventory_unit_num'  => '',
+                    'unit_price'          => '',
+                    'unit_num'            => '',
+                    'unit_name'           => '',
+                    'notax_price'         => 0,
+                    'memo'                => '',
                 );
             }
 
@@ -950,12 +961,14 @@ class DepositController extends Controller
             $addLine = 15 - $detailCnt;
             for ($i=1;$i<=$addLine;$i++) {
                 $calcDepositList['detail'][] = array(
-                    'date'        => '',
-                    'name'        => '',
-                    'unit_price'  => '',
-                    'unit_num'    => '',
-                    'notax_price' => '',
-                    'memo'        => ''
+                    'date'                => '',
+                    'name'                => '',
+                    'inventory_unit_num'  => '',
+                    'unit_price'          => '',
+                    'unit_num'            => '',
+                    'unit_name'           => '',
+                    'notax_price'         => '',
+                    'memo'                => ''
                 );
             }
         }

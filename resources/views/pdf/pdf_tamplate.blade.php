@@ -40,22 +40,26 @@
         <table id="detail-table" border='1'>
             <tr>
                 <th class="width-10 td-space">納品日</th>
-                <th class="width-30 td-space">商品名</th>
+                <th class="width-20 td-space">商品名</th>
+                <th class="width-5 td-space">個数</th>
                 <th class="width-10 td-space">単価</th>
                 <th class="width-10 td-space">数量</th>
+                <th class="width-5 td-space">単位</th>
                 <th class="width-15 td-space">税抜金額</th>
                 <th class="width-25 td-space">摘要</th>
             </tr>
             @foreach ($depositList['detail'] as $detailDatas)
             <tr class='page'>
-                <td class="date-cell td-space">{{$detailDatas['date']}}</td>
+                <td class="center-cell td-space">{{$detailDatas['date']}}</td>
                 <td class="td-space">{{$detailDatas['name']}}</td>
+                <td class="center-cell td-space">{{$detailDatas['inventory_unit_num']}}</td>
                 @if ($detailDatas['unit_price'] === '')
                 <td class="price-cell td-space brank-line">{{$detailDatas['unit_price']}}</td>
                 @else
                 <td class="price-cell td-space">{{number_format($detailDatas['unit_price'])}}</td>
                 @endif
                 <td class="price-cell td-space">{{$detailDatas['unit_num']}}</td>
+                <td class="center-cell td-space">{{$detailDatas['unit_name']}}</td>
                 @if ($detailDatas['notax_price'] === '')
                 <td class="price-cell td-space brank-line">{{$detailDatas['notax_price']}}</td>
                 @else
@@ -164,7 +168,7 @@
         border-collapse: collapse;
     }
 
-    .date-cell {
+    .center-cell {
         text-align: center;
     }
 
@@ -231,9 +235,14 @@
         width: 10%;
     }
 
+    .width-5 {
+        width: 5%;
+    }
+
     .page {
         page-break-after: always;
         page-break-inside: avoid;
+        font-size: 14px;
     }
 
     .page:last-child {

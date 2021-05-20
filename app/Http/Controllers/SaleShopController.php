@@ -370,7 +370,7 @@ class SaleShopController extends Controller
             $SaleShop = new SaleShop;
             $SaleShop->code              = $sale_shop_code;
             $SaleShop->sale_company_id   = $request->data['SaleShop']['sale_company_id'];
-            $SaleShop->name              = $request->data['SaleShop']['sale_company_name'];
+            $SaleShop->name              = $request->data['SaleShop']['sale_shop_name'];
             $SaleShop->yomi              = $request->data['SaleShop']['yomi'];
             $SaleShop->postal_code       = $request->data['SaleShop']['postal_code'];
             $SaleShop->address           = $request->data['SaleShop']['address'];

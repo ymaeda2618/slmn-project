@@ -228,8 +228,6 @@
                         $('#search-btn').focus();
                     }
 
-                    focusBlur(event);
-
                     return false;
 
                 } else if (event.keyCode === 111) { // スラッシュが押された時
@@ -431,88 +429,6 @@
 
 
         });
-
-        function focusBlur(event) {
-
-            var tabindex = parseInt($(this).attr('tabindex'), 10);
-            var set_val = $(this).val();
-            // 全角数字を半角に変換
-            set_val = set_val.replace(/[０-９]/g, function(s) {
-                return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
-            });
-            $(this).val(set_val);
-            var selector_code = $(this).attr('id');
-            var selector_id = selector_code.replace('_code', '_id');
-            var selector_text = selector_code.replace('_code', '_text');
-
-            var fd = new FormData();
-            fd.append("inputText", set_val);
-
-            if (selector_code.match(/supply_company/)) { // 仕入先企業
-
-                $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxSetSupplyCompany",
-                        type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data) {
-
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
-                    });
-
-            } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
-
-                $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxSetSupplyShop",
-                        type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data) {
-
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
-                    });
-
-            } else if (selector_code.match(/product/)) { // 製品IDの部分
-
-                $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxSetProduct",
-                        type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function(data) {
-
-                        var before_product_id = $("#" + selector_id).val();
-
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
-
-                    });
-            }
-        }
-
     })(jQuery);
 </script>
 

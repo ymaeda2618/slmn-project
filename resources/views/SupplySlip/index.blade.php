@@ -71,8 +71,8 @@
                 </table>
                 <div class="btn-area ">
                     <div class='search-btn-area'>
-                        <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索'>
-                        <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット'>
+                        <input type='button' class='search-btn btn-primary' onclick="submit();" name='search-btn' id="search-btn" value='検索'>
+                        <input type='button' class='initial-btn' onclick="submit();" name='reset-btn' id="reset-btn" value='検索条件リセット'>
                     </div>
                 </div>
             </form>

@@ -7,7 +7,7 @@
 
         <!--検索エリア-->
         <div class='search-area'>
-            <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data" onsubmit="return false;">
+            <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
                 {{ csrf_field() }}
                 <table>
                     <tbody>
@@ -71,8 +71,8 @@
                 </table>
                 <div class="btn-area ">
                     <div class='search-btn-area'>
-                        <input type='button' class='search-btn btn-primary' onclick="submit();" name='search-btn' id="search-btn" value='検索'>
-                        <input type='button' class='initial-btn' onclick="submit();" name='reset-btn' id="reset-btn" value='検索条件リセット'>
+                        <input type='submit' class='search-btn btn-primary' name='search-btn' id="search-btn" value='検索'>
+                        <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット'>
                     </div>
                 </div>
             </form>
@@ -202,7 +202,7 @@
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keyup", "input", function(event) {
+            $(document).on("keydown", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 

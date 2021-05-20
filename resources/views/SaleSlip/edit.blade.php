@@ -41,9 +41,6 @@
                         <input type="text" class="form-control" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$SaleSlipList->sale_shop_name}}" readonly>
                     </td>
                 </tr>
-                <tr>
-                    <td class='status-memo-area'>1:登録 2:一時保存 3:削除 4:請求書印刷</td>
-                </tr>
             </table>
 
             <!--<div class="add-slip-btn-area">

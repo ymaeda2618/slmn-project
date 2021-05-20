@@ -796,6 +796,10 @@ class DepositController extends Controller
             'SaleCompany.name                            AS company_name',
             'SaleCompany.postal_code                     AS company_postal_code',
             'SaleCompany.address                         AS company_address',
+            'SaleShop.id                                 AS shop_id',
+            'SaleShop.name                               AS shop_name',
+            'SaleShop.postal_code                        AS shop_postal_code',
+            'SaleShop.address                            AS shop_address',
             'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
             'SaleSlipDetail.unit_price                   AS unit_price',
             'SaleSlipDetail.unit_num                     AS unit_num',
@@ -808,6 +812,10 @@ class DepositController extends Controller
         ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
         ->join('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
+        })
+        ->leftJoin('sale_shops as SaleShop', function ($join) {
+            $join->on('SaleShop.id', '=', 'Deposit.sale_shop_id')
+                 ->where('SaleShop.active', '=', true);
         })
         ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
             $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
@@ -843,16 +851,33 @@ class DepositController extends Controller
             // -------
             // 企業情報格納
             if (!isset($calcDepositList['company_info'])) {
-                $companyId = $depositDatas->company_id;
-                $calcDepositList['company_info']['name']    = $depositDatas->company_name;
-                $calcDepositList['company_info']['address'] = $depositDatas->company_address;
-                // 郵便番号は間にハイフンを入れる
-                $calcDepositList['company_info']['code'] = '';
-                if (!empty($depositDatas->company_postal_code)) {
-                    $codeBefore = substr($depositDatas->company_postal_code, 0, 3);
-                    $codeAfter  = substr($depositDatas->company_postal_code, 3, 4);
-                    $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+
+                if (isset($depositDatas->shop_name) && !empty($depositDatas->shop_name)) { // 店舗情報がる場合はこちらを入れる
+
+                    $companyId = $depositDatas->company_id; // ブラウザ名になるので店舗の場合でもこちらを入れる
+                    $calcDepositList['company_info']['name']    = $depositDatas->shop_name;
+                    $calcDepositList['company_info']['address'] = $depositDatas->shop_address;
+                    // 郵便番号は間にハイフンを入れる
+                    $calcDepositList['company_info']['code'] = '';
+                    if (!empty($depositDatas->shop_postal_code)) {
+                        $codeBefore = substr($depositDatas->shop_postal_code, 0, 3);
+                        $codeAfter  = substr($depositDatas->shop_postal_code, 3, 4);
+                        $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                    }
+
+                } else {
+                    $companyId = $depositDatas->company_id;
+                    $calcDepositList['company_info']['name']    = $depositDatas->company_name;
+                    $calcDepositList['company_info']['address'] = $depositDatas->company_address;
+                    // 郵便番号は間にハイフンを入れる
+                    $calcDepositList['company_info']['code'] = '';
+                    if (!empty($depositDatas->company_postal_code)) {
+                        $codeBefore = substr($depositDatas->company_postal_code, 0, 3);
+                        $codeAfter  = substr($depositDatas->company_postal_code, 3, 4);
+                        $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                    }
                 }
+
                 // 支払期日もここで入れる
                 $calcDepositList['company_info']['payment_date'] = date('Y年m月d日', strtotime($depositDatas->payment_date));
             }

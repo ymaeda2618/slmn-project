@@ -29,7 +29,7 @@
                                 <div class="table-th">取引先企業</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control withdrawal_company_code_input" id="withdrawal_company_code" name="data[Withdrawal][withdrawal_company_code]" value="{{$condition_company_code}}" tabindex="3">
-                                    <input type="hidden" id="withdrawal_company_id" name="data[SupplySlip][withdrawal_company_id]" value="{{$condition_company_id}}">
+                                    <input type="hidden" id="withdrawal_company_id" name="data[Withdrawal][withdrawal_company_id]" value="{{$condition_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="withdrawal_company_text" name="data[Withdrawal][withdrawal_company_text]" value="{{$condition_company_text}}" readonly>
@@ -431,5 +431,4 @@
         border-left: 3px solid #18cb00!important;
         text-align: center;
     }
-
 </style>

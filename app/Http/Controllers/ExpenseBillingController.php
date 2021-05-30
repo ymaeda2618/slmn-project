@@ -201,7 +201,7 @@ class ExpenseBillingController extends Controller
         // スタッフ一覧を取得
         $staffList = Staff::where([
             ['active', 1],
-        ])->orderBy('sort', 'asc')->get();
+        ])->orderBy('code', 'asc')->get();
 
         // エラーメッセージ取得
         $error_message       = $request->session()->get('error_message');

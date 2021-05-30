@@ -118,7 +118,7 @@ class ExpenseBillingController extends Controller
         try {
 
             // 経費一覧を取得
-            $depositList = DB::table('expense_billings AS ExpenseBilling')
+            $expenseBillingList = DB::table('expense_billings AS ExpenseBilling')
             ->select(
                 'ExpenseBilling.id                  AS id',
                 'ExpenseBilling.date                AS date',
@@ -182,7 +182,7 @@ class ExpenseBillingController extends Controller
             "condition_staff_code"     => $condition_staff_code,
             "condition_staff_id"       => $condition_staff_id,
             "condition_staff_text"     => $condition_staff_text,
-            "depositList"              => $depositList
+            "expenseBillingList"       => $expenseBillingList
         ]);
     }
 

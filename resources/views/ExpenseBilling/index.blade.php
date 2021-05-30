@@ -13,8 +13,8 @@
                             <td>
                                 <div class="table-th">対象日付</div>
                                 <div class="table-td radio_box">
-                                    <label class="radio-label"><input type="radio" name="data[ExpenseBilling][date_type]" value="1" {{$check_str_slip_date}}> 請求日付</label>
-                                    <label class="radio-label"><input type="radio" name="data[ExpenseBilling][date_type]" value="2" {{$check_str_expense_billing_date}}> 支払期限</label>
+                                    <label class="radio-label"><input type="radio" name="data[ExpenseBilling][date_type]" value="1" {{$check_str_date}}> 請求日付</label>
+                                    <label class="radio-label"><input type="radio" name="data[ExpenseBilling][date_type]" value="2" {{$check_str_due_date}}> 支払期限</label>
                                 </div>
                                 <div class="table-td">
                                     <input type="date" class="search-control" id="expense_billing_date_from" name="data[ExpenseBilling][expense_billing_date_from]" value="{{$condition_date_from}}" tabindex="1">

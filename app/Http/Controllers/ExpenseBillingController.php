@@ -165,15 +165,15 @@ class ExpenseBillingController extends Controller
         }
 
         // 対象日付のチェック
-        $check_str_slip_date = "";
-        $check_str_deposit_date = "";
-        if($condition_date_type == 2) $check_str_deposit_date = "checked";
-        else  $check_str_slip_date = "checked";
+        $check_str_date = "";
+        $check_str_due_date = "";
+        if($condition_date_type == 2) $check_str_due_date = "checked";
+        else  $check_str_date = "checked";
 
         return view('ExpenseBilling.index')->with([
             "search_action"            => $search_action,
-            "check_str_slip_date"      => $check_str_slip_date,
-            "check_str_deposit_date"   => $check_str_deposit_date,
+            "check_str_date"           => $check_str_date,
+            "check_str_due_date"       => $check_str_due_date,
             "condition_date_from"      => $condition_date_from,
             "condition_date_to"        => $condition_date_to,
             "condition_company_code"   => $condition_company_code,

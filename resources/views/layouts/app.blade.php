@@ -49,22 +49,17 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('register') }}">{{ __('Register') }}</a>
                         </li>
-                        @endif --}}
-                        @else
+                        @endif --}} @else
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     取引登録<span class="caret"></span>
                                 </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 <a href="{{ asset('/') }}DailyPerformanceIndex" class="dropdown-item">日別一覧</a>
-                                <a href="{{ asset('/') }}PeriodPerformanceIndex" class="dropdown-item">期間実績一覧</a>
-                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SupplySlipCreate" class="dropdown-item">仕入登録</a> @endif
-                                <a href="{{ asset('/') }}SupplySlipIndex" class="dropdown-item">仕入一覧</a>
-                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SaleSlipCreate" class="dropdown-item">売上登録</a> @endif
-                                <a href="{{ asset('/') }}SaleSlipIndex" class="dropdown-item">売上一覧</a>
-                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}OrderSupplyUnitPriceCreate" class="dropdown-item">仕入発注単価登録</a> @endif
-                                <a href="{{ asset('/') }}OrderSupplyUnitPriceIndex" class="dropdown-item">仕入発注単価一覧</a>
-                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}OrderSaleUnitPriceCreate" class="dropdown-item">売上発注単価登録</a> @endif
+                                <a href="{{ asset('/') }}PeriodPerformanceIndex" class="dropdown-item">期間実績一覧</a> @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SupplySlipCreate" class="dropdown-item">仕入登録</a> @endif
+                                <a href="{{ asset('/') }}SupplySlipIndex" class="dropdown-item">仕入一覧</a> @if (Home::authClerkCheck()) <a href="{{ asset('/') }}SaleSlipCreate" class="dropdown-item">売上登録</a> @endif
+                                <a href="{{ asset('/') }}SaleSlipIndex" class="dropdown-item">売上一覧</a> @if (Home::authClerkCheck()) <a href="{{ asset('/') }}OrderSupplyUnitPriceCreate" class="dropdown-item">仕入発注単価登録</a> @endif
+                                <a href="{{ asset('/') }}OrderSupplyUnitPriceIndex" class="dropdown-item">仕入発注単価一覧</a> @if (Home::authClerkCheck()) <a href="{{ asset('/') }}OrderSaleUnitPriceCreate" class="dropdown-item">売上発注単価登録</a> @endif
                                 <a href="{{ asset('/') }}OrderSaleUnitPriceIndex" class="dropdown-item">売上発注単価一覧</a>
                             </div>
                         </li>
@@ -74,12 +69,21 @@
                                 </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 @if (Home::authClerkCheck()) <a href="{{ asset('/') }}WithdrawalCreate" class="dropdown-item">支払登録</a> @endif
-                                <a href="{{ asset('/') }}WithdrawalIndex" class="dropdown-item">支払一覧</a>
-                                @if (Home::authClerkCheck()) <a href="{{ asset('/') }}DepositCreate" class="dropdown-item">入金登録</a> @endif
-                                <a href="{{ asset('/') }}DepositIndex" class="dropdown-item">入金一覧</a>
-                                {{--  <a href="{{ asset('/') }}InvoiceOutputIndex" class="dropdown-item">請求書出力</a>  --}}
+                                <a href="{{ asset('/') }}WithdrawalIndex" class="dropdown-item">支払一覧</a> @if (Home::authClerkCheck()) <a href="{{ asset('/') }}DepositCreate" class="dropdown-item">入金登録</a> @endif
+                                <a href="{{ asset('/') }}DepositIndex" class="dropdown-item">入金一覧</a> {{-- <a href="{{ asset('/') }}InvoiceOutputIndex" class="dropdown-item">請求書出力</a> --}}
                             </div>
                         </li>
+                        @if (Home::authClerkCheck())
+                        <li class="nav-item dropdown">
+                            <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    経費<span class="caret"></span>
+                                </a>
+                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                                <a href="{{ asset('/') }}ExpenseBillingCreate" class="dropdown-item">経費登録</a>
+                                <a href="{{ asset('/') }}ExpenseBillingIndex" class="dropdown-item">経費一覧</a>
+                            </div>
+                        </li>
+                        @endif
                         <li class="nav-item dropdown">
                             <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     在庫管理<span class="caret"></span>
@@ -93,19 +97,13 @@
                                     マスタ登録<span class="caret"></span>
                                 </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}UserCreate" class="dropdown-item">ユーザ登録</a> @endif
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}UserIndex" class="dropdown-item">ユーザ一覧</a> @endif
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}StaffCreate" class="dropdown-item">スタッフ登録</a> @endif
-                                <a href="{{ asset('/') }}StaffIndex" class="dropdown-item">スタッフ一覧</a>
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}ProductCreate" class="dropdown-item">製品登録</a> @endif
-                                <a href="{{ asset('/') }}ProductIndex" class="dropdown-item">製品一覧</a>
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyCompanyCreate" class="dropdown-item">仕入先企業登録</a> @endif
-                                <a href="{{ asset('/') }}SupplyCompanyIndex" class="dropdown-item">仕入先企業一覧</a>
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyShopCreate" class="dropdown-item">仕入先店舗登録</a> @endif
-                                <a href="{{ asset('/') }}SupplyShopIndex" class="dropdown-item">仕入先店舗一覧</a>
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleCompanyCreate" class="dropdown-item">売上先企業登録</a> @endif
-                                <a href="{{ asset('/') }}SaleCompanyIndex" class="dropdown-item">売上先企業一覧</a>
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleShopCreate" class="dropdown-item">売上先店舗登録</a> @endif
+                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}UserCreate" class="dropdown-item">ユーザ登録</a> @endif @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}UserIndex" class="dropdown-item">ユーザ一覧</a> @endif @if (Home::authOwnerCheck())
+                                <a href="{{ asset('/') }}StaffCreate" class="dropdown-item">スタッフ登録</a> @endif
+                                <a href="{{ asset('/') }}StaffIndex" class="dropdown-item">スタッフ一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}ProductCreate" class="dropdown-item">製品登録</a> @endif
+                                <a href="{{ asset('/') }}ProductIndex" class="dropdown-item">製品一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyCompanyCreate" class="dropdown-item">仕入先企業登録</a> @endif
+                                <a href="{{ asset('/') }}SupplyCompanyIndex" class="dropdown-item">仕入先企業一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyShopCreate" class="dropdown-item">仕入先店舗登録</a> @endif
+                                <a href="{{ asset('/') }}SupplyShopIndex" class="dropdown-item">仕入先店舗一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleCompanyCreate" class="dropdown-item">売上先企業登録</a> @endif
+                                <a href="{{ asset('/') }}SaleCompanyIndex" class="dropdown-item">売上先企業一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleShopCreate" class="dropdown-item">売上先店舗登録</a> @endif
                                 <a href="{{ asset('/') }}SaleShopIndex" class="dropdown-item">売上先店舗一覧</a>
                             </div>
                         </li>

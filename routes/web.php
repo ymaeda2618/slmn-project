@@ -222,6 +222,15 @@ Route::post('DailyPerformanceIndex', 'DailyPerformanceController@index');
 Route::get('PeriodPerformanceIndex', 'PeriodPerformanceController@index');
 Route::post('PeriodPerformanceIndex', 'PeriodPerformanceController@index');
 
+// 経費関連
+Route::get('ExpenseBillingIndex', 'ExpenseBillingController@index');
+Route::get('ExpenseBillingIndex/{page_num}', 'ExpenseBillingController@index');
+Route::post('ExpenseBillingIndex', 'ExpenseBillingController@index');
+Route::post('ExpenseBillingIndex/{page_num}', 'ExpenseBillingController@index');
+Route::get('ExpenseBillingCreate', 'ExpenseBillingController@create');
+Route::get('ExpenseBillingEdit/{user_id}', 'ExpenseBillingController@edit');
+Route::get('ExpenseBillingregister', 'ExpenseBillingController@register');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

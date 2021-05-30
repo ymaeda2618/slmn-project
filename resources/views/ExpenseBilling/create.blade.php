@@ -55,7 +55,7 @@
                 <label class="column-label" for="staff_id">担当者</label>
                 <select class="file-control" id="staff_id" name="data[ExpenseBilling][staff_id]">
                 @foreach ($staffList as $staffs)
-                    <option value="{{$staffs->id}}">{{$staffs->name}}</option>
+                    <option value="{{$staffs->id}}">{{$staffs->name_sei}} {{$staffs->name_mei}}</option>
                 @endforeach
                 </select>
             </div>

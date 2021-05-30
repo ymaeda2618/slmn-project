@@ -130,7 +130,7 @@ class ExpenseBillingController extends Controller
                 'ExpenseBilling.price               AS price',
             )
             ->join('supply_companies AS SupplyCompany', function ($join) {
-                $join->on('SupplyCompany.id', '=', 'ExpenseBilling.sale_company_id');
+                $join->on('SupplyCompany.id', '=', 'ExpenseBilling.supply_company_id');
             })
             ->join('expense_items AS ExpenseItem', function ($join) {
                 $join->on('ExpenseItem.id', '=', 'ExpenseBilling.expense_item_id');
@@ -145,7 +145,7 @@ class ExpenseBillingController extends Controller
                 return $query->whereBetween('ExpenseBilling.due_date', [$condition_date_from, $condition_date_to]);
             })
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
-                return $query->where('ExpenseBilling.sale_company_id', '=', $condition_company_id);
+                return $query->where('ExpenseBilling.supply_company_id', '=', $condition_company_id);
             })
             ->if(!empty($condition_staff_id), function ($query) use ($condition_staff_id) {
                 return $query->where('ExpenseBilling.staff_id', '=', $condition_staff_id);

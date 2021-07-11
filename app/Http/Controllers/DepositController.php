@@ -386,6 +386,47 @@ class DepositController extends Controller
 
             if ($depositDatas['deposit_submit_type'] == 3) {
 
+                // ------------------------------------
+                // 売上伝票を再度選択できるようにデータを戻す
+                // ------------------------------------
+                // 対象のデータを取得
+                $saleSlips = DB::table('sale_slips AS SaleSlip')
+                ->select(
+                    'SaleSlip.id AS sale_slip_id'
+                )
+                ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
+                    $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SaleSlip.id')
+                            ->where([
+                                ['DepositWithdrawalDetail.type', '=', '2'],
+                                ['DepositWithdrawalDetail.active', '=', '1']
+                            ]);
+                })
+                ->join('deposits AS Deposit', function ($join) {
+                    $join->on('Deposit.id', '=', 'DepositWithdrawalDetail.deposit_withdrawal_id')
+                            ->where('Deposit.active', '=', '1');
+                })
+                ->where([
+                    ['Deposit.id', '=', $depositDatas['id']],
+                    ['SaleSlip.active', '=', '1'],
+                ])
+                ->get();
+
+                // ----------------------
+                // 売上伝票のフラグを元に戻す
+                // ----------------------
+                foreach ($saleSlips as $saleSlip) {
+                    $saleSlipUpParams = array(
+                        'sale_flg'         => 0,                // 支払フラグ
+                        'modified_user_id' => $user_info_id,    // 更新者ユーザーID
+                        'modified'         => Carbon::now()     // 更新時間
+                    );
+
+                    // 更新処理
+                    DB::table('sale_slips')
+                    ->where('id', '=', $saleSlip->sale_slip_id)
+                    ->update($saleSlipUpParams);
+                }
+
                 // -----------------
                 // 伝票を論理削除させる
                 // -----------------

@@ -1349,8 +1349,6 @@
 
                 // 計算値を算入
                 notax_sub_total_8 += calc_price;
-                // 税額計算
-                tax_total_8 += Math.round(calc_price * 0.08);
                 // 税込額計算
                 sub_total_8 = notax_sub_total_8 + tax_total_8;
 
@@ -1358,14 +1356,14 @@
 
                 // 計算値を算入
                 notax_sub_total_10 += calc_price;
-                // 税額計算
-                tax_total_10 += Math.round(calc_price * 0.1);
                 // 税込額計算
                 sub_total_10 = notax_sub_total_10 + tax_total_10;
             }
         }
 
-
+        // 小計の税金計算
+        tax_total_8 = Math.round(notax_sub_total_8 * 0.08);
+        tax_total_10 = Math.round(notax_sub_total_10 * 0.1);
 
         // 計算値を算入
         notax_sub_total = notax_sub_total_8 + notax_sub_total_10;

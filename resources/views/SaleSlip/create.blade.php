@@ -1340,7 +1340,7 @@
             if (!unit_price) unit_price = 0;
             if (!unit_num) unit_num = 0;
 
-            calc_price = CalcDecimalPoint(unit_price, unit_num);
+            calc_price = Math.floor(CalcDecimalPoint(unit_price, unit_num));
 
             // 税額を取得
             tax_id = $("#tax_id_" + slip_num).val();
@@ -1496,7 +1496,7 @@
             if (!unit_price) unit_price = 0;
             if (!unit_num) unit_num = 0;
 
-            calc_price = CalcDecimalPoint(unit_price, unit_num);
+            calc_price = Math.floor(CalcDecimalPoint(unit_price, unit_num));
 
             // 税額を取得
             tax_id = $("#tax_id_" + slip_num).val();

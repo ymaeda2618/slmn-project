@@ -1495,8 +1495,6 @@
     //-----------------------
     function adjustPrice() {
 
-        if ($("#adjust_price").val() == '-') return;
-
         // 伝票ナンバーを取得(最大値)
         var slip_max_num = $("#slip_num").val();
 
@@ -1583,7 +1581,7 @@
         $("#tax_total").val(tax_total);
         $("#sub_total").val(sub_total);
 
-        $("#adjust_price").val(adjust_price);
+        //$("#adjust_price").val(adjust_price);
         $("#total").val(total);
     }
 

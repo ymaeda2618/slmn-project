@@ -1362,8 +1362,8 @@
         }
 
         // 小計の税金計算
-        tax_total_8 = Math.round(notax_sub_total_8 * 0.08);
-        tax_total_10 = Math.round(notax_sub_total_10 * 0.1);
+        tax_total_8 = Math.floor(notax_sub_total_8 * 0.08);
+        tax_total_10 = Math.floor(notax_sub_total_10 * 0.1);
 
         // 計算値を算入
         notax_sub_total = notax_sub_total_8 + notax_sub_total_10;
@@ -1457,6 +1457,27 @@
     //-----------------------
     function adjustPrice() {
 
+        // 伝票ナンバーを取得(最大値)
+        var slip_max_num = $("#slip_num").val();
+
+        // 更新対象のproduct_idを取得
+        var unit_price = 0;
+        var unit_num = 0;
+        var calc_price = 0;
+        var tax_id = 0;
+
+        notax_sub_total_8 = 0;
+        tax_total_8 = 0;
+        sub_total_8 = 0;
+
+        notax_sub_total_10 = 0;
+        tax_total_10 = 0;
+        sub_total_10 = 0;
+
+        notax_sub_total = 0;
+        tax_total = 0;
+        sub_total = 0;
+
         // 配送額
         delivery_price = parseInt($("#delivery_price").val(), 10);
         if (!delivery_price) delivery_price = 0;
@@ -1464,10 +1485,65 @@
         // 調整額取得
         adjust_price = parseInt($("#adjust_price").val(), 10);
         if (!adjust_price) adjust_price = 0;
+        total = 0;
 
+        // ループ処理をする
+        for (var slip_num = 0; slip_num < slip_max_num; slip_num++) {
+
+            unit_price = $("#unit_price_" + slip_num).val();
+            unit_num = $("#unit_num_" + slip_num).val();
+
+            if (!unit_price) unit_price = 0;
+            if (!unit_num) unit_num = 0;
+
+            calc_price = CalcDecimalPoint(unit_price, unit_num);
+
+            // 税額を取得
+            tax_id = $("#tax_id_" + slip_num).val();
+
+            if (tax_id == 1) { // 8%の場合
+
+                // 計算値を算入
+                notax_sub_total_8 += calc_price;
+                // 税込額計算
+                sub_total_8 = notax_sub_total_8 + tax_total_8;
+
+            } else if (tax_id == 2) { // 10%の場合
+
+                // 計算値を算入
+                notax_sub_total_10 += calc_price;
+                // 税込額計算
+                sub_total_10 = notax_sub_total_10 + tax_total_10;
+            }
+        }
+
+        // 小計の税金計算
+        tax_total_8 = Math.floor(notax_sub_total_8 * 0.08);
+        tax_total_10 = Math.floor(notax_sub_total_10 * 0.1);
+
+        // 計算値を算入
+        notax_sub_total = notax_sub_total_8 + notax_sub_total_10;
+        tax_total = tax_total_8 + tax_total_10;
+        sub_total = notax_sub_total + tax_total;
+
+        // 調整後金額を取得
         total = sub_total + delivery_price + adjust_price;
 
-        // 調整後税込額
+
+        // 各課税額に入れる
+        $("#notax_sub_total_8").val(notax_sub_total_8);
+        $("#tax_total_8").val(tax_total_8);
+        $("#sub_total_8").val(sub_total_8);
+
+        $("#notax_sub_total_10").val(notax_sub_total_10);
+        $("#tax_total_10").val(tax_total_10);
+        $("#sub_total_10").val(sub_total_10);
+
+        $("#notax_sub_total").val(notax_sub_total);
+        $("#tax_total").val(tax_total);
+        $("#sub_total").val(sub_total);
+
+        $("#adjust_price").val(adjust_price);
         $("#total").val(total);
     }
 

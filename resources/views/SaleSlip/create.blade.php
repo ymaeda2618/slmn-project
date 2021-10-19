@@ -1297,7 +1297,7 @@
         if (!this_unit_price) this_unit_price = 0;
         if (!this_unit_num) this_unit_num = 0;
 
-        var this_calc_price = CalcDecimalPoint(this_unit_price, this_unit_num);
+        var this_calc_price = Math.floor(CalcDecimalPoint(this_unit_price, this_unit_num));
         $("#notax_price_" + this_slip_num).val(this_calc_price);
 
 

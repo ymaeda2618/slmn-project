@@ -1431,6 +1431,8 @@
     //-----------------------
     function adjustPrice() {
 
+        if ($("#adjust_price").val() == '-') return;
+
         // 伝票ナンバーを取得(最大値)
         var slip_max_num = $("#slip_num").val();
 

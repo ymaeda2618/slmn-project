@@ -106,7 +106,7 @@
 
 <style>
     /* 共通 */
-
+    
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -114,49 +114,49 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .error-alert {
         color: red;
         font-weight: bold;
     }
-
+    
     .smn-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .form-group {
         margin-bottom: 3rem !important;
     }
-
+    
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-
+    
     .column-label {
         font-size: 0.9em;
         font-weight: bold;
     }
-
+    
     #standard_add_btn {
         margin: 10px auto 0px;
     }
-
+    
     #standart_list_area {
         width: 100%;
     }
-
+    
     .standard_list td {
         width: 10%;
     }
-
+    
     .standard_list td:first-of-type {
         width: 90%;
     }
-
+    
     .standard_del_btn {
         margin: auto 5px;
     }

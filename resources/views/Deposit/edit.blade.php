@@ -75,9 +75,9 @@
                     <?php
                     // 金額計算
                     $notaxSubTotal8  = $saleSlipData->notax_sub_total_8;                     // 税抜8%金額
-                    $tax8            = round($saleSlipData->notax_sub_total_8 * 8 / 100);    // 8%消費税
+                    $tax8            = floor($saleSlipData->notax_sub_total_8 * 8 / 100);    // 8%消費税
                     $notaxSubTotal10 = $saleSlipData->notax_sub_total_10;                    // 税抜10%金額
-                    $tax10           = round($saleSlipData->notax_sub_total_10 * 10 / 100);  // 8%消費税
+                    $tax10           = floor($saleSlipData->notax_sub_total_10 * 10 / 100);  // 8%消費税
                     $subTotal        = $notaxSubTotal8 + $tax8 + $notaxSubTotal10 + $tax10;  // 小計
                     $delivery_price  = $saleSlipData->delivery_price;                        // 配送額
                     $adjust_price    = $saleSlipData->adjust_price;                          // 調整額
@@ -247,12 +247,12 @@
                         if ($depositDatas->deposit_submit_type == 1) $text = '入金済';
                         if ($depositDatas->deposit_submit_type == 2) $text = '繰越';
                     ?>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="{{$text}}" readonly>
-                    </td>
-                    <td class="width-50">
-                        <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="11">
-                    </td>
+                        <td class="width-30">
+                            <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="{{$text}}" readonly>
+                        </td>
+                        <td class="width-50">
+                            <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="11">
+                        </td>
                 </tr>
             </table>
 
@@ -745,13 +745,13 @@
         });
 
         // 8%税込額
-        subTotal8 = Math.round(notaxSubTotal8 * 1.08);
+        subTotal8 = Math.floor(notaxSubTotal8 * 1.08);
 
         // 8%消費税額
         tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
 
         // 10%税込額
-        subTotal10 = Math.round(notaxSubTotal10 * 1.1);
+        subTotal10 = Math.floor(notaxSubTotal10 * 1.1);
 
         // 10%消費税額
         tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);

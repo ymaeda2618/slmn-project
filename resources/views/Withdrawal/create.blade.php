@@ -253,7 +253,7 @@
                             $('#withdrawal_submit_type_text').val("未支払");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
-                        }else if (submit_type == 1) {
+                        } else if (submit_type == 1) {
                             $('#withdrawal_submit_type_text').val("支払済");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
@@ -510,7 +510,7 @@
 
                 if (this_val == "0") {
                     $('#withdrawal-create-form').submit();
-                }else if (this_val == "1") {
+                } else if (this_val == "1") {
                     $('#withdrawal-create-form').submit();
                 } else if (this_val == "2") {
                     $('#withdrawal-create-form').submit();
@@ -534,7 +534,7 @@
                     $('#withdrawal_submit_type_text').val("未支払");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
-                }else if (submit_type == 1) {
+                } else if (submit_type == 1) {
                     $('#withdrawal_submit_type_text').val("支払済");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
@@ -657,13 +657,13 @@
         });
 
         // 8%税込額
-        subTotal8 = Math.round(notaxSubTotal8 * 1.08);
+        subTotal8 = Math.floor(notaxSubTotal8 * 1.08);
 
         // 8%消費税額
         tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
 
         // 10%税込額
-        subTotal10 = Math.round(notaxSubTotal10 * 1.1);
+        subTotal10 = Math.floor(notaxSubTotal10 * 1.1);
 
         // 10%消費税額
         tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);

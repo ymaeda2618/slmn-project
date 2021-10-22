@@ -580,10 +580,10 @@ class WithdrawalController extends Controller
                         }
 
                         // 税込8%
-                        $subTotal8 = round($notaxSubTotal8 * 1.08);
+                        $subTotal8 = floor($notaxSubTotal8 * 1.08);
 
                         // 税込10%
-                        $subTotal10 = round($notaxSubTotal10 * 1.1);
+                        $subTotal10 = floor($notaxSubTotal10 * 1.1);
 
                         // 小計(調整額含まない)
                         $subTotal = $subTotal8 + $subTotal10 + $deliveryPrice + $adjustTotalPrice;
@@ -717,9 +717,9 @@ class WithdrawalController extends Controller
             foreach ($supplySlipList as $supplySlipDatas) {
                 // 金額計算
                 $notaxSubTotal8  = $supplySlipDatas->notax_sub_total_8;                     // 税抜8%金額
-                $tax8            = round($supplySlipDatas->notax_sub_total_8 * 8 / 100);    // 8%消費税
+                $tax8            = floor($supplySlipDatas->notax_sub_total_8 * 8 / 100);    // 8%消費税
                 $notaxSubTotal10 = $supplySlipDatas->notax_sub_total_10;                    // 税抜10%金額
-                $tax10           = round($supplySlipDatas->notax_sub_total_10 * 10 / 100);  // 8%消費税
+                $tax10           = floor($supplySlipDatas->notax_sub_total_10 * 10 / 100);  // 8%消費税
                 $subTotal        = $notaxSubTotal8 + $tax8 + $notaxSubTotal10 + $tax10;     // 小計
                 $delivery_price  = $supplySlipDatas->delivery_price;                        // 配送額
                 $adjust_price    = $supplySlipDatas->adjust_price;                          // 調整額

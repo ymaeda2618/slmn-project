@@ -628,10 +628,10 @@ class DepositController extends Controller
                         }
 
                         // 税込8%
-                        $subTotal8 = round($notaxSubTotal8 * 1.08);
+                        $subTotal8 = floor($notaxSubTotal8 * 1.08);
 
                         // 税込10%
-                        $subTotal10 = round($notaxSubTotal10 * 1.1);
+                        $subTotal10 = floor($notaxSubTotal10 * 1.1);
 
                         // 小計(調整額含まない)
                         $subTotal = $subTotal8 + $subTotal10 + $deliveryPrice + $adjustTotalPrice;
@@ -765,9 +765,9 @@ class DepositController extends Controller
             foreach ($saleSlipList as $saleSlipDatas) {
                 // 金額計算
                 $notaxSubTotal8  = $saleSlipDatas->notax_sub_total_8;                     // 税抜8%金額
-                $tax8            = round($saleSlipDatas->notax_sub_total_8 * 8 / 100);    // 8%消費税
+                $tax8            = floor($saleSlipDatas->notax_sub_total_8 * 8 / 100);    // 8%消費税
                 $notaxSubTotal10 = $saleSlipDatas->notax_sub_total_10;                    // 税抜10%金額
-                $tax10           = round($saleSlipDatas->notax_sub_total_10 * 10 / 100);  // 8%消費税
+                $tax10           = floor($saleSlipDatas->notax_sub_total_10 * 10 / 100);  // 8%消費税
                 $subTotal        = $notaxSubTotal8 + $tax8 + $notaxSubTotal10 + $tax10;   // 小計
                 $delivery_price  = $saleSlipDatas->delivery_price;                        // 配送額
                 $adjust_price    = $saleSlipDatas->adjust_price;                          // 調整額
@@ -885,7 +885,11 @@ class DepositController extends Controller
         // ------------------------
         // 取得してきたデータを整形する
         // ------------------------
+
+        // 初期化処理
         $calcDepositList = array();
+        $notaxSubTotal8Amount = 0;
+        $notaxSubTotal10Amount = 0;
         foreach ($depositList as $depositDatas) {
             // -------
             // 会社情報
@@ -951,27 +955,29 @@ class DepositController extends Controller
             if ($depositDatas->tax_id == 1) {
                 // 8%の計算
                 // 計算
-                $notaxSubTotal8 = $depositDatas->notax_price;
-                $tax8           = round($depositDatas->notax_price * 0.08);
-                $subTotal8      = $notaxSubTotal8 + $tax8;
+                $notaxSubTotal8Amount += $depositDatas->notax_price;
 
-                // データ格納
-                $calcDepositList['total']['notax_subtotal_8'] += $notaxSubTotal8;
-                $calcDepositList['total']['tax_8']            += $tax8;
-                $calcDepositList['total']['total']            += $subTotal8;
             } else {
                 // 10%の計算
                 // 計算
-                $notaxSubTotal10 = $depositDatas->notax_price;
-                $tax10           = round($depositDatas->notax_price * 0.1);
-                $subTotal10      = $notaxSubTotal10 + $tax10;
-
-                // データ格納
-                $calcDepositList['total']['notax_subtotal_10'] += $notaxSubTotal10;
-                $calcDepositList['total']['tax_10']            += $tax10;
-                $calcDepositList['total']['total']             += $subTotal10;
+                $notaxSubTotal10Amount += $depositDatas->notax_price;
             }
         }
+
+        // 税金計算
+        $tax8  = floor($notaxSubTotal8Amount * 0.08);
+        $tax10 = floor($notaxSubTotal10Amount * 0.1);
+
+        // 税込小計
+        $subTotal8Amount  = $notaxSubTotal8Amount  + $tax8;
+        $subTotal10Amount = $notaxSubTotal10Amount + $tax10;
+
+        // データ格納
+        $calcDepositList['total']['notax_subtotal_8']  = $notaxSubTotal8Amount;
+        $calcDepositList['total']['tax_8']             = $tax8 ;
+        $calcDepositList['total']['notax_subtotal_10'] = $subTotal10Amount;
+        $calcDepositList['total']['tax_10']            = $tax10;
+        $calcDepositList['total']['total']             = $subTotal8Amount + $subTotal10Amount;
 
         // -----------------
         // 調整額と配送額の計算

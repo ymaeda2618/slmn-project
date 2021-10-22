@@ -661,13 +661,13 @@
         });
 
         // 8%税込額
-        subTotal8 = Math.round(notaxSubTotal8 * 1.08);
+        subTotal8 = Math.floor(notaxSubTotal8 * 1.08);
 
         // 8%消費税額
         tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
 
         // 10%税込額
-        subTotal10 = Math.round(notaxSubTotal10 * 1.1);
+        subTotal10 = Math.floor(notaxSubTotal10 * 1.1);
 
         // 10%消費税額
         tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);

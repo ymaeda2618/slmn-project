@@ -72,9 +72,9 @@
                     <?php
                     // 金額計算
                     $notaxSubTotal8  = $supplySlipData->notax_sub_total_8;                     // 税抜8%金額
-                    $tax8            = round($supplySlipData->notax_sub_total_8 * 8 / 100);    // 8%消費税
+                    $tax8            = floor($supplySlipData->notax_sub_total_8 * 8 / 100);    // 8%消費税
                     $notaxSubTotal10 = $supplySlipData->notax_sub_total_10;                    // 税抜10%金額
-                    $tax10           = round($supplySlipData->notax_sub_total_10 * 10 / 100);  // 8%消費税
+                    $tax10           = floor($supplySlipData->notax_sub_total_10 * 10 / 100);  // 8%消費税
                     $subTotal        = $notaxSubTotal8 + $tax8 + $notaxSubTotal10 + $tax10;    // 小計
                     $delivery_price  = $supplySlipData->delivery_price;                        // 配送額
                     $adjust_price    = $supplySlipData->adjust_price;                          // 調整額
@@ -244,12 +244,12 @@
                         if ($withdrawalDatas->withdrawal_submit_type == 1) $text = '支払済';
                         if ($withdrawalDatas->withdrawal_submit_type == 2) $text = '繰越';
                     ?>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="withdrawal_submit_type_text" name="data[Withdrawal][withdrawal_submit_type_text]" value="{{$text}}" readonly>
-                    </td>
-                    <td class="width-50">
-                        <input type="button" id="register-btn" class="register-btn btn btn-primary" value="支払登録" tabindex="9"> {{-- <button id="register-btn" class="register-btn btn btn-primary" type="button">支払登録</button> --}}
-                    </td>
+                        <td class="width-30">
+                            <input type="text" class="form-control" id="withdrawal_submit_type_text" name="data[Withdrawal][withdrawal_submit_type_text]" value="{{$text}}" readonly>
+                        </td>
+                        <td class="width-50">
+                            <input type="button" id="register-btn" class="register-btn btn btn-primary" value="支払登録" tabindex="9"> {{-- <button id="register-btn" class="register-btn btn btn-primary" type="button">支払登録</button> --}}
+                        </td>
                 </tr>
             </table>
 
@@ -740,13 +740,13 @@
         });
 
         // 8%税込額
-        subTotal8 = Math.round(notaxSubTotal8 * 1.08);
+        subTotal8 = Math.floor(notaxSubTotal8 * 1.08);
 
         // 8%消費税額
         tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
 
         // 10%税込額
-        subTotal10 = Math.round(notaxSubTotal10 * 1.1);
+        subTotal10 = Math.floor(notaxSubTotal10 * 1.1);
 
         // 10%消費税額
         tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);

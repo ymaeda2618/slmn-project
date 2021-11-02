@@ -137,7 +137,7 @@
                         <input type="text" class="form-control" id="notax_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][notax_price]" value="{{$SaleSlipDetails->notax_price}}" readonly>
                     </td>-->
                     <td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
+                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->sort }})'>
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>

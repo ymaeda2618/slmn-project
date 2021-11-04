@@ -1337,8 +1337,17 @@
         }
 
         // 小計の税金計算
-        tax_total_8 = Math.floor(notax_sub_total_8 * 0.08);
-        tax_total_10 = Math.floor(notax_sub_total_10 * 0.1);
+        if (notax_sub_total_8 < 0) { // マイナスの場合
+            tax_total_8 = Math.floor(notax_sub_total_8 * -1 * 0.08) * -1;
+        } else {
+            tax_total_8 = Math.floor(notax_sub_total_8 * 0.08);
+        }
+
+        if (notax_sub_total_10 < 0) { // マイナスの場合
+            tax_total_10 = Math.floor(notax_sub_total_10 * -1 * 0.1) * -1;
+        } else {
+            tax_total_10 = Math.floor(notax_sub_total_10 * 0.1);
+        }
 
         // 計算値を算入
         notax_sub_total = notax_sub_total_8 + notax_sub_total_10;
@@ -1491,8 +1500,17 @@
         }
 
         // 小計の税金計算
-        tax_total_8 = Math.floor(notax_sub_total_8 * 0.08);
-        tax_total_10 = Math.floor(notax_sub_total_10 * 0.1);
+        if (notax_sub_total_8 < 0) { // マイナスの場合
+            tax_total_8 = Math.floor(notax_sub_total_8 * -1 * 0.08) * -1;
+        } else {
+            tax_total_8 = Math.floor(notax_sub_total_8 * 0.08);
+        }
+
+        if (notax_sub_total_10 < 0) { // マイナスの場合
+            tax_total_10 = Math.floor(notax_sub_total_10 * -1 * 0.1) * -1;
+        } else {
+            tax_total_10 = Math.floor(notax_sub_total_10 * 0.1);
+        }
 
         // 計算値を算入
         notax_sub_total = notax_sub_total_8 + notax_sub_total_10;

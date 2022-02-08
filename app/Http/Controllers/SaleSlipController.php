@@ -34,7 +34,7 @@ class SaleSlipController extends Controller
      */
     public function index(Request $request)
     {
-        var_dump($request);
+        echo "test";
 
         // リクエストパスを取得
         $request_path = $request->path();
@@ -46,6 +46,8 @@ class SaleSlipController extends Controller
         } else {
             $search_action = './SaleSlipIndex';
         }
+
+        echo "test0";
 
         // postできたか、getできたか
         if ($_SERVER["REQUEST_METHOD"] != "POST"

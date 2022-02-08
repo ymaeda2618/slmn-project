@@ -328,10 +328,6 @@ class SaleSlipController extends Controller
             // 各伝票にいくつ明細がついているのかをカウントする配列
             $sale_slip_detail_arr = array();
 
-            echo "test004";
-
-            var_dump($SaleSlipDetailList);
-
             // 伝票詳細で取得したDBをループ
             foreach($SaleSlipDetailList as $SaleSlipDetails){
 

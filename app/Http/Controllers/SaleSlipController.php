@@ -356,6 +356,9 @@ class SaleSlipController extends Controller
             if($condition_date_type == 1) $check_str_slip_date = "checked";
             else  $check_str_deliver_date = "checked";
 
+            var_dump($saleSlipList);
+            dd($SaleSlipDetailList);
+
         } catch (\Exception $e) {
 
             dd($e);

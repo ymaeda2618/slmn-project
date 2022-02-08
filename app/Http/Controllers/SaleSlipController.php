@@ -34,6 +34,8 @@ class SaleSlipController extends Controller
      */
     public function index(Request $request)
     {
+        var_dump($request);
+
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);
@@ -147,6 +149,8 @@ class SaleSlipController extends Controller
 
         try {
 
+            echo "test00";
+
             // sale_slip_detailsのサブクエリを作成
             $product_sub_query = null;
             if(!empty($condition_product_id)) {
@@ -156,6 +160,8 @@ class SaleSlipController extends Controller
                 ->where('SubTable.product_id', '=', $condition_product_id)
                 ->groupBy('SubTable.sale_slip_id');
             }
+
+            echo "test01";
 
             //---------------------
             // 売上一覧を取得
@@ -205,6 +211,8 @@ class SaleSlipController extends Controller
             ->orderBy('SaleSlip.date', 'desc')
             ->orderBy('SaleSlip.id', 'desc')
             ->paginate(10);
+
+            var_dump($saleSlipList);
 
             //---------------------
             // 売上一覧を総額集計
@@ -267,6 +275,8 @@ class SaleSlipController extends Controller
                 $notax_sub_total_amount = $saleSlipSumVal[0]->notax_sub_total_sum;
                 $sale_slip_amount       = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
             }
+
+            var_dump($saleSlipSumList);
 
             //---------------------
             // 伝票詳細を取得
@@ -356,7 +366,6 @@ class SaleSlipController extends Controller
             if($condition_date_type == 1) $check_str_slip_date = "checked";
             else  $check_str_deliver_date = "checked";
 
-            var_dump($saleSlipList);
             dd($SaleSlipDetailList);
 
         } catch (\Exception $e) {

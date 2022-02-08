@@ -206,8 +206,6 @@ class SaleSlipController extends Controller
             ->orderBy('SaleSlip.id', 'desc')
             ->paginate(10);
 
-            var_dump($saleSlipList);
-
             //---------------------
             // 売上一覧を総額集計
             //---------------------
@@ -270,8 +268,6 @@ class SaleSlipController extends Controller
                 $sale_slip_amount       = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
             }
 
-            var_dump($saleSlipSumList);
-
             //---------------------
             // 伝票詳細を取得
             //---------------------
@@ -325,6 +321,8 @@ class SaleSlipController extends Controller
                 $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id')
                 ->where('SaleCompany.active', '=', true);
             })
+            ->orderBy('SaleSlip.id', 'desc')
+            ->limit(5000)
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列

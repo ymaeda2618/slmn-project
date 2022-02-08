@@ -34,8 +34,6 @@ class SaleSlipController extends Controller
      */
     public function index(Request $request)
     {
-        echo "test";
-
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);
@@ -46,8 +44,6 @@ class SaleSlipController extends Controller
         } else {
             $search_action = './SaleSlipIndex';
         }
-
-        echo "test0";
 
         // postできたか、getできたか
         if ($_SERVER["REQUEST_METHOD"] != "POST"
@@ -151,8 +147,6 @@ class SaleSlipController extends Controller
 
         try {
 
-            echo "test00";
-
             // sale_slip_detailsのサブクエリを作成
             $product_sub_query = null;
             if(!empty($condition_product_id)) {
@@ -162,8 +156,6 @@ class SaleSlipController extends Controller
                 ->where('SubTable.product_id', '=', $condition_product_id)
                 ->groupBy('SubTable.sale_slip_id');
             }
-
-            echo "test01";
 
             //---------------------
             // 売上一覧を取得
@@ -333,7 +325,12 @@ class SaleSlipController extends Controller
                 $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id')
                 ->where('SaleCompany.active', '=', true);
             })
-            ->get();
+            ->toSql();
+            //->get();
+
+            dd($SaleSlipDetailList);
+
+            $SaleSlipDetailList = array();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列
             $sale_slip_detail_arr = array();
@@ -367,8 +364,6 @@ class SaleSlipController extends Controller
             $check_str_deliver_date = "";
             if($condition_date_type == 1) $check_str_slip_date = "checked";
             else  $check_str_deliver_date = "checked";
-
-            dd($SaleSlipDetailList);
 
         } catch (\Exception $e) {
 

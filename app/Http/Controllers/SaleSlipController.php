@@ -321,25 +321,23 @@ class SaleSlipController extends Controller
                 $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id')
                 ->where('SaleCompany.active', '=', true);
             })
-            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
-                return $query->whereBetween('SaleSlip.date', [$condition_date_from, $condition_date_to]);
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($queryDetail) use ($condition_date_from, $condition_date_to) {
+                return $queryDetail->whereBetween('SaleSlip.date', [$condition_date_from, $condition_date_to]);
             })
-            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 2, function ($query) use ($condition_date_from, $condition_date_to) {
-                return $query->whereBetween('SaleSlip.delivery_date', [$condition_date_from, $condition_date_to]);
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 2, function ($queryDetail) use ($condition_date_from, $condition_date_to) {
+                return $queryDetail->whereBetween('SaleSlip.delivery_date', [$condition_date_from, $condition_date_to]);
             })
-            ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
-                return $query->where('SaleSlip.sale_company_id', '=', $condition_company_id);
+            ->if(!empty($condition_company_id), function ($queryDetail) use ($condition_company_id) {
+                return $queryDetail->where('SaleSlip.sale_company_id', '=', $condition_company_id);
             })
-            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
-                return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
+            ->if(!empty($condition_shop_id), function ($queryDetail) use ($condition_shop_id) {
+                return $queryDetail->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
             })
-            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
-                return $query
-                       ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                       ->mergeBindings($product_sub_query);
+            ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
+                return $queryDetail->where('SaleSlipDetail.product_id', '=', $condition_product_id);
             })
-            ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
-                return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
+            ->if(!empty($condition_submit_type), function ($queryDetail) use ($condition_submit_type) {
+                return $queryDetail->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->orderBy('SaleSlip.id', 'desc')
             ->limit(5000)
@@ -347,6 +345,9 @@ class SaleSlipController extends Controller
 
             // 各伝票にいくつ明細がついているのかをカウントする配列
             $sale_slip_detail_arr = array();
+
+            // 各小計が入るファイルをリセット
+            $sale_slip_detail_count_arr = array();
 
             // 伝票詳細で取得したDBをループ
             foreach($SaleSlipDetailList as $SaleSlipDetails){

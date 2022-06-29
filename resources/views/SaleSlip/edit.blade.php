@@ -43,15 +43,11 @@
                 </tr>
             </table>
 
-            <!--<div class="add-slip-btn-area">
-                <button id="add-slip-btn" type="button" class="btn add-slip-btn btn-primary">伝票追加</button>
-            </div>-->
-
             <table class="slip-table">
                 <tr>
                     <th rowspan="3">No.</th>
                     <th colspan="2">製品ID</th>
-                    <th colspan="2">単価</th>
+                    <th colspan="2">個数</th>
                     <th colspan="2">担当</th>
                     <th>税率</th>
                     <th rowspan="4">削除</th>
@@ -65,7 +61,7 @@
                 </tr>
                 <tr>
                     <th colspan="2">品質</th>
-                    <th colspan="2">金額</th>
+                    <th colspan="2">単価</th>
                     <th colspan="3">摘要</th>
                 </tr>
 

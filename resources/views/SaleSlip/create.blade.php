@@ -53,7 +53,7 @@
                 <tr>
                     <th rowspan="3">No.</th>
                     <th colspan="2">製品ID</th>
-                    <th colspan="2">単価</th>
+                    <th colspan="2">個数</th>
                     <th colspan="2">担当</th>
                     <th>税率</th>
                     <th rowspan="4">削除</th>
@@ -67,31 +67,9 @@
                 </tr>
                 <tr>
                     <th colspan="2">品質</th>
-                    <th colspan="2">金額</th>
+                    <th colspan="2">単価</th>
                     <th colspan="3">摘要</th>
                 </tr>
-                <!--<tr>
-                    <th colspan="2">製品ID</th>
-                    <th colspan="2">単価</th>
-                    <th colspan="2">担当</th>
-                    <th>税率</th>
-                    <th rowspan="4">削除</th>
-                </tr>
-                <tr>
-                    <th colspan="2">規格</th>
-                    <th colspan="2">数量</th>
-                    <th colspan="3">発注数量</th>
-                </tr>
-                <tr>
-                    <th colspan="2">品質</th>
-                    <th colspan="2">金額</th>
-                    <th>対応仕入</th>
-                    <th>対象件数</th>
-                    <th>対象数量</th>
-                </tr>
-                <tr>
-                    <th colspan="7">摘要</th>
-                </tr>-->
                 <tr id="slip-partition-0" class="partition-area"></tr>
                 <input type="hidden" name="sort" id="sort" value="0">
                 <tr id="slip-upper-0">

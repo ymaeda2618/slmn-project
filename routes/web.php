@@ -231,6 +231,9 @@ Route::get('ExpenseBillingCreate', 'ExpenseBillingController@create');
 Route::get('ExpenseBillingEdit/{user_id}', 'ExpenseBillingController@edit');
 Route::get('ExpenseBillingregister', 'ExpenseBillingController@register');
 
+// 営業情報関連
+Route::get('todayDeliverySlips', 'SaleSlipNonAuthController@todayDeliverySlips');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

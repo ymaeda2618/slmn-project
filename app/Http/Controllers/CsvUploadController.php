@@ -104,8 +104,8 @@ class CsvUploadController extends Controller
             // CSVファイルの処理
             $original_file_name = $request->file('uploadCsvFile')->getClientOriginalName();
             $orgName = date('YmdHis') . "_" . $original_file_name;
-            $spath = storage_path('app\\');
-            $path = $spath . $request->file('uploadCsvFile')->storeAs('', $orgName);
+            $spath = storage_path('app');
+            $path = $spath . '/' . $request->file('uploadCsvFile')->storeAs('', $orgName);
 
             $file = new \SplFileObject($path);
 

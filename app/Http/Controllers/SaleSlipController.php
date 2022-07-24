@@ -271,6 +271,11 @@ class SaleSlipController extends Controller
             //---------------------
             // 伝票詳細を取得
             //---------------------
+            $sale_slip_id_arr = array();
+            foreach($saleSlipList as $saleSlipVal){
+                $sale_slip_id_arr[] = $saleSlipVal->sale_slip_id;
+            }
+
             $SaleSlipDetailList = DB::table('sale_slip_details AS SaleSlipDetail')
             ->select(
                 'SaleSlip.id                  AS sale_slip_id',
@@ -339,8 +344,8 @@ class SaleSlipController extends Controller
             ->if(!empty($condition_submit_type), function ($queryDetail) use ($condition_submit_type) {
                 return $queryDetail->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
+            ->whereIn('SaleSlip.id', $sale_slip_id_arr)
             ->orderBy('SaleSlip.id', 'desc')
-            ->limit(5000)
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列

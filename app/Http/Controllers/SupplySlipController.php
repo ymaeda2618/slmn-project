@@ -260,6 +260,11 @@ class SupplySlipController extends Controller
             //---------------------
             // 伝票詳細を取得
             //---------------------
+            $supply_slip_id_arr = array();
+            foreach($supplySlipList as $supplySlipVal){
+                $supply_slip_id_arr[] = $supplySlipVal->supply_slip_id;
+            }
+
             $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
             ->select(
                 'SupplySlip.id                  AS supply_slip_id',
@@ -310,6 +315,7 @@ class SupplySlipController extends Controller
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
                 ->where('SupplyCompany.active', '=', true);
             })
+            ->whereIn('SupplySlip.id', $supply_slip_id_arr)
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列

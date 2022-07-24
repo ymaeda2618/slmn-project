@@ -301,14 +301,14 @@
             // CSVアップロードのタブが押された時
             //-----------------------
             $(document).on("click", "#csv-upload-tab", function() {
-                $(this).attr('href', '/csvUpload?tab_index=1');
+                $(this).attr('href', './csvUpload?tab_index=1');
             });
 
             //-----------------------
             // アップロード履歴のタブが押された時の処理
             //-----------------------
             $(document).on("click", "#upload-history-tab", function() {
-                $(this).attr('href', '/csvUpload?tab_index=2');
+                $(this).attr('href', './csvUpload?tab_index=2');
             });
 
             //-----------------------
@@ -359,7 +359,7 @@
                             // アラートメッセージ
                             alert(data["message"]);
                             // アップロード画面に戻る
-                            location.href = '/csvUpload?tab_index=1';
+                            location.href = './csvUpload?tab_index=1';
                         }
                     });
             });

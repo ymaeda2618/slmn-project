@@ -234,6 +234,10 @@ Route::get('ExpenseBillingregister', 'ExpenseBillingController@register');
 // 営業情報関連
 Route::get('todayDeliverySlips', 'SaleSlipNonAuthController@todayDeliverySlips');
 
+// CSV upload
+Route::get('csvUpload', 'CsvUploadController@create');
+Route::post('AjaxUploadCsv', 'CsvUploadController@AjaxUploadCsv');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

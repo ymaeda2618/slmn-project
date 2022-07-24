@@ -81,7 +81,8 @@
     </div>
 </div>
 @endsection
-<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<!--<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>-->
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <style>
@@ -326,8 +327,7 @@
 
                 // ファイル拡張子を確認し、csv以外は弾くようにする
                 var acceptArray = new Array('text/csv');
-                var uploadFile = $("#uploadCsvFile").prop('files')[0];
-                var fileAccept = uploadFile.type;
+                var fileAccept = $("#uploadCsvFile").prop('files')[0].type;
 
                 // ファイルがない場合はアラートを飛ばす
                 if (!$("#uploadCsvFile").val()) {
@@ -355,7 +355,7 @@
 
                         if (data["success"]) {
                             // アップロード履歴に遷移する
-                            location.href = '/csvUpload?tab_index=2';
+                            location.href = './csvUpload?tab_index=2';
                         } else {
                             // アラートメッセージ
                             alert(data["message"]);

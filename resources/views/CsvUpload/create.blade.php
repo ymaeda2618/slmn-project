@@ -326,7 +326,8 @@
 
                 // ファイル拡張子を確認し、csv以外は弾くようにする
                 var acceptArray = new Array('text/csv');
-                var fileAccept = $("#uploadCsvFile").prop('files')[0].type;
+                var uploadFile = $("#uploadCsvFile").prop('files')[0];
+                var fileAccept = uploadFile.type;
 
                 // ファイルがない場合はアラートを飛ばす
                 if (!$("#uploadCsvFile").val()) {

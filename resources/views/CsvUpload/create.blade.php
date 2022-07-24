@@ -343,7 +343,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "/AjaxUploadCsv",
+                        url: "./AjaxUploadCsv",
                         type: "POST",
                         dataType: "JSON",
                         data: fd,

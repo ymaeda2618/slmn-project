@@ -81,9 +81,7 @@
     </div>
 </div>
 @endsection
-<!--<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>-->
-<script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <style>
@@ -314,6 +312,15 @@
             });
 
             //-----------------------
+            // ファイルの拡張子を返す処理
+            //-----------------------
+            function getExt(filename) {
+                var pos = filename.lastIndexOf('.');
+                if (pos === -1) return '';
+                return filename.slice(pos + 1);
+            }
+
+            //-----------------------
             // アップロードボタンが押された時の処理
             //-----------------------
             $(document).on("click", "#upload-btn", function() {
@@ -326,19 +333,21 @@
                 fd.append("slip_type_val", $("#slip_type_val").val());
                 fd.append("uploadCsvFile", $("#uploadCsvFile").prop('files')[0]);
 
-                // ファイル拡張子を確認し、csv以外は弾くようにする
-                var acceptArray = new Array('text/csv');
-                var fileAccept = $("#uploadCsvFile").prop('files')[0].type;
-
                 // ファイルがない場合はアラートを飛ばす
                 if (!$("#uploadCsvFile").val()) {
                     alert("csvファイルが選択されておりません。");
                     $("#overlay").fadeOut(0);
                     return;
-                } else if ($.inArray(fileAccept, acceptArray) === -1) {
-                    alert("選択されたファイルがCSVではありません。");
-                    $("#overlay").fadeOut(0);
-                    return;
+                } else { // ファイルが存在する場合
+
+                    // ファイルの拡張子を取得
+                    var file_ext = getExt($("#uploadCsvFile").prop('files')[0].name);
+
+                    if (file_ext != "csv") {
+                        alert("選択されたファイルがCSVではありません。");
+                        $("#overlay").fadeOut(0);
+                        return;
+                    }
                 }
 
                 $.ajax({

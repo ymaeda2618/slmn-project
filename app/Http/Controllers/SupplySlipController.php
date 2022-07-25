@@ -315,10 +315,29 @@ class SupplySlipController extends Controller
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
                 ->where('SupplyCompany.active', '=', true);
             })
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('SupplySlip.date', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 2, function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('SupplySlip.delivery_date', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
+                return $query->where('SupplySlip.supply_company_id', '=', $condition_company_id);
+            })
+            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
+                return $query->where('SupplySlip.supply_shop_id', '=', $condition_shop_id);
+            })
+            ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
+                return $queryDetail->where('SupplySlipDetail.product_id', '=', $condition_product_id);
+            })
+            ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
+                return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
+            })
             ->whereIn('SupplySlip.id', $supply_slip_id_arr)
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列
+            $supply_slip_detail_count_arr = array();
             $supply_slip_detail_arr = array();
 
 

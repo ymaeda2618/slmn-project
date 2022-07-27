@@ -63,6 +63,12 @@ class SupplySlipController extends Controller
             $condition_product_id    = $request->session()->get('condition_product_id');
             $condition_product_text  = $request->session()->get('condition_product_text');
             $condition_submit_type   = $request->session()->get('condition_submit_type');
+            $condition_display_sort  = $request->session()->get('condition_display_sort');
+            $condition_display_num   = $request->session()->get('condition_display_num');
+
+            // 空値の場合は初期値を設定
+            if(empty($condition_display_sort)) $condition_display_sort = 0;
+            if(empty($condition_display_num)) $condition_display_num = 20;
 
         } else { // POST時の処理
 
@@ -79,6 +85,8 @@ class SupplySlipController extends Controller
                 $condition_product_id    = $request->data['SupplySlipDetail']['product_id'];
                 $condition_product_text  = $request->data['SupplySlipDetail']['product_text'];
                 $condition_submit_type   = isset($request->data['SupplySlip']['supply_submit_type']) ? $request->data['SupplySlip']['supply_submit_type'] : 0;
+                $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
+                $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;
 
                 // 日付の設定
                 $condition_date_from     = $request->data['SupplySlip']['supply_date_from'];
@@ -104,6 +112,8 @@ class SupplySlipController extends Controller
                 $request->session()->put('condition_product_id', $condition_product_id);
                 $request->session()->put('condition_product_text', $condition_product_text);
                 $request->session()->put('condition_submit_type', $condition_submit_type);
+                $request->session()->put('condition_display_sort', $condition_display_sort);
+                $request->session()->put('condition_display_num', $condition_display_num);
 
             } else { // リセットボタンが押された時の処理
 
@@ -120,6 +130,8 @@ class SupplySlipController extends Controller
                 $condition_product_id    = null;
                 $condition_product_text  = null;
                 $condition_submit_type   = 0;
+                $condition_display_sort  = 0;
+                $condition_display_num   = 20;
                 $request->session()->forget('condition_date_type');
                 $request->session()->forget('condition_date_from');
                 $request->session()->forget('condition_date_to');
@@ -133,6 +145,8 @@ class SupplySlipController extends Controller
                 $request->session()->forget('condition_product_id');
                 $request->session()->forget('condition_product_text');
                 $request->session()->forget('condition_submit_type');
+                $request->session()->forget('condition_display_sort');
+                $request->session()->forget('condition_display_num');
             }
         }
 
@@ -191,10 +205,21 @@ class SupplySlipController extends Controller
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
             })
             ->where('SupplySlip.active', '=', '1')
-            ->orderBy('SupplySlip.date', 'desc')
+            //->orderBy('SupplySlip.date', 'desc')
+            ->if($condition_display_sort == 0, function ($query) { // 伝票日付:降順
+                return $query->orderBy('SupplySlip.date', 'desc');
+            })
+            ->if($condition_display_sort == 1, function ($query) { // 伝票日付:昇順
+                return $query->orderBy('SupplySlip.date', 'asc');
+            })
+            ->if($condition_display_sort == 2, function ($query) { // 納品日付:降順
+                return $query->orderBy('SupplySlip.delivery_date', 'desc');
+            })
+            ->if($condition_display_sort == 3, function ($query) { // 納品日付:昇順
+                return $query->orderBy('SupplySlip.delivery_date', 'asc');
+            })
             ->orderBy('SupplySlip.id', 'desc')
-            ->paginate(10);
-
+            ->paginate($condition_display_num);
 
             //---------------------
             // 仕入れ一覧の総額集計
@@ -267,19 +292,19 @@ class SupplySlipController extends Controller
 
             $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
             ->select(
-                'SupplySlip.id                  AS supply_slip_id',
-                'SupplySlip.total               AS supply_slip_total',
-                'SupplySlip.supply_submit_type  AS supply_submit_type',
-                'SupplyCompany.code             AS supply_company_code',
-                'SupplyCompany.name             AS supply_company_name',
-                'Product.code                   AS product_code',
-                'Product.name                   AS product_name',
-                'Product.tax_id                 AS product_tax_id',
-                'Standard.name                  AS standard_name',
-                'SupplySlipDetail.id            AS supply_slip_detail_id',
-                'SupplySlipDetail.unit_price    AS supply_slip_detail_unit_price',
-                'SupplySlipDetail.unit_num      AS supply_slip_detail_unit_num',
-                'Unit.name                      AS unit_name'
+                'SupplySlip.id                     AS supply_slip_id',
+                'SupplySlip.total                  AS supply_slip_total',
+                'SupplySlip.supply_submit_type     AS supply_submit_type',
+                'SupplyCompany.code                AS supply_company_code',
+                'SupplyCompany.name                AS supply_company_name',
+                'Product.code                      AS product_code',
+                'Product.name                      AS product_name',
+                'Product.tax_id                    AS product_tax_id',
+                'Standard.name                     AS standard_name',
+                'SupplySlipDetail.id               AS supply_slip_detail_id',
+                'SupplySlipDetail.unit_price       AS supply_slip_detail_unit_price',
+                'SupplySlipDetail.unit_num         AS supply_slip_detail_unit_num',
+                'Unit.name                         AS unit_name'
             )
             ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y/%m/%d")                AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y/%m/%d") AS supply_slip_delivery_date')
@@ -337,14 +362,22 @@ class SupplySlipController extends Controller
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列
-            $supply_slip_detail_count_arr = array();
-            $supply_slip_detail_arr = array();
+            $supply_slip_condition_num             = 0;       // 条件指定された時の伝票の枚数
+            $supply_slip_condition_notax_sub_total = 0;       // 条件指定された伝票詳細の税抜小計
+            $supply_slip_detail_count_arr          = array(); // 各伝票が伝票詳細をいくつ持っているか
+            $supply_slip_detail_arr                = array(); // 各伝票に紐づく伝票詳細配列
 
 
             // 伝票詳細で取得したDBをループ
             foreach($SupplySlipDetailList as $SupplySlipDetails){
 
+                $unit_price  = $SupplySlipDetails->supply_slip_detail_unit_price; // 単価
+                $unit_num    = $SupplySlipDetails->supply_slip_detail_unit_num;   // 数量
+                $notax_price = $unit_price * $unit_num;                           // 税抜小計
+                $supply_slip_condition_notax_sub_total += $notax_price;           // 小計を加えていく
+
                 if(!isset($supply_slip_detail_count_arr[$SupplySlipDetails->supply_slip_id])){
+                    $supply_slip_condition_num +=1;
                     $supply_slip_detail_count_arr[$SupplySlipDetails->supply_slip_id] = 0;
                 }
 
@@ -357,8 +390,8 @@ class SupplySlipController extends Controller
                     'product_tax_id'                => $SupplySlipDetails->product_tax_id,
                     'standard_name'                 => $SupplySlipDetails->standard_name,
                     'supply_slip_detail_id'         => $SupplySlipDetails->supply_slip_detail_id,
-                    'supply_slip_detail_unit_price' => $SupplySlipDetails->supply_slip_detail_unit_price,
-                    'supply_slip_detail_unit_num'   => $SupplySlipDetails->supply_slip_detail_unit_num,
+                    'supply_slip_detail_unit_price' => $unit_price,
+                    'supply_slip_detail_unit_num'   => $unit_num,
                     'unit_name'                     => $SupplySlipDetails->unit_name,
                     'staff_name'                    => $SupplySlipDetails->staff_name,
                 ];
@@ -402,8 +435,12 @@ class SupplySlipController extends Controller
             "adjust_price_amount"          => $adjust_price_amount,
             "notax_sub_total_amount"       => $notax_sub_total_amount,
             "supply_slip_amount"           => $supply_slip_amount,
+            "supply_slip_condition_num"    => $supply_slip_condition_num,
+            "supply_slip_condition_notax_sub_total" => $supply_slip_condition_notax_sub_total,
             "supply_slip_detail_arr"       => $supply_slip_detail_arr,
-            "supply_slip_detail_count_arr" => $supply_slip_detail_count_arr
+            "supply_slip_detail_count_arr" => $supply_slip_detail_count_arr,
+            "condition_display_sort"       => $condition_display_sort,
+            "condition_display_num"        => $condition_display_num
         ]);
     }
 

@@ -75,6 +75,15 @@ class SaleSlipController extends Controller
                 $condition_submit_type = $request->session()->get('condition_submit_type');
             }
 
+            $condition_display_sort  = $request->session()->get('condition_display_sort');
+            $condition_display_num   = $request->session()->get('condition_display_num');
+            $condition_no_display    = $request->session()->get('condition_no_display');
+
+            // 空値の場合は初期値を設定
+            if(empty($condition_display_sort)) $condition_display_sort = 0;
+            if(empty($condition_display_num)) $condition_display_num = 20;
+            if(empty($condition_no_display)) $condition_no_display = 0;
+
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
@@ -90,6 +99,9 @@ class SaleSlipController extends Controller
                 $condition_product_id    = $request->data['SaleSlipDetail']['product_id'];
                 $condition_product_text  = $request->data['SaleSlipDetail']['product_text'];
                 $condition_submit_type   = isset($request->data['SaleSlip']['sale_submit_type']) ? $request->data['SaleSlip']['sale_submit_type'] : 0;
+                $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
+                $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;
+                $condition_no_display    = isset($request->no_display) ? $request->no_display : 0;
 
                 // 日付の設定
                 $condition_date_from     = $request->data['SaleSlip']['sale_date_from'];
@@ -114,6 +126,9 @@ class SaleSlipController extends Controller
                 $request->session()->put('condition_product_id', $condition_product_id);
                 $request->session()->put('condition_product_text', $condition_product_text);
                 $request->session()->put('condition_submit_type', $condition_submit_type);
+                $request->session()->put('condition_display_sort', $condition_display_sort);
+                $request->session()->put('condition_display_num', $condition_display_num);
+                $request->session()->put('condition_no_display', $condition_no_display);
 
             } else { // リセットボタンが押された時の処理
 
@@ -130,6 +145,9 @@ class SaleSlipController extends Controller
                 $condition_product_id    = null;
                 $condition_product_text  = null;
                 $condition_submit_type   = 0;
+                $condition_display_sort  = 0;
+                $condition_display_num   = 20;
+                $condition_no_display    = 0;
                 $request->session()->forget('condition_date_from');
                 $request->session()->forget('condition_date_to');
                 $request->session()->forget('condition_company_code');
@@ -142,6 +160,9 @@ class SaleSlipController extends Controller
                 $request->session()->forget('condition_product_id');
                 $request->session()->forget('condition_product_text');
                 $request->session()->forget('condition_submit_type');
+                $request->session()->forget('condition_display_sort');
+                $request->session()->forget('condition_display_num');
+                $request->session()->forget('condition_no_display');
             }
         }
 
@@ -201,10 +222,25 @@ class SaleSlipController extends Controller
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
+            ->if(!empty($condition_no_display), function ($query) {
+                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
+            })
             ->where('SaleSlip.active', '=', '1')
-            ->orderBy('SaleSlip.date', 'desc')
+            //->orderBy('SaleSlip.date', 'desc')
+            ->if($condition_display_sort == 0, function ($query) { // 伝票日付:降順
+                return $query->orderBy('SaleSlip.date', 'desc');
+            })
+            ->if($condition_display_sort == 1, function ($query) { // 伝票日付:昇順
+                return $query->orderBy('SaleSlip.date', 'asc');
+            })
+            ->if($condition_display_sort == 2, function ($query) { // 納品日付:降順
+                return $query->orderBy('SaleSlip.delivery_date', 'desc');
+            })
+            ->if($condition_display_sort == 3, function ($query) { // 納品日付:昇順
+                return $query->orderBy('SaleSlip.delivery_date', 'asc');
+            })
             ->orderBy('SaleSlip.id', 'desc')
-            ->paginate(10);
+            ->paginate($condition_display_num);
 
             //---------------------
             // 売上一覧を総額集計
@@ -348,16 +384,22 @@ class SaleSlipController extends Controller
             ->orderBy('SaleSlip.id', 'desc')
             ->get();
 
-            // 各伝票にいくつ明細がついているのかをカウントする配列
-            $sale_slip_detail_arr = array();
 
-            // 各小計が入るファイルをリセット
-            $sale_slip_detail_count_arr = array();
+            $sale_slip_condition_num               = 0;       // 条件指定された時の伝票の枚数
+            $sale_slip_condition_notax_sub_total   = 0;       // 条件指定された伝票詳細の税抜小計
+            $sale_slip_detail_arr                  = array(); // 各伝票にいくつ明細がついているのかをカウントする配列
+            $sale_slip_detail_count_arr            = array(); // 各小計が入るファイルをリセット
 
             // 伝票詳細で取得したDBをループ
             foreach($SaleSlipDetailList as $SaleSlipDetails){
 
+                $unit_price  = $SaleSlipDetails->sale_slip_detail_unit_price; // 単価
+                $unit_num    = $SaleSlipDetails->sale_slip_detail_unit_num;   // 数量
+                $notax_price = $unit_price * $unit_num;                       // 税抜小計
+                $sale_slip_condition_notax_sub_total += $notax_price;         // 小計を加えていく
+
                 if(!isset($sale_slip_detail_count_arr[$SaleSlipDetails->sale_slip_id])){
+                    $sale_slip_condition_num +=1;
                     $sale_slip_detail_count_arr[$SaleSlipDetails->sale_slip_id] = 0;
                 }
 
@@ -415,8 +457,13 @@ class SaleSlipController extends Controller
             "adjust_price_amount"        => $adjust_price_amount,
             "notax_sub_total_amount"     => $notax_sub_total_amount,
             "sale_slip_amount"           => $sale_slip_amount,
+            "sale_slip_condition_num"    => $sale_slip_condition_num,
+            "sale_slip_condition_notax_sub_total" => $sale_slip_condition_notax_sub_total,
             "sale_slip_detail_arr"       => $sale_slip_detail_arr,
-            "sale_slip_detail_count_arr" => $sale_slip_detail_count_arr
+            "sale_slip_detail_count_arr" => $sale_slip_detail_count_arr,
+            "condition_display_sort"     => $condition_display_sort,
+            "condition_display_num"      => $condition_display_num,
+            "condition_no_display"       => $condition_no_display
         ]);
     }
 

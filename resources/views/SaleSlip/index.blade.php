@@ -5,9 +5,10 @@
 
         <div class="top-title">売上一覧</div>
 
-        <!--検索エリア-->
-        <div class='search-area'>
-            <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
+        <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
+            <!--検索エリア-->
+            <div class='search-area'>
+
                 {{ csrf_field() }}
                 <table>
                     <tbody>
@@ -75,17 +76,50 @@
                         <input type='submit' class='initial-btn' name='reset-btn' id="reset-btn" value='検索条件リセット'>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div>
 
-        <!--総計表示エリア-->
-        <div class='sum-display-area'>
-            <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_num)}}件</div>
-            <div class='sum-display-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
-            <div class='sum-display-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>
-            <div class='sum-display-div'>総税抜額:{{number_format($notax_sub_total_amount)}}円</div>
-            <div class='sum-display-div'>総額:{{number_format($sale_slip_amount)}}円</div>
-        </div>
+            <!--総計表示エリア-->
+            <div class='sum-display-area'>
+                @if($sale_slip_num != 0)
+                <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_num)}}件</div>
+                <div class='sum-display-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
+                <div class='sum-display-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>
+                <div class='sum-display-div'>総税抜額:{{number_format($notax_sub_total_amount)}}円</div>
+                <div class='sum-display-div'>総額:{{number_format($sale_slip_amount)}}円</div>
+                @else
+                <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_condition_num)}}件</div>
+                <div class='sum-display-div'>総配送額:0円</div>
+                <div class='sum-display-div'>総調整額:0円</div>
+                <div class='sum-display-div'>総税抜額:{{number_format($sale_slip_condition_notax_sub_total)}}円</div>
+                <div class='sum-display-div'>総額:{{number_format($sale_slip_condition_notax_sub_total)}}円</div>
+                @endif
+                <div class='display-condition-div'>並び順
+                    <select id='display-sort' name="display_sort" class='display-condition-select'>
+                    <option value="0">伝票日付:降順</option>
+                    <option value="1">伝票日付:昇順</option>
+                    <option value="2">納品日付:降順</option>
+                    <option value="3">納品日付:昇順</option>
+                </select>
+                </div>
+                <div class='display-condition-div'>表示件数
+                    <select id='display-num' name="display_num" class='display-condition-select'>
+                    <option value="20">20件</option>
+                    <option value="40">40件</option>
+                    <option value="60">60件</option>
+                    <option value="80">80件</option>
+                    <option value="100">100件</option>
+                </select>
+                </div>
+                <input type='hidden' id='display_sort_selected' value='{{$condition_display_sort}}'>
+                <input type='hidden' id='display_num_selected' value='{{$condition_display_num}}'>
+                <div class="float-clear"></div>
+            </div>
+            <div class='no-display-area'>
+                <input type="checkbox" id="no_display" name="no_display" value="1">
+                <label for="no_display">infomartのデータを表示しない</label>
+                <input type='hidden' id='no_display_selected' value='{{$condition_no_display}}'>
+            </div>
+        </form>
 
         <!--一覧表示エリア-->
         <div class='list-area'>
@@ -198,6 +232,51 @@
             var sale_submit_type_selected = $("#sale_submit_type_selected").val();
             // 検索条件で設定された企業を設定
             $('#sale_submit_type').val(sale_submit_type_selected);
+
+            //-------------------------------------
+            // 表示条件のセレクトボックスに値を入れる
+            //-------------------------------------
+
+            // ソート条件を取得
+            var display_sort_selected = $("#display_sort_selected").val();
+            // ソート条件を設定
+            $('#display-sort').val(display_sort_selected);
+
+            // 表示件数を取得
+            var display_num_selected = $("#display_num_selected").val();
+            // 表示件数を設定
+            $('#display-num').val(display_num_selected);
+
+            // infomart表示非表示条件を取得
+            var display_num_selected = $("#no_display_selected").val();
+            // infomart表示非表示条件を設定
+            if (display_num_selected == 1) {
+                $('#no_display').prop("checked", true);
+            } else {
+                $('#no_display').prop("checked", false);
+            }
+
+
+            //-------------------------------------
+            // 並び順が変更された時
+            //-------------------------------------
+            $('#display-sort').change(function() {
+                $('#search-btn').click();
+            });
+
+            //-------------------------------------
+            // 表示件数が変更された時
+            //-------------------------------------
+            $('#display-num').change(function() {
+                $('#search-btn').click();
+            });
+
+            //-------------------------------------
+            // infomart非表示チェックボックスが変更された時
+            //-------------------------------------
+            $('#no_display').change(function() {
+                $('#search-btn').click();
+            });
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
@@ -437,7 +516,7 @@
 
 <style>
     /* 共通 */
-
+    
     .search-control {
         display: block;
         width: 100%;
@@ -452,12 +531,16 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
+    .float-clear {
+        clear: both;
+    }
+    
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-
+    
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -465,26 +548,32 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-
+    
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-
+    
+    #index-search-form {
+        width: 100%;
+        margin-bottom: auto;
+    }
+    
     .search-area {
         max-width: 1300px;
         width: 90%;
         padding: 10px 0px 0px;
         border: 1px solid #bcbcbc;
         border-radius: 5px;
+        margin: auto;
     }
-
+    
     .search-area table {
         margin: auto;
         width: 100%;
     }
-
+    
     .table-th {
         width: 10%;
         padding: 15px 0px 0px 10px;
@@ -492,40 +581,40 @@
         float: left;
         font-weight: bolder;
     }
-
+    
     .table-td {
         width: 20%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .table-code-td {
         padding-right: 0px;
     }
-
+    
     .table-name-td {
         padding-left: 0px;
     }
-
+    
     .table-double-td {
         width: 40%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .radio_box {
         padding-top: 15px;
     }
-
+    
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-
+    
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -534,7 +623,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-
+    
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -544,28 +633,66 @@
         margin-left: 2%;
     }
     /*総額エリア*/
-
+    
     .sum-display-area {
         max-width: 1300px;
         width: 90%;
         padding-top: 20px;
         padding-left: 20px;
+        margin: auto;
     }
-
+    
     .sum-display-div {
         float: left;
         margin-right: 1rem;
         font-weight: bold;
         font-size: 14px;
     }
+    
+    .display-condition-div {
+        float: right;
+        margin-right: 1rem;
+        font-weight: bold;
+        font-size: 12px;
+        padding: 2px;
+    }
+    
+    .display-condition-select {
+        font-size: 10px;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0.25rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+    
+    .no-display-area {
+        max-width: 1300px;
+        width: 90%;
+        padding-top: 10px;
+        padding-left: 20px;
+        margin: auto;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    #no_display {
+        position: relative;
+        top: 2px
+    }
+    
+    .no-display-area label {
+        margin-left: 10px;
+    }
     /*伝票表示エリア*/
-
+    
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-
+    
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -573,7 +700,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-
+    
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -585,7 +712,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-
+    
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -593,35 +720,35 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-
+    
     .double-width {
         width: 20%!important;
     }
-
+    
     .triple-width {
         width: 30%!important;
     }
-
+    
     .forth-width {
         width: 40%!important;
     }
-
+    
     .width-10 {
         width: 10%!important;
     }
-
+    
     .width-15 {
         width: 15%!important;
     }
-
+    
     .width-20 {
         width: 20%!important;
     }
-
+    
     .width-30 {
         width: 30%!important;
     }
-
+    
     .edit-btn {
         border-radius: 5px;
         color: #fff;
@@ -632,21 +759,21 @@
         text-align: center;
         padding: 10px;
     }
-
+    
     .regis-complete {
         background-color: #D2F0F0;
         font-weight: bold;
         border-left: 3px solid #0099CB!important;
         text-align: center;
     }
-
+    
     .regis-temp {
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
         text-align: center;
     }
-
+    
     .bold-tr {
         font-weight: bold;
     }

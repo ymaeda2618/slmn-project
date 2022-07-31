@@ -7,193 +7,114 @@
 
         <form class="smn-form" id="sale-slip-create-form" method="post" action="./../editRegisterSaleSlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
-            <div class="form-group">
+            <div class="date-area">
                 <div class="sale_date_box">
                     <label class="column-label" for="sale_date">売上日付</label>
-                    <input type="date" class="form-control " id="sale_date " name="data[SaleSlip][sale_date]" value="{{$SaleSlipList->sale_slip_sale_date}}">
+                    <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]" value="<?php echo date('Y-m-d');?>" value="{{$SaleSlipList->sale_slip_sale_date}}">
                 </div>
 
                 <div class="delivery_date_box">
                     <label class="column-label" for="delivery_date">納品日付</label>
-                    <input type="date" class="form-control " id="delivery_date " name="data[SaleSlip][delivery_date]" value="{{$SaleSlipList->sale_slip_delivery_date}}">
+                    <input type="date" class="form-control " id="delivery_date " name="data[SaleSlip][delivery_date]" value="<?php echo date('Y-m-d');?>" value="{{$SaleSlipList->sale_slip_delivery_date}}">
                 </div>
             </div>
 
 
-            <table class="sale-from-table">
-                <tr>
-                    <th colspan="2">売上企業</th>
-                    <th colspan="2">売上店舗</th>
-                </tr>
-                <tr>
-                    <td class="width-20">
+            <div class="company-shop-area">
+                <div class="company-area">
+                    <div class="company-shop-label">売上企業</div>
+                    <div class="width-40">
                         <input type="text" class="form-control sale_company_code_input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" value="{{$SaleSlipList->sale_company_code}}" tabindex="1">
-                        <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]" value="{{$SaleSlipList->sale_company_id}}">
-                    </td>
-                    <td class="width-30">
+                        <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]">
+                    </div>
+                    <div class="width-60">
                         <input type="text" class="form-control" id="sale_company_text" name="data[SaleSlip][sale_company_text]" value="{{$SaleSlipList->sale_company_name}}" readonly>
-                    </td>
-                    <td class="width-20">
+                    </div>
+                </div>
+                <div class="shop-area">
+                    <div class="company-shop-label">売上店舗</div>
+                    <div class="width-40">
                         <input type="text" class="form-control sale_shop_code_input" id="sale_shop_code" name="data[SaleSlip][sale_shop_code]" value="{{$SaleSlipList->sale_shop_code}}" tabindex="2">
-                        <input type="hidden" id="sale_shop_id" name="data[SaleSlip][sale_shop_id]" value="{{$SaleSlipList->sale_shop_id}}">
-                    </td>
-                    <td class="width-30">
+                        <input type="hidden" id="sale_shop_id" name="data[SaleSlip][sale_shop_id]">
+                    </div>
+                    <div class="width-60">
                         <input type="text" class="form-control" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$SaleSlipList->sale_shop_name}}" readonly>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                </div>
+            </div>
 
-            <table class="slip-table">
+            <table class="slip-data-table">
                 <tr>
-                    <th rowspan="3">No.</th>
-                    <th colspan="2">製品ID</th>
-                    <th colspan="2">個数</th>
-                    <th colspan="2">担当</th>
-                    <th>税率</th>
-                    <th rowspan="4">削除</th>
-                </tr>
-                <tr>
-                    <th colspan="2">規格</th>
-                    <th colspan="2">数量</th>
-                    <th>対応仕入</th>
-                    <th>対象件数</th>
-                    <th>対象数量</th>
-                </tr>
-                <tr>
-                    <th colspan="2">品質</th>
-                    <th colspan="2">単価</th>
-                    <th colspan="3">摘要</th>
+                    <th class="width-5">No.</th>
+                    <th class="width-20" colspan="2">製品</th>
+                    <th class="width-15" colspan="2">産地</th>
+                    <th class="width-10">個数</th>
+                    <th class="width-10">数量</th>
+                    <th class="width-15" colspan="2">単価 / 小計</th>
+                    <th class="width-20" colspan="3">担当者 / 摘要</th>
+                    <th class="width-5">削除</th>
                 </tr>
 
                 @foreach ($SaleSlipDetailList as $SaleSlipDetails)
-                <?php $tabInitialNum = intval(9*($SaleSlipDetails->sort) + 3); ?>
+                <?php $tabInitialNum = intval(7*$SaleSlipDetails->sort + 2); ?>
                 <tr id="slip-partition-{{$SaleSlipDetails->sort}}" class="partition-area"></tr>
                 <input type="hidden" name="sort" id="sort" value="{{$SaleSlipDetails->sort}}">
                 <input type="hidden" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][id]" value="{{$SaleSlipDetails->sale_slip_detail_id}}">
                 <tr id="slip-upper-{{$SaleSlipDetails->sort}}">
-                    <td class="index-td" rowspan="4">{{$SaleSlipDetails->sort}}</td>
-                    <td class="width-10">
-                        <input type="text" class="form-control product_code_input" id="product_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_code]" value="{{$SaleSlipDetails->product_code}}" tabindex="{{ $tabInitialNum }}">
+                    <td class="index-td" rowspan="2">{{$SaleSlipDetails->sort}}</td>
+                    <td colspan="2">
+                        <input type="text" class="form-control product_code_input" id="product_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_code]" value="{{$SaleSlipDetails->product_code}}" tabindex="{{$tabInitialNum + 1}}">
                         <input type="hidden" id="product_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_id]" value="{{$SaleSlipDetails->product_id}}">
+                        <input type='hidden' id='tax_id_{{$SaleSlipDetails->sort}}' name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_id]" value="{{$SaleSlipDetails->tax_id}}">
                     </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control" id="product_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_text]" value="{{$SaleSlipDetails->product_name}}" placeholder="製品欄" readonly>
+                    <td colspan="2">
+                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_code]" value="{{$SaleSlipDetails->origin_area_id}}" tabindex="{{$tabInitialNum + 2}}">
+                        <input type="hidden" id="origin_area_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_id]" value="{{$SaleSlipDetails->origin_area_id}}">
                     </td>
-                    <!--<td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 1}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'>
-                    </td>-->
                     <td>
                         @php $readonly = empty($SaleSlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
-                        <input type="number" class="form-control" id="inventory_unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_num]" value="{{$SaleSlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 1}}">
+                        <input type="number" class="form-control" id="inventory_unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_num]" value="{{$SaleSlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 3}}">
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="inventory_unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_text]" value="{{$SaleSlipDetails->inventory_unit_name}}" readonly>
-                        <input type="hidden" id="inventory_unit_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_id]" value="{{$SaleSlipDetails->inventory_unit_id}}">
+                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'
+                            tabindex="{{$tabInitialNum + 4}}">
                     </td>
-                    <td class="width-10">
-                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_code]" value="{{$SaleSlipDetails->staff_code}}" tabindex="{{$tabInitialNum + 4}}">
+                    <td colspan="2">
+                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'
+                            tabindex="{{$tabInitialNum + 5}}">
+                    </td>
+                    <td>
+                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_code]" value="{{$SaleSlipDetails->staff_code}}" tabindex="{{$tabInitialNum + 6}}">
                         <input type="hidden" id="staff_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_id]" value="{{$SaleSlipDetails->staff_id}}">
                     </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control" id="staff_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_text]" value="{{$SaleSlipDetails->staff_name}}" placeholder="担当欄" readonly>
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="staff_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_text]" placeholder="担当欄" value="{{$SaleSlipDetails->staff_name}}" readonly>
                     </td>
-                    <td class="width-15">
-                        <input type="text" class="form-control" id="tax_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_text]" value="{{$SaleSlipDetails->tax_name}}" readonly>
-                        <input type='hidden' id="tax_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_id]" value="{{$SaleSlipDetails->tax_id}}">
-                    </td>
-                    <td rowspan="4" class="width-5">
-                        <button id="remove-slip-btn" type="button" class="btn remove-slip-btn btn-secondary" onclick='javascript:removeSlip({{$SaleSlipDetails->sort}}) '>削除</button>
+                    <td rowspan="2">
+                        <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary" onclick='javascript:removeSlip({{$SaleSlipDetails->sort}}) '>削除</button>
                     </td>
                 </tr>
-
-                <tr id="slip-middle-{{$SaleSlipDetails->sort}}">
-                    <td>
-                        <input type="text" class="form-control standard_code_input" id="standard_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][standard_code]" value="{{$SaleSlipDetails->standard_code}}">
-                        <input type="hidden" id="standard_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][standard_id]" value="{{$SaleSlipDetails->standard_id}}">
+                <tr id="slip-lower-{{$SaleSlipDetails->sort}}">
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="product_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_text]" value="{{$SaleSlipDetails->product_name}}" placeholder="製品欄" readonly>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="origin_area_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_text]" value="{{$SaleSlipDetails->origin_area_name}}" placeholder="産地欄" readonly>
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="standard_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][standard_text]" value="{{$SaleSlipDetails->standard_name}}" placeholder="規格欄" readonly>
-                    </td>
-                    <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>
-                        <input type="hidden" id="unit_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_id]" value="{{$SaleSlipDetails->unit_id}}">
-                    </td>-->
-                    <!--<td>
-                        @php $readonly = empty($SaleSlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
-                        <input type="number" class="form-control" id="inventory_unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_num]" value="{{$SaleSlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 2}}">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="inventory_unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_text]" value="{{$SaleSlipDetails->inventory_unit_name}}" readonly>
+                        <input type="text" class="form-control" id="inventory_unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_text]" value="{{$SaleSlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
                         <input type="hidden" id="inventory_unit_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_id]" value="{{$SaleSlipDetails->inventory_unit_id}}">
                     </td>
-                   <td colspan="2">
-                        <input type="text" class="form-control" id="notax_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][notax_price]" value="{{$SaleSlipDetails->notax_price}}" readonly>
-                    </td>-->
                     <td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->sort }})'>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>
+                        <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" placeholder="数量欄" readonly>
                         <input type="hidden" id="unit_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_id]" value="{{$SaleSlipDetails->unit_id}}">
                     </td>
-                    <td>
-                        <input type="button" class="form-control btn btn-primary" id="supply_sale_slip_btn_0" value="対応仕入" onclick='javascript:showSupplySaleModal(0)'>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="sale_supply_slip_count_0" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][supply_count]" value="{{$SaleSlipDetails->unit_num_count}}" readonly>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="sale_supply_slip_unit_num_0" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][supply_unit_num]" value="{{$SaleSlipDetails->unit_num_sum}}" readonly>
-                    </td>
-                </tr>
-
-                <tr id="slip-lower-{{$SaleSlipDetails->sort}}">
-                    <td>
-                        <input type="text" class="form-control quality_code_input" id="quality_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][quality_code]" value="{{$SaleSlipDetails->quality_code}}">
-                        <input type="hidden" id="quality_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][quality_id]" value="{{$SaleSlipDetails->quality_id}}">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="quality_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][quality_text]" value="{{$SaleSlipDetails->quality_name}}" placeholder="品質欄" readonly>
-                    </td>
-                    <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{ $SaleSlipDetails->product_code }})'>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_text]" value="{{$SaleSlipDetails->unit_name}}" readonly>
-                        <input type="hidden" id="unit_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_id]" value="{{$SaleSlipDetails->unit_id}}">
-                    </td>
-                   <td colspan="2">
+                    <td colspan="2">
                         <input type="text" class="form-control" id="notax_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][notax_price]" value="{{$SaleSlipDetails->notax_price}}" readonly>
                     </td>
-                    <td>
-                        <input type="button" class="form-control btn btn-primary" id="supply_sale_slip_btn_0" value="対応仕入" onclick='javascript:showSupplySaleModal(0)'>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="sale_supply_slip_count_0" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][supply_count]" value="{{$SaleSlipDetails->unit_num_count}}" readonly>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="sale_supply_slip_unit_num_0" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][supply_unit_num]" value="{{$SaleSlipDetails->unit_num_sum}}" readonly>
-                    </td>-->
-                    <td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'>
-                    </td>
                     <td colspan="3">
-                        <input type="text " class="form-control " id="memo_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][memo]" value="{{$SaleSlipDetails->memo}}" tabindex="{{$tabInitialNum + 5}}">
+                        <input type="text" class="form-control" id="memo_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][memo]" value="{{$SaleSlipDetails->memo}}" placeholder="摘要欄" tabindex="{{$tabInitialNum + 7}}">
                     </td>
-                </tr>
-                <tr id="slip-most-lower-{{$SaleSlipDetails->sort}}">
-                    <td class='subtotal-text'>
-                        小計
-                    </td>
-                    <td colspan="3">
-                        <input type="text" class="form-control" id="notax_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][notax_price]" value="{{$SaleSlipDetails->notax_price}}" readonly>
-                    </td>
-                    <!--<td colspan="7 ">
-                        <input type="text " class="form-control " id="memo_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][memo]" value="{{$SaleSlipDetails->memo}}" tabindex="{{$tabInitialNum + 5}}">
-                    </td>-->
                 </tr>
                 @endforeach
             </table>
@@ -332,6 +253,11 @@
                         <input type="hidden" id="sale_slip_num" value="">
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="overlay">
+            <div class="cv-spinner">
+                <span class="spinner"></span>
             </div>
         </div>
     </div>
@@ -490,7 +416,10 @@
                     var this_id = $(this).attr('id');
 
                     // 文字列の最後の文字を削除
-                    $(this).val($(this).val().slice(0, -1));
+                    var last_letter = $(this).val().slice(-1);
+                    if (last_letter == "/") {
+                        $(this).val($(this).val().slice(0, -1));
+                    }
 
                     if (this_id == "delivery_code") { // 配送コードの場合
 
@@ -1090,7 +1019,18 @@
             //--------------------
             // 伝票追加処理
             //--------------------
+            var canAjax = true;
             $("#add-slip-btn").on('click', function() {
+
+                if (!canAjax) {
+                    return;
+                }
+                // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+                canAjax = false;
+
+                // ボタンを非活性にして、処理中を出す。
+                $("#overlay").fadeIn(300);
+
 
                 // 伝票ナンバーを取得
                 var slip_num = $("#slip_num").val();
@@ -1115,7 +1055,7 @@
                         $("#slip_num").val(data[0]);
 
                         // 伝票追加
-                        $(".slip-table").append(data[1]);
+                        $(".slip-data-table").append(data[1]);
 
                         // 仕入伝票格納エリア
                         $("#supply-slip-area").append(data[2]);
@@ -1145,62 +1085,8 @@
                         });
                         $("#product-code-area-" + slip_num).append(product_code_selector);
 
-                        // 規格ID
-                        let standard_code_selector = $(data[4]).autocomplete({
-                            source: function(req, resp) {
-
-                                var product_id = $("#product_id_" + slip_num).val();
-
-                                $.ajax({
-                                    headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                                    },
-                                    url: "./../AjaxAutoCompleteStandard",
-                                    type: "POST",
-                                    cache: false,
-                                    dataType: "json",
-                                    data: {
-                                        productId: product_id,
-                                        inputText: req.term
-                                    },
-                                    success: function(o) {
-                                        resp(o);
-                                    },
-                                    error: function(xhr, ts, err) {
-                                        resp(['']);
-                                    }
-                                });
-                            }
-                        });
-                        $("#standard-code-area-" + slip_num).append(standard_code_selector);
-
-                        // 品質ID
-                        let quality_code_selector = $(data[5]).autocomplete({
-                            source: function(req, resp) {
-                                $.ajax({
-                                    headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                                    },
-                                    url: "./../AjaxAutoCompleteQuality",
-                                    type: "POST",
-                                    cache: false,
-                                    dataType: "json",
-                                    data: {
-                                        inputText: req.term
-                                    },
-                                    success: function(o) {
-                                        resp(o);
-                                    },
-                                    error: function(xhr, ts, err) {
-                                        resp(['']);
-                                    }
-                                });
-                            }
-                        });
-                        $("#quality-code-area-" + slip_num).append(quality_code_selector);
-
                         // 産地ID
-                        let origin_code_selector = $(data[5]).autocomplete({
+                        let origin_code_selector = $(data[4]).autocomplete({
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
@@ -1225,7 +1111,7 @@
                         $("#origin-code-area-" + slip_num).append(origin_code_selector);
 
                         // 担当ID
-                        let staff_code_selector = $(data[6]).autocomplete({
+                        let staff_code_selector = $(data[5]).autocomplete({
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
@@ -1256,6 +1142,10 @@
                         alert(errorThrown);
                         // 送信失敗
                         alert("失敗しました。");
+                    }).always(function() {
+                        // 成否に関わらず実行
+                        $("#overlay").fadeOut(0);
+                        canAjax = true; // 再びAjaxできるようにする
                     });
             });
 
@@ -1484,9 +1374,7 @@
         // 削除
         $("#slip-partition-" + remove_num).remove();
         $("#slip-upper-" + remove_num).remove();
-        $("#slip-middle-" + remove_num).remove();
         $("#slip-lower-" + remove_num).remove();
-        $("#slip-most-lower-" + remove_num).remove();
         $(".use_num_" + remove_num).remove();
         $(".supply_slip_id_" + remove_num).remove();
 
@@ -2065,18 +1953,147 @@
         width: 100%;
         margin-bottom: 50px;
     }
+    /*
+    ----新規テーブルエリア----
+    */
+
+    .date-area,
+    .company-shop-area {
+        font-size: 8px;
+        padding-bottom: 20px;
+        display: -webkit-box;
+    }
+
+    .company-shop-area {
+        padding-bottom: 30px;
+    }
+
+    .company-shop-label {
+        width: 100%;
+    }
+
+    .company-area {
+        width: 50%;
+        float: left;
+    }
+
+    .shop-area {
+        width: 50%;
+        float: right;
+    }
+
+    .company-area div,
+    .shop-area div {
+        float: left;
+    }
+
+    .company-shop-area .form-control,
+    .date-area .form-control {
+        display: block;
+        width: 98%;
+        height: calc(1.5rem + 2px);
+        padding: 0px 5px;
+        font-size: 8px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .sale_date_box {
+        width: 50%;
+        float: left
+    }
+
+    .delivery_date_box {
+        width: 50%;
+        float: right;
+    }
+
+    .slip-data-table {
+        font-size: 8px;
+    }
+
+    .slip-data-table th {
+        text-align: center;
+    }
+
+    .slip-data-table .form-control {
+        display: block;
+        width: 100%;
+        height: calc(1.5rem + 2px);
+        padding: 0px 5px;
+        font-size: 8px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .add-slip-btn-area .btn,
+    .register-btn-table .btn {
+        font-size: 8px;
+    }
+
+    .slip-data-table .rmv-slip-btn {
+        height: calc(3rem + 4px)!important;
+        width: 100%;
+        font-size: 8px;
+    }
+
+    .total-table {
+        font-size: 8px;
+    }
+
+    .total-table .form-control,
+    .biko-area .form-control,
+    .register-btn-table .form-control {
+        display: block;
+        width: 98%;
+        height: calc(1.5rem + 2px);
+        padding: 0px 5px;
+        font-size: 8px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .biko-area textarea.form-control {
+        height: auto;
+    }
+
+    .biko-area {
+        font-size: 8px;
+    }
 
     .register-btn-table {
+        width: 100%;
+        font-size: 8px;
+    }
+    /*
+    -------------------------
+    */
+    /*.register-btn-table {
         width: 100%;
     }
 
     .slip-table {
         width: 100%;
-    }
+    }*/
 
     .add-slip-btn-area {
         text-align: right;
-        padding: 0px 0px 40px;
+        padding: 0px 0px 20px;
     }
 
     .add-slip-btn {
@@ -2114,14 +2131,21 @@
         width: 30%!important;
     }
 
+    .width-40 {
+        width: 40%!important;
+    }
+
     .width-50 {
         width: 50%!important;
         text-align: center;
     }
 
+    .width-60 {
+        width: 60%!important;
+    }
+
     #register-btn {
         width: 80%;
-        height: 40px;
     }
 
     .partition-area {
@@ -2130,7 +2154,6 @@
     }
 
     .index-td {
-        font-size: 14px;
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
@@ -2225,15 +2248,47 @@
         float: left;
     }
 
-    .delivery_date_box {
-        width: 100%;
-        padding-top: 3%;
-    }
-
     .status-memo-area {
         width: 100%;
         padding: 20px 10px;
         font-weight: bold;
         letter-spacing: 2px;
+    }
+    /*モーダルの処理*/
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+        height: 100%;
+        display: none;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .cv-spinner {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px #ddd solid;
+        border-top: 4px #2e93e6 solid;
+        border-radius: 50%;
+        animation: sp-anime 0.8s infinite linear;
+    }
+
+    @keyframes sp-anime {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .is-hide {
+        display: none;
     }
 </style>

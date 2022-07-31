@@ -509,9 +509,9 @@ class SaleSlipController extends Controller
             'SaleShop.code                AS sale_shop_code',
             'SaleShop.id                  AS sale_shop_id',
             'SaleShop.name                AS sale_shop_name',
-            'Delivery.code                  AS delivery_code',
-            'Delivery.id                    AS delivery_id',
-            'Delivery.name                  AS delivery_name'
+            'Delivery.code                AS delivery_code',
+            'Delivery.id                  AS delivery_id',
+            'Delivery.name                AS delivery_name'
         )
         ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d") AS sale_slip_sale_date')
         ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
@@ -1858,6 +1858,7 @@ class SaleSlipController extends Controller
                 $SaleSlipDetail->unit_price         = $SaleSlipDetailVal['unit_price'];
                 $SaleSlipDetail->unit_num           = $SaleSlipDetailVal['unit_num'];
                 $SaleSlipDetail->notax_price        = $SaleSlipDetailVal['notax_price'];
+                $SaleSlipDetail->origin_area_id     = $SaleSlipDetailVal['origin_area_id'];
                 $SaleSlipDetail->unit_id            = $SaleSlipDetailVal['unit_id'];
                 $SaleSlipDetail->inventory_unit_id  = $SaleSlipDetailVal['inventory_unit_id'];
                 $SaleSlipDetail->inventory_unit_num = $SaleSlipDetailVal['inventory_unit_num'];
@@ -1979,137 +1980,81 @@ class SaleSlipController extends Controller
         $slip_num = $request->slip_num;
         if(empty($slip_num)) $slip_num = 1;
 
-        $tabInitialNum = intval(7*$slip_num + 3);
+        $tabInitialNum = intval(7*$slip_num + 2);
 
         // 追加伝票形成
         $ajaxHtml1 = '';
-        $ajaxHtml1 .= " <tr id='slip-partition-".$slip_num."' class='partition-area'>";
-        $ajaxHtml1 .= " </tr>";
-        $ajaxHtml1 .= "<input type='hidden' name='sort' id='sort' value='".$slip_num."'>";
-        $ajaxHtml1 .= " <tr id='slip-upper-".$slip_num."'>";
-        $ajaxHtml1 .= "     <td class='index-td' rowspan='4'>".$slip_num."</td>";
-        $ajaxHtml1 .= "     <td class='width-10' id='product-code-area-".$slip_num."'>";
-        $ajaxHtml1 .= "         <input type='hidden' id='product_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][product_id]'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td class='width-20'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='product_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][product_text]' placeholder='製品欄'  readonly>";
-        $ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td class='width-15' colspan='2'>";
-        //$ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_price]' onKeyUp='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 1)."'>";
-        //$ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='number' class='form-control' id='inventory_unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_num]' tabindex='".($tabInitialNum + 1)."'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='inventory_unit_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_text]' placeholder='個数欄' readonly>";
-        $ajaxHtml1 .= "         <input type='hidden' id='inventory_unit_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_id]' value='0'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td class='width-10' id='staff-code-area-".$slip_num."'>";
-        $ajaxHtml1 .= "         <input type='hidden' id='staff_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_id]' value='9'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td class='width-20'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='staff_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_text]' placeholder='担当欄' value='石塚 貞雄' readonly>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td class='width-15'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='tax_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][tax_text]'' placeholder='税率欄'  readonly>";
-        $ajaxHtml1 .= "         <input type='hidden' id='tax_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][tax_id]'  value='0'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td rowspan='4' class='width-5'>";
-        $ajaxHtml1 .= "         <button id='remove-slip-btn' type='button' class='btn remove-slip-btn btn-secondary' onclick='javascript:removeSlip(".$slip_num.") '>削除</button>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= " </tr>";
-        $ajaxHtml1 .= " <tr id='slip-middle-".$slip_num."'>";
-        $ajaxHtml1 .= "     <td id='standard-code-area-".$slip_num."'>";
-        $ajaxHtml1 .= "         <input type='hidden' id='standard_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][standard_id]' >";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='standard_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][standard_text]' placeholder='規格欄'  readonly>";
-        $ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='inventory_unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_num]' tabindex='".($tabInitialNum + 2)."'>";
-        //$ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='inventory_unit_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_text]' placeholder='個数欄' readonly>";
-        //$ajaxHtml1 .= "         <input type='hidden' id='inventory_unit_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][inventory_unit_id]' value='0'>";
-        //$ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_num]' onchange='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 2)."'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='unit_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_text]' placeholder='数量欄' readonly>";
-        $ajaxHtml1 .= "         <input type='hidden' id='unit_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_id]' value='0'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='button' class='form-control btn btn-primary' id='supply_sale_slip_btn_".$slip_num."' value='対応仕入' onclick='javascript:showSupplySaleModal(".$slip_num.")'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='sale_supply_slip_count_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][supply_count]' value='0' readonly>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='sale_supply_slip_unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][supply_unit_num]' value='0' readonly>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= " </tr>";
-        $ajaxHtml1 .= " <tr id='slip-lower-".$slip_num."'>";
-        $ajaxHtml1 .= "     <td id='quality-code-area-".$slip_num."'>";
-        $ajaxHtml1 .= "         <input type='hidden' id='quality_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][quality_id]' >";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='quality_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][quality_text]' placeholder='品質欄' readonly>";
-        $ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_num]' onKeyUp='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 3)."'>";
-        //$ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='unit_text_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_text]' placeholder='数量欄' readonly>";
-        //$ajaxHtml1 .= "         <input type='hidden' id='unit_id_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_id]' value='0'>";
-        //$ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td colspan='2'>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='notax_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][notax_price]'  value='0' readonly>";
-        //$ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='button' class='form-control btn btn-primary' id='supply_sale_slip_btn_".$slip_num."' value='対応仕入' onclick='javascript:showSupplySaleModal(".$slip_num.")'>";
-        //$ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='sale_supply_slip_count_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][supply_count]' value='0' readonly>";
-        //$ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='sale_supply_slip_unit_num_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][supply_unit_num]' value='0' readonly>";
-        //$ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td class='width-15' colspan='2'>";
-        $ajaxHtml1 .= "         <input type='number' class='form-control' id='unit_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][unit_price]' onchange='javascript:priceNumChange(".$slip_num.")' tabindex='".($tabInitialNum + 3)."'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= "     <td colspan='3'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='memo_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][memo]' placeholder='摘要欄' tabindex='".($tabInitialNum + 5)."'>";
-        $ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= " </tr>";
-        $ajaxHtml1 .= " <tr id='slip-most-lower-".$slip_num."'>";
-        $ajaxHtml1 .= "     <td class='subtotal-text'>小計</td>";
-        $ajaxHtml1 .= "     <td colspan='3'>";
-        $ajaxHtml1 .= "         <input type='text' class='form-control' id='notax_price_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][notax_price]' value='0' readonly>";
-        $ajaxHtml1 .= "     </td>";
-        //$ajaxHtml1 .= "     <td colspan='7'>";
-        //$ajaxHtml1 .= "         <input type='text' class='form-control' id='memo_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][memo]' tabindex='".($tabInitialNum + 5)."'>";
-        //$ajaxHtml1 .= "     </td>";
-        $ajaxHtml1 .= " </tr>";
+        $ajaxHtml1 .= "<tr id='slip-partition-".$slip_num."' class='partition-area'>";
+        $ajaxHtml1 .= "</tr>";
+        $ajaxHtml1 .= '<tr id="slip-upper-' . $slip_num . '">';
+        $ajaxHtml1 .= '    <td class="index-td" rowspan="2">' . $slip_num . '</td>';
+        $ajaxHtml1 .= '    <td colspan="2" id="product-code-area-' . $slip_num . '">';
+        $ajaxHtml1 .= '        <input type="hidden" id="product_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_id]">';
+        $ajaxHtml1 .= '        <input type="hidden" id="tax_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][tax_id]" value="' . $slip_num . '">';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td colspan="2" id="origin-code-area-' . $slip_num . '">';
+
+        $ajaxHtml1 .= '        <input type="hidden" id="origin_area_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_id]">';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td>';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="inventory_unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_num]" tabindex="' . ($tabInitialNum + 3) . '">';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td>';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_num]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 4) . '">';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_price]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 5) . '">';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td id="staff-code-area-'.$slip_num.'">';
+        $ajaxHtml1 .= '        <input type="hidden" id="staff_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][staff_id]" value="9">';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="staff_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][staff_text]" placeholder="担当欄" value="石塚 貞雄" readonly>';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td rowspan="2">';
+        $ajaxHtml1 .= '        <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary" onclick="javascript:removeSlip(' . $slip_num . ')">削除</button>';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '</tr>';
+        $ajaxHtml1 .= '<tr id="slip-lower-' . $slip_num . '">';
+        $ajaxHtml1 .= '    <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="product_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_text]" placeholder="製品欄" readonly>';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="origin_area_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_text]" placeholder="産地欄" readonly>';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td>';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="inventory_unit_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_text]" placeholder="個数欄" readonly>';
+        $ajaxHtml1 .= '        <input type="hidden" id="inventory_unit_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_id]" value="' . $slip_num . '">';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td>';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="unit_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_text]" placeholder="数量欄" readonly>';
+        $ajaxHtml1 .= '        <input type="hidden" id="unit_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_id]" value="' . $slip_num . '">';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][notax_price]" value="' . $slip_num . '" readonly>';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td colspan="3">';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="memo_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][memo]" placeholder="摘要欄" tabindex="' . ($tabInitialNum + 7) . '">';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '</tr>';
+
 
         // 仕入伝票リスト格納エリア
-        $ajaxHtml2 = " <div id='supply-slip-area-".$slip_num."'></div>";
+        $ajaxHtml2 = " <div id='slip-slip-area-".$slip_num."'></div>";
 
         //-------------------------------
         // AutoCompleteの要素は別で形成する
         //-------------------------------
         // 製品ID
-        $autoCompleteProduct = "<input type='text' class='form-control product_code_input' id='product_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][product_code]' tabindex='".$tabInitialNum."'>";
-        // 規格ID
-        $autoCompleteStandard = "<input type='text' class='form-control standard_code_input' id='standard_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][standard_code]'>";
-        // 品質ID
-        $autoCompleteQuality = "<input type='text' class='form-control quality_code_input' id='quality_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][quality_code]'>";
+        $autoCompleteProduct = '<input type="text" class="form-control product_code_input" id="product_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_code]" tabindex="' . ($tabInitialNum + 1) . '">';
+        // 産地
+        $autoCompleteOrigin  = '<input type="text" class="form-control origin_area_code_input" id="origin_area_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_code]" tabindex="' . ($tabInitialNum + 2) . '">';
         // 担当
-        $autoCompleteStaff = "<input type='text' class='form-control staff_code_input' id='staff_code_".$slip_num."' name='data[SaleSlipDetail][".$slip_num."][staff_code]' tabindex='".($tabInitialNum + 4)."' value='1009'>";
+        $autoCompleteStaff   = '<input type="text" class="form-control staff_code_input" id="staff_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][staff_code]" value="1009" tabindex="' . ($tabInitialNum + 6) . '">';
 
         $slip_num = intval($slip_num) + 1;
 
-        $returnArray = array($slip_num, $ajaxHtml1, $ajaxHtml2, $autoCompleteProduct, $autoCompleteStandard, $autoCompleteQuality, $autoCompleteStaff);
+        $returnArray = array($slip_num, $ajaxHtml1, $ajaxHtml2, $autoCompleteProduct, $autoCompleteOrigin, $autoCompleteStaff);
 
 
         return $returnArray;

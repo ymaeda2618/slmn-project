@@ -7,7 +7,7 @@
 
         <form class="smn-form" id="supply-slip-create-form" method="post" action="./../editRegisterSupplySlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
-            <div class="form-group">
+            <div class="date-area">
                 <div class="supply_date_box">
                     <label class="column-label" for="supply_date">仕入日付</label>
                     <input type="date" class="form-control " id="supply_date" name="data[SupplySlip][supply_date]" value="{{$SupplySlipList->supply_slip_supply_date}}">
@@ -15,187 +15,107 @@
 
                 <div class="delivery_date_box">
                     <label class="column-label" for="delivery_date">納品日付</label>
-                    <input type="date" class="form-control " id="delivery_date " name="data[SupplySlip][delivery_date]" value="{{$SupplySlipList->supply_slip_delivery_date}}">
+                    <input type="date" class="form-control" id="delivery_date" name="data[SupplySlip][delivery_date]" value="{{$SupplySlipList->supply_slip_delivery_date}}">
                 </div>
             </div>
 
-
-            <table class="supply-from-table">
-                <tr>
-                    <th colspan="2">仕入企業</th>
-                    <th colspan="2">仕入店舗</th>
-                </tr>
-                <tr>
-                    <td class="width-20">
+            <div class="company-shop-area">
+                <div class="company-area">
+                    <div class="company-shop-label">仕入企業</div>
+                    <div class="width-40">
                         <input type="text" class="form-control supply_company_code_input" id="supply_company_code" name="data[SupplySlip][supply_company_code]" value="{{$SupplySlipList->supply_company_code}}" tabindex="1">
                         <input type="hidden" id="supply_company_id" name="data[SupplySlip][supply_company_id]" value="{{$SupplySlipList->supply_company_id}}">
-                    </td>
-                    <td class="width-30">
+                    </div>
+                    <div class="width-60">
                         <input type="text" class="form-control" id="supply_company_text" name="data[SupplySlip][supply_company_text]" value="{{$SupplySlipList->supply_company_name}}" readonly>
-                    </td>
-                    <td class="width-20">
+                    </div>
+                </div>
+                <div class="shop-area">
+                    <div class="company-shop-label">仕入店舗</div>
+                    <div class="width-40">
                         <input type="text" class="form-control supply_shop_code_input" id="supply_shop_code" name="data[SupplySlip][supply_shop_code]" value="{{$SupplySlipList->supply_shop_code}}" tabindex="2">
                         <input type="hidden" id="supply_shop_id" name="data[SupplySlip][supply_shop_id]" value="{{$SupplySlipList->supply_shop_id}}">
-                    </td>
-                    <td class="width-30">
+                    </div>
+                    <div class="width-60">
                         <input type="text" class="form-control" id="supply_shop_text" name="data[SupplySlip][supply_shop_text]" value="{{$SupplySlipList->supply_shop_name}}" readonly>
-                    </td>
-                </tr>
-
-            </table>
-
-            <!--<div class="add-slip-btn-area">
-                <button id="add-slip-btn" type="button" class="btn add-slip-btn btn-primary">伝票追加</button>
-            </div>-->
-
-            <table class="slip-table">
+                    </div>
+                </div>
+            </div>
+            <table class="slip-data-table">
                 <tr>
-                    <th rowspan="3">No.</th>
-                    <th colspan="2">製品ID</th>
-                    <th colspan="2">個数</th>
-                    <th colspan="2">産地</th>
-                    <th>税率</th>
-                    <th rowspan="4">削除</th>
+                    <th class="width-5">No.</th>
+                    <th class="width-20" colspan="2">製品</th>
+                    <th class="width-15" colspan="2">産地</th>
+                    <th class="width-10">個数</th>
+                    <th class="width-10">数量</th>
+                    <th class="width-15" colspan="2">単価 / 小計</th>
+                    <th class="width-20" colspan="3">担当者 / 摘要</th>
+                    <th class="width-5">削除</th>
                 </tr>
-                <tr>
-                    <th colspan="2">規格</th>
-                    <th colspan="2">数量</th>
-                    <th colspan="2">担当</th>
-                    <th>セリNO.</th>
-                </tr>
-                <tr>
-                    <th colspan="2">品質</th>
-                    <th colspan="2">単価</th>
-                    <th colspan="2">摘要</th>
-                </tr>
-
                 @foreach ($SupplySlipDetailList as $SupplySlipDetails)
-                <?php $tabInitialNum = intval(9*($SupplySlipDetails->sort) + 3); ?>
+                <?php $tabInitialNum = intval(7*($SupplySlipDetails->sort) + 2); ?>
                 <tr id="slip-partition-{{$SupplySlipDetails->sort}}" class="partition-area"></tr>
                 <input type="hidden" name="sort" id="sort" value="{{$SupplySlipDetails->sort}}">
+                <input type="hidden" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][id]" value="{{$SupplySlipDetails->supply_slip_detail_id}}">
                 <tr id="slip-upper-{{$SupplySlipDetails->sort}}">
-                    <input type="hidden" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][id]" value="{{$SupplySlipDetails->supply_slip_detail_id}}">
-                    <td class="index-td" rowspan="4">{{$SupplySlipDetails->sort}}</td>
-                    <td class="width-10">
-                        <input type="text" class="form-control product_code_input" id="product_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_code]" value="{{$SupplySlipDetails->product_code}}" tabindex="{{ $tabInitialNum }}">
+                    <td class="index-td" rowspan="2">{{$SupplySlipDetails->sort}}</td>
+                    <td colspan="2">
+                        <input type="text" class="form-control product_code_input" id="product_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_code]" value="{{$SupplySlipDetails->product_code}}" tabindex="{{$tabInitialNum + 1}}">
                         <input type="hidden" id="product_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_id]" value="{{$SupplySlipDetails->product_id}}">
-                    </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control" id="product_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_text]" value="{{$SupplySlipDetails->product_name}}" placeholder="製品欄" readonly>
-                    </td>
-                    <!--<td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 1}}" onchange='javascript:priceNumChange({{$SupplySlipDetails->sort}})'>
-                    </td>-->
-                    <td>
-                        <input type="number" class="form-control" id="inventory_unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_num]" value="{{$SupplySlipDetails->inventory_unit_num}}" tabindex="{{$tabInitialNum + 1}}"
-                            onchange='javascript:priceNumChange({{ $SupplySlipDetails->inventory_unit_num}})' placeholder="個数欄">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="inventory_unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_text]" value="{{$SupplySlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
-                        <input type="hidden" id="inventory_unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_id]" value="{{$SupplySlipDetails->inventory_unit_id}}">
-                    </td>
-                    <td class="width-10">
-                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][origin_area_code]" value="{{$SupplySlipDetails->origin_area_id}}" tabindex="{{$tabInitialNum + 4}}">
-                        <input type="hidden" id="origin_area_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][origin_area_id]" value="{{$SupplySlipDetails->origin_area_id}}">
-                    </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control" id="origin_area_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][origin_area_text]" value="{{$SupplySlipDetails->origin_area_name}}" placeholder="産地欄" readonly>
-                    </td>
-                    <td class="width-15">
-                        <input type="text" class="form-control" id="tax_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][tax_text]" value="{{$SupplySlipDetails->tax_name}}" placeholder="税率欄" readonly>
                         <input type='hidden' id='tax_id_{{$SupplySlipDetails->sort}}' name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][tax_id]" value="{{$SupplySlipDetails->tax_id}}">
                     </td>
-                    <td rowspan="4" class="width-5">
-                        <button id="remove-slip-btn" type="button" class="btn remove-slip-btn btn-secondary" onclick='javascript:removeSlip({{$SupplySlipDetails->sort}}) '>削除</button>
-                    </td>
-                </tr>
-                <tr id="slip-middle-{{$SupplySlipDetails->sort}}">
-                    <td>
-                        <input type="text" class="form-control standard_code_input" id="standard_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][standard_code]" value="{{$SupplySlipDetails->standard_code}}">
-                        <input type="hidden" id="standard_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][standard_id]" value="{{$SupplySlipDetails->standard_id}}">
+                    <td colspan="2">
+                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][origin_area_code]" value="{{$SupplySlipDetails->origin_area_id}}" tabindex="{{$tabInitialNum + 2}}">
+                        <input type="hidden" id="origin_area_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][origin_area_id]" value="{{$SupplySlipDetails->origin_area_id}}">
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="standard_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][standard_text]" value="{{$SupplySlipDetails->standard_name}}" placeholder="規格欄" readonly>
-                    </td>
-                    <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SupplySlipDetails->product_code }})'>
+                        @php $readonly = empty($SupplySlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
+                        <input type="number" class="form-control" id="inventory_unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_num]" value="{{$SupplySlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 3}}">
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_text]" value="{{$SupplySlipDetails->unit_name}}" readonly>
-                        <input type="hidden" id="unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_id]" value="{{$SupplySlipDetails->unit_id}}">
+                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" onchange='javascript:priceNumChange({{$SupplySlipDetails->sort}})'
+                            tabindex="{{$tabInitialNum + 4}}">
+                    </td>
+                    <td colspan="2">
+                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" onchange='javascript:priceNumChange({{$SupplySlipDetails->sort}})'
+                            tabindex="{{$tabInitialNum + 5}}">
                     </td>
                     <td>
-                        <input type="number" class="form-control" id="inventory_unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_num]" value="{{$SupplySlipDetails->inventory_unit_num}}" tabindex="{{$tabInitialNum + 2}}"
-                            onchange='javascript:priceNumChange({{ $SupplySlipDetails->inventory_unit_num}})' placeholder="個数欄">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="inventory_unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_text]" value="{{$SupplySlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
-                        <input type="hidden" id="inventory_unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_id]" value="{{$SupplySlipDetails->inventory_unit_id}}">
-                    </td>-->
-                    <td>
-                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 2}}" onchange='javascript:priceNumChange({{ $SupplySlipDetails->sort }})'>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_text]" value="{{$SupplySlipDetails->unit_name}}" placeholder="数量欄" readonly>
-                        <input type="hidden" id="unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_id]" value="{{$SupplySlipDetails->unit_id}}">
-                    </td>
-                    <td class="width-10">
-                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][staff_code]" value="{{$SupplySlipDetails->staff_code}}" tabindex="{{$tabInitialNum + 5}}">
+                        <input type="text" class="form-control staff_code_input" id="staff_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][staff_code]" value="{{$SupplySlipDetails->staff_code}}" tabindex="{{$tabInitialNum + 6}}">
                         <input type="hidden" id="staff_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][staff_id]" value="{{$SupplySlipDetails->staff_id}}">
                     </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control" id="staff_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][staff_text]" value="{{$SupplySlipDetails->staff_name}}" placeholder="担当欄" readonly>
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="staff_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][staff_text]" placeholder="担当欄" value="{{$SupplySlipDetails->staff_name}}" readonly>
                     </td>
-                    <td>
-                        <input type="text" class="form-control" id="seri_no_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][seri_no]" value="{{$SupplySlipDetails->seri_no}}" placeholder="セリNO欄" tabindex="{{$tabInitialNum + 6}}">
+                    <td rowspan="2">
+                        <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary" onclick='javascript:removeSlip({{$SupplySlipDetails->sort}}) '>削除</button>
                     </td>
                 </tr>
                 <tr id="slip-lower-{{$SupplySlipDetails->sort}}">
-                    <td>
-                        <input type="text" class="form-control quality_code_input" id="quality_code_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][quality_code]" value="{{$SupplySlipDetails->quality_code}}">
-                        <input type="hidden" id="quality_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][quality_id]" value="{{$SupplySlipDetails->quality_id}}">
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="product_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][product_text]" value="{{$SupplySlipDetails->product_name}}" placeholder="製品欄" readonly>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="origin_area_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][origin_area_text]" value="{{$SupplySlipDetails->origin_area_name}}" placeholder="産地欄" readonly>
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="quality_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][quality_text]" value="{{$SupplySlipDetails->quality_name}}" placeholder="品質欄" readonly>
-                    </td>
-                    <!--<td colspan="2">
-                        <input type="text" class="form-control" id="notax_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][notax_price]" value="{{$SupplySlipDetails->notax_price}}" readonly>
-                    </td>-->
-                    <!--<td>
-                        <input type="number" class="form-control" id="unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_num]" value="{{$SupplySlipDetails->unit_num}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{ $SupplySlipDetails->sort }})'>
+                        <input type="text" class="form-control" id="inventory_unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_text]" value="{{$SupplySlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
+                        <input type="hidden" id="inventory_unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_id]" value="{{$SupplySlipDetails->inventory_unit_id}}">
                     </td>
                     <td>
                         <input type="text" class="form-control" id="unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_text]" value="{{$SupplySlipDetails->unit_name}}" placeholder="数量欄" readonly>
                         <input type="hidden" id="unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_id]" value="{{$SupplySlipDetails->unit_id}}">
                     </td>
                     <td colspan="2">
-                        @php $readonly = empty($SupplySlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
-                        <input type="number" class="form-control" id="inventory_unit_num_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_num]" value="{{$SupplySlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 5}}">
-                    </td>-->
-                    <!--<td>
-                        <input type="text" class="form-control" id="inventory_unit_text_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_text]" value="{{$SupplySlipDetails->inventory_unit_name}}" readonly>
-                        <input type="hidden" id="inventory_unit_id_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][inventory_unit_id]" value="{{$SupplySlipDetails->inventory_unit_id}}">
-                    </td>-->
-                    <td class="width-15" colspan="2">
-                        <input type="number" class="form-control" id="unit_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][unit_price]" value="{{$SupplySlipDetails->unit_price}}" tabindex="{{$tabInitialNum + 3}}" onchange='javascript:priceNumChange({{$SupplySlipDetails->sort}})'>
-                    </td>
-                    <td colspan="4">
-                        <input type="text" class="form-control" id="memo_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][memo]" value="{{$SupplySlipDetails->memo}}" placeholder="摘要欄" tabindex="{{$tabInitialNum + 8}}">
-                    </td>
-                </tr>
-                <tr id="slip-most-lower-{{$SupplySlipDetails->sort}}">
-                    <td class='subtotal-text'>
-                        小計
-                    </td>
-                    <td colspan="3">
                         <input type="text" class="form-control" id="notax_price_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][notax_price]" value="{{$SupplySlipDetails->notax_price}}" readonly>
                     </td>
-                    <!--<td colspan="7">
-                        <input type="text" class="form-control" id="memo_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][memo]" value="{{$SupplySlipDetails->memo}}" tabindex="{{$tabInitialNum + 8}}">
-                    </td>-->
+                    <td colspan="3">
+                        <input type="text" class="form-control" id="memo_{{$SupplySlipDetails->sort}}" name="data[SupplySlipDetail][{{$SupplySlipDetails->sort}}][memo]" value="{{$SupplySlipDetails->memo}}" placeholder="摘要欄" tabindex="{{$tabInitialNum + 7}}">
+                    </td>
                 </tr>
                 @endforeach
             </table>
+
             <br><br>
             <div class="add-slip-btn-area">
                 <button id="add-slip-btn" type="button" class="btn add-slip-btn btn-primary">伝票追加</button>
@@ -286,9 +206,13 @@
                         </td>
                 </tr>
             </table>
-
-
         </form>
+
+        <div id="overlay">
+            <div class="cv-spinner">
+                <span class="spinner"></span>
+            </div>
+        </div>
     </div>
 </div>
 @endsection
@@ -439,8 +363,11 @@
 
                     var this_id = $(this).attr('id');
 
-                    // 文字列の最後の文字を削除
-                    $(this).val($(this).val().slice(0, -1));
+                    /// 文字列の最後の文字を削除
+                    var last_letter = $(this).val().slice(-1);
+                    if (last_letter == "/") {
+                        $(this).val($(this).val().slice(0, -1));
+                    }
 
                     if (this_id == "delivery_code") { // 配送コードの場合
 
@@ -1041,7 +968,19 @@
             //--------------------
             // 伝票追加処理
             //--------------------
+            var canAjax = true;
+
             $("#add-slip-btn").on('click', function() {
+
+                if (!canAjax) {
+                    return;
+                }
+
+                // これからAjaxを使うので、新たなAjax処理が発生しないようにする
+                canAjax = false;
+
+                // ボタンを非活性にして、処理中を出す。
+                $("#overlay").fadeIn(300);
 
                 // 伝票ナンバーを取得
                 var slip_num = $("#slip_num").val();
@@ -1066,7 +1005,7 @@
                         $("#slip_num").val(data[0]);
 
                         // 伝票追加
-                        $(".slip-table").append(data[1]);
+                        $(".slip-data-table").append(data[1]);
 
                         // 製品ID
                         let product_code_selector = $(data[2]).autocomplete({
@@ -1093,62 +1032,8 @@
                         });
                         $("#product-code-area-" + slip_num).append(product_code_selector);
 
-                        // 規格ID
-                        let standard_code_selector = $(data[3]).autocomplete({
-                            source: function(req, resp) {
-
-                                var product_id = $("#product_id_" + slip_num).val();
-
-                                $.ajax({
-                                    headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                                    },
-                                    url: "./../AjaxAutoCompleteStandard",
-                                    type: "POST",
-                                    cache: false,
-                                    dataType: "json",
-                                    data: {
-                                        productId: product_id,
-                                        inputText: req.term
-                                    },
-                                    success: function(o) {
-                                        resp(o);
-                                    },
-                                    error: function(xhr, ts, err) {
-                                        resp(['']);
-                                    }
-                                });
-                            }
-                        });
-                        $("#standard-code-area-" + slip_num).append(standard_code_selector);
-
-                        // 品質ID
-                        let quality_code_selector = $(data[4]).autocomplete({
-                            source: function(req, resp) {
-                                $.ajax({
-                                    headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
-                                    },
-                                    url: "./../AjaxAutoCompleteQuality",
-                                    type: "POST",
-                                    cache: false,
-                                    dataType: "json",
-                                    data: {
-                                        inputText: req.term
-                                    },
-                                    success: function(o) {
-                                        resp(o);
-                                    },
-                                    error: function(xhr, ts, err) {
-                                        resp(['']);
-                                    }
-                                });
-                            }
-                        });
-                        $("#quality-code-area-" + slip_num).append(quality_code_selector);
-
                         // 産地ID
-                        let origin_code_selector = $(data[5]).autocomplete({
+                        let origin_code_selector = $(data[3]).autocomplete({
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
@@ -1173,7 +1058,7 @@
                         $("#origin-code-area-" + slip_num).append(origin_code_selector);
 
                         // 担当ID
-                        let staff_code_selector = $(data[6]).autocomplete({
+                        let staff_code_selector = $(data[4]).autocomplete({
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
@@ -1204,6 +1089,10 @@
                         alert(errorThrown);
                         // 送信失敗
                         alert("失敗しました。");
+                    }).always(function() {
+                        // 成否に関わらず実行
+                        $("#overlay").fadeOut(0);
+                        canAjax = true; // 再びAjaxできるようにする
                     });
             });
 
@@ -1789,6 +1678,136 @@
     .slip-table {
         width: 100%;
     }
+    /*
+    ----新規テーブルエリア----
+    */
+
+    .date-area,
+    .company-shop-area {
+        font-size: 8px;
+        padding-bottom: 20px;
+        display: -webkit-box;
+    }
+
+    .company-shop-area {
+        padding-bottom: 30px;
+    }
+
+    .company-shop-label {
+        width: 100%;
+    }
+
+    .company-area {
+        width: 50%;
+        float: left;
+    }
+
+    .shop-area {
+        width: 50%;
+        float: right;
+    }
+
+    .company-area div,
+    .shop-area div {
+        float: left;
+    }
+
+    .company-shop-area .form-control,
+    .date-area .form-control {
+        display: block;
+        width: 98%;
+        height: calc(1.5rem + 2px);
+        padding: 0px 5px;
+        font-size: 8px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .supply_date_box {
+        width: 50%;
+        float: left
+    }
+
+    .delivery_date_box {
+        width: 50%;
+        float: right;
+    }
+
+    .slip-data-table {
+        font-size: 8px;
+    }
+
+    .slip-data-table th {
+        text-align: center;
+    }
+
+    .slip-data-table .form-control {
+        display: block;
+        width: 100%;
+        height: calc(1.5rem + 2px);
+        padding: 0px 5px;
+        font-size: 8px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .add-slip-btn-area .btn,
+    .register-btn-table .btn {
+        font-size: 8px;
+    }
+
+    .slip-data-table .rmv-slip-btn {
+        height: calc(3rem + 4px)!important;
+        width: 100%;
+        font-size: 8px;
+    }
+
+    .total-table {
+        font-size: 8px;
+    }
+
+    .total-table .form-control,
+    .biko-area .form-control,
+    .register-btn-table .form-control {
+        display: block;
+        width: 98%;
+        height: calc(1.5rem + 2px);
+        padding: 0px 5px;
+        font-size: 8px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: 0;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    .biko-area textarea.form-control {
+        height: auto;
+    }
+
+    .biko-area {
+        font-size: 8px;
+    }
+
+    .register-btn-table {
+        width: 100%;
+        font-size: 8px;
+    }
+    /*
+    -------------------------
+    */
 
     .add-slip-btn-area {
         text-align: right;
@@ -1826,6 +1845,10 @@
         width: 20%!important;
     }
 
+    .width-40 {
+        width: 40%!important;
+    }
+
     .width-30 {
         width: 30%!important;
     }
@@ -1835,19 +1858,17 @@
         text-align: center;
     }
 
+    .width-60 {
+        width: 60%!important;
+    }
+
     #register-btn {
         width: 80%;
-        height: 40px;
     }
 
     .partition-area {
         width: 100%;
         height: 1.0em;
-    }
-
-    .delivery_date_box {
-        width: 100%;
-        padding-top: 3%;
     }
 
     .index-td {
@@ -1867,5 +1888,42 @@
         padding: 20px 10px;
         font-weight: bold;
         letter-spacing: 2px;
+    }
+    /*モーダルの処理*/
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        z-index: 100;
+        width: 100%;
+        height: 100%;
+        display: none;
+        background: rgba(0, 0, 0, 0.6);
+    }
+
+    .cv-spinner {
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px #ddd solid;
+        border-top: 4px #2e93e6 solid;
+        border-radius: 50%;
+        animation: sp-anime 0.8s infinite linear;
+    }
+
+    @keyframes sp-anime {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    .is-hide {
+        display: none;
     }
 </style>

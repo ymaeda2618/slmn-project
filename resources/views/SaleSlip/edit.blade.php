@@ -58,8 +58,8 @@
                 @foreach ($SaleSlipDetailList as $SaleSlipDetails)
                 <?php $tabInitialNum = intval(7*$SaleSlipDetails->sort + 2); ?>
                 <tr id="slip-partition-{{$SaleSlipDetails->sort}}" class="partition-area"></tr>
-                <input type="hidden" name="sort" id="sort" value="{{$SaleSlipDetails->sort}}">
-                <input type="hidden" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][id]" value="{{$SaleSlipDetails->sale_slip_detail_id}}">
+                <input type="hidden" name="sort" id="sort-{{$SaleSlipDetails->sort}}" value="{{$SaleSlipDetails->sort}}">
+                <input type="hidden" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][id]" id="id-{{$SaleSlipDetails->sort}}" value="{{$SaleSlipDetails->sale_slip_detail_id}}">
                 <tr id="slip-upper-{{$SaleSlipDetails->sort}}">
                     <td class="index-td" rowspan="2">{{$SaleSlipDetails->sort}}</td>
                     <td colspan="2">
@@ -1373,6 +1373,8 @@
 
         // 削除
         $("#slip-partition-" + remove_num).remove();
+        $("#id-" + remove_num).remove();
+        $("#sort-" + remove_num).remove();
         $("#slip-upper-" + remove_num).remove();
         $("#slip-lower-" + remove_num).remove();
         $(".use_num_" + remove_num).remove();
@@ -1899,7 +1901,7 @@
 </script>
 <style>
     /* 共通 */
-
+    
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -1907,48 +1909,48 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .smn-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .form-group {
         margin-bottom: 3rem !important;
     }
-
+    
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-
+    
     .column-label {
         font-size: 0.9em;
         font-weight: bold;
     }
-
+    
     #standard_add_btn {
         margin: 10px auto 0px;
     }
-
+    
     #standart_list_area {
         width: 100%;
     }
-
+    
     .standard_list td {
         width: 10%;
     }
-
+    
     .standard_list td:first-of-type {
         width: 90%;
     }
-
+    
     .standard_del_btn {
         margin: auto 5px;
     }
-
+    
     .sale-from-table {
         width: 100%;
         margin-bottom: 50px;
@@ -1956,37 +1958,37 @@
     /*
     ----新規テーブルエリア----
     */
-
+    
     .date-area,
     .company-shop-area {
         font-size: 8px;
         padding-bottom: 20px;
         display: -webkit-box;
     }
-
+    
     .company-shop-area {
         padding-bottom: 30px;
     }
-
+    
     .company-shop-label {
         width: 100%;
     }
-
+    
     .company-area {
         width: 50%;
         float: left;
     }
-
+    
     .shop-area {
         width: 50%;
         float: right;
     }
-
+    
     .company-area div,
     .shop-area div {
         float: left;
     }
-
+    
     .company-shop-area .form-control,
     .date-area .form-control {
         display: block;
@@ -2002,25 +2004,25 @@
         border-radius: 0;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .sale_date_box {
         width: 50%;
         float: left
     }
-
+    
     .delivery_date_box {
         width: 50%;
         float: right;
     }
-
+    
     .slip-data-table {
         font-size: 8px;
     }
-
+    
     .slip-data-table th {
         text-align: center;
     }
-
+    
     .slip-data-table .form-control {
         display: block;
         width: 100%;
@@ -2035,22 +2037,22 @@
         border-radius: 0;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .add-slip-btn-area .btn,
     .register-btn-table .btn {
         font-size: 8px;
     }
-
+    
     .slip-data-table .rmv-slip-btn {
         height: calc(3rem + 4px)!important;
         width: 100%;
         font-size: 8px;
     }
-
+    
     .total-table {
         font-size: 8px;
     }
-
+    
     .total-table .form-control,
     .biko-area .form-control,
     .register-btn-table .form-control {
@@ -2067,15 +2069,15 @@
         border-radius: 0;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .biko-area textarea.form-control {
         height: auto;
     }
-
+    
     .biko-area {
         font-size: 8px;
     }
-
+    
     .register-btn-table {
         width: 100%;
         font-size: 8px;
@@ -2090,164 +2092,164 @@
     .slip-table {
         width: 100%;
     }*/
-
+    
     .add-slip-btn-area {
         text-align: right;
         padding: 0px 0px 20px;
     }
-
+    
     .add-slip-btn {
         min-width: 100px;
         background-color: #e3342f!important;
         border-color: #e3342f!important;
     }
-
+    
     .remove-slip-btn {
         height: calc(9.2rem + 6px)!important;
         width: 100%;
     }
-
+    
     .total-table {
         width: 100%;
     }
-
+    
     .width-5 {
         width: 5%!important;
     }
-
+    
     .width-10 {
         width: 10%!important;
     }
-
+    
     .width-15 {
         width: 15%!important;
     }
-
+    
     .width-20 {
         width: 20%!important;
     }
-
+    
     .width-30 {
         width: 30%!important;
     }
-
+    
     .width-40 {
         width: 40%!important;
     }
-
+    
     .width-50 {
         width: 50%!important;
         text-align: center;
     }
-
+    
     .width-60 {
         width: 60%!important;
     }
-
+    
     #register-btn {
         width: 80%;
     }
-
+    
     .partition-area {
         width: 100%;
         height: 1.0em;
     }
-
+    
     .index-td {
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
         text-align: center;
     }
-
+    
     .subtotal-text {
         text-align: center;
     }
     /*modal関連*/
-
+    
     .modal-dialog {
         width: 90%!important;
         max-width: 1100px!important;
     }
-
+    
     .modal-header {
         border-bottom: none!important;
     }
-
+    
     .modal-footer {
         justify-content: unset!important;
     }
-
+    
     .product-area {
         padding: 0px 1rem 1rem;
         font-size: 18px;
         font-weight: bold;
     }
-
+    
     .modal-table {
         width: 100%;
     }
-
+    
     .modal-table th {
         font-size: 14px;
         border: 1px solid #dadada;
         padding: 0.3rem;
         width: 10%;
     }
-
+    
     .modal-table th:nth-of-type(1) {
         width: 5%;
     }
-
+    
     .modal-table th:nth-of-type(2) {
         width: 8%;
     }
-
+    
     .modal-table td {
         font-size: 13px;
         border: 1px solid #dadada;
         padding: 0.3rem;
     }
-
+    
     .modal-table td:nth-of-type(1) {
         padding-left: 0.5rem;
     }
-
+    
     .modal-table td:nth-of-type(2) {
         text-align: center;
     }
-
+    
     .modal-sale-num {
         width: 100%;
         text-align: right;
         padding-right: 0.5rem;
     }
-
+    
     #sum-area {
         margin-top: 1rem;
         font-size: 15px;
         font-weight: bold;
         letter-spacing: 4px;
     }
-
+    
     #sum_count_area {
         float: left;
         margin-left: 1.5rem;
     }
-
+    
     #sum_count_name_area {
         float: left;
     }
-
+    
     #sum_unit_num_area {
         float: left;
         margin-left: 1.5rem;
     }
-
+    
     #sum_unit_name_area {
         float: left;
     }
-
+    
     .status-memo-area {
         width: 100%;
         padding: 20px 10px;
@@ -2255,7 +2257,7 @@
         letter-spacing: 2px;
     }
     /*モーダルの処理*/
-
+    
     #overlay {
         position: fixed;
         top: 0;
@@ -2265,14 +2267,14 @@
         display: none;
         background: rgba(0, 0, 0, 0.6);
     }
-
+    
     .cv-spinner {
         height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
     }
-
+    
     .spinner {
         width: 40px;
         height: 40px;
@@ -2281,13 +2283,13 @@
         border-radius: 50%;
         animation: sp-anime 0.8s infinite linear;
     }
-
+    
     @keyframes sp-anime {
         100% {
             transform: rotate(360deg);
         }
     }
-
+    
     .is-hide {
         display: none;
     }

@@ -880,7 +880,8 @@ class DepositController extends Controller
             ['Deposit.active', '=', '1']
         ])
         ->orderBy('SaleSlip.delivery_date', 'asc')
-        ->orderBy('SaleSlip.sort', 'asc')
+        ->orderBy('SaleSlip.id', 'asc')
+        ->orderBy('SaleSlipDetail.sort', 'asc')
         ->get();
 
         // ------------------------

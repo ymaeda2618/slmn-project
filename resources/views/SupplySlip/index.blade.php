@@ -187,7 +187,7 @@
                             <!--製品名-->{{$supply_slip_detail_val['product_name']}}
                         </td>
                         <td class="double-width" colspan="2">
-                            <!--規格-->{{$supply_slip_detail_val['standard_name']}}
+                            <!--摘要-->{{$supply_slip_detail_val['memo']}}
                         </td>
                         <td>
                             <!--担当者名-->{{$supply_slip_detail_val['staff_name']}}

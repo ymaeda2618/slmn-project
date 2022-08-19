@@ -304,7 +304,8 @@ class SupplySlipController extends Controller
                 'SupplySlipDetail.id               AS supply_slip_detail_id',
                 'SupplySlipDetail.unit_price       AS supply_slip_detail_unit_price',
                 'SupplySlipDetail.unit_num         AS supply_slip_detail_unit_num',
-                'Unit.name                         AS unit_name'
+                'Unit.name                         AS unit_name',
+                'SupplySlipDetail.memo             AS supply_slip_detail_memo',
             )
             ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y/%m/%d")                AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y/%m/%d") AS supply_slip_delivery_date')
@@ -359,6 +360,8 @@ class SupplySlipController extends Controller
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
             })
             ->whereIn('SupplySlip.id', $supply_slip_id_arr)
+            ->orderBy('SaleSlip.id', 'desc')
+            ->orderBy('SaleSlipDetail.sort', 'asc')
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列
@@ -394,6 +397,7 @@ class SupplySlipController extends Controller
                     'supply_slip_detail_unit_num'   => $unit_num,
                     'unit_name'                     => $SupplySlipDetails->unit_name,
                     'staff_name'                    => $SupplySlipDetails->staff_name,
+                    'memo'                          => $SupplySlipDetails->supply_slip_detail_memo,
                 ];
             }
 

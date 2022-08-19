@@ -319,17 +319,18 @@ class SaleSlipController extends Controller
             ->select(
                 'SaleSlip.id                  AS sale_slip_id',
                 'SaleSlip.total               AS sale_slip_total',
-                'SaleSlip.sale_submit_type  AS sale_submit_type',
+                'SaleSlip.sale_submit_type    AS sale_submit_type',
                 'SaleCompany.code             AS sale_company_code',
                 'SaleCompany.name             AS sale_company_name',
-                'Product.code                   AS product_code',
-                'Product.name                   AS product_name',
-                'Product.tax_id                 AS product_tax_id',
-                'Standard.name                  AS standard_name',
+                'Product.code                 AS product_code',
+                'Product.name                 AS product_name',
+                'Product.tax_id               AS product_tax_id',
+                'Standard.name                AS standard_name',
                 'SaleSlipDetail.id            AS sale_slip_detail_id',
                 'SaleSlipDetail.unit_price    AS sale_slip_detail_unit_price',
                 'SaleSlipDetail.unit_num      AS sale_slip_detail_unit_num',
-                'Unit.name                      AS unit_name'
+                'Unit.name                    AS unit_name',
+                'SaleSlipDetail.memo          AS sale_slip_detail_memo',
             )
             ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y/%m/%d")                AS sale_slip_date')
             ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y/%m/%d") AS sale_slip_delivery_date')
@@ -388,6 +389,7 @@ class SaleSlipController extends Controller
             })
             ->whereIn('SaleSlip.id', $sale_slip_id_arr)
             ->orderBy('SaleSlip.id', 'desc')
+            ->orderBy('SaleSlipDetail.sort', 'asc')
             ->get();
 
 
@@ -422,6 +424,7 @@ class SaleSlipController extends Controller
                     'sale_slip_detail_unit_num'   => $SaleSlipDetails->sale_slip_detail_unit_num,
                     'unit_name'                   => $SaleSlipDetails->unit_name,
                     'staff_name'                  => $SaleSlipDetails->staff_name,
+                    'memo'                        => $SaleSlipDetails->sale_slip_detail_memo,
                 ];
             }
 

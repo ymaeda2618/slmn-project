@@ -360,8 +360,8 @@ class SupplySlipController extends Controller
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
             })
             ->whereIn('SupplySlip.id', $supply_slip_id_arr)
-            ->orderBy('SaleSlip.id', 'desc')
-            ->orderBy('SaleSlipDetail.sort', 'asc')
+            ->orderBy('SupplySlip.id', 'desc')
+            ->orderBy('SupplySlipDetail.sort', 'asc')
             ->get();
 
             // 各伝票にいくつ明細がついているのかをカウントする配列

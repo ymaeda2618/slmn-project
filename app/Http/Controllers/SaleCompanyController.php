@@ -299,7 +299,11 @@ class SaleCompanyController extends Controller
                         ['SaleCompany.active', '=', '1'],
                     ])->orderBy('id', 'desc')->first();
 
-                    $sale_company_code = $SaleCompanyCode->code + 1;
+                    if (!is_numeric($SaleCompanyCode->code)) {
+                        throw new Exception("コードが数値ではありません。");
+                    }
+
+                    $sale_company_code = intval($SaleCompanyCode->code) + 1;
 
                     // codeが存在するかチェック
                     $SaleCompanyCodeCheck = DB::table('sale_companies AS SaleCompany')

@@ -2734,12 +2734,11 @@ class SaleSlipController extends Controller
             }
         }
 
-        $pdf = \PDF::view('pdf.pdfDeliverySlip.blade', [
+        $pdf = \PDF::view('pdf.pdfDeliverySlip', [
             'depositList' => $calcDepositList
         ])
-
         ->setOption('encoding', 'utf-8');
-        return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
+        return $pdf->inline('delivery_slip' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード
     }
 }

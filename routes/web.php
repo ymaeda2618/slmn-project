@@ -149,6 +149,7 @@ Route::get('SaleSlipEdit/{supply_slip_id}', 'SaleSlipController@edit');
 Route::post('editRegisterSaleSlips', 'SaleSlipController@editRegister');
 Route::post('AjaxShowSupplySlip', 'SaleSlipController@AjaxShowSupplySlip');
 Route::post('getOrderSaleUnitPrice', 'SaleSlipController@getOrderSaleUnitPrice');
+Route::get('deliverySlipOutput/{sale_slip_id}', 'SaleSlipController@deliverySlipOutput');
 
 // 入出金管理関連
 Route::get('WithdrawalIndex', 'WithdrawalController@index');

@@ -2542,4 +2542,204 @@ class SaleSlipController extends Controller
 
         return;
     }
+
+
+    /**
+     * 納品書印刷
+     */
+    public function deliverySlipOutput($sale_slip_id) {
+
+        // activeの変数を格納
+        $this_active = 1;
+
+        //------------------
+        // 売上伝票詳細取得
+        //------------------
+        $SaleSlipDetailList = DB::table('sale_slip_details AS SaleSlipDetail')
+        ->select(
+            'SaleSlip.id                       AS sale_slip_id',
+            'SaleSlip.delivery_price           AS delivery_price',
+            'SaleSlip.adjust_price             AS adjust_price',
+            'SaleSlip.remarks                  AS remarks',
+            'SaleSlipDetail.id                 AS sale_slip_detail_id',
+            'SaleSlipDetail.unit_price         AS unit_price',
+            'SaleSlipDetail.unit_num           AS unit_num',
+            'SaleSlipDetail.notax_price        AS notax_price',
+            'SaleSlipDetail.seri_no            AS seri_no',
+            'SaleSlipDetail.inventory_unit_num AS inventory_unit_num',
+            'SaleSlipDetail.memo               AS memo',
+            'SaleCompany.id                    AS company_id',
+            'SaleCompany.name                  AS company_name',
+            'SaleCompany.postal_code           AS company_postal_code',
+            'SaleCompany.address               AS company_address',
+            'Product.name                      AS product_name',
+            'Product.tax_id                    AS tax_id',
+            'Unit.name                         AS unit_name',
+        )
+        ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
+        ->join('sale_slips AS SaleSlip', function ($join) {
+            $join->on('SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id');
+        })
+        ->join('sale_companies AS SaleCompany', function ($join) {
+            $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
+        })
+        ->join('products as Product', function ($join) {
+            $join->on('Product.id', '=', 'SaleSlipDetail.product_id')
+                 ->where('Product.active', '=', true);
+        })
+        ->join('units as Unit', function ($join) {
+            $join->on('Unit.id', '=', 'SaleSlipDetail.unit_id')
+                 ->where('Unit.active', '=', true);
+        })
+        ->where([
+            ['SaleSlipDetail.sale_slip_id','=', $sale_slip_id],
+            ['SaleSlipDetail.active','=', $this_active]
+        ])
+        ->get();
+
+        // ------------------------
+        // 取得してきたデータを整形する
+        // ------------------------
+
+        // 初期化処理
+        $calcDepositList = array();
+        $notaxSubTotal8Amount = 0;
+        $notaxSubTotal10Amount = 0;
+        foreach ($SaleSlipDetailList as $SaleSlipDetailDatas) {
+            // -------
+            // 会社情報
+            // -------
+            // 企業情報格納
+            if (!isset($calcDepositList['company_info'])) {
+                $companyId = $SaleSlipDetailDatas->company_id;
+                $calcDepositList['company_info']['name']    = $SaleSlipDetailDatas->company_name;
+                $calcDepositList['company_info']['address'] = $SaleSlipDetailDatas->company_address;
+                // 郵便番号は間にハイフンを入れる
+                $calcDepositList['company_info']['code'] = '';
+                if (!empty($SaleSlipDetailDatas->company_postal_code)) {
+                    $codeBefore = substr($SaleSlipDetailDatas->company_postal_code, 0, 3);
+                    $codeAfter  = substr($SaleSlipDetailDatas->company_postal_code, 3, 4);
+                    $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                }
+            }
+
+            // -------------------
+            // 8%, 10%ごとの金額計算
+            // -------------------
+            // 初期化
+            $calcDepositList['detail'][] = array(
+                'date'                => $SaleSlipDetailDatas->sale_slip_delivery_date,
+                'name'                => $SaleSlipDetailDatas->product_name,
+                'inventory_unit_num'  => $SaleSlipDetailDatas->inventory_unit_num,
+                'unit_price'          => $SaleSlipDetailDatas->unit_price,
+                'unit_num'            => $SaleSlipDetailDatas->unit_num,
+                'unit_name'           => $SaleSlipDetailDatas->unit_name,
+                'notax_price'         => $SaleSlipDetailDatas->notax_price,
+                'memo'                => $SaleSlipDetailDatas->memo,
+            );
+
+            if (!isset($calcDepositList['total'])) {
+                $calcDepositList['total'] = array(
+                    'notax_subtotal_8'  => 0,
+                    'notax_subtotal_10' => 0,
+                    'tax_8'             => 0,
+                    'tax_10'            => 0,
+                    'total'             => 0
+                );
+            }
+
+            if ($SaleSlipDetailDatas->tax_id == 1) {
+                // 8%の計算
+                // 計算
+                $notaxSubTotal8Amount += $SaleSlipDetailDatas->notax_price;
+
+            } else {
+                // 10%の計算
+                // 計算
+                $notaxSubTotal10Amount += $SaleSlipDetailDatas->notax_price;
+            }
+        }
+
+        // 税金計算
+        $tax8  = floor($notaxSubTotal8Amount * 0.08);
+        $tax10 = floor($notaxSubTotal10Amount * 0.1);
+
+        // 税込小計
+        $subTotal8Amount  = $notaxSubTotal8Amount  + $tax8;
+        $subTotal10Amount = $notaxSubTotal10Amount + $tax10;
+
+        // データ格納
+        $calcDepositList['total']['notax_subtotal_8']  = $notaxSubTotal8Amount;
+        $calcDepositList['total']['tax_8']             = $tax8 ;
+        $calcDepositList['total']['notax_subtotal_10'] = $subTotal10Amount;
+        $calcDepositList['total']['tax_10']            = $tax10;
+        $calcDepositList['total']['total']             = $subTotal8Amount + $subTotal10Amount;
+
+        // -----------------
+        // 調整額と配送額の計算
+        // -----------------
+        $calcDepositIds  = array();
+        $calcSaleSlipIds = array();
+        foreach ($SaleSlipDetailList as $SaleSlipDetailDatas) {
+            // 初期化
+            if (!isset($calcDepositList['detail']['adjust_price'])) {
+                $calcDepositList['detail']['adjust_price'] = array(
+                    'date'               => '',
+                    'name'                => '調整額',
+                    'inventory_unit_num'  => '',
+                    'unit_price'         => '',
+                    'unit_num'           => '',
+                    'unit_name'          => '',
+                    'notax_price'        => 0,
+                    'memo'               => '',
+                );
+            }
+
+            if (!isset($calcDepositList['detail']['delivery_price'])) {
+                $calcDepositList['detail']['delivery_price'] = array(
+                    'date'                => '',
+                    'name'                => '配送額',
+                    'inventory_unit_num'  => '',
+                    'unit_price'          => '',
+                    'unit_num'            => '',
+                    'unit_name'           => '',
+                    'notax_price'         => 0,
+                    'memo'                => '',
+                );
+            }
+            // 売上伝票ごとに
+            if (!in_array($SaleSlipDetailDatas->sale_slip_id, $calcSaleSlipIds)) {
+                $calcDepositList['detail']['adjust_price']['notax_price'] += $SaleSlipDetailDatas->adjust_price;
+                $calcDepositList['detail']['delivery_price']['notax_price'] += $SaleSlipDetailDatas->delivery_price;
+                $calcDepositList['total']['total'] += $SaleSlipDetailDatas->adjust_price + $SaleSlipDetailDatas->delivery_price;
+                $calcSaleSlipIds[] = $SaleSlipDetailDatas->sale_slip_id;
+            }
+        }
+
+        // 明細の数が10件未満なら10件まで空データを入れる
+        $detailCnt = count($calcDepositList['detail']);
+        if ($detailCnt < 15) {
+            $addLine = 15 - $detailCnt;
+            for ($i=1;$i<=$addLine;$i++) {
+                $calcDepositList['detail'][] = array(
+                    'date'                => '',
+                    'name'                => '',
+                    'inventory_unit_num'  => '',
+                    'unit_price'          => '',
+                    'unit_num'            => '',
+                    'unit_name'           => '',
+                    'notax_price'         => '',
+                    'memo'                => ''
+                );
+            }
+        }
+
+        $pdf = \PDF::view('pdf.pdfDeliverySlip.blade', [
+            'depositList' => $calcDepositList
+        ])
+
+        ->setOption('encoding', 'utf-8');
+        return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
+        // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード
+    }
 }

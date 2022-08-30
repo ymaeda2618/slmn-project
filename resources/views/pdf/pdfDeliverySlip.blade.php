@@ -122,7 +122,7 @@
         height: 11.5%;
         border: solid 1px #DDDDDD;
         padding: 4% 0 4% 5%;
-        font-size: 20px;
+        font-size: 16px;
     }
     
     #claim-table {

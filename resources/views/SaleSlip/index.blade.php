@@ -166,7 +166,7 @@
                         </td>
                         @if (Home::authClerkCheck())
                         <td class="double-width" colspan="2">
-                            <!--編集ボタン--><a class='edit-btn' href='./SaleSlipEdit/{{$saleSlips->sale_slip_id}}'>編集</a>
+                            <!--編集ボタン--><a class='edit-btn' target="_blank" href='./SaleSlipEdit/{{$saleSlips->sale_slip_id}}'>編集</a>
                         </td>
                         @endif
                     </tr>
@@ -185,7 +185,7 @@
                         </td>
                         @if (Home::authClerkCheck())
                         <td class="double-width" colspan="2">
-                            <!--納品書ボタン--><a class='delivery-slip-btn' href='./deliverySlipOutput/{{$saleSlips->sale_slip_id}}'>納品書</a>
+                            <!--納品書ボタン--><a class='delivery-slip-btn' target="_blank" href='./deliverySlipOutput/{{$saleSlips->sale_slip_id}}'>納品書</a>
                         </td>
                         @endif
                     </tr>

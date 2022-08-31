@@ -1029,6 +1029,16 @@ class DepositController extends Controller
             }
         }
 
+        // 調整額が0円の場合は配列から除去する
+        if(empty($calcDepositList['detail']['adjust_price']['notax_price'])){
+            unset($calcDepositList['detail']['adjust_price']);
+        }
+
+        // 配送額が0円の場合は配列から除去する
+        if(empty($calcDepositList['detail']['delivery_price']['notax_price'])){
+            unset($calcDepositList['detail']['delivery_price']);
+        }
+
         // 明細の数が10件未満なら10件まで空データを入れる
         $detailCnt = count($calcDepositList['detail']);
         if ($detailCnt < 15) {

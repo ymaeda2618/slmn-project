@@ -848,7 +848,8 @@ class DepositController extends Controller
             'SaleSlipDetail.memo                         AS memo',
             'Product.name                                AS product_name',
             'Product.tax_id                              AS tax_id',
-            'Unit.name                                   AS unit_name'
+            'Unit.name                                   AS unit_name',
+            'OriginArea.name                             AS origin_name',
         )
         ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
         ->join('sale_companies AS SaleCompany', function ($join) {
@@ -874,6 +875,10 @@ class DepositController extends Controller
         })
         ->join('units AS Unit', function ($join) {
             $join->on('Product.unit_id', '=', 'Unit.id');
+        })
+        ->leftJoin('origin_areas as OriginArea', function ($join) {
+            $join->on('OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
+                 ->where('OriginArea.active', '=', true);
         })
         ->where([
             ['Deposit.id', '=', $depositId],
@@ -936,6 +941,7 @@ class DepositController extends Controller
             $calcDepositList['detail'][] = array(
                 'date'                => $depositDatas->sale_slip_delivery_date,
                 'name'                => $depositDatas->product_name,
+                'origin_name'         => $depositDatas->origin_name,
                 'inventory_unit_num'  => $depositDatas->inventory_unit_num,
                 'unit_price'          => $depositDatas->unit_price,
                 'unit_num'            => $depositDatas->unit_num,
@@ -992,6 +998,7 @@ class DepositController extends Controller
                 $calcDepositList['detail']['adjust_price'] = array(
                     'date'               => '',
                     'name'                => '調整額',
+                    'origin_name'         => '',
                     'inventory_unit_num'  => '',
                     'unit_price'         => '',
                     'unit_num'           => '',
@@ -1005,6 +1012,7 @@ class DepositController extends Controller
                 $calcDepositList['detail']['delivery_price'] = array(
                     'date'                => '',
                     'name'                => '配送額',
+                    'origin_name'         => '',
                     'inventory_unit_num'  => '',
                     'unit_price'          => '',
                     'unit_num'            => '',
@@ -1047,6 +1055,7 @@ class DepositController extends Controller
                 $calcDepositList['detail'][] = array(
                     'date'                => '',
                     'name'                => '',
+                    'origin_name'         => '',
                     'inventory_unit_num'  => '',
                     'unit_price'          => '',
                     'unit_num'            => '',

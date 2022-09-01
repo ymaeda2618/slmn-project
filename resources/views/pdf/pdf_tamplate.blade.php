@@ -39,13 +39,14 @@
     <div id='details'>
         <table id="detail-table" border='1'>
             <tr class='header'>
-                <th class="width-10 td-space">納品日</th>
-                <th class="width-20 td-space">商品名</th>
+                <th class="width-7 td-space">納品日</th>
+                <th class="width-23 td-space">商品名</th>
+                <th class="width-12 td-space">産地</th>
                 <th class="width-5 td-space">個数</th>
-                <th class="width-10 td-space">単価</th>
-                <th class="width-10 td-space">数量</th>
+                <th class="width-9 td-space">単価</th>
+                <th class="width-5 td-space">数量</th>
                 <th class="width-5 td-space">単位</th>
-                <th class="width-15 td-space">税抜金額</th>
+                <th class="width-9 td-space">税抜金額</th>
                 <th class="width-25 td-space">摘要</th>
             </tr>
             <?php $prev_date = ""; ?> @foreach ($depositList['detail'] as $detailDatas)
@@ -54,6 +55,7 @@
                     @if($prev_date != $detailDatas['date']) {{$detailDatas['date']}} @endif
                 </td>
                 <td class="td-space">{{$detailDatas['name']}}</td>
+                <td class="td-space">{{$detailDatas['origin_name']}}</td>
                 <td class="center-cell td-space">{{$detailDatas['inventory_unit_num']}}</td>
                 @if ($detailDatas['unit_price'] === '')
                 <td class="price-cell td-space brank-line">{{$detailDatas['unit_price']}}</td>
@@ -113,27 +115,27 @@
     #wrapper {
         width: 100%;
     }
-
+    
     #top-contents {
         width: 100%;
         overflow: hidden;
     }
-
+    
     #left-contents {
         width: 50%;
         float: left;
         overflow: hidden;
     }
-
+    
     #right-contents {
         width: 50%;
         overflow: hidden;
     }
-
+    
     #details {
         width: 100%;
     }
-
+    
     #company-info {
         width: 80%;
         height: 11.5%;
@@ -141,119 +143,135 @@
         padding: 4% 0 4% 5%;
         font-size: 16px;
     }
-
+    
     #claim-table {
         width: 95%;
         border: solid 2px #999999;
         border-collapse: collapse;
         font-size: 22px;
     }
-
+    
     #claim-table td {
         padding: 3%;
         text-align: center;
     }
-
+    
     #bank-info {
         width: 95%;
         border: solid 2px #999999;
         text-align: center;
     }
-
+    
     h1 {
         width: 80%;
         border-bottom: solid 2px #999999;
         letter-spacing: 1em;
         text-align: center;
     }
-
+    
     #detail-table {
         width: 100%;
         border: solid 2px #999999;
         border-collapse: collapse;
     }
-
+    
     .center-cell {
         text-align: center;
     }
-
+    
     .price-cell {
         text-align: center;
     }
-
+    
     #total-table {
         width: 100%;
         border: solid 2px #999999;
         border-collapse: collapse;
     }
-
+    
     .font-bold {
         font-weight: bold;
     }
-
+    
     .text-right {
         text-align: right;
     }
-
+    
     .text-left-top {
         text-align: left;
         vertical-align: top;
     }
-
+    
     .td-space {
         padding: 1%;
     }
-
+    
     .brank-line {
         padding: 2%;
     }
-
+    
     .width-70 {
         width: 70%;
     }
-
+    
     .width-50 {
         width: 50%;
     }
-
+    
     .width-40 {
         width: 40%;
     }
-
+    
     .width-30 {
         width: 30%;
     }
-
+    
     .width-25 {
         width: 25%;
     }
-
+    
+    .width-23 {
+        width: 23%;
+    }
+    
     .width-20 {
         width: 20%;
     }
-
+    
     .width-15 {
         width: 15%;
     }
-
+    
+    .width-12 {
+        width: 12%;
+    }
+    
     .width-10 {
         width: 10%;
     }
-
+    
+    .width-9 {
+        width: 9%;
+    }
+    
     .width-5 {
         width: 5%;
     }
-
+    
+    .width-7 {
+        width: 7%;
+    }
+    
     .header {
         font-size: 16px;
     }
-
+    
     .page {
         page-break-after: always;
         page-break-inside: avoid;
         font-size: 12px;
     }
-
+    
     .page:last-child {
         page-break-after: auto;
     }

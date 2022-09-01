@@ -2575,6 +2575,7 @@ class SaleSlipController extends Controller
             'Product.name                      AS product_name',
             'Product.tax_id                    AS tax_id',
             'Unit.name                         AS unit_name',
+            'OriginArea.name                   AS origin_name',
         )
         ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
         ->join('sale_slips AS SaleSlip', function ($join) {
@@ -2590,6 +2591,10 @@ class SaleSlipController extends Controller
         ->join('units as Unit', function ($join) {
             $join->on('Unit.id', '=', 'SaleSlipDetail.unit_id')
                  ->where('Unit.active', '=', true);
+        })
+        ->leftJoin('origin_areas as OriginArea', function ($join) {
+            $join->on('OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
+                 ->where('OriginArea.active', '=', true);
         })
         ->where([
             ['SaleSlipDetail.sale_slip_id','=', $sale_slip_id],
@@ -2630,6 +2635,7 @@ class SaleSlipController extends Controller
             $calcDepositList['detail'][] = array(
                 'date'                => $SaleSlipDetailDatas->sale_slip_delivery_date,
                 'name'                => $SaleSlipDetailDatas->product_name,
+                'origin_name'         => $SaleSlipDetailDatas->origin_name,
                 'inventory_unit_num'  => $SaleSlipDetailDatas->inventory_unit_num,
                 'unit_price'          => $SaleSlipDetailDatas->unit_price,
                 'unit_num'            => $SaleSlipDetailDatas->unit_num,
@@ -2686,6 +2692,7 @@ class SaleSlipController extends Controller
                 $calcDepositList['detail']['adjust_price'] = array(
                     'date'               => '',
                     'name'                => '調整額',
+                    'origin_name'         => '',
                     'inventory_unit_num'  => '',
                     'unit_price'         => '',
                     'unit_num'           => '',
@@ -2699,6 +2706,7 @@ class SaleSlipController extends Controller
                 $calcDepositList['detail']['delivery_price'] = array(
                     'date'                => '',
                     'name'                => '配送額',
+                    'origin_name'         => '',
                     'inventory_unit_num'  => '',
                     'unit_price'          => '',
                     'unit_num'            => '',
@@ -2734,6 +2742,7 @@ class SaleSlipController extends Controller
                 $calcDepositList['detail'][] = array(
                     'date'                => '',
                     'name'                => '',
+                    'origin_name'         => '',
                     'inventory_unit_num'  => '',
                     'unit_price'          => '',
                     'unit_num'            => '',

@@ -709,7 +709,7 @@ class DepositController extends Controller
             $whereArray = [
                 ['SaleSlip.sale_company_id', '=', $saleCompany],
                 ['SaleSlip.sale_flg', '=', '0'],
-                ['SaleSlip.deposit_flg', '=', '0'],
+                // ['SaleSlip.deposit_flg', '=', '0'], 現状出力した明細も出すようにする
                 ['SaleSlip.active', '=', '1']
             ];
         }

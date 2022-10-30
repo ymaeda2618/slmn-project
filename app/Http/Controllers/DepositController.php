@@ -680,7 +680,7 @@ class DepositController extends Controller
         $saleCompany   = $request->sales_company;
         $searchDateVal = $request->search_date_val;
         $action        = $request->action;
-// error_log(print_r('aaa', true), '3', '/home/gfproject/mizucho.com/public_html/laravel/storage/logs/error.log');
+
         // 入力された値のチェック
         if (empty($saleFromDate) && empty($saleToDate)) {
             return false;
@@ -774,7 +774,7 @@ class DepositController extends Controller
                 $total           = $subTotal + $delivery_price + $adjust_price;           // 調整後総合計額
 
                 $ajaxHtml .= '        <tr>';
-                $ajaxHtml .= '            <td><input type="checkbox" id="sale-slip-id-' . $saleSlipDatas->id . '" name="data[DepositDetail][' . $saleSlipDatas->id . '][id]" value="' . $saleSlipDatas->id . '" onchange="javascript:discardSaleSlipId(' . $saleSlipDatas->id . ')"></td>';
+                $ajaxHtml .= '            <td><input type="checkbox" class="checkbox_list" id="sale-slip-id-' . $saleSlipDatas->id . '" name="data[DepositDetail][' . $saleSlipDatas->id . '][id]" value="' . $saleSlipDatas->id . '" onchange="javascript:discardSaleSlipId(' . $saleSlipDatas->id . ')"></td>';
                 $ajaxHtml .= '            <td>' . $saleSlipDatas->date;
                 $ajaxHtml .= '                <input type="hidden" name="data[DepositDetail][' . $saleSlipDatas->id . '][date]" value="' . $saleSlipDatas->date . '">';
                 $ajaxHtml .= '            </td>';
@@ -803,7 +803,7 @@ class DepositController extends Controller
                 $ajaxHtml .= '                <input type="hidden" name="data[DepositDetail][' . $saleSlipDatas->id . '][total]" value="' . $total . '">';
                 $ajaxHtml .= '            </td>';
                 $ajaxHtml .= '            <td>';
-                $ajaxHtml .= '                <a href="./SaleSlipEdit/' . $saleSlipDatas->id . '">明細</a>';
+                $ajaxHtml .= '                <a target="_blank" href="./SaleSlipEdit/' . $saleSlipDatas->id . '">明細</a>';
                 $ajaxHtml .= '            </td>';
                 $ajaxHtml .= '        </tr>';
 

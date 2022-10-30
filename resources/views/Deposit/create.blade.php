@@ -56,6 +56,8 @@
 
             {{-- 抽出結果表示欄 開始 --}}
             <div id="result-area" class="result-area">
+                <input type="checkbox" id="checkbox_all">
+                <label for="checkbox_all">全て選択 / 解除</label>
                 <table class="result-table" onchange="javascript:changeCalcFlg()">
                     <tr>
                         <th class="width-5">選択</th>
@@ -212,6 +214,9 @@
     var adjust_price;
     var total;
 
+    //チェックボックスのリスト
+    let checkbox_list;
+
     (function($) {
         jQuery(window).load(function() {
 
@@ -233,6 +238,11 @@
 
             adjust_price = 0;
             total = 0;
+
+            //全選択・解除のチェックボックス
+            let checkbox_all = document.querySelector("#checkbox_all");
+            //全選択のチェックボックスイベント
+            checkbox_all.addEventListener('change', change_all);
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
@@ -605,6 +615,8 @@
 
                 if (data != '') {
                     $(".result-table").html(data[0]);
+                    // チェックボックスのリストを取得
+                    checkbox_list = document.querySelectorAll(".checkbox_list");
                 } else {
                     alert("抽出対象が存在しません。");
                 }
@@ -832,6 +844,33 @@
             $('#sale-slip-detail-id-' + id).remove();
         }
     }
+
+
+
+    // -------------------
+    // 計算対象のチェックボックスを全選択・全解除
+    // -------------------
+    function change_all() {
+
+        //チェックされているか
+        if ($('#checkbox_all').prop("checked")) {
+
+            //全て選択
+            for (let i in checkbox_list) {
+                if (checkbox_list.hasOwnProperty(i)) {
+                    checkbox_list[i].checked = true;
+                }
+            }
+
+        } else {
+            //全て解除
+            for (let i in checkbox_list) {
+                if (checkbox_list.hasOwnProperty(i)) {
+                    checkbox_list[i].checked = false;
+                }
+            }
+        }
+    }
 </script>
 <style>
     /* 共通 */
@@ -942,9 +981,10 @@
     .result-area {
         display: block;
         width: 100%;
-        height: 30vh;
+        height: auto;
         margin-top: 2%;
         overflow: auto;
+        min-height: 150px;
     }
 
     .result-table {
@@ -953,12 +993,21 @@
         padding: 0;
         width: 100%;
         table-layout: fixed;
+        font-size: 10px;
     }
 
     .result-table th {
-        padding: 1% 0;
         border-right: 1px solid #bbb;
         text-align: center;
+        width: 10%;
+        padding: 10px;
+        padding-left: 10px;
+        background-color: #57595b;
+        font-weight: bold;
+        color: white;
+        font-size: 10px;
+        letter-spacing: 1px;
+        border: 1px solid #bcbcbc;
     }
 
     .result-table tr {

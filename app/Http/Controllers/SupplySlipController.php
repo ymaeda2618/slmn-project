@@ -703,7 +703,7 @@ class SupplySlipController extends Controller
             dd($e);
         }
 
-        return redirect('./SupplySlipIndex');
+        return redirect('./SupplySlipCreate');
     }
 
     /**
@@ -1669,7 +1669,7 @@ class SupplySlipController extends Controller
             dd($e);
         }
 
-        return redirect('./SupplySlipIndex');
+        return redirect('./SupplySlipCreate');
     }
 
     /**

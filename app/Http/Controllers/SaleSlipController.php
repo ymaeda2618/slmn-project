@@ -944,7 +944,7 @@ class SaleSlipController extends Controller
             dd($e);
         }
 
-        return redirect('./SaleSlipIndex');
+        return redirect('./SaleSlipCreate');
     }
 
     /**
@@ -1969,7 +1969,7 @@ class SaleSlipController extends Controller
             dd($e);
         }
 
-        return redirect('./SaleSlipIndex');
+        return redirect('./SaleSlipCreate');
     }
 
     /**

@@ -42,43 +42,48 @@ class ProductController extends Controller
             $search_action = './ProductIndex';
         }
 
-        // postできたか、getできたか
-        if ($_SERVER["REQUEST_METHOD"] != "POST"
-        ) { // ページング処理
+        // 変数の初期化
+        $product_search_type = 1;
+        $product_search_text = null;
+        $product_name        = null;
+        $product_code        = null;
 
-            $product_type = $request->session()->get('product_type');
-            $status_id    = $request->session()->get('status_id');
-            $tax_id       = $request->session()->get('tax_id');
-            $product_name = $request->session()->get('product_name');
-            $unit_id      = $request->session()->get('unit_id');
+        // postできたか、getできたか
+        if ($_SERVER["REQUEST_METHOD"] != "POST") { // ページング処理
+
+            $product_search_type = $request->session()->get('product_search_type');
+            $product_search_text = $request->session()->get('product_search_text');
+
+            if($product_search_type == 1){ // 製品名検索の場合
+                $product_name = $product_search_text;
+            } else { // 製品コード検索の場合
+                $product_code = $product_search_text;
+            }
 
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
-                $product_type = $request->data['Product']['product_type'];
-                $status_id    = $request->data['Product']['status_id'];
-                $tax_id       = $request->data['Product']['tax_id'];
-                $product_name = $request->data['Product']['product_name'];
-                $unit_id      = $request->data['Product']['unit_id'];
 
-                $request->session()->put('product_type', $product_type);
-                $request->session()->put('status_id', $status_id);
-                $request->session()->put('tax_id', $tax_id);
+                $product_search_type = $request->data['Product']['product_search_type'];
+                $product_search_text = $request->data['Product']['product_search_text'];
+
+                if ($product_search_type == 1) { // 製品名検索の場合
+                    $product_name        = $product_search_text;
+                } else { // 製品コード検索の場合
+                    $product_code        = $product_search_text;
+                }
+
+                $request->session()->put('product_search_type', $product_search_type);
+                $request->session()->put('product_search_text', $product_search_text);
                 $request->session()->put('product_name', $product_name);
-                $request->session()->put('unit_id', $unit_id);
+                $request->session()->put('product_code', $product_code);
+
             } else { // リセットボタンが押された時の処理
 
-                $product_type = 0;
-                $status_id    = 0;
-                $tax_id       = 0;
-                $product_name = null;
-                $unit_id      = 0;
-
-                $request->session()->forget('product_type');
-                $request->session()->forget('status_id');
-                $request->session()->forget('tax_id');
+                $request->session()->forget('product_search_type');
+                $request->session()->forget('product_search_text');
                 $request->session()->forget('product_name');
-                $request->session()->forget('unit_id');
+                $request->session()->forget('product_code');
             }
         }
 
@@ -122,23 +127,20 @@ class ProductController extends Controller
             ->join('units AS Unit', function ($join) {
                 $join->on('Unit.id', '=', 'Product.unit_id');
             })
-            ->if(!empty($product_type), function ($query) use ($product_type) {
-                return $query->where('Product.product_type', '=', $product_type);
-            })
-            ->if(!empty($status_id), function ($query) use ($status_id) {
-                return $query->where('Product.status_id', '=', $status_id);
-            })
-            ->if(!empty($tax_id), function ($query) use ($tax_id) {
-                return $query->where('Product.tax_id', '=', $tax_id);
-            })
             ->if(!empty($product_name), function ($query) use ($product_name) {
                 return $query->where('Product.name', 'like', '%'.$product_name.'%');
             })
-            ->if(!empty($unit_id), function ($query) use ($unit_id) {
-                return $query->where('Product.unit_id', '=', $unit_id);
+            ->if(!empty($product_code), function ($query) use ($product_code) {
+                return $query->where('Product.code', '=', $product_code);
             })
             ->where('Product.active', '=', '1')
             ->orderBy('Product.created', 'asc')->paginate(20);
+
+            // 対象日付のチェック
+            $product_search_type_name = "";
+            $product_search_type_code = "";
+            if($product_search_type == 1) $product_search_type_name = "checked";
+            else  $product_search_type_code = "checked";
 
 
         } catch (\Exception $e) {
@@ -151,17 +153,16 @@ class ProductController extends Controller
         }
 
         return view('Product.index')->with([
-            "action"             => $search_action,
-            "product_type"       => $product_type,
-            "status_id"          => $status_id,
-            "tax_id"             => $tax_id,
-            "product_name"       => $product_name,
-            "unit_id"            => $unit_id,
-            "search_action"      => $search_action,
-            "statusList"         => $statusList,
-            "taxList"            => $taxList,
-            "unitList"           => $unitList,
-            "productList"        => $productList,
+            "action"                   => $search_action,
+            "product_search_type"      => $product_search_type,
+            "product_search_type_name" => $product_search_type_name,
+            "product_search_type_code" => $product_search_type_code,
+            "product_search_text"      => $product_search_text,
+            "search_action"            => $search_action,
+            "statusList"               => $statusList,
+            "taxList"                  => $taxList,
+            "unitList"                 => $unitList,
+            "productList"              => $productList,
         ]);
     }
 

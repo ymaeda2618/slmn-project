@@ -13,52 +13,13 @@
                     <tbody>
                         <tr>
                             <td>
-                                <div class="table-th">製品種別</div>
-                                <div class="table-td">
-                                    <select class="form-control" id="product_type" name="data[Product][product_type]">
-                                        <option value="0">-</option>
-                                        <option value="1">魚</option>
-                                        <option value="2">その他</option>
-                                    </select>
-                                    <input type='hidden' id='product_type_selected' value='{{$product_type}}'>
+                                <div class="table-th">検索対象</div>
+                                <div class="table-td radio_box">
+                                    <label class="radio-label"><input type="radio" name="data[Product][product_search_type]" value="1" {{$product_search_type_name}}> 製品名</label>
+                                    <label class="radio-label"><input type="radio" name="data[Product][product_search_type]" value="2" {{$product_search_type_code}}> コード</label>
                                 </div>
-                                <div class="table-th">製品状態</div>
                                 <div class="table-td">
-                                    <select class="form-control" id="status_id" name="data[Product][status_id]">
-                                        <option value="0">-</option>
-                                        @foreach ($statusList as $statuses)
-                                        <option value="{{$statuses->id}}">{{$statuses->name}}</option>
-                                        @endforeach
-                                    </select>
-                                    <input type='hidden' id='status_id_selected' value='{{$status_id}}'>
-                                </div>
-                                <div class="table-th">税率</div>
-                                <div class="table-td">
-                                    <select class="form-control" id="tax_id" name="data[Product][tax_id]">
-                                        <option value="0">-</option>
-                                        @foreach ($taxList as $taxes)
-                                        <option value="{{$taxes->id}}">{{$taxes->name}}</option>
-                                        @endforeach
-                                    </select>
-                                    <input type='hidden' id='tax_id_selected' value='{{$tax_id}}'>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="table-th">製品名</div>
-                                <div class="table-td">
-                                    <input type="text" class="form-control" id="product_name" name="data[Product][product_name]" value='{{$product_name}}'>
-                                </div>
-                                <div class="table-th">単位</div>
-                                <div class="table-td">
-                                    <select class="form-control" id="unit_id" name="data[Product][unit_id]">
-                                    <option value="0">-</option>
-                                    @foreach ($unitList as $units)
-                                    <option value="{{$units->id}}">{{$units->name}}</option>
-                                    @endforeach
-                                </select>
-                                    <input type='hidden' id='unit_id_selected' value='{{$unit_id}}'>
+                                    <input type="text" class="search-control" name="data[Product][product_search_text]" value="{{$product_search_text}}" tabindex="1">
                                 </div>
                             </td>
                         </tr>
@@ -82,7 +43,8 @@
                         <th class="double-width" colspan="2">品名</th>
                         <th>税率</th>
                         <th>単位</th>
-                        @if (Home::authOwnerCheck()) <th>編集</th> @endif
+                        @if (Home::authOwnerCheck())
+                        <th>編集</th> @endif
                     </tr>
                     @foreach ($productList as $products)
                     <tr>
@@ -92,7 +54,8 @@
                         <td class="double-width" colspan="2 ">{{$products->product_name}}</td>
                         <td>{{$products->tax_name}}</td>
                         <td>{{$products->unit_name}}</td>
-                        @if (Home::authOwnerCheck()) <td><a class='edit-btn' href='./ProductEdit/{{$products->product_id}}'>編集</a></td> @endif
+                        @if (Home::authOwnerCheck())
+                        <td><a class='edit-btn' href='./ProductEdit/{{$products->product_id}}'>編集</a></td> @endif
                     </tr>
                     @endforeach
                 </tbody>
@@ -137,7 +100,22 @@
 
 <style>
     /* 共通 */
-    
+
+    .search-control {
+        display: block;
+        width: 100%;
+        height: 30px;
+        padding: 5px;
+        font-size: 10px;
+        line-height: 1.6;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -145,7 +123,18 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-    
+
+    .search-control[readonly] {
+        background-color: #e9ecef;
+        opacity: 1;
+    }
+
+    .radio-label {
+        margin-bottom: initial!important;
+        font-weight: bolder;
+        margin-right: 10px;
+    }
+
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -153,34 +142,42 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-    
+
     .search-area table {
         margin: auto;
         width: 100%;
     }
-    
+
     .table-th {
-        width: 10%;
-        padding: 15px 0px 0px 10px;
-        font-size: 10px;
+        width: 30%;
+        padding: 15px 50px 0px 0px;
+        font-size: 14px;
         float: left;
         font-weight: bolder;
+        text-align: right;
     }
-    
+
     .table-td {
+        font-size: 12px;
+        float: left;
+        padding: 10px 0px;
+        width: 30%;
+    }
+
+    .radio_box {
         width: 20%;
-        padding: 10px;
-        font-size: 10px;
+        padding: 17px 10px;
+        font-size: 12px;
         float: left;
     }
-    
+
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-    
+
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -189,7 +186,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-    
+
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -198,13 +195,13 @@
         border-radius: 10px;
         margin-left: 2%;
     }
-    
+
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-    
+
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -212,7 +209,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-    
+
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -224,7 +221,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-    
+
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -232,11 +229,11 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-    
+
     .double-width {
         width: 20%!important;
     }
-    
+
     .edit-btn {
         border-radius: 5px;
         color: #fff;

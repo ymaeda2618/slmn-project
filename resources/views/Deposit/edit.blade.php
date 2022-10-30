@@ -132,7 +132,7 @@
                                 <input type="hidden" name="data[DepositDetail][{{$saleSlipData->id}}][total]" value="{{$total}}">
                             </td>
                             <td>
-                                <a href="./../SaleSlipEdit/{{$saleSlipData->id}}">明細</a>
+                                <a target="_blank" href="./../SaleSlipEdit/{{$saleSlipData->id}}">明細</a>
                             </td>
                         </tr>
                         @endforeach

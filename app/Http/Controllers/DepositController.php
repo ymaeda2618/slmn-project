@@ -983,7 +983,7 @@ class DepositController extends Controller
         // データ格納
         $calcDepositList['total']['notax_subtotal_8']  = $notaxSubTotal8Amount;
         $calcDepositList['total']['tax_8']             = $tax8 ;
-        $calcDepositList['total']['notax_subtotal_10'] = $subTotal10Amount;
+        $calcDepositList['total']['notax_subtotal_10'] = $notaxSubTotal10Amount;
         $calcDepositList['total']['tax_10']            = $tax10;
         $calcDepositList['total']['total']             = $subTotal8Amount + $subTotal10Amount;
 

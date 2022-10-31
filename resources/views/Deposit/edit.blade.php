@@ -95,7 +95,7 @@
 
                     ?>
                         <tr>
-                            <td><input type="checkbox" class="checkbox_list" id="sale-slip-id-{{$saleSlipData->id}}" name="data[DepositDetail][{{$saleSlipData->id}}][id]" value="{{$saleSlipData->id}}" <?php echo $checked; ?> onchange="javascript:discardSaleSlipId({{$saleSlipData->id}})"></td>
+                            <td><input type="checkbox" class="checkbox_list" id="sale-slip-id-{{$saleSlipData->id}}" name="data[DepositDetail][{{$saleSlipData->id}}][id]" value="{{$saleSlipData->id}}" <?php echo $checked; ?>></td>
                             <td>{{$saleSlipData->date}}
                                 <input type="hidden" name="data[DepositDetail][{{$saleSlipData->id}}][date]" value="{{$saleSlipData->date}}">
                             </td>
@@ -642,7 +642,8 @@
                 // idを取得
                 var id = $(this).val();
 
-                discardSaleSlipId(id);
+                // チェックしたら詳細エリアにIDを追加
+                $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
             });
 
             calcSalePrice();
@@ -736,6 +737,9 @@
         var tax8 = 0;
         var tax10 = 0;
 
+        // チェックされている要素を全削除
+        $('#sale-slip-area').empty();
+
         // チェックボックスの値を取得して計算
         $('.result-table input:checked').each(function() {
 
@@ -754,7 +758,8 @@
             // 調整額
             adjustPrice += parseInt($('#sale-slip-adjustPrice-' + id).val());
 
-            discardSaleSlipId(id)
+            // チェックしたら詳細エリアにIDを追加
+            $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
 
         });
 
@@ -912,27 +917,6 @@
 
         $("#calc-flg").val(0);
 
-    }
-
-    // -------------------
-    // sale_slip_idの取得
-    // -------------------
-    function discardSaleSlipId(id) {
-
-        // 対象IDのチェック状態を取得
-        var isCheck = $('#sale-slip-id-' + id).prop('checked');
-
-        if (isCheck) {
-            if (!($('#sale-slip-detail-id-' + id).length)) {
-                // チェックしたら詳細エリアにIDを追加
-                $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
-            }
-        } else {
-            if ($('#sale-slip-detail-id-' + id).length) {
-                // チェック外れたらIDを詳細エリアから外す
-                $('#sale-slip-detail-id-' + id).remove();
-            }
-        }
     }
 
     // -------------------

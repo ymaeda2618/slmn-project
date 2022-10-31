@@ -774,7 +774,7 @@ class DepositController extends Controller
                 $total           = $subTotal + $delivery_price + $adjust_price;           // 調整後総合計額
 
                 $ajaxHtml .= '        <tr>';
-                $ajaxHtml .= '            <td><input type="checkbox" class="checkbox_list" id="sale-slip-id-' . $saleSlipDatas->id . '" name="data[DepositDetail][' . $saleSlipDatas->id . '][id]" value="' . $saleSlipDatas->id . '" onchange="javascript:discardSaleSlipId(' . $saleSlipDatas->id . ')"></td>';
+                $ajaxHtml .= '            <td><input type="checkbox" class="checkbox_list" id="sale-slip-id-' . $saleSlipDatas->id . '" name="data[DepositDetail][' . $saleSlipDatas->id . '][id]" value="' . $saleSlipDatas->id . '"></td>';
                 $ajaxHtml .= '            <td>' . $saleSlipDatas->date;
                 $ajaxHtml .= '                <input type="hidden" name="data[DepositDetail][' . $saleSlipDatas->id . '][date]" value="' . $saleSlipDatas->date . '">';
                 $ajaxHtml .= '            </td>';

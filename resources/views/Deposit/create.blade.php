@@ -652,6 +652,9 @@
         var tax8 = 0;
         var tax10 = 0;
 
+        // チェックされている要素を全削除
+        $('#sale-slip-area').empty();
+
         // チェックボックスの値を取得して計算
         $('.result-table input:checked').each(function() {
 
@@ -669,6 +672,9 @@
 
             // 調整額
             adjustPrice += parseInt($('#sale-slip-adjustPrice-' + id).val());
+
+            // チェックしたら詳細エリアにIDを追加
+            $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
 
         });
 
@@ -827,25 +833,6 @@
         $("#calc-flg").val(0);
 
     }
-
-    // -------------------
-    // sale_slip_idの取得
-    // -------------------
-    function discardSaleSlipId(id) {
-
-        // 対象IDのチェック状態を取得
-        var isCheck = $('#sale-slip-id-' + id).prop('checked');
-
-        if (isCheck) {
-            // チェックしたら詳細エリアにIDを追加
-            $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
-        } else {
-            // チェック外れたらIDを詳細エリアから外す
-            $('#sale-slip-detail-id-' + id).remove();
-        }
-    }
-
-
 
     // -------------------
     // 計算対象のチェックボックスを全選択・全解除

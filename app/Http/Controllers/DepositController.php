@@ -708,8 +708,8 @@ class DepositController extends Controller
         } else {
             $whereArray = [
                 ['SaleSlip.sale_company_id', '=', $saleCompany],
-                ['SaleSlip.sale_flg', '=', '0'],
-                // ['SaleSlip.deposit_flg', '=', '0'], 現状出力した明細も出すようにする
+                //['SaleSlip.sale_flg', '=', '0'], 現状出力した明細も出すようにする
+                ['SaleSlip.deposit_flg', '=', '0'],
                 ['SaleSlip.active', '=', '1']
             ];
         }

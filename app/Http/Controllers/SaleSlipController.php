@@ -813,7 +813,10 @@ class SaleSlipController extends Controller
                 // -----------------------------
                 // 登録されている対象売上データの削除
                 // -----------------------------
-                \App\InventoryManage::where('sale_detail_slip_id', $SaleSlipDetailData[0]['id'])->delete();
+
+                if (isset($SaleSlipDetailData[0]) && !empty($SaleSlipDetailData[0])) {
+                    \App\InventoryManage::where('sale_detail_slip_id', $SaleSlipDetailData[0]['id'])->delete();
+                }
 
                 // -------
                 // 新規登録

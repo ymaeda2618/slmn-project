@@ -168,7 +168,7 @@ class DepositController extends Controller
     }
 
     /**
-     * 入金登録画面
+     * 請求登録画面
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -178,7 +178,7 @@ class DepositController extends Controller
     }
 
     /**
-     * 入金登録処理
+     * 請求登録処理
      *
      */
     public function registerDeposit(Request $request) {

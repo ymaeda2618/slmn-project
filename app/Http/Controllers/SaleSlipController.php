@@ -933,7 +933,7 @@ class SaleSlipController extends Controller
             // 登録のタイプが請求書印刷の場合(sale_submit_type:4)
             if ($SaleSlipData['sale_submit_type'] == 4) {
 
-                // 入金登録をして入金一覧画面に遷移させる
+                // 請求登録をして請求一覧画面に遷移させる
                 $this->registerSaleDeposit($SaleSlip->id, $staffId);
 
                 return redirect('./DepositIndex');
@@ -1960,7 +1960,7 @@ class SaleSlipController extends Controller
 
             // 登録のタイプが請求書印刷の場合(sale_submit_type:4)
             if ($SaleSlipData['sale_submit_type'] == 4) {
-                // 入金登録をして入金一覧画面に遷移させる
+                // 請求登録をして請求一覧画面に遷移させる
                 $this->registerSaleDeposit($SaleSlip->id, $staffId);
 
                 return redirect('./DepositIndex');
@@ -2321,7 +2321,7 @@ class SaleSlipController extends Controller
     }
 
     /**
-     * 売上登録、入金登録して請求書印刷する
+     * 売上登録、請求登録して請求書印刷する
      *
      * @param int $saleSlipId
      * @param int $staffId

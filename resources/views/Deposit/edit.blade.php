@@ -2,7 +2,7 @@
 <div class="container">
 
     <div class="row justify-content-center">
-        <div class="top-title">入金編集画面</div>
+        <div class="top-title">請求編集画面</div>
 
         <form class="smn-form" id="deposit-create-form" method="post" action="./../editRegisterDeposit" enctype="multipart/form-data" onsubmit="return submitCheck();">
             {{ csrf_field() }}
@@ -943,7 +943,7 @@
 </script>
 <style>
     /* 共通 */
-
+    
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -951,102 +951,102 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .smn-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .form-group {
         margin-bottom: 2rem !important;
     }
-
+    
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-
+    
     .column-label {
         display: block;
         width: 100%;
         font-size: 0.9em;
         font-weight: bold;
     }
-
+    
     .sale-label {
         font-size: 0.9em;
         font-weight: bold;
     }
-
+    
     .deposit-from-table {
         width: 100%;
     }
-
+    
     .deposit-table {
         width: 100%;
         margin-top: 4%;
     }
-
+    
     .width-5 {
         width: 5%!important;
     }
-
+    
     .width-10 {
         width: 10%!important;
     }
-
+    
     .width-15 {
         width: 15%!important;
     }
-
+    
     .width-20 {
         width: 20%!important;
     }
-
+    
     .width-30 {
         width: 30%!important;
     }
-
+    
     .width-40 {
         width: 40%!important;
     }
-
+    
     .width-45 {
         width: 45%!important;
     }
-
+    
     .slip-table {
         width: 100%;
     }
-
+    
     .partition-area {
         width: 100%;
         height: 1.0em;
     }
-
+    
     .remove-slip-btn {
         height: calc(4.2rem + 7px)!important;
         width: 100%;
     }
-
+    
     .sale-date-form {
         width: 100%;
         margin-bottom: 2%;
     }
-
+    
     .sale_from_date {
         float: left;
         display: block;
     }
-
+    
     .sale-block {
         float: left;
         width: 10%;
         text-align: center;
     }
-
+    
     .result-area {
         display: block;
         width: 100%;
@@ -1055,7 +1055,7 @@
         overflow: auto;
         min-height: 150px;
     }
-
+    
     .result-table {
         border-collapse: collapse;
         margin: auto;
@@ -1064,7 +1064,7 @@
         table-layout: fixed;
         font-size: 10px;
     }
-
+    
     .result-table th {
         border-right: 1px solid #bbb;
         text-align: center;
@@ -1078,52 +1078,52 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-
+    
     .result-table tr {
         padding: 1%;
         border-bottom: 1px solid #bbb;
     }
-
+    
     .result-table tr:last-child {
         border-bottom: none
     }
-
+    
     .result-table td {
         padding: 0.5%;
         border-right: 1px solid #bbb;
         text-align: center;
     }
-
+    
     .result-table th:last-child,
     .result-table td:last-child {
         border: none;
     }
-
+    
     .calc-btn {
         margin: 1%;
         background-color: #FF570D!important;
         border-color: #FF570D!important;
     }
-
+    
     .total-table {
         width: 100%;
         margin-top: 4%;
     }
-
+    
     .register-btn-table {
         width: 100%;
         text-align: center;
         margin-top: 4%;
     }
-
+    
     .register-btn {
         width: 85%;
     }
-
+    
     .payment-date-label {
         margin-top: 2%;
     }
-
+    
     .status-memo-area {
         width: 100%;
         padding: 20px 10px;

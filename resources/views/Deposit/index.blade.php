@@ -2,7 +2,7 @@
 <div class="container">
     <div class="row justify-content-center">
 
-        <div class="top-title">入金一覧</div>
+        <div class="top-title">請求一覧</div>
 
         <div class='search-area'>
             <form id="index-search-form" method="post" action='{{$search_action}}' enctype="multipart/form-data">
@@ -255,7 +255,7 @@
 
 <style>
     /* 共通 */
-
+    
     .search-control {
         display: block;
         width: 100%;
@@ -270,12 +270,12 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-
+    
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -283,13 +283,13 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-
+    
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-
+    
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -297,12 +297,12 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-
+    
     .search-area table {
         margin: auto;
         width: 100%;
     }
-
+    
     .table-th {
         width: 10%;
         padding: 15px 0px 0px 10px;
@@ -310,40 +310,40 @@
         float: left;
         font-weight: bolder;
     }
-
+    
     .table-td {
         width: 20%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .table-code-td {
         padding-right: 0px;
     }
-
+    
     .table-name-td {
         padding-left: 0px;
     }
-
+    
     .table-double-td {
         width: 40%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .radio_box {
         padding-top: 15px;
     }
-
+    
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-
+    
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -352,12 +352,12 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-
+    
     .initial-btn-area {
         text-align: center;
         margin: 20px auto 10px;
     }
-
+    
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -366,13 +366,13 @@
         border-radius: 10px;
         margin-left: 2%;
     }
-
+    
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-
+    
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -380,7 +380,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-
+    
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -392,7 +392,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-
+    
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -400,23 +400,23 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-
+    
     .width-10 {
         width: 10%!important;
     }
-
+    
     .width-15 {
         width: 15%!important;
     }
-
+    
     .width-20 {
         width: 20%!important;
     }
-
+    
     .width-30 {
         width: 30%!important;
     }
-
+    
     .edit-btn {
         border-radius: 5px;
         color: #fff;
@@ -427,7 +427,7 @@
         text-align: center;
         padding: 10px;
     }
-
+    
     .output-btn {
         border-radius: 5px!important;
         color: #fff!important;
@@ -440,34 +440,33 @@
         font-size: 10px!important;
         border: #e3342fa6!important;
     }
-
+    
     #pdf-output-form {
         width: 100%;
     }
-
+    
     .slip-td {
         margin-right: 20%;
     }
-
+    
     .regis-complete {
         background-color: #D2F0F0;
         font-weight: bold;
         border-left: 3px solid #0099CB!important;
         text-align: center;
     }
-
+    
     .regis-temp {
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
         text-align: center;
     }
-
+    
     .regis-carry {
         background-color: #d5f0d2;
         font-weight: bold;
         border-left: 3px solid #18cb00!important;
         text-align: center;
     }
-
 </style>

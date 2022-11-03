@@ -8,9 +8,6 @@
             {{ csrf_field() }}
 
             <div class="form-group">
-                <label class="column-label" for="deposit_date">入金日付</label>
-                <input type="date" class="form-control " id="deposit_date" name="data[Deposit][deposit_date]" value="<?php echo date('Y-m-d');?>" tabindex="1">
-
                 <label class="column-label payment-date-label" for="payment_date">支払期日</label>
                 <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d');?>" tabindex="2">
             </div>

@@ -200,7 +200,8 @@ class DepositController extends Controller
             $insertParams = array(
                 'sale_company_id'     => $depositDatas['deposit_company_id'],
                 'sale_shop_id'        => $depositDatas['deposit_shop_id'],
-                'date'                => $depositDatas['deposit_date'],
+                //'date'                => $depositDatas['deposit_date'],
+                'date'                => $depositDatas['payment_date'],// 入金日付には支払期限を入れる
                 'sale_from_date'      => $depositDatas['sales_from_date'],
                 'sale_to_date'        => $depositDatas['sales_to_date'],
                 'payment_date'        => $depositDatas['payment_date'],
@@ -238,7 +239,8 @@ class DepositController extends Controller
                 $insertDetailParams[] = array(
                     'deposit_withdrawal_id'   => $depositNewId,
                     'supply_sale_slip_id'     => $saleSlipId,
-                    'deposit_withdrawal_date' => $depositDatas['deposit_date'],
+                    //'deposit_withdrawal_date' => $depositDatas['deposit_date'],
+                    'deposit_withdrawal_date' => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
                     'supply_sale_slip_date'   => $saleSlipDate,
                     'type'                    => 2,
                     'notax_sub_total_8'       => $notaxSubTotal8,
@@ -447,7 +449,8 @@ class DepositController extends Controller
                 $updateParams = array(
                     'sale_company_id'     => $depositDatas['deposit_company_id'],
                     'sale_shop_id'        => $depositDatas['deposit_shop_id'],
-                    'date'                => $depositDatas['deposit_date'],
+                    //'date'                => $depositDatas['deposit_date'],
+                    'date'                => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
                     'sale_from_date'      => $depositDatas['sale_from_date'],
                     'sale_to_date'        => $depositDatas['sale_to_date'],
                     'payment_date'        => $depositDatas['payment_date'],
@@ -504,7 +507,8 @@ class DepositController extends Controller
                     $insertDetailParams[] = array(
                         'deposit_withdrawal_id'   => $depositDatas['id'],
                         'supply_sale_slip_id'     => $saleSlipId,
-                        'deposit_withdrawal_date' => $depositDatas['deposit_date'],
+                       // 'deposit_withdrawal_date' => $depositDatas['deposit_date'],
+                        'deposit_withdrawal_date' => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
                         'supply_sale_slip_date'   => $saleSlipDate,
                         'type'                    => 2,
                         'notax_sub_total_8'       => $notaxSubTotal8,

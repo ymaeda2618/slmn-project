@@ -9,9 +9,6 @@
 
             <input type="hidden" id="deposit_id" name="data[Deposit][id]" value="{{$depositDatas->deposit_id}}">
             <div class="form-group">
-                <label class="column-label" for="deposit_date">入金日付</label>
-                <input type="date" class="form-control " id="deposit_date" name="data[Deposit][deposit_date]" tabindex="1" value="{{$depositDatas->deposit_date}}">
-
                 <label class="column-label payment-date-label" for="payment_date">支払期日</label>
                 <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" tabindex="2" value="{{$depositDatas->payment_date}}">
             </div>

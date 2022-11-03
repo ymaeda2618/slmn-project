@@ -10,12 +10,12 @@
             <div class="date-area">
                 <div class="sale_date_box">
                     <label class="column-label" for="sale_date">売上日付</label>
-                    <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]" value="<?php echo date('Y-m-d');?>" value="{{$SaleSlipList->sale_slip_sale_date}}">
+                    <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]" value="{{$SaleSlipList->sale_slip_sale_date}}">
                 </div>
 
                 <div class="delivery_date_box">
                     <label class="column-label" for="delivery_date">納品日付</label>
-                    <input type="date" class="form-control " id="delivery_date " name="data[SaleSlip][delivery_date]" value="<?php echo date('Y-m-d');?>" value="{{$SaleSlipList->sale_slip_delivery_date}}">
+                    <input type="date" class="form-control " id="delivery_date " name="data[SaleSlip][delivery_date]" value="{{$SaleSlipList->sale_slip_delivery_date}}">
                 </div>
             </div>
 

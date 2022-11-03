@@ -9,7 +9,7 @@
 
             <div class="form-group">
                 <label class="column-label payment-date-label" for="payment_date">支払期日</label>
-                <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d');?>" tabindex="2">
+                <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d',strtotime('+1 month'));?>" tabindex="2">
             </div>
 
             <div class="search-area">

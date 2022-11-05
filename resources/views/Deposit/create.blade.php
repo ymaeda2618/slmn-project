@@ -176,7 +176,7 @@
                 </tr>
                 <tr>
                     <td class="width-20">
-                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="1">
+                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="0">
                     </td>
                     <td class="width-30">
                         <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="入金済" readonly>

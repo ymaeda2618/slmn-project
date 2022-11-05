@@ -86,7 +86,7 @@
                         $checked = '';
                         foreach ($depositDetailDatas as $depositDetailData) {
                             if ($depositDetailData->sale_slip_id == $saleSlipData->id) {
-                                $checked = $saleFlg == 1 ? 'checked' : '';
+                                $checked = 'checked';
                             }
                         }
 

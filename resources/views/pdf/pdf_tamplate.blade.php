@@ -6,8 +6,8 @@
                 <p>{{$depositList['company_info']['address']}}</p>
                 <p>{{$depositList['company_info']['name']}} 御中</p>
             </div>
-            <p>下記のとおり、御請求申し上げます。</p>
             <p>請求期間<br> {{$depositList['company_info']['sale_from_to_date']}}</p>
+            <p>下記のとおり、御請求申し上げます。</p>
             <table id='claim-table' border='1'>
                 <tr>
                     <td>合計金額</td>
@@ -23,10 +23,10 @@
             <h1>御請求書</h1>
             <br>
             <h2>株式会社水長水産</h2>
-            <p>〒135-6001　東京都江東区豊洲6-5-1</p>
-            <p>　　　　　　6街区口棟103~105</p>
+            <p>〒135-0061　東京都江東区豊洲6-5-1</p>
             <p>売り場店舗 TEL：03-6633-5320　FAX：03-6633-4320</p>
             <p>事務所　TEL：047-464-1638　FAX：047-464-1626</p>
+            <br>
             <div id='bank-info'>
                 <p>[振込先]　東京東信用金庫 三咲支店</p>
                 <p>口座番号/(当座)0701724</p>

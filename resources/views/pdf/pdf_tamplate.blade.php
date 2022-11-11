@@ -7,8 +7,8 @@
                 <p>{{$depositList['company_info']['name']}} 御中</p>
             </div>
             <p>下記のとおり、御請求申し上げます。</p>
-            <br><br>
-            <p>請求期間</p><br>
+            <br>
+            <p>請求期間</p>
             <p>{{$depositList['company_info']['sale_from_to_date']}}</p>
             <br>
             <table id='claim-table' border='1'>

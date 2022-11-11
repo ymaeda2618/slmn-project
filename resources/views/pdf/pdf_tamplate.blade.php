@@ -9,7 +9,7 @@
             <p>下記のとおり、御請求申し上げます。</p>
             <br><br>
             <p>請求期間</p><br>
-            <p>{{number_format($depositList['company_info']['sale_from_to_date'])}}</p>
+            <p>{{$depositList['company_info']['sale_from_to_date']}}</p>
             <br>
             <table id='claim-table' border='1'>
                 <tr>

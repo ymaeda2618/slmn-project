@@ -20,7 +20,7 @@ class DepositController extends Controller
     }
 
     /**
-     * 入金一覧
+     * 請求一覧
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -104,7 +104,7 @@ class DepositController extends Controller
 
         try {
 
-            // 出金一覧を取得
+            // 請求一覧を取得
             $depositList = DB::table('deposits AS Deposit')
             ->select(
                 'Deposit.id                  AS deposit_id',
@@ -343,7 +343,6 @@ class DepositController extends Controller
         ->whereBetween('SaleSlip.date', [$depositDatas->sale_from_date, $depositDatas->sale_to_date])
         ->where([
             ['SaleSlip.sale_company_id', '=', $depositDatas->sale_company_id],
-            ['SaleSlip.deposit_flg', '=', '0'],
             ['SaleSlip.active', '=', '1']
         ])
         ->get();
@@ -492,37 +491,38 @@ class DepositController extends Controller
                 // 新規登録
                 // -------
                 // sale_slip_idの数ループさせる
-                foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
+                if (isset($depositDetailDatas['sale_slip_ids'])) {
+                    foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
+                        // 仕入伝票データ取得
+                        $saleSlipDate    = $depositDetailDatas[$saleSlipId]['date'];
+                        $notaxSubTotal8  = $depositDetailDatas[$saleSlipId]['notax_subTotal_8'];
+                        $notaxSubTotal10 = $depositDetailDatas[$saleSlipId]['notax_subTotal_10'];
+                        $subTotal        = $depositDetailDatas[$saleSlipId]['subTotal'];
+                        $deliveryPrice   = $depositDetailDatas[$saleSlipId]['delivery_price'];
+                        $adjustPrice     = $depositDetailDatas[$saleSlipId]['adjust_price'];
+                        $total           = $depositDetailDatas[$saleSlipId]['total'];
 
-                    // 仕入伝票データ取得
-                    $saleSlipDate    = $depositDetailDatas[$saleSlipId]['date'];
-                    $notaxSubTotal8  = $depositDetailDatas[$saleSlipId]['notax_subTotal_8'];
-                    $notaxSubTotal10 = $depositDetailDatas[$saleSlipId]['notax_subTotal_10'];
-                    $subTotal        = $depositDetailDatas[$saleSlipId]['subTotal'];
-                    $deliveryPrice   = $depositDetailDatas[$saleSlipId]['delivery_price'];
-                    $adjustPrice     = $depositDetailDatas[$saleSlipId]['adjust_price'];
-                    $total           = $depositDetailDatas[$saleSlipId]['total'];
-
-                    // 登録データ格納
-                    $insertDetailParams[] = array(
-                        'deposit_withdrawal_id'   => $depositDatas['id'],
-                        'supply_sale_slip_id'     => $saleSlipId,
-                       // 'deposit_withdrawal_date' => $depositDatas['deposit_date'],
-                        'deposit_withdrawal_date' => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
-                        'supply_sale_slip_date'   => $saleSlipDate,
-                        'type'                    => 2,
-                        'notax_sub_total_8'       => $notaxSubTotal8,
-                        'notax_sub_total_10'      => $notaxSubTotal10,
-                        'sub_total'               => $subTotal,
-                        'delivery_price'          => $deliveryPrice,
-                        'adjust_price'            => $adjustPrice,
-                        'total'                   => $total,
-                        'active'                  => 1,
-                        'created_user_id'         => $user_info_id,
-                        'created'                 => Carbon::now(),
-                        'modified_user_id'        => $user_info_id,
-                        'modified'                => Carbon::now(),
-                    );
+                        // 登録データ格納
+                        $insertDetailParams[] = array(
+                            'deposit_withdrawal_id'   => $depositDatas['id'],
+                            'supply_sale_slip_id'     => $saleSlipId,
+                            // 'deposit_withdrawal_date' => $depositDatas['deposit_date'],
+                            'deposit_withdrawal_date' => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
+                            'supply_sale_slip_date'   => $saleSlipDate,
+                            'type'                    => 2,
+                            'notax_sub_total_8'       => $notaxSubTotal8,
+                            'notax_sub_total_10'      => $notaxSubTotal10,
+                            'sub_total'               => $subTotal,
+                            'delivery_price'          => $deliveryPrice,
+                            'adjust_price'            => $adjustPrice,
+                            'total'                   => $total,
+                            'active'                  => 1,
+                            'created_user_id'         => $user_info_id,
+                            'created'                 => Carbon::now(),
+                            'modified_user_id'        => $user_info_id,
+                            'modified'                => Carbon::now(),
+                        );
+                    }
                 }
 
                 if (!empty($insertDetailParams)) {
@@ -532,55 +532,64 @@ class DepositController extends Controller
                 // -----------------------------
                 // 支払データのフラグを支払済みにする
                 // -----------------------------
-                // 一旦対象データの支払フラグを未払いに戻す
-                foreach ($delBeforeSaleSlipIds as $delBeforeSaleSlipId) {
-                    $saleSlipIds[] = $delBeforeSaleSlipId->sale_slip_id;
-                }
-                DB::table('sale_slips')
-                ->whereIn('id', $saleSlipIds)
-                ->update(array('sale_flg' => 0));
+                if (!empty($delBeforeSaleSlipIds)) {
+                    // 一旦対象データの支払フラグを未払いに戻す
+                    foreach ($delBeforeSaleSlipIds as $delBeforeSaleSlipId) {
+                        $saleSlipIds[] = $delBeforeSaleSlipId->sale_slip_id;
+                    }
 
-                // その後支払済みに更新する
-                DB::table('sale_slips')
-                ->whereIn('id', $depositDetailDatas['sale_slip_ids'])
-                ->update(array('sale_flg' => 1));
+                    if (isset($saleSlipIds) && !empty($saleSlipIds)) {
+                        DB::table('sale_slips')
+                        ->whereIn('id', $saleSlipIds)
+                        ->update(array('sale_flg' => 0));
+                    }
+
+                    if (isset($depositDetailDatas['sale_slip_ids']) && !empty($depositDetailDatas['sale_slip_ids'])) {
+                        // その後支払済みに更新する
+                        DB::table('sale_slips')
+                            ->whereIn('id', $depositDetailDatas['sale_slip_ids'])
+                            ->update(array('sale_flg' => 1));
+                    }
+                }
 
                 // --------------------------------------------
                 // 入金詳細テーブルに重複しているIDが存在しているか確認
                 // --------------------------------------------
                 $delTargetDatas = array();
-                foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
-                    // 編集対象のID以外のものを抽出
-                    $delTargetDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
-                    ->select(
-                        'DepositWithdrawalDetail.id As id',
-                        'DepositWithdrawalDetail.deposit_withdrawal_id As deposit_withdrawal_id'
-                    )
-                    ->join('sale_slips As SaleSlip', function ($join){
-                        $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SaleSlip.id');
-                    })
-                    ->where([
-                        ['DepositWithdrawalDetail.deposit_withdrawal_id', '<>', $depositDatas['id']],
-                        ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $saleSlipId],
-                        ['SaleSlip.deposit_flg', '=', '0'],
-                        ['DepositWithdrawalDetail.active', '=', '1'],
-                        ['SaleSlip.active', '=', '1']
-                    ])
-                    ->get();
+                if (isset($depositDetailDatas['sale_slip_ids'])) {
+                    foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
+                        // 編集対象のID以外のものを抽出
+                        $delTargetDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+                        ->select(
+                            'DepositWithdrawalDetail.id As id',
+                            'DepositWithdrawalDetail.deposit_withdrawal_id As deposit_withdrawal_id'
+                        )
+                        ->join('sale_slips As SaleSlip', function ($join) {
+                            $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SaleSlip.id');
+                        })
+                        ->where([
+                            ['DepositWithdrawalDetail.deposit_withdrawal_id', '<>', $depositDatas['id']],
+                            ['DepositWithdrawalDetail.supply_sale_slip_id', '=', $saleSlipId],
+                            ['DepositWithdrawalDetail.active', '=', '1'],
+                            ['SaleSlip.active', '=', '1']
+                        ])
+                        ->get();
+                    }
+                }
 
-                    // ----------------------------------------
-                    // 存在していれば編集対象以外のデータを削除、再計算
-                    // ----------------------------------------
-                    if (!$delTargetDatas->isEmpty()) {
+                // ----------------------------------------
+                // 存在していれば編集対象以外のデータを削除、再計算
+                // ----------------------------------------
+                if (!empty($delTargetDatas)) {
 
-                        // 削除対象データを削除
-                        \App\DepositWithdrawalDetail::where('id', $delTargetDatas[0]->id)->delete();
+                    // 削除対象データを削除
+                    \App\DepositWithdrawalDetail::where('id', $delTargetDatas[0]->id)->delete();
 
-                        // ------------------------
-                        // 削除された出金IDの再計算する
-                        // ------------------------
-                        // まずは計算データ取得
-                        $depositDetailCalcDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+                    // ------------------------
+                    // 削除された出金IDの再計算する
+                    // ------------------------
+                    // まずは計算データ取得
+                    $depositDetailCalcDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
                         ->select(
                             'DepositWithdrawalDetail.notax_sub_total_8 As notax_sub_total_8',
                             'DepositWithdrawalDetail.notax_sub_total_10 As notax_sub_total_10',
@@ -593,7 +602,7 @@ class DepositController extends Controller
                         ])
                         ->get();
 
-                        $depositCalcDatas = DB::table('deposits AS Deposit')
+                    $depositCalcDatas = DB::table('deposits AS Deposit')
                         ->select(
                             'Deposit.adjustment_amount As adjustment_amount'
                         )
@@ -603,58 +612,55 @@ class DepositController extends Controller
                         ])
                         ->get();
 
-                        // ---------
-                        // データ計算
-                        // ---------
-                        $notaxSubTotal8   = 0;
-                        $notaxSubTotal10  = 0;
-                        $subTotal8        = 0;
-                        $subTotal10       = 0;
-                        $deliveryPrice    = 0;
-                        $adjustTotalPrice = 0;
-                        $adjustPrice      = 0;
-                        $subTotal         = 0;
-                        $total            = 0;
-                        foreach ($depositDetailCalcDatas as $depositDetailCalcData) {
+                    // ---------
+                    // データ計算
+                    // ---------
+                    $notaxSubTotal8   = 0;
+                    $notaxSubTotal10  = 0;
+                    $subTotal8        = 0;
+                    $subTotal10       = 0;
+                    $deliveryPrice    = 0;
+                    $adjustTotalPrice = 0;
+                    $adjustPrice      = 0;
+                    $subTotal         = 0;
+                    $total            = 0;
+                    foreach ($depositDetailCalcDatas as $depositDetailCalcData) {
 
-                            // 税抜8％額
-                            $notaxSubTotal8 += $depositDetailCalcData->notax_sub_total_8;
+                        // 税抜8％額
+                        $notaxSubTotal8 += $depositDetailCalcData->notax_sub_total_8;
 
-                            // 税抜10％額
-                            $notaxSubTotal10 += $depositDetailCalcData->notax_sub_total_10;
+                        // 税抜10％額
+                        $notaxSubTotal10 += $depositDetailCalcData->notax_sub_total_10;
 
-                            // 配送額
-                            $deliveryPrice += $depositDetailCalcData->delivery_price;
+                        // 配送額
+                        $deliveryPrice += $depositDetailCalcData->delivery_price;
 
-                            // 調整額
-                            $adjustTotalPrice += $depositDetailCalcData->adjust_price;
-
-                        }
-
-                        // 税込8%
-                        $subTotal8 = floor($notaxSubTotal8 * 1.08);
-
-                        // 税込10%
-                        $subTotal10 = floor($notaxSubTotal10 * 1.1);
-
-                        // 小計(調整額含まない)
-                        $subTotal = $subTotal8 + $subTotal10 + $deliveryPrice + $adjustTotalPrice;
-
-                        // 総合計
-                        if (!empty($depositCalcDatas[0]->adjustment_amount)) $adjustPrice = $depositCalcDatas[0]->adjustment_amount;
-                        $total = $subTotal + $adjustPrice;
-
-                        // -----------------------------
-                        // 計算結果を出金テーブルに更新させる
-                        // -----------------------------
-                        DB::table('deposits')
-                        ->where('id', $delTargetDatas[0]->deposit_withdrawal_id)
-                        ->update(array(
-                            'sub_total' => $subTotal,
-                            'amount'    => $total
-                        ));
+                        // 調整額
+                        $adjustTotalPrice += $depositDetailCalcData->adjust_price;
                     }
 
+                    // 税込8%
+                    $subTotal8 = floor($notaxSubTotal8 * 1.08);
+
+                    // 税込10%
+                    $subTotal10 = floor($notaxSubTotal10 * 1.1);
+
+                    // 小計(調整額含まない)
+                    $subTotal = $subTotal8 + $subTotal10 + $deliveryPrice + $adjustTotalPrice;
+
+                    // 総合計
+                    if (!empty($depositCalcDatas[0]->adjustment_amount)) $adjustPrice = $depositCalcDatas[0]->adjustment_amount;
+                    $total = $subTotal + $adjustPrice;
+
+                    // -----------------------------
+                    // 計算結果を出金テーブルに更新させる
+                    // -----------------------------
+                    DB::table('deposits')
+                    ->where('id', $delTargetDatas[0]->deposit_withdrawal_id)
+                    ->update(array(
+                        'sub_total' => $subTotal,
+                        'amount'    => $total
+                    ));
                 }
             }
 
@@ -834,6 +840,8 @@ class DepositController extends Controller
             'Deposit.payment_date                        AS payment_date',
             'Deposit.adjustment_amount                   AS deposit_adjust_price',
             'Deposit.remarks                             AS remarks',
+            'Deposit.sale_from_date                      AS sale_from_date',
+            'Deposit.sale_to_date                        AS sale_to_date',
             'DepositWithdrawalDetail.supply_sale_slip_id AS sale_slip_id',
             'DepositWithdrawalDetail.delivery_price      AS delivery_price',
             'DepositWithdrawalDetail.adjust_price        AS sale_adjust_price',
@@ -933,6 +941,9 @@ class DepositController extends Controller
                         $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
                     }
                 }
+
+                // 請求期間
+                $calcDepositList['company_info']['sale_from_to_date'] = date('Y年m月d日', strtotime($depositDatas->sale_from_date)) . '～' . date('Y年m月d日', strtotime($depositDatas->sale_to_date));
 
                 // 支払期日もここで入れる
                 $calcDepositList['company_info']['payment_date'] = date('Y年m月d日', strtotime($depositDatas->payment_date));

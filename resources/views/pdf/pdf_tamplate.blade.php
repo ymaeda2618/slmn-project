@@ -75,7 +75,7 @@
         <br>
         <table id="total-table" border='1' class='page'>
             <tr>
-                <td rowspan='7' class="width-70 text-left-top">備考<br><br>{{$depositList['total']['remarks']}}</td>
+                <td rowspan='7' class="width-70 text-left-top">備考<br><br>{{$depositList['company_info']['remarks']}}</td>
                 <td class="width-15 td-space">8%課税対象額</td>
                 <td class="width-15 text-right td-space">{{number_format($depositList['total']['notax_subtotal_8'])}}</td>
             </tr>

@@ -10,7 +10,6 @@
             margin: 0;
             font-size: 10px;
             color: #000000;
-            background-color: #ff0000;
         }
     </style>
 </head>

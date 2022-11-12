@@ -2630,6 +2630,9 @@ class SaleSlipController extends Controller
                     $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
                 }
 
+                // 納品日
+                $calcDepositList['company_info']['sale_slip_delivery_date'] = date('Y年m月d日', strtotime($SaleSlipDetailDatas->sale_slip_delivery_date));
+
                 // 備考情報もここで入れる
                 $calcDepositList['company_info']['remarks'] = $SaleSlipDetailDatas->remarks;
             }

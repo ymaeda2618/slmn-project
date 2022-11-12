@@ -947,6 +947,9 @@ class DepositController extends Controller
 
                 // 支払期日もここで入れる
                 $calcDepositList['company_info']['payment_date'] = date('Y年m月d日', strtotime($depositDatas->payment_date));
+
+                // 備考情報もここで入れる
+                $calcDepositList['company_info']['remarks'] = $depositDatas->remarks;
             }
 
             // -------------------

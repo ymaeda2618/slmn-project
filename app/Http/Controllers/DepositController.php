@@ -1091,10 +1091,9 @@ class DepositController extends Controller
             'depositList' => $calcDepositList
         ])
         ->setOption('footer-left', $company_name)
-        //->setOption('footer-center', '[page] ページ')
-        //->setOption('footer-font-size', 8)
-        //->setOption('footer-font-name', 'Nunito,sans-serif')
-        ->setOption('footer-html', view('pdf.pdfFooter'))
+        ->setOption('footer-center', '[page] ページ')
+        ->setOption('footer-font-size', 8)
+        ->setOption('footer-encoding', 'utf-8')
         ->setOption('encoding', 'utf-8');
         return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード

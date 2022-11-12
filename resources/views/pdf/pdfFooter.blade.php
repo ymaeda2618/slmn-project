@@ -8,7 +8,7 @@
         * {
             padding: 0;
             margin: 0;
-            font-size: 8px;
+            font-size: 10px;
             color: #000000;
         }
     </style>

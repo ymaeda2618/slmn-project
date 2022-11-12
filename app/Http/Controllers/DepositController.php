@@ -1087,7 +1087,7 @@ class DepositController extends Controller
         $pdf = \PDF::view('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList
         ])
-        ->setOption('footer-html', \View::make('pdf.pdfFooter')->render())
+        ->setOption('footer-html', \PDF::view('pdf.pdfFooter'))
         ->setOption('encoding', 'utf-8');
         return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード

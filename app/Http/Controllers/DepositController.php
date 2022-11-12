@@ -909,6 +909,7 @@ class DepositController extends Controller
         $calcDepositList = array();
         $notaxSubTotal8Amount = 0;
         $notaxSubTotal10Amount = 0;
+        $company_name = "初期値";
         foreach ($depositList as $depositDatas) {
             // -------
             // 会社情報
@@ -920,6 +921,7 @@ class DepositController extends Controller
 
                     $companyId = $depositDatas->company_id; // ブラウザ名になるので店舗の場合でもこちらを入れる
                     $calcDepositList['company_info']['name']    = $depositDatas->shop_name;
+                    $company_name                               = $depositDatas->shop_name;
                     $calcDepositList['company_info']['address'] = $depositDatas->shop_address;
                     // 郵便番号は間にハイフンを入れる
                     $calcDepositList['company_info']['code'] = '';
@@ -932,6 +934,7 @@ class DepositController extends Controller
                 } else {
                     $companyId = $depositDatas->company_id;
                     $calcDepositList['company_info']['name']    = $depositDatas->company_name;
+                    $company_name                               = $depositDatas->company_name;
                     $calcDepositList['company_info']['address'] = $depositDatas->company_address;
                     // 郵便番号は間にハイフンを入れる
                     $calcDepositList['company_info']['code'] = '';
@@ -1087,7 +1090,8 @@ class DepositController extends Controller
         $pdf = \PDF::view('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList
         ])
-        ->setOption('footer-center', $calcDepositList['company_info']['name'])
+        ->setOption('footer-left', $company_name)
+        ->setOption('footer-center', '[page] ページ')
         ->setOption('encoding', 'utf-8');
         return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード

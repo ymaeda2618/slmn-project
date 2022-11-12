@@ -16,11 +16,9 @@
 </head>
 
 <body>
-    @foreach ($pages as $page)
     <div class="page">
-        {{ $page }}ページ目
+        {{ $page }}ページ
     </div>
-    @endforeach
 </body>
 
 </html>

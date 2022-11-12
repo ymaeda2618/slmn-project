@@ -1093,6 +1093,7 @@ class DepositController extends Controller
         ->setOption('footer-left', $company_name)
         ->setOption('footer-center', '[page] ページ')
         ->setOption('footer-font-size', 8)
+        ->setOption('footer-font-name', 'IPAexMincho')
         ->setOption('encoding', 'utf-8');
         return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード

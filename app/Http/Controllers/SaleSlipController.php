@@ -2629,6 +2629,9 @@ class SaleSlipController extends Controller
                     $codeAfter  = substr($SaleSlipDetailDatas->company_postal_code, 3, 4);
                     $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
                 }
+
+                // 備考情報もここで入れる
+                $calcDepositList['company_info']['remarks'] = $SaleSlipDetailDatas->remarks;
             }
 
             // -------------------

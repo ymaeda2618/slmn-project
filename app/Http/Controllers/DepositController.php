@@ -1084,7 +1084,7 @@ class DepositController extends Controller
             }
         }
 
-        $pdf = \PDF::view('pdf.pdf_tamplate', [
+        $pdf = \PDF::loadView('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList
         ])
         ->setOption('footer-html', \View::make('pdf.pdfFooter')->render() // 用意したフッターを設定

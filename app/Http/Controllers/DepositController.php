@@ -1091,9 +1091,8 @@ class DepositController extends Controller
             'depositList' => $calcDepositList
         ])
         ->setOption('encoding', 'utf-8')
-        //->setOption('footer-left', $company_name)
         ->setOption('footer-center', '[page] ページ')
-        //->setOption('footer-font-size', 8)
+        ->setOption('footer-font-size', 8)
         ->setOption('footer-html', view('pdf.pdfFooter', [
             'company_name' => $calcDepositList['company_info']['name']
         ]));

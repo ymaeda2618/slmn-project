@@ -17,7 +17,7 @@
 
 <body>
     <div class="page">
-        {{ $page }}ページ
+        {{ $company_name }}
     </div>
 </body>
 

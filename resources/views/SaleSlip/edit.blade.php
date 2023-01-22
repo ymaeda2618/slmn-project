@@ -47,10 +47,10 @@
                 <tr>
                     <th class="width-5">No.</th>
                     <th class="width-20" colspan="2">製品</th>
-                    <th class="width-15" colspan="2">産地</th>
                     <th class="width-10">個数</th>
                     <th class="width-10">数量</th>
                     <th class="width-15" colspan="2">単価 / 小計</th>
+                    <th class="width-15" colspan="2">産地</th>
                     <th class="width-20" colspan="3">担当者 / 摘要</th>
                     <th class="width-5">削除</th>
                 </tr>
@@ -67,21 +67,21 @@
                         <input type="hidden" id="product_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_id]" value="{{$SaleSlipDetails->product_id}}">
                         <input type='hidden' id='tax_id_{{$SaleSlipDetails->sort}}' name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][tax_id]" value="{{$SaleSlipDetails->tax_id}}">
                     </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_code]" value="{{$SaleSlipDetails->origin_area_id}}" tabindex="{{$tabInitialNum + 2}}">
-                        <input type="hidden" id="origin_area_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_id]" value="{{$SaleSlipDetails->origin_area_id}}">
-                    </td>
                     <td>
                         @php $readonly = empty($SaleSlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
-                        <input type="number" class="form-control" id="inventory_unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_num]" value="{{$SaleSlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 3}}">
+                        <input type="number" class="form-control" id="inventory_unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_num]" value="{{$SaleSlipDetails->inventory_unit_num}}" {{$readonly}} tabindex="{{$tabInitialNum + 2}}">
                     </td>
                     <td>
                         <input type="number" class="form-control" id="unit_num_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_num]" value="{{$SaleSlipDetails->unit_num}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'
-                            tabindex="{{$tabInitialNum + 4}}">
+                            tabindex="{{$tabInitialNum + 3}}">
                     </td>
                     <td colspan="2">
                         <input type="number" class="form-control" id="unit_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][unit_price]" value="{{$SaleSlipDetails->unit_price}}" onchange='javascript:priceNumChange({{$SaleSlipDetails->sort}})'
-                            tabindex="{{$tabInitialNum + 5}}">
+                            tabindex="{{$tabInitialNum + 4}}">
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_code]" value="{{$SaleSlipDetails->origin_area_id}}" tabindex="{{$tabInitialNum + 5}}">
+                        <input type="hidden" id="origin_area_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_id]" value="{{$SaleSlipDetails->origin_area_id}}">
                     </td>
                     <td>
                         <input type="text" class="form-control staff_code_input" id="staff_code_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][staff_code]" value="{{$SaleSlipDetails->staff_code}}" tabindex="{{$tabInitialNum + 6}}">
@@ -98,9 +98,6 @@
                     <td colspan="2">
                         <input type="text" class="form-control" id="product_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][product_text]" value="{{$SaleSlipDetails->product_name}}" placeholder="製品欄" readonly>
                     </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control" id="origin_area_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_text]" value="{{$SaleSlipDetails->origin_area_name}}" placeholder="産地欄" readonly>
-                    </td>
                     <td>
                         <input type="text" class="form-control" id="inventory_unit_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_text]" value="{{$SaleSlipDetails->inventory_unit_name}}" placeholder="個数欄" readonly>
                         <input type="hidden" id="inventory_unit_id_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][inventory_unit_id]" value="{{$SaleSlipDetails->inventory_unit_id}}">
@@ -111,6 +108,9 @@
                     </td>
                     <td colspan="2">
                         <input type="text" class="form-control" id="notax_price_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][notax_price]" value="{{$SaleSlipDetails->notax_price}}" readonly>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="origin_area_text_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][origin_area_text]" value="{{$SaleSlipDetails->origin_area_name}}" placeholder="産地欄" readonly>
                     </td>
                     <td colspan="3">
                         <input type="text" class="form-control" id="memo_{{$SaleSlipDetails->sort}}" name="data[SaleSlipDetail][{{$SaleSlipDetails->sort}}][memo]" value="{{$SaleSlipDetails->memo}}" placeholder="摘要欄" tabindex="{{$tabInitialNum + 7}}">

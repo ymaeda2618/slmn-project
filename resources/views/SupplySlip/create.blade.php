@@ -46,10 +46,10 @@
                 <tr>
                     <th class="width-5">No.</th>
                     <th class="width-20" colspan="2">製品</th>
-                    <th class="width-15" colspan="2">産地</th>
                     <th class="width-10">個数</th>
                     <th class="width-10">数量</th>
                     <th class="width-15" colspan="2">単価 / 小計</th>
+                    <th class="width-15" colspan="2">産地</th>
                     <th class="width-20" colspan="3">担当者 / 摘要</th>
                     <th class="width-5">削除</th>
                 </tr>
@@ -63,18 +63,18 @@
                         <input type="hidden" id="product_id_0" name="data[SupplySlipDetail][0][product_id]">
                         <input type='hidden' id='tax_id_0' name="data[SupplySlipDetail][0][tax_id]" value="0">
                     </td>
+                    <td>
+                        <input type="number" class="form-control" id="inventory_unit_num_0" name="data[SupplySlipDetail][0][inventory_unit_num]" tabindex="4">
+                    </td>
+                    <td>
+                        <input type="number" class="form-control" id="unit_num_0" name="data[SupplySlipDetail][0][unit_num]" onchange='javascript:priceNumChange(0)' tabindex="5">
+                    </td>
                     <td colspan="2">
-                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_0" name="data[SupplySlipDetail][0][origin_area_code]" tabindex="4">
+                        <input type="number" class="form-control" id="unit_price_0" name="data[SupplySlipDetail][0][unit_price]" onchange='javascript:priceNumChange(0)' tabindex="6">
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_0" name="data[SupplySlipDetail][0][origin_area_code]" tabindex="7">
                         <input type="hidden" id="origin_area_id_0" name="data[SupplySlipDetail][0][origin_area_id]">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" id="inventory_unit_num_0" name="data[SupplySlipDetail][0][inventory_unit_num]" tabindex="5">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" id="unit_num_0" name="data[SupplySlipDetail][0][unit_num]" onchange='javascript:priceNumChange(0)' tabindex="6">
-                    </td>
-                    <td colspan="2">
-                        <input type="number" class="form-control" id="unit_price_0" name="data[SupplySlipDetail][0][unit_price]" onchange='javascript:priceNumChange(0)' tabindex="7">
                     </td>
                     <td>
                         <input type="text" class="form-control staff_code_input" id="staff_code_0" name="data[SupplySlipDetail][0][staff_code]" value="1009" tabindex="8">
@@ -91,9 +91,6 @@
                     <td colspan="2">
                         <input type="text" class="form-control" id="product_text_0" name="data[SupplySlipDetail][0][product_text]" placeholder="製品欄" readonly>
                     </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control" id="origin_area_text_0" name="data[SupplySlipDetail][0][origin_area_text]" placeholder="産地欄" readonly>
-                    </td>
                     <td>
                         <input type="text" class="form-control" id="inventory_unit_text_0" name="data[SupplySlipDetail][0][inventory_unit_text]" placeholder="個数欄" readonly>
                         <input type="hidden" id="inventory_unit_id_0" name="data[SupplySlipDetail][0][inventory_unit_id]" value="0">
@@ -104,6 +101,9 @@
                     </td>
                     <td colspan="2">
                         <input type="text" class="form-control" id="notax_price_0" name="data[SupplySlipDetail][0][notax_price]" value="0" readonly>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" class="form-control" id="origin_area_text_0" name="data[SupplySlipDetail][0][origin_area_text]" placeholder="産地欄" readonly>
                     </td>
                     <td colspan="3">
                         <input type="text" class="form-control" id="memo_0" name="data[SupplySlipDetail][0][memo]" placeholder="摘要欄" tabindex="9">

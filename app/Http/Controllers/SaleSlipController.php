@@ -223,7 +223,7 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->if(!empty($condition_no_display), function ($query) {
-                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
+                return $query->where('SaleSlip.external_slip_no', '=', 0);
             })
             ->where('SaleSlip.active', '=', '1')
             //->orderBy('SaleSlip.date', 'desc')
@@ -279,7 +279,7 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->if(!empty($condition_no_display), function ($query) {
-                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
+                return $query->where('SaleSlip.external_slip_no', '=', 0);
             })
             ->where('SaleSlip.active', '=', '1')
             ->get();
@@ -385,7 +385,7 @@ class SaleSlipController extends Controller
                 return $queryDetail->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->if(!empty($condition_no_display), function ($query) {
-                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
+                return $query->where('SaleSlip.external_slip_no', '=', 0);
             })
             ->whereIn('SaleSlip.id', $sale_slip_id_arr)
             ->orderBy('SaleSlip.id', 'desc')
@@ -2000,18 +2000,18 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= '        <input type="hidden" id="product_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_id]">';
         $ajaxHtml1 .= '        <input type="hidden" id="tax_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][tax_id]" value="' . $slip_num . '">';
         $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td>';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="inventory_unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_num]" tabindex="' . ($tabInitialNum + 2) . '">';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td>';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_num]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 3) . '">';
+        $ajaxHtml1 .= '   </td>';
+        $ajaxHtml1 .= '   <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_price]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 4) . '">';
+        $ajaxHtml1 .= '   </td>';
         $ajaxHtml1 .= '    <td colspan="2" id="origin-code-area-' . $slip_num . '">';
         $ajaxHtml1 .= '        <input type="hidden" id="origin_area_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_id]">';
         $ajaxHtml1 .= '    </td>';
-        $ajaxHtml1 .= '    <td>';
-        $ajaxHtml1 .= '        <input type="number" class="form-control" id="inventory_unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_num]" tabindex="' . ($tabInitialNum + 3) . '">';
-        $ajaxHtml1 .= '   </td>';
-        $ajaxHtml1 .= '   <td>';
-        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_num]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 4) . '">';
-        $ajaxHtml1 .= '   </td>';
-        $ajaxHtml1 .= '   <td colspan="2">';
-        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_price]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 5) . '">';
-        $ajaxHtml1 .= '   </td>';
         $ajaxHtml1 .= '   <td id="staff-code-area-'.$slip_num.'">';
         $ajaxHtml1 .= '        <input type="hidden" id="staff_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][staff_id]" value="9">';
         $ajaxHtml1 .= '   </td>';
@@ -2026,9 +2026,6 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= '    <td colspan="2">';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="product_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_text]" placeholder="製品欄" readonly>';
         $ajaxHtml1 .= '    </td>';
-        $ajaxHtml1 .= '    <td colspan="2">';
-        $ajaxHtml1 .= '        <input type="text" class="form-control" id="origin_area_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_text]" placeholder="産地欄" readonly>';
-        $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td>';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="inventory_unit_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_text]" placeholder="個数欄" readonly>';
         $ajaxHtml1 .= '        <input type="hidden" id="inventory_unit_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_id]" value="' . $slip_num . '">';
@@ -2039,6 +2036,9 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][notax_price]" value="' . $slip_num . '" readonly>';
+        $ajaxHtml1 .= '    </td>';
+        $ajaxHtml1 .= '    <td colspan="2">';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="origin_area_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_text]" placeholder="産地欄" readonly>';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="3">';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="memo_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][memo]" placeholder="摘要欄" tabindex="' . ($tabInitialNum + 7) . '">';
@@ -2055,7 +2055,7 @@ class SaleSlipController extends Controller
         // 製品ID
         $autoCompleteProduct = '<input type="text" class="form-control product_code_input" id="product_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_code]" tabindex="' . ($tabInitialNum + 1) . '">';
         // 産地
-        $autoCompleteOrigin  = '<input type="text" class="form-control origin_area_code_input" id="origin_area_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_code]" tabindex="' . ($tabInitialNum + 2) . '">';
+        $autoCompleteOrigin  = '<input type="text" class="form-control origin_area_code_input" id="origin_area_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_code]" tabindex="' . ($tabInitialNum + 5) . '">';
         // 担当
         $autoCompleteStaff   = '<input type="text" class="form-control staff_code_input" id="staff_code_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][staff_code]" value="1009" tabindex="' . ($tabInitialNum + 6) . '">';
 

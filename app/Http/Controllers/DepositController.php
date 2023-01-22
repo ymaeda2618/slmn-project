@@ -909,8 +909,32 @@ class DepositController extends Controller
         $calcDepositList = array();
         $notaxSubTotal8Amount = 0;
         $notaxSubTotal10Amount = 0;
-        $company_name = "初期値";
+        $thedate_subtotal = 0;  // 日々の小計
+        $prev_thedate = "";     // 日々の小計に利用する前レコードの日付
         foreach ($depositList as $depositDatas) {
+
+            // 前レコードと日付が変わっている場合は日々の小計データを入れる
+            if (!empty($prev_thedate) && $prev_thedate != $depositDatas->sale_slip_delivery_date) {
+                $calcDepositList['detail'][] = array(
+                    'date'                => $prev_thedate,
+                    'name'                => "小計",
+                    'origin_name'         => "",
+                    'inventory_unit_num'  => "",
+                    'unit_price'          => "",
+                    'unit_num'            => "",
+                    'unit_name'           => "",
+                    'notax_price'         => $thedate_subtotal,
+                    'memo'                => "",
+                );
+
+                // 初期化
+                $thedate_subtotal = 0;
+            }
+
+            // 日付を格納
+            $prev_thedate = $depositDatas->sale_slip_delivery_date;
+            $thedate_subtotal += $depositDatas->notax_price;
+
             // -------
             // 会社情報
             // -------
@@ -934,7 +958,6 @@ class DepositController extends Controller
                 } else {
                     $companyId = $depositDatas->company_id;
                     $calcDepositList['company_info']['name']    = $depositDatas->company_name;
-                    $company_name                               = $depositDatas->company_name;
                     $calcDepositList['company_info']['address'] = $depositDatas->company_address;
                     // 郵便番号は間にハイフンを入れる
                     $calcDepositList['company_info']['code'] = '';
@@ -992,6 +1015,19 @@ class DepositController extends Controller
                 $notaxSubTotal10Amount += $depositDatas->notax_price;
             }
         }
+
+        // レコードの最後に小計データを入れる
+        $calcDepositList['detail'][] = array(
+            'date'                => $prev_thedate,
+            'name'                => "小計",
+            'origin_name'         => "",
+            'inventory_unit_num'  => "",
+            'unit_price'          => "",
+            'unit_num'            =>"",
+            'unit_name'           => "",
+            'notax_price'         => $thedate_subtotal,
+            'memo'                => "",
+        );
 
         // 税金計算
         $tax8  = floor($notaxSubTotal8Amount * 0.08);
@@ -1086,6 +1122,9 @@ class DepositController extends Controller
                 );
             }
         }
+
+        // テスト用
+        //return view('pdf.pdf_tamplate')->with(['depositList'=> $calcDepositList]);
 
         $pdf = \PDF::view('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList

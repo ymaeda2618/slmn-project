@@ -159,6 +159,7 @@ class SupplySlipController extends Controller
                 $product_sub_query = DB::table('supply_slip_details as SubTable')
                 ->select('SubTable.supply_slip_id AS supply_slip_id')
                 ->where('SubTable.product_id', '=', $condition_product_id)
+                ->where('SubTable.active', '=', '1')
                 ->groupBy('SubTable.supply_slip_id');
             }
 
@@ -204,8 +205,6 @@ class SupplySlipController extends Controller
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
             })
-            ->where('SupplySlip.active', '=', '1')
-            //->orderBy('SupplySlip.date', 'desc')
             ->if($condition_display_sort == 0, function ($query) { // 伝票日付:降順
                 return $query->orderBy('SupplySlip.date', 'desc');
             })
@@ -218,6 +217,7 @@ class SupplySlipController extends Controller
             ->if($condition_display_sort == 3, function ($query) { // 納品日付:昇順
                 return $query->orderBy('SupplySlip.delivery_date', 'asc');
             })
+            ->where('SupplySlip.active', '1')
             ->orderBy('SupplySlip.id', 'desc')
             ->paginate($condition_display_num);
 
@@ -360,6 +360,7 @@ class SupplySlipController extends Controller
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
             })
             ->whereIn('SupplySlip.id', $supply_slip_id_arr)
+            ->where('SupplySlip.active', '=', '1')
             ->orderBy('SupplySlip.id', 'desc')
             ->orderBy('SupplySlipDetail.sort', 'asc')
             ->get();

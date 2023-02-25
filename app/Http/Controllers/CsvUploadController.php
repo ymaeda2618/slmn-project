@@ -611,6 +611,12 @@ class CsvUploadController extends Controller
             $tax_rate           = $lines[101];//税率名
 
             // 見本やサンプルの場合空白が入ってくるので、0を入れる
+            if(empty($unit_num)){
+                $unit_num = 0;
+            }
+            if(empty($unit_price)){
+                $unit_price = 0;
+            }
             if(empty($notax_price)){
                 $notax_price = 0;
             }

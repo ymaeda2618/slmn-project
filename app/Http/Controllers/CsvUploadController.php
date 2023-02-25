@@ -610,6 +610,11 @@ class CsvUploadController extends Controller
             $product_name       = $lines[96];// 商品名
             $tax_rate           = $lines[101];//税率名
 
+            // 見本やサンプルの場合空白が入ってくるので、0を入れる
+            if(empty($notax_price)){
+                $notax_price = 0;
+            }
+
             // 初期化
             $product_code = "";
 

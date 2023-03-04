@@ -642,6 +642,8 @@ class CsvUploadController extends Controller
 
             if (!empty($origin_area_check)) {
                 $origin_area_id = $origin_area_check->id;
+            } else {
+                $origin_area_id = 0;
             }
 
             // 商品コードが存在するチェックし、存在しない場合は暫定で新規登録する

@@ -555,7 +555,7 @@ class DepositController extends Controller
                 // --------------------------------------------
                 // 入金詳細テーブルに重複しているIDが存在しているか確認
                 // --------------------------------------------
-                $delTargetDatas = array();
+                $delTargetDatas = null;
                 if (isset($depositDetailDatas['sale_slip_ids'])) {
                     foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
                         // 編集対象のID以外のものを抽出
@@ -573,7 +573,7 @@ class DepositController extends Controller
                             ['DepositWithdrawalDetail.active', '=', '1'],
                             ['SaleSlip.active', '=', '1']
                         ])
-                        ->get();
+                        ->first();
                     }
                 }
 
@@ -583,7 +583,7 @@ class DepositController extends Controller
                 if (!empty($delTargetDatas)) {
 
                     // 削除対象データを削除
-                    \App\DepositWithdrawalDetail::where('id', $delTargetDatas[0]->id)->delete();
+                    \App\DepositWithdrawalDetail::where('id', $delTargetDatas->id)->delete();
 
                     // ------------------------
                     // 削除された出金IDの再計算する
@@ -597,7 +597,7 @@ class DepositController extends Controller
                             'DepositWithdrawalDetail.adjust_price As adjust_price'
                         )
                         ->where([
-                            ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $delTargetDatas[0]->deposit_withdrawal_id],
+                            ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $delTargetDatas->deposit_withdrawal_id],
                             ['DepositWithdrawalDetail.active', '=', '1']
                         ])
                         ->get();
@@ -607,7 +607,7 @@ class DepositController extends Controller
                             'Deposit.adjustment_amount As adjustment_amount'
                         )
                         ->where([
-                            ['Deposit.id', '=', $delTargetDatas[0]->deposit_withdrawal_id],
+                            ['Deposit.id', '=', $delTargetDatas->deposit_withdrawal_id],
                             ['Deposit.active', '=', '1']
                         ])
                         ->get();
@@ -656,7 +656,7 @@ class DepositController extends Controller
                     // 計算結果を出金テーブルに更新させる
                     // -----------------------------
                     DB::table('deposits')
-                    ->where('id', $delTargetDatas[0]->deposit_withdrawal_id)
+                    ->where('id', $delTargetDatas->deposit_withdrawal_id)
                     ->update(array(
                         'sub_total' => $subTotal,
                         'amount'    => $total

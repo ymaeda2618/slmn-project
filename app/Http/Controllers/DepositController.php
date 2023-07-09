@@ -981,10 +981,20 @@ class DepositController extends Controller
             // -------------------
             // 8%, 10%ごとの金額計算
             // -------------------
+
+            $product_name = "";
+            if ($depositDatas->tax_id == 1) {// 税率が8%の場合
+                $product_name = $depositDatas->product_name . " *"; // 軽減税率対象商品がわかるようにする
+                $notaxSubTotal8Amount += $depositDatas->notax_price;
+            } else {// 税率が10%の場合
+                $product_name = $depositDatas->product_name;
+                $notaxSubTotal10Amount += $depositDatas->notax_price;
+            }
+
             // 初期化
             $calcDepositList['detail'][] = array(
                 'date'                => $depositDatas->sale_slip_delivery_date,
-                'name'                => $depositDatas->product_name,
+                'name'                => $product_name,
                 'origin_name'         => $depositDatas->origin_name,
                 'inventory_unit_num'  => $depositDatas->inventory_unit_num,
                 'unit_price'          => $depositDatas->unit_price,
@@ -1002,17 +1012,6 @@ class DepositController extends Controller
                     'tax_10'            => 0,
                     'total'             => 0
                 );
-            }
-
-            if ($depositDatas->tax_id == 1) {
-                // 8%の計算
-                // 計算
-                $notaxSubTotal8Amount += $depositDatas->notax_price;
-
-            } else {
-                // 10%の計算
-                // 計算
-                $notaxSubTotal10Amount += $depositDatas->notax_price;
             }
         }
 

@@ -26,7 +26,8 @@
             <p>〒135-0061　東京都江東区豊洲6-5-1</p>
             <p>売り場店舗 TEL：03-6633-5320　FAX：03-6633-4320</p>
             <p>事務所　TEL：047-464-1638　FAX：047-464-1626</p>
-            <br><br>
+            <p>適格請求書発行事業者番号：T1010001147111</p>
+            <br>
             <div id='bank-info'>
                 <p>[振込先]　東京東信用金庫 三咲支店</p>
                 <p>口座番号/(当座)0701724</p>
@@ -72,6 +73,9 @@
             </tr>
             <?php $prev_date = $detailDatas['date']; ?> @endforeach
         </table>
+        <div class='attention-area'>
+            <p>*は軽減税率対象商品</p>
+        </div>
         <br>
         <table id="total-table" border='1' class='page'>
             <tr>

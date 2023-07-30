@@ -24,6 +24,13 @@
                 <input type="text" class="form-control" id="yomi" name="data[SaleCompany][yomi]">
             </div>
             <div class="form-group">
+                <label class="column-label" for="tax_calc_type">消費税計算区分</label>
+                <select class="form-control" id="tax_calc_type" name="data[SaleCompany][tax_calc_type]">
+                    <option value="0" selected>伝票ごとに計算</option>
+                    <option value="1">請求書ごとに計算</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label class="column-label" for="closing_date">締め日</label>
                 <select class="form-control" id="closing_date" name="data[SaleCompany][closing_date]">
                     <option value="99">月末</option>

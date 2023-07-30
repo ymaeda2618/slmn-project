@@ -20,6 +20,12 @@
                 <input type="text" class="form-control" id="yomi" name="data[SaleCompany][yomi]" value="{{$request->data['SaleCompany']['yomi']}}" readonly>
             </div>
             <div class="form-group">
+                <label class="column-label" for="tax_calc_type">消費税計算区分</label> @if($request->data['SaleCompany']['tax_calc_type'] == 0)
+                <input type="text" class="form-control" id="tax_calc_type_text" name="data[SaleCompany][tax_calc_type_text]" value="伝票ごとに計算" readonly> @elseif($request->data['SaleCompany']['tax_calc_type'] == 1)
+                <input type="text" class="form-control" id="tax_calc_type_text" name="data[SaleCompany][tax_calc_type_text]" value="請求書ごとに計算" readonly> @endif
+                <input type='hidden' name="data[SaleCompany][tax_calc_type]" value="{{$request->data['SaleCompany']['tax_calc_type']}}">
+            </div>
+            <div class="form-group">
                 <label class="column-label" for="closing_date_text">締め日<font color="red">※任意</font></label> @if($request->data['SaleCompany']['closing_date'] == 99)
                 <input type="text" class="form-control" id="closing_date_text" name="data[SaleCompany][closing_date_text]" value="月末" readonly> @elseif($request->data['SaleCompany']['closing_date'] == 88)
                 <input type="text" class="form-control" id="closing_date_text" name="data[SaleCompany][closing_date_text]" value="都度" readonly> @else
@@ -73,7 +79,7 @@
 
 <style>
     /* 共通 */
-
+    
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -81,7 +87,7 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .confirm-title {
         font-size: 0.9em;
         font-weight: bold;
@@ -90,23 +96,23 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .form-group {
         margin-bottom: 3rem !important;
     }
-
+    
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-
+    
     .column-label {
         font-size: 0.9em;
         font-weight: bold;

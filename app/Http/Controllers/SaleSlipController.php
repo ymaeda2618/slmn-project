@@ -1091,7 +1091,8 @@ class SaleSlipController extends Controller
             ->select(
                 'SaleCompany.code  AS code',
                 'SaleCompany.id    AS id',
-                'SaleCompany.name  AS name'
+                'SaleCompany.name  AS name',
+                'SaleCompany.tax_calc_type  AS tax_calc_type',
             )
             ->if(!empty($input_code), function ($query) use ($input_code) {
                 return $query->where('SaleCompany.code', '=', $input_code);
@@ -1105,10 +1106,11 @@ class SaleSlipController extends Controller
                 $output_code = $saleCompanyList->code;
                 $output_id   = $saleCompanyList->id;
                 $output_name = $saleCompanyList->name;
+                $output_tax_calc_type = $saleCompanyList->tax_calc_type;
             }
         }
 
-        $returnArray = array($output_code, $output_id, $output_name);
+        $returnArray = array($output_code, $output_id, $output_name, $output_tax_calc_type);
 
         return json_encode($returnArray);
     }

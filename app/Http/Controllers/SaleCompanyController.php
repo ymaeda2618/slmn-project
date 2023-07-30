@@ -116,6 +116,7 @@ class SaleCompanyController extends Controller
             'SaleCompany.code          AS code',
             'SaleCompany.name          AS sale_company_name',
             'SaleCompany.yomi          AS yomi',
+            'SaleCompany.tax_calc_type AS tax_calc_type',
             'SaleCompany.closing_date  AS closing_date',
             'SaleCompany.postal_code   AS postal_code',
             'SaleCompany.address       AS address',
@@ -227,6 +228,7 @@ class SaleCompanyController extends Controller
             $SaleCompany->code              = $sale_company_code;
             $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
             $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
+            $SaleCompany->tax_calc_type     = $request->data['SaleCompany']['tax_calc_type'];
             $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
             $SaleCompany->postal_code       = $request->data['SaleCompany']['postal_code'];
             $SaleCompany->address           = $request->data['SaleCompany']['address'];
@@ -347,6 +349,7 @@ class SaleCompanyController extends Controller
             $SaleCompany->code              = $sale_company_code;
             $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
             $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
+            $SaleCompany->tax_calc_type     = $request->data['SaleCompany']['tax_calc_type'];
             $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
             $SaleCompany->postal_code       = $request->data['SaleCompany']['postal_code'];
             $SaleCompany->address           = $request->data['SaleCompany']['address'];

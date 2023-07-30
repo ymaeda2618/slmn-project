@@ -307,6 +307,7 @@ class DepositController extends Controller
             'Deposit.sale_shop_id        AS sale_shop_id',
             'SaleCompany.name            AS sale_company_name',
             'SaleCompany.code            AS sale_company_code',
+            'SaleCompany.tax_calc_type   AS sale_company_tax_calc_type',
             'SaleShop.name               AS sale_shop_name',
             'SaleShop.code               AS sale_shop_code',
             'Staff.code                  AS staff_code'
@@ -792,13 +793,13 @@ class DepositController extends Controller
                 $ajaxHtml .= '                <input type="hidden" id="sale-slip-subTotal8-' . $saleSlipDatas->id . '" name="data[DepositDetail][' . $saleSlipDatas->id . '][notax_subTotal_8]" value="' . $notaxSubTotal8 . '">';
                 $ajaxHtml .= '            </td>';
                 $ajaxHtml .= '            <td>' . number_format($tax8);
-                $ajaxHtml .= '                <input type="hidden" name="data[DepositDetail][' . $saleSlipDatas->id . '][tax8]" value="' . $tax8 . '">';
+                $ajaxHtml .= '                <input type="hidden" id="sale-slip-tax8-' . $saleSlipDatas->id . '"name="data[DepositDetail][' . $saleSlipDatas->id . '][tax8]" value="' . $tax8 . '">';
                 $ajaxHtml .= '            </td>';
                 $ajaxHtml .= '            <td>' . number_format($notaxSubTotal10);
                 $ajaxHtml .= '                <input type="hidden" id="sale-slip-subTotal10-' . $saleSlipDatas->id . '"name="data[DepositDetail][' . $saleSlipDatas->id . '][notax_subTotal_10]" value="' . $notaxSubTotal10 . '">';
                 $ajaxHtml .= '            </td>';
                 $ajaxHtml .= '            <td>' . number_format($tax10);
-                $ajaxHtml .= '                <input type="hidden" name="data[DepositDetail][' . $saleSlipDatas->id . '][tax10]" value="' . $tax10 . '">';
+                $ajaxHtml .= '                <input type="hidden" id="sale-slip-tax10-' . $saleSlipDatas->id . '"name="data[DepositDetail][' . $saleSlipDatas->id . '][tax10]" value="' . $tax10 . '">';
                 $ajaxHtml .= '            </td>';
                 $ajaxHtml .= '            <td>' . number_format($subTotal);
                 $ajaxHtml .= '                <input type="hidden" name="data[DepositDetail][' . $saleSlipDatas->id . '][subTotal]" value="' . $subTotal . '">';
@@ -849,6 +850,7 @@ class DepositController extends Controller
             'SaleCompany.name                            AS company_name',
             'SaleCompany.postal_code                     AS company_postal_code',
             'SaleCompany.address                         AS company_address',
+            'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
             'SaleShop.id                                 AS shop_id',
             'SaleShop.name                               AS shop_name',
             'SaleShop.postal_code                        AS shop_postal_code',
@@ -873,7 +875,7 @@ class DepositController extends Controller
         })
         ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
             $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
-                 ->where('DepositWithdrawalDetail.type', '=', '2');
+                 ->where('DepositWithdrawalDetail.type', '=', '2'); // 入出金タイプ 1:出金, 2:入金
         })
         ->join('sale_slips AS SaleSlip', function ($join) {
             $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SaleSlip.id');
@@ -907,6 +909,12 @@ class DepositController extends Controller
 
         // 初期化処理
         $calcDepositList = array();
+        $companyTaxCalcType = 0;
+        $prev_sale_slip_id = 0;
+        $tax8PerSaleSlip = 0; // 伝票ごとの消費税を格納する変数
+        $tax10PerSaleSlip = 0; // 伝票ごとの消費税を格納する変数
+        $tax8  = 0; // 請求書の消費税合計を格納する変数
+        $tax10 = 0; // 請求書の消費税合計を格納する変数
         $notaxSubTotal8Amount = 0;
         $notaxSubTotal10Amount = 0;
         $thedate_subtotal = 0;  // 日々の小計
@@ -934,6 +942,20 @@ class DepositController extends Controller
             // 日付を格納
             $prev_thedate = $depositDatas->sale_slip_delivery_date;
             $thedate_subtotal += $depositDatas->notax_price;
+
+             // 税計算種別が0:伝票ごとの場合
+            if (
+                $companyTaxCalcType == 0 &&
+                !empty($prev_sale_slip_id) &&
+                $prev_sale_slip_id != $depositDatas->sale_slip_id
+            ) {
+                $tax8  += floor($tax8PerSaleSlip * 0.08);
+                $tax10 += floor($tax10PerSaleSlip * 0.1);
+                $tax8PerSaleSlip = 0;
+                $tax10PerSaleSlip = 0;
+            }
+            // 消費税計算するために前売上伝票IDを取得
+            $prev_sale_slip_id = $depositDatas->sale_slip_id;
 
             // -------
             // 会社情報
@@ -976,6 +998,9 @@ class DepositController extends Controller
 
                 // 備考情報もここで入れる
                 $calcDepositList['company_info']['remarks'] = $depositDatas->remarks;
+
+                // 税計算種別(0:伝票ごと 1:請求書ごと)
+                $companyTaxCalcType = $depositDatas->company_tax_calc_type;
             }
 
             // -------------------
@@ -986,9 +1011,15 @@ class DepositController extends Controller
             if ($depositDatas->tax_id == 1) {// 税率が8%の場合
                 $product_name = $depositDatas->product_name . " *"; // 軽減税率対象商品がわかるようにする
                 $notaxSubTotal8Amount += $depositDatas->notax_price;
+                if ($companyTaxCalcType == 0) { //　伝票ごとに消費税算出する計算方式の場合
+                    $tax8PerSaleSlip += $depositDatas->notax_price;
+                }
             } else {// 税率が10%の場合
                 $product_name = $depositDatas->product_name;
                 $notaxSubTotal10Amount += $depositDatas->notax_price;
+                if ($companyTaxCalcType == 0) { //　伝票ごとに消費税算出する計算方式の場合
+                    $tax10PerSaleSlip += $depositDatas->notax_price;
+                }
             }
 
             // 初期化
@@ -1029,8 +1060,15 @@ class DepositController extends Controller
         );
 
         // 税金計算
-        $tax8  = floor($notaxSubTotal8Amount * 0.08);
-        $tax10 = floor($notaxSubTotal10Amount * 0.1);
+        if ($companyTaxCalcType == 0) {
+            $tax8  += floor($tax8PerSaleSlip * 0.08);
+            $tax10 += floor($tax10PerSaleSlip * 0.1);
+            $tax8PerSaleSlip = 0;
+            $tax10PerSaleSlip = 0;
+        } else if ($companyTaxCalcType == 1) { //　請求書ごとに消費税算出する計算方式の場合
+            $tax8  = floor($notaxSubTotal8Amount * 0.08);
+            $tax10 = floor($notaxSubTotal10Amount * 0.1);
+        }
 
         // 税込小計
         $subTotal8Amount  = $notaxSubTotal8Amount  + $tax8;
@@ -1123,7 +1161,7 @@ class DepositController extends Controller
         }
 
         // テスト用
-        //return view('pdf.pdf_tamplate')->with(['depositList'=> $calcDepositList]);
+        return view('pdf.pdf_tamplate')->with(['depositList'=> $calcDepositList]);
 
         $pdf = \PDF::view('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList

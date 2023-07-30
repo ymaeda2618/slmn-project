@@ -33,6 +33,7 @@
                         <td class="width-20">
                             <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='javascript:changeCalcFlg()' tabindex="5" value="{{$depositDatas->sale_company_code}}">
                             <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]" value="{{$depositDatas->sale_company_id}}">
+                            <input type="hidden" id="deposit_company_tax_calc_type" name="data[Deposit][deposit_company_tax_calc_type]" value="{{$depositDatas->sale_company_tax_calc_type}}">
                         </td>
                         <td class="width-30">
                             <input type="text" class="form-control" id="deposit_company_text" name="data[Deposit][deposit_company_text]" value="{{$depositDatas->sale_company_name}}" readonly>
@@ -102,7 +103,7 @@
                             </td>
                             <td>
                                 <?php echo number_format($tax8); ?>
-                                <input type="hidden" name="data[DepositDetail][{{$saleSlipData->id}}][tax8]" value="{{$tax8}}">
+                                <input type="hidden" id="sale-slip-tax8-{{$saleSlipData->id}}" name="data[DepositDetail][{{$saleSlipData->id}}][tax8]" value="{{$tax8}}">
                             </td>
                             <td>
                                 <?php echo number_format($notaxSubTotal10); ?>
@@ -110,7 +111,7 @@
                             </td>
                             <td>
                                 <?php echo number_format($tax10); ?>
-                                <input type="hidden" name="data[DepositDetail][{{$saleSlipData->id}}][tax10]" value="{{$tax10}}">
+                                <input type="hidden" id="sale-slip-tax10-{{$saleSlipData->id}}" name="data[DepositDetail][{{$saleSlipData->id}}][tax10]" value="{{$tax10}}">
                             </td>
                             <td>
                                 <?php echo number_format($subTotal); ?>
@@ -436,6 +437,7 @@
                 var selector_code = $(this).attr('id');
                 var selector_id = selector_code.replace('_code', '_id');
                 var selector_text = selector_code.replace('_code', '_text');
+                var selector_tax_calc_type = selector_code.replace('_code', '_tax_calc_type');
 
                 var fd = new FormData();
                 fd.append("inputText", set_val);
@@ -458,6 +460,7 @@
                             $("#" + selector_code).val(data[0]);
                             $("#" + selector_id).val(data[1]);
                             $("#" + selector_text).val(data[2]);
+                            $("#" + selector_tax_calc_type).val(data[3]);
                         });
 
                 } else if (selector_code.match(/deposit_shop/)) { // 売上店舗
@@ -737,6 +740,9 @@
         // チェックされている要素を全削除
         $('#sale-slip-area').empty();
 
+        // 企業の税金計算区分取得(0:伝票ごとに消費税計算 1:請求書ごとに消費税計算)
+        var tax_calc_type = $('#deposit_company_tax_calc_type').val();
+
         // チェックボックスの値を取得して計算
         $('.result-table input:checked').each(function() {
 
@@ -755,19 +761,28 @@
             // 調整額
             adjustPrice += parseInt($('#sale-slip-adjustPrice-' + id).val());
 
+            // 消費税計算方法が伝票ごとの消費税計算の場合
+            if (tax_calc_type == 0) {
+                // 8%消費税額
+                subTotal8 += parseInt($('#sale-slip-tax8-' + id).val()) + parseInt($('#sale-slip-subTotal8-' + id).val());
+                // 10%消費税額
+                subTotal10 += parseInt($('#sale-slip-tax10-' + id).val()) + parseInt($('#sale-slip-subTotal10-' + id).val());
+            }
+
             // チェックしたら詳細エリアにIDを追加
             $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
 
         });
 
-        // 8%税込額
-        subTotal8 = Math.floor(notaxSubTotal8 * 1.08);
-
+        // 消費税計算方法が請求書ごとの消費税計算の場合
+        if (tax_calc_type == 1) {
+            // 8%税込額
+            subTotal8 = Math.floor(notaxSubTotal8 * 1.08);
+            // 10%税込額
+            subTotal10 = Math.floor(notaxSubTotal10 * 1.1);
+        }
         // 8%消費税額
         tax8 = parseInt(subTotal8) - parseInt(notaxSubTotal8);
-
-        // 10%税込額
-        subTotal10 = Math.floor(notaxSubTotal10 * 1.1);
 
         // 10%消費税額
         tax10 = parseInt(subTotal10) - parseInt(notaxSubTotal10);

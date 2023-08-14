@@ -98,7 +98,11 @@ class SaleSlipController extends Controller
                 //$condition_shop_id       = $request->data['SaleSlip']['sale_shop_id'];
                 //$condition_shop_text     = $request->data['SaleSlip']['sale_shop_text'];
                 $condition_payment_method_type      = $request->data['SaleSlip']['payment_method_type'];
-                $condition_payment_method_type_text = $request->data['SaleSlip']['payment_method_type_text'];
+                if($condition_payment_method_type == "") {
+                    $condition_payment_method_type_text = "";
+                } else {
+                    $condition_payment_method_type_text = $request->data['SaleSlip']['payment_method_type_text'];
+                }
                 $condition_product_code  = $request->data['SaleSlipDetail']['product_code'];
                 $condition_product_id    = $request->data['SaleSlipDetail']['product_id'];
                 $condition_product_text  = $request->data['SaleSlipDetail']['product_text'];

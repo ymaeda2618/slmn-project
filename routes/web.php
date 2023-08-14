@@ -132,6 +132,7 @@ Route::post('AjaxAutoCompleteSaleCompany', 'SaleSlipController@AjaxAutoCompleteS
 Route::post('AjaxSetSaleCompany', 'SaleSlipController@AjaxSetSaleCompany');
 Route::post('AjaxAutoCompleteSaleShop', 'SaleSlipController@AjaxAutoCompleteSaleShop');
 Route::post('AjaxSetSaleShop', 'SaleSlipController@AjaxSetSaleShop');
+Route::post('AjaxSetPaymentMethodType', 'SaleSlipController@AjaxSetPaymentMethodType');
 Route::post('AjaxAutoCompleteProduct', 'SaleSlipController@AjaxAutoCompleteProduct');
 Route::post('AjaxSetProduct', 'SaleSlipController@AjaxSetProduct');
 Route::post('AjaxAutoCompleteStandard', 'SaleSlipController@AjaxAutoCompleteStandard');

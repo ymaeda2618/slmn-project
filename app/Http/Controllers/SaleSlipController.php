@@ -61,9 +61,11 @@ class SaleSlipController extends Controller
             $condition_company_code  = $request->session()->get('condition_company_code');
             $condition_company_id    = $request->session()->get('condition_company_id');
             $condition_company_text  = $request->session()->get('condition_company_text');
-            $condition_shop_code     = $request->session()->get('condition_shop_code');
-            $condition_shop_id       = $request->session()->get('condition_shop_id');
-            $condition_shop_text     = $request->session()->get('condition_shop_text');
+            //$condition_shop_id       = $request->session()->get('condition_shop_id');
+            //$condition_shop_code     = $request->session()->get('condition_shop_code');
+            //$condition_shop_text     = $request->session()->get('condition_shop_text');
+            $condition_payment_method_type      = $request->session()->get('condition_payment_method_type');
+            $condition_payment_method_type_text = $request->session()->get('condition_payment_method_type_text');
             $condition_product_code  = $request->session()->get('condition_product_code');
             $condition_product_id    = $request->session()->get('condition_product_id');
             $condition_product_text  = $request->session()->get('condition_product_text');
@@ -92,9 +94,11 @@ class SaleSlipController extends Controller
                 $condition_company_code  = $request->data['SaleSlip']['sale_company_code'];
                 $condition_company_id    = $request->data['SaleSlip']['sale_company_id'];
                 $condition_company_text  = $request->data['SaleSlip']['sale_company_text'];
-                $condition_shop_code     = $request->data['SaleSlip']['sale_shop_code'];
-                $condition_shop_id       = $request->data['SaleSlip']['sale_shop_id'];
-                $condition_shop_text     = $request->data['SaleSlip']['sale_shop_text'];
+                //$condition_shop_code     = $request->data['SaleSlip']['sale_shop_code'];
+                //$condition_shop_id       = $request->data['SaleSlip']['sale_shop_id'];
+                //$condition_shop_text     = $request->data['SaleSlip']['sale_shop_text'];
+                $condition_payment_method_type      = $request->data['SaleSlip']['payment_method_type'];
+                $condition_payment_method_type_text = $request->data['SaleSlip']['payment_method_type_text'];
                 $condition_product_code  = $request->data['SaleSlipDetail']['product_code'];
                 $condition_product_id    = $request->data['SaleSlipDetail']['product_id'];
                 $condition_product_text  = $request->data['SaleSlipDetail']['product_text'];
@@ -119,9 +123,11 @@ class SaleSlipController extends Controller
                 $request->session()->put('condition_company_code', $condition_company_code);
                 $request->session()->put('condition_company_id', $condition_company_id);
                 $request->session()->put('condition_company_text', $condition_company_text);
-                $request->session()->put('condition_shop_code', $condition_shop_code);
-                $request->session()->put('condition_shop_id', $condition_shop_id);
-                $request->session()->put('condition_shop_text', $condition_shop_text);
+                //$$request->session()->put('condition_shop_code', $condition_shop_code);
+                //$request->session()->put('condition_shop_id', $condition_shop_id);
+                //$$request->session()->put('condition_shop_text', $condition_shop_text);
+                $request->session()->put('condition_payment_method_type', $condition_payment_method_type);
+                $request->session()->put('condition_payment_method_type_text', $condition_payment_method_type_text);
                 $request->session()->put('condition_product_code', $condition_product_code);
                 $request->session()->put('condition_product_id', $condition_product_id);
                 $request->session()->put('condition_product_text', $condition_product_text);
@@ -138,9 +144,11 @@ class SaleSlipController extends Controller
                 $condition_company_code  = null;
                 $condition_company_id    = null;
                 $condition_company_text  = null;
-                $condition_shop_code     = null;
-                $condition_shop_id       = null;
-                $condition_shop_text     = null;
+                //$condition_shop_code     = null;
+                //$condition_shop_id       = null;
+                //$condition_shop_text     = null;
+                $condition_payment_method_type = null;
+                $condition_payment_method_type_text = null;
                 $condition_product_code  = null;
                 $condition_product_id    = null;
                 $condition_product_text  = null;
@@ -153,9 +161,11 @@ class SaleSlipController extends Controller
                 $request->session()->forget('condition_company_code');
                 $request->session()->forget('condition_company_id');
                 $request->session()->forget('condition_company_text');
-                $request->session()->forget('condition_shop_code');
-                $request->session()->forget('condition_shop_id');
-                $request->session()->forget('condition_shop_text');
+                //$request->session()->forget('condition_shop_code');
+                //$request->session()->forget('condition_shop_id');
+                //$request->session()->forget('condition_shop_text');
+                $request->session()->forget('condition_payment_method_type');
+                $request->session()->forget('condition_payment_method_type_text');
                 $request->session()->forget('condition_product_code');
                 $request->session()->forget('condition_product_id');
                 $request->session()->forget('condition_product_text');
@@ -184,6 +194,7 @@ class SaleSlipController extends Controller
             $saleSlipList = DB::table('sale_slips AS SaleSlip')
             ->select(
                 'SaleSlip.id                  AS sale_slip_id',
+                'SaleSlip.payment_method_type AS payment_method_type',
                 'SaleSlip.delivery_price      AS delivery_price',
                 'SaleSlip.adjust_price        AS adjust_price',
                 'SaleSlip.notax_sub_total     AS notax_sub_total',
@@ -191,17 +202,24 @@ class SaleSlipController extends Controller
                 'SaleSlip.sale_submit_type    AS sale_submit_type',
                 'SaleCompany.code             AS sale_company_code',
                 'SaleCompany.name             AS sale_company_name',
-                'SaleShop.name                AS sale_shop_name'
+                //'SaleShop.name                AS sale_shop_name'
             )
             ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y/%m/%d")          AS sale_slip_date')
             ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y/%m/%d") AS sale_slip_delivery_date')
             ->selectRaw('DATE_FORMAT(SaleSlip.modified, "%m-%d %H:%i")   AS sale_slip_modified')
+            ->selectRaw('
+                CASE
+                WHEN SaleSlip.payment_method_type = 0 THEN "掛け売り"
+                WHEN SaleSlip.payment_method_type = 1 THEN "現金売り"
+                ELSE "存在しません"
+                END AS payment_method_type_text'
+            )
             ->join('sale_companies AS SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
             })
-            ->leftJoin('sale_shops AS SaleShop', function ($join) {
+            /*->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
-            })
+            })*/
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
                        ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
@@ -216,8 +234,11 @@ class SaleSlipController extends Controller
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('SaleSlip.sale_company_id', '=', $condition_company_id);
             })
-            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
+            /*->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
+            })*/
+            ->if(!empty($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
+                return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
@@ -251,13 +272,14 @@ class SaleSlipController extends Controller
             ->selectRaw('SUM(SaleSlip.delivery_price) AS delivery_price_sum')
             ->selectRaw('SUM(SaleSlip.adjust_price) AS adjust_price_sum')
             ->selectRaw('SUM(SaleSlip.notax_sub_total) AS notax_sub_total_sum')
+            ->selectRaw('SUM(SaleSlip.sub_total) AS sub_total_sum')
 
             ->join('sale_companies AS SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
             })
-            ->leftJoin('sale_shops AS SaleShop', function ($join) {
+            /*->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
-            })
+            })*/
             ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
                 return $query->whereBetween('SaleSlip.date', [$condition_date_from, $condition_date_to]);
             })
@@ -267,8 +289,11 @@ class SaleSlipController extends Controller
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('SaleSlip.sale_company_id', '=', $condition_company_id);
             })
-            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
+            /*->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
+            })*/
+            ->if(!empty($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
+                return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
@@ -292,8 +317,12 @@ class SaleSlipController extends Controller
             $adjust_price_amount = 0;
             // 全体の税抜小計額をカウント
             $notax_sub_total_amount = 0;
+            // 全体の税込小計額をカウント
+            $notax_sub_total_amount = 0;
             // 全体の総額をカウント
             $sale_slip_amount = 0;
+            // 全体の税込総額をカウント
+            $sale_slip_tax_amount = 0;
 
             if(!empty($saleSlipSumList)) {
 
@@ -304,7 +333,9 @@ class SaleSlipController extends Controller
                 $delivery_price_amount  = $saleSlipSumVal[0]->delivery_price_sum;
                 $adjust_price_amount    = $saleSlipSumVal[0]->adjust_price_sum;
                 $notax_sub_total_amount = $saleSlipSumVal[0]->notax_sub_total_sum;
+                $sub_total_amount       = $saleSlipSumVal[0]->sub_total_sum;
                 $sale_slip_amount       = ($delivery_price_amount + $adjust_price_amount + $notax_sub_total_amount);
+                $sale_slip_tax_amount   = ($delivery_price_amount + $adjust_price_amount + $sub_total_amount);
             }
 
             //---------------------
@@ -375,8 +406,11 @@ class SaleSlipController extends Controller
             ->if(!empty($condition_company_id), function ($queryDetail) use ($condition_company_id) {
                 return $queryDetail->where('SaleSlip.sale_company_id', '=', $condition_company_id);
             })
-            ->if(!empty($condition_shop_id), function ($queryDetail) use ($condition_shop_id) {
+            /*->if(!empty($condition_shop_id), function ($queryDetail) use ($condition_shop_id) {
                 return $queryDetail->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
+            })*/
+            ->if(!empty($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
+                return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
             ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
                 return $queryDetail->where('SaleSlipDetail.product_id', '=', $condition_product_id);
@@ -452,9 +486,11 @@ class SaleSlipController extends Controller
             "condition_company_code"     => $condition_company_code,
             "condition_company_id"       => $condition_company_id,
             "condition_company_text"     => $condition_company_text,
-            "condition_shop_code"        => $condition_shop_code,
-            "condition_shop_id"          => $condition_shop_id,
-            "condition_shop_text"        => $condition_shop_text,
+            //"condition_shop_code"        => $condition_shop_code,
+            //"condition_shop_id"          => $condition_shop_id,
+            //"condition_shop_text"        => $condition_shop_text,
+            "condition_payment_method_type" => $condition_payment_method_type,
+            "condition_payment_method_type_text" => $condition_payment_method_type_text,
             "condition_product_code"     => $condition_product_code,
             "condition_product_id"       => $condition_product_id,
             "condition_product_text"     => $condition_product_text,
@@ -466,6 +502,7 @@ class SaleSlipController extends Controller
             "adjust_price_amount"        => $adjust_price_amount,
             "notax_sub_total_amount"     => $notax_sub_total_amount,
             "sale_slip_amount"           => $sale_slip_amount,
+            "sale_slip_tax_amount"       => $sale_slip_tax_amount,
             "sale_slip_condition_num"    => $sale_slip_condition_num,
             "sale_slip_condition_notax_sub_total" => $sale_slip_condition_notax_sub_total,
             "sale_slip_detail_arr"       => $sale_slip_detail_arr,
@@ -492,6 +529,7 @@ class SaleSlipController extends Controller
         $SaleSlipList = DB::table('sale_slips AS SaleSlip')
         ->select(
             'SaleSlip.id                  AS sale_slip_id',
+            'SaleSlip.payment_method_type AS payment_method_type',
             'SaleSlip.notax_sub_total_8   AS notax_sub_total_8',
             'SaleSlip.notax_sub_total_10  AS notax_sub_total_10',
             'SaleSlip.notax_sub_total     AS notax_sub_total',
@@ -509,23 +547,30 @@ class SaleSlipController extends Controller
             'SaleCompany.code             AS sale_company_code',
             'SaleCompany.id               AS sale_company_id',
             'SaleCompany.name             AS sale_company_name',
-            'SaleShop.code                AS sale_shop_code',
-            'SaleShop.id                  AS sale_shop_id',
-            'SaleShop.name                AS sale_shop_name',
+            //'SaleShop.code                AS sale_shop_code',
+            //'SaleShop.id                  AS sale_shop_id',
+            //'SaleShop.name                AS sale_shop_name',
             'Delivery.code                AS delivery_code',
             'Delivery.id                  AS delivery_id',
             'Delivery.name                AS delivery_name'
         )
         ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d") AS sale_slip_sale_date')
+        ->selectRaw('
+            CASE
+            WHEN SaleSlip.payment_method_type = 0 THEN "掛け売り"
+            WHEN SaleSlip.payment_method_type = 1 THEN "現金売り"
+            ELSE "存在しません"
+            END AS payment_method_type_text'
+        )
         ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
         ->join('sale_companies as SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id')
                  ->where('SaleCompany.active', '=', true);
         })
-        ->leftJoin('sale_shops as SaleShop', function ($join) {
+        /*->leftJoin('sale_shops as SaleShop', function ($join) {
             $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id')
                  ->where('SaleShop.active', '=', true);
-        })
+        })*/
         ->leftJoin('deliverys as Delivery', function ($join) {
             $join->on('Delivery.id', '=', 'SaleSlip.delivery_id')
                  ->where('Delivery.active', '=', true);
@@ -725,7 +770,7 @@ class SaleSlipController extends Controller
             } else {
 
                 // 値がNULLのところを初期化
-                if(empty($SaleSlipData['sale_shop_id'])) $SaleSlipData['sale_shop_id'] = 0;
+                //if(empty($SaleSlipData['sale_shop_id'])) $SaleSlipData['sale_shop_id'] = 0;
                 if(empty($SaleSlipData['delivery_id'])) $SaleSlipData['delivery_id'] = 0;
                 if(empty($SaleSlipData['delivery_price'])) $SaleSlipData['delivery_price'] = 0;
                 if(empty($SaleSlipData['adjust_price'])) $SaleSlipData['adjust_price'] = 0;
@@ -735,7 +780,8 @@ class SaleSlipController extends Controller
                 $SaleSlip->date               = $SaleSlipData['sale_date'];            // 日付
                 $SaleSlip->delivery_date      = $SaleSlipData['delivery_date'];        // 納品日
                 $SaleSlip->sale_company_id    = $SaleSlipData['sale_company_id'];      // 売上先ID
-                $SaleSlip->sale_shop_id       = $SaleSlipData['sale_shop_id'];         // 売上先店舗ID
+                //$SaleSlip->sale_shop_id       = $SaleSlipData['sale_shop_id'];         // 売上先店舗ID
+                $SaleSlip->payment_method_type = $SaleSlipData['payment_method_type']; // 支払い方法
                 $SaleSlip->delivery_id        = $SaleSlipData['delivery_id'];          // 配送ID
                 $SaleSlip->notax_sub_total_8  = $SaleSlipData['notax_sub_total_8'];    // 8%課税対象額
                 $SaleSlip->notax_sub_total_10 = $SaleSlipData['notax_sub_total_10'];   // 10%課税対象額
@@ -1205,6 +1251,32 @@ class SaleSlipController extends Controller
         }
 
         $returnArray = array($output_code, $output_id, $output_name);
+
+        return json_encode($returnArray);
+    }
+
+    /**
+     * 売上先店舗更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetPaymentMethodType(Request $request)
+    {
+        // 初期化
+        $output_name = null;
+
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        if($input_text == 0){
+            $output_name = "掛け売り";
+        } else if ($input_text == 1){
+            $output_name = "現金売り";
+        } else {
+            $output_name = "存在しないコードです";
+        }
+
+        $returnArray = array($output_name);
 
         return json_encode($returnArray);
     }
@@ -2345,7 +2417,7 @@ class SaleSlipController extends Controller
             ->select(
                 'SaleSlip.date               AS sale_date',
                 'SaleSlip.sale_company_id    AS company_id',
-                'SaleSlip.sale_shop_id       AS shop_id',
+              //  'SaleSlip.sale_shop_id       AS shop_id',
                 'SaleSlip.notax_sub_total_8  AS notax_subtotal_8',
                 'SaleSlip.notax_sub_total_10 AS notax_subtotal_10',
                 'SaleSlip.notax_sub_total    AS notax_subtotal',
@@ -2444,7 +2516,7 @@ class SaleSlipController extends Controller
                 // ---------------------
                 $updateParams = array(
                     'sale_company_id'     => $saleSlipDatas->company_id,
-                    'sale_shop_id'        => $saleSlipDatas->shop_id,
+                  //  'sale_shop_id'        => $saleSlipDatas->shop_id,
                     'date'                => $saleSlipDatas->sale_date,
                     'staff_id'            => $staffId,
                     'sub_total'           => $subtotal,
@@ -2472,7 +2544,7 @@ class SaleSlipController extends Controller
                 // 配列に値を格納
                 $insertDepositColumns = array(
                     'sale_company_id'     => $saleSlipDatas->company_id,
-                    'sale_shop_id'        => $saleSlipDatas->shop_id,
+                  //  'sale_shop_id'        => $saleSlipDatas->shop_id,
                     'date'                => $saleSlipDatas->sale_date,
                     'sale_from_date'      => $saleSlipDatas->sale_date,
                     'sale_to_date'        => $saleSlipDatas->sale_date,

@@ -34,7 +34,7 @@ class SaleSlip extends Model
         $this->date               = $SaleSlipData['sale_date'];            // 日付
         $this->delivery_date      = $SaleSlipData['delivery_date'];        // 納品日
         $this->sale_company_id    = $SaleSlipData['sale_company_id'];      // 売上先ID
-        $this->sale_shop_id       = $SaleSlipData['sale_shop_id'];         // 売上先店舗ID
+        $this->payment_method_type = $SaleSlipData['payment_method_type']; // 支払方法
         $this->delivery_id        = $SaleSlipData['delivery_id'];          // 配送ID
         $this->notax_sub_total_8  = $SaleSlipData['notax_sub_total_8'];    // 8%課税対象額
         $this->notax_sub_total_10 = $SaleSlipData['notax_sub_total_10'];   // 10%課税対象額

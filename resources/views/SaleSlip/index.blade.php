@@ -37,13 +37,12 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="sale_company_text" name="data[SaleSlip][sale_company_text]" value="{{$condition_company_text}}" readonly>
                                 </div>
-                                <div class="table-th">取引先店舗</div>
+                                <div class="table-th">支払方法</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[SaleSlip][sale_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="sale_shop_id" name="data[SaleSlip][sale_shop_id]" value="{{$condition_shop_id}}">
+                                    <input type="text" class="search-control" id="payment_method_type" name="data[SaleSlip][payment_method_type]" value="{{$condition_payment_method_type}}" tabindex="4">
                                 </div>
                                 <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[SaleSlip][sale_shop_text]" value="{{$condition_shop_text}}" readonly>
+                                    <input type="text" class="search-control read-only" id="payment_method_type_text" name="data[SaleSlip][payment_method_type_text]" value="{{$condition_payment_method_type_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -80,18 +79,15 @@
 
             <!--総計表示エリア-->
             <div class='sum-display-area'>
-                @if($sale_slip_num != 0)
+                @if(empty($condition_product_id))
                 <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_num)}}件</div>
                 <div class='sum-display-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
                 <div class='sum-display-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>
                 <div class='sum-display-div'>総税抜額:{{number_format($notax_sub_total_amount)}}円</div>
-                <div class='sum-display-div'>総額:{{number_format($sale_slip_amount)}}円</div>
+                <div class='sum-display-div'>税込総額:{{number_format($sale_slip_tax_amount)}}円</div>
                 @else
                 <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_condition_num)}}件</div>
-                <div class='sum-display-div'>総配送額:0円</div>
-                <div class='sum-display-div'>総調整額:0円</div>
                 <div class='sum-display-div'>総税抜額:{{number_format($sale_slip_condition_notax_sub_total)}}円</div>
-                <div class='sum-display-div'>総額:{{number_format($sale_slip_condition_notax_sub_total)}}円</div>
                 @endif
                 <div class='display-condition-div'>並び順
                     <select id='display-sort' name="display_sort" class='display-condition-select'>
@@ -379,32 +375,6 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上店舗ID
-            //-------------------------------------
-            $(".sale_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSaleShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
             // autocomplete処理 製品ID
             //-------------------------------------
             $(".product_code_input").autocomplete({
@@ -489,6 +459,23 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
+                } else if (selector_code.match(/payment_method_type/)) { // 支払方法
+                    $.ajax({
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetPaymentMethodType",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
+
+                            $("#payment_method_type_text").val(data[0]);
+                        });
+
                 } else if (selector_code.match(/product/)) { // 製品IDの部分
 
                     $.ajax({
@@ -513,15 +500,13 @@
                         });
                 }
             });
-
-
         });
     })(jQuery);
 </script>
 
 <style>
     /* 共通 */
-    
+
     .search-control {
         display: block;
         width: 100%;
@@ -536,16 +521,16 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-    
+
     .float-clear {
         clear: both;
     }
-    
+
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-    
+
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -553,18 +538,18 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-    
+
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-    
+
     #index-search-form {
         width: 100%;
         margin-bottom: auto;
     }
-    
+
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -573,12 +558,12 @@
         border-radius: 5px;
         margin: auto;
     }
-    
+
     .search-area table {
         margin: auto;
         width: 100%;
     }
-    
+
     .table-th {
         width: 10%;
         padding: 15px 0px 0px 10px;
@@ -586,40 +571,40 @@
         float: left;
         font-weight: bolder;
     }
-    
+
     .table-td {
         width: 20%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-    
+
     .table-code-td {
         padding-right: 0px;
     }
-    
+
     .table-name-td {
         padding-left: 0px;
     }
-    
+
     .table-double-td {
         width: 40%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-    
+
     .radio_box {
         padding-top: 15px;
     }
-    
+
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-    
+
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -628,7 +613,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-    
+
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -638,7 +623,7 @@
         margin-left: 2%;
     }
     /*総額エリア*/
-    
+
     .sum-display-area {
         max-width: 1300px;
         width: 90%;
@@ -646,14 +631,14 @@
         padding-left: 20px;
         margin: auto;
     }
-    
+
     .sum-display-div {
         float: left;
         margin-right: 1rem;
         font-weight: bold;
         font-size: 14px;
     }
-    
+
     .display-condition-div {
         float: right;
         margin-right: 1rem;
@@ -661,7 +646,7 @@
         font-size: 12px;
         padding: 2px;
     }
-    
+
     .display-condition-select {
         font-size: 10px;
         color: #495057;
@@ -671,7 +656,7 @@
         border-radius: 0.25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-    
+
     .no-display-area {
         max-width: 1300px;
         width: 90%;
@@ -681,23 +666,23 @@
         font-weight: bold;
         font-size: 14px;
     }
-    
+
     #no_display {
         position: relative;
         top: 2px
     }
-    
+
     .no-display-area label {
         margin-left: 10px;
     }
     /*伝票表示エリア*/
-    
+
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-    
+
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -705,7 +690,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-    
+
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -717,7 +702,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-    
+
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -725,35 +710,35 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-    
+
     .double-width {
         width: 20%!important;
     }
-    
+
     .triple-width {
         width: 30%!important;
     }
-    
+
     .forth-width {
         width: 40%!important;
     }
-    
+
     .width-10 {
         width: 10%!important;
     }
-    
+
     .width-15 {
         width: 15%!important;
     }
-    
+
     .width-20 {
         width: 20%!important;
     }
-    
+
     .width-30 {
         width: 30%!important;
     }
-    
+
     .edit-btn,
     .delivery-slip-btn {
         border-radius: 5px;
@@ -765,26 +750,26 @@
         text-align: center;
         padding: 5px;
     }
-    
+
     .delivery-slip-btn {
         background-color: #e3342fa6!important;
         border: #e3342fa6!important;
     }
-    
+
     .regis-complete {
         background-color: #D2F0F0;
         font-weight: bold;
         border-left: 3px solid #0099CB!important;
         text-align: center;
     }
-    
+
     .regis-temp {
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
         text-align: center;
     }
-    
+
     .bold-tr {
         font-weight: bold;
     }

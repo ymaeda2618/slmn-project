@@ -137,7 +137,8 @@
         width: 95%;
         border: solid 2px #999999;
         border-collapse: collapse;
-        font-size: 10px;
+        font-size: 14px;
+        margin-top: 45px;
     }
 
     #claim-table td {
@@ -150,7 +151,7 @@
 
     #claim-table .billing-amount-area {
         width: 40%;
-        font-size: 20px;
+        font-size: 24px;
     }
 
     #bank-info {
@@ -184,7 +185,7 @@
         width: 100%;
         border: solid 2px #999999;
         border-collapse: collapse;
-        height: 150px;
+        height: 250px;
     }
 
     #remark-table td {

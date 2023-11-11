@@ -10,7 +10,7 @@
             <p>下記のとおり、御請求申し上げます。</p>
             <table id='claim-table' border='1'>
                 <tr>
-                    <td class="billing-amount-area">ご請求額</td>
+                    <td class="billing-amount-area">御請求額</td>
                     <td>8%課税対象額</td>
                     <td>{{number_format($depositList['total']['notax_subtotal_8'])}}</td>
                 </tr>
@@ -137,11 +137,11 @@
         border: solid 2px #999999;
         border-collapse: collapse;
         font-size: 12px;
-        margin-top: 50px;
+        margin-top: 40px;
     }
     
     #claim-table td {
-        padding: 1%;
+        padding: 12px;
         text-align: center;
         border: none;
         width: 20%;

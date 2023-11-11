@@ -26,6 +26,9 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+
+        // 納品日をLINE通知
+        //$schedule->command('command:getLineNoticeDeliveryDate')->dailyAt("0:00");
     }
 
     /**

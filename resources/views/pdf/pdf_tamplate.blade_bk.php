@@ -10,22 +10,12 @@
             <p>下記のとおり、御請求申し上げます。</p>
             <table id='claim-table' border='1'>
                 <tr>
-                    <td class="billing-amount-area">ご請求額</td>
-                    <td>8%課税対象額</td>
-                    <td>{{number_format($depositList['total']['notax_subtotal_8'])}}</td>
+                    <td>合計金額</td>
+                    <td>{{number_format($depositList['total']['total'])}}</td>
                 </tr>
                 <tr>
-                    <td class="billing-amount-area" rowspan='3'>{{number_format($depositList['total']['total'])}}</td>
-                    <td>10%課税対象額</td>
-                    <td>{{number_format($depositList['total']['tax_8'])}}</td>
-                </tr>
-                <tr>
-                    <td>8%消費税</td>
-                    <td>{{number_format($depositList['total']['notax_subtotal_10'])}}</td>
-                </tr>
-                <tr>
-                    <td>10%消費税</td>
-                    <td>{{number_format($depositList['total']['tax_10'])}}</td>
+                    <td>お支払期限</td>
+                    <td>{{$depositList['company_info']['payment_date']}}</td>
                 </tr>
             </table>
         </div>
@@ -39,8 +29,6 @@
             <p>適格請求書発行事業者番号：T1010001147111</p>
             <br>
             <div id='bank-info'>
-
-                <p>お支払期限：{{$depositList['company_info']['payment_date']}}</p>
                 <p>[振込先]　東京東信用金庫 三咲支店</p>
                 <p>口座番号/(当座)0701724</p>
             </div>
@@ -89,12 +77,38 @@
             <p>*は軽減税率対象商品</p>
         </div>
         <br>
-        <p>【備考】</p>
-        <table id="remark-table" class='page'>
+        <table id="total-table" border='1' class='page'>
             <tr>
-                <td>
-                    {{$depositList['company_info']['remarks']}}
-                </td>
+                <td rowspan='7' class="width-70 text-left-top">備考<br><br>{{$depositList['company_info']['remarks']}}</td>
+                <td class="width-15 td-space">8%課税対象額</td>
+                <td class="width-15 text-right td-space">{{number_format($depositList['total']['notax_subtotal_8'])}}</td>
+            </tr>
+            <tr>
+                <td class="td-space">10%課税対象額</td>
+                <td class="text-right td-space">{{number_format($depositList['total']['notax_subtotal_10'])}}</td>
+            </tr>
+            <tr>
+                <td class="td-space">8%消費税額</td>
+                <td class="text-right td-space">{{number_format($depositList['total']['tax_8'])}}</td>
+            </tr>
+            <tr>
+                <td class="td-space">10%消費税額</td>
+                <td class="text-right td-space">{{number_format($depositList['total']['tax_10'])}}</td>
+            </tr>
+            @if (isset($depositList['detail']['adjust_price']['notax_price']))
+            <tr>
+                <td class="td-space">調整額</td>
+                <td class="text-right td-space">{{number_format($depositList['detail']['adjust_price']['notax_price'])}}</td>
+            </tr>
+            @endif @if (isset($depositList['detail']['delivery_price']['notax_price']))
+            <tr>
+                <td class="td-space">配送額</td>
+                <td class="text-right td-space">{{number_format($depositList['detail']['delivery_price']['notax_price'])}}</td>
+            </tr>
+            @endif
+            <tr>
+                <td class="td-space">合計</td>
+                <td class="font-bold text-right td-space">{{number_format($depositList['total']['total'])}}</td>
             </tr>
         </table>
     </div>
@@ -137,20 +151,12 @@
         width: 95%;
         border: solid 2px #999999;
         border-collapse: collapse;
-        font-size: 10px;
+        font-size: 22px;
     }
 
     #claim-table td {
-        padding: 1%;
+        padding: 3%;
         text-align: center;
-        border: none;
-        width: 20%;
-        border: solid 2px #999999;
-    }
-
-    #claim-table .billing-amount-area {
-        width: 40%;
-        font-size: 20px;
     }
 
     #bank-info {
@@ -180,16 +186,10 @@
         text-align: center;
     }
 
-    #remark-table {
+    #total-table {
         width: 100%;
         border: solid 2px #999999;
         border-collapse: collapse;
-        height: 150px;
-    }
-
-    #remark-table td {
-        vertical-align: top;
-        padding: 10px;
     }
 
     .font-bold {

@@ -141,7 +141,8 @@
     }
     
     #claim-table td {
-        padding: 12px;
+        padding-top: 10px;
+        padding-bottom: 10px;
         text-align: center;
         border: none;
         width: 20%;

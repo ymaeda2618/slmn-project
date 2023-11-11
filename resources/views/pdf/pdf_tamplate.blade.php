@@ -17,11 +17,11 @@
                 <tr>
                     <td class="billing-amount-area" rowspan='3'>{{number_format($depositList['total']['total'])}}</td>
                     <td>10%課税対象額</td>
-                    <td>{{number_format($depositList['total']['tax_8'])}}</td>
+                    <td>{{number_format($depositList['total']['notax_subtotal_10'])}}</td>
                 </tr>
                 <tr>
                     <td>8%消費税</td>
-                    <td>{{number_format($depositList['total']['notax_subtotal_10'])}}</td>
+                    <td>{{number_format($depositList['total']['tax_8'])}}</td>
                 </tr>
                 <tr>
                     <td>10%消費税</td>
@@ -136,7 +136,7 @@
         border: solid 2px #999999;
         border-collapse: collapse;
         font-size: 12px;
-        margin-top: 30px;
+        margin-top: 25px;
     }
     
     #claim-table td {

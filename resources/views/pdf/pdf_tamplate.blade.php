@@ -47,7 +47,6 @@
         </div>
     </div>
     <br>
-    <br>
     <div id='details'>
         <table id="detail-table" border='1'>
             <tr class='header'>
@@ -137,7 +136,7 @@
         border: solid 2px #999999;
         border-collapse: collapse;
         font-size: 12px;
-        margin-top: 40px;
+        margin-top: 30px;
     }
     
     #claim-table td {

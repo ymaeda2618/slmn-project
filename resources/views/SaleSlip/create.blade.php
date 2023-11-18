@@ -1168,12 +1168,14 @@
         if (!this_unit_price) {
             this_unit_price = 0;
         } else {
+            // 07など入れられてしまう場合があるので、数値型で変換する
             $("#unit_price_" + this_slip_num).val(Number(this_unit_price));
         }
 
         if (!this_unit_num) {
             this_unit_num = 0;
         } else {
+            // 07など入れられてしまう場合があるので、数値型で変換する
             $("#unit_num_" + this_slip_num).val(Number(this_unit_num));
         }
 

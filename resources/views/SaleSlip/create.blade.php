@@ -1165,8 +1165,17 @@
         var this_unit_price = $("#unit_price_" + this_slip_num).val();
         var this_unit_num = $("#unit_num_" + this_slip_num).val();
 
-        if (!this_unit_price) this_unit_price = 0;
-        if (!this_unit_num) this_unit_num = 0;
+        if (!this_unit_price) {
+            this_unit_price = 0;
+        } else {
+            $("#unit_price_" + this_slip_num).val(Number(this_unit_price));
+        }
+
+        if (!this_unit_num) {
+            this_unit_num = 0;
+        } else {
+            $("#unit_num_" + this_slip_num).val(Number(this_unit_num));
+        }
 
         var this_calc_price = Math.floor(CalcDecimalPoint(this_unit_price, this_unit_num));
         $("#notax_price_" + this_slip_num).val(this_calc_price);

@@ -1340,6 +1340,13 @@ class SaleSlipController extends Controller
             $product_code = $input_text;
             $product_name = null;
         } else {
+            // 先頭2文字がis001などの場合
+            $replace_result = substr_replace($input_text, '', 0, 2);
+            if(is_numeric($replace_result)){
+                $product_code = $input_text;
+                $product_name = null;
+            }
+
             $product_code = null;
             $product_name = $input_text;
         }

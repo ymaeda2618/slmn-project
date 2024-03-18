@@ -807,10 +807,10 @@ class DailyPerformanceController extends Controller
             if(is_numeric($replace_result)){
                 $product_code = $input_text;
                 $product_name = null;
+            } else {
+                $product_code = null;
+                $product_name = $input_text;
             }
-
-            $product_code = null;
-            $product_name = $input_text;
         }
 
         // 初期化

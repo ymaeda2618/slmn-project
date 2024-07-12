@@ -32,17 +32,17 @@
         <div id='right-contents'>
             <h1>御請求書</h1>
             <br>
-            <h2>{{$billingCompanyInfo['name']}}</h2>
-            <p>〒{{$billingCompanyInfo['postal_code']}}　{{$billingCompanyInfo['address']}}</p>
-            <p>売り場店舗 TEL：{{$billingCompanyInfo['shop_tel']}}　FAX：{{$billingCompanyInfo['shop_fax']}}</p>
-            <p>事務所　TEL：{{$billingCompanyInfo['office_tel']}}　FAX：{{$billingCompanyInfo['office_fax']}}</p>
-            <p>適格請求書発行事業者番号：T{{$billingCompanyInfo['invoice_form_id']}}</p>
+            <h2>{{$companyInfo['name']}}</h2>
+            <p>〒{{$companyInfo['postal_code']}}　{{$companyInfo['address']}}</p>
+            <p>売り場店舗 TEL：{{$companyInfo['shop_tel']}}　FAX：{{$companyInfo['shop_fax']}}</p>
+            <p>事務所　TEL：{{$companyInfo['office_tel']}}　FAX：{{$companyInfo['office_fax']}}</p>
+            <p>適格請求書発行事業者番号：T{{$companyInfo['invoice_form_id']}}</p>
             <br>
             <div id='bank-info'>
 
                 <p>お支払期限：{{$depositList['company_info']['payment_date']}}</p>
-                <p>[振込先]　{{$billingCompanyInfo['bank_name']}} {{$billingCompanyInfo['branch_name']}}</p>
-                <p>口座番号/({{$billingCompanyInfo['bank_type']}}){{$billingCompanyInfo['bank_account']}}</p>
+                <p>[振込先]　{{$companyInfo['bank_name']}} {{$companyInfo['branch_name']}}</p>
+                <p>口座番号/({{$companyInfo['bank_type']}}){{$companyInfo['bank_account']}}</p>
             </div>
         </div>
     </div>

@@ -915,25 +915,25 @@ class DepositController extends Controller
 
         // 請求元企業情報の整形
         // 初期化
-        $billingCompanyInfo = array();
+        $companyInfo = array();
         $bank_type = array(
             1 => '普通',
             2 => '当座',
             3 => 'その他',
         );
 
-        $billingCompanyInfo['name']            = $companyDatas[0]->name;
-        $billingCompanyInfo['postal_code']     = $companyDatas[0]->postal_code;
-        $billingCompanyInfo['address']         = $companyDatas[0]->address;
-        $billingCompanyInfo['office_tel']      = $companyDatas[0]->office_tel;
-        $billingCompanyInfo['office_fax']      = $companyDatas[0]->office_fax;
-        $billingCompanyInfo['shop_tel']        = $companyDatas[0]->shop_tel;
-        $billingCompanyInfo['shop_fax']        = $companyDatas[0]->shop_fax;
-        $billingCompanyInfo['invoice_form_id'] = $companyDatas[0]->invoice_form_id;
-        $billingCompanyInfo['bank_name']       = $companyDatas[0]->bank_name;
-        $billingCompanyInfo['branch_name']     = $companyDatas[0]->branch_name;
-        $billingCompanyInfo['bank_type']       = $bank_type[$companyDatas[0]->bank_type];
-        $billingCompanyInfo['bank_account']    = $companyDatas[0]->bank_account;
+        $companyInfo['name']            = $companyDatas[0]->name;
+        $companyInfo['postal_code']     = $companyDatas[0]->postal_code;
+        $companyInfo['address']         = $companyDatas[0]->address;
+        $companyInfo['office_tel']      = $companyDatas[0]->office_tel;
+        $companyInfo['office_fax']      = $companyDatas[0]->office_fax;
+        $companyInfo['shop_tel']        = $companyDatas[0]->shop_tel;
+        $companyInfo['shop_fax']        = $companyDatas[0]->shop_fax;
+        $companyInfo['invoice_form_id'] = $companyDatas[0]->invoice_form_id;
+        $companyInfo['bank_name']       = $companyDatas[0]->bank_name;
+        $companyInfo['branch_name']     = $companyDatas[0]->branch_name;
+        $companyInfo['bank_type']       = $bank_type[$companyDatas[0]->bank_type];
+        $companyInfo['bank_account']    = $companyDatas[0]->bank_account;
 
         // 初期化処理
         $calcDepositList = array();
@@ -1193,7 +1193,7 @@ class DepositController extends Controller
 
         $pdf = \PDF::view('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList,
-            'billingCompanyInfo' => $billingCompanyInfo
+            'companyInfo' => $companyInfo
         ])
         ->setOption('encoding', 'utf-8')
         ->setOption('margin-bottom', 8)

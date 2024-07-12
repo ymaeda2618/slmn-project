@@ -32,17 +32,17 @@
         <div id='right-contents'>
             <h1>御請求書</h1>
             <br>
-            <h2>株式会社水長水産</h2>
-            <p>〒135-0061　東京都江東区豊洲6-5-1</p>
-            <p>売り場店舗 TEL：03-6633-5320　FAX：03-6633-4320</p>
-            <p>事務所　TEL：047-464-1638　FAX：047-464-1626</p>
-            <p>適格請求書発行事業者番号：T1010001147111</p>
+            <h2>{{$billingCompanyInfo['name']}}</h2>
+            <p>〒{{$billingCompanyInfo['postal_code']}}　{{$billingCompanyInfo['address']}}</p>
+            <p>売り場店舗 TEL：{{$billingCompanyInfo['shop_tel']}}　FAX：{{$billingCompanyInfo['shop_fax']}}</p>
+            <p>事務所　TEL：{{$billingCompanyInfo['office_tel']}}　FAX：{{$billingCompanyInfo['office_fax']}}</p>
+            <p>適格請求書発行事業者番号：T{{$billingCompanyInfo['invoice_form_id']}}</p>
             <br>
             <div id='bank-info'>
 
                 <p>お支払期限：{{$depositList['company_info']['payment_date']}}</p>
-                <p>[振込先]　東京東信用金庫 三咲支店</p>
-                <p>口座番号/(当座)0701724</p>
+                <p>[振込先]　{{$billingCompanyInfo['bank_name']}} {{$billingCompanyInfo['branch_name']}}</p>
+                <p>口座番号/({{$billingCompanyInfo['bank_type']}}){{$billingCompanyInfo['bank_account']}}</p>
             </div>
         </div>
     </div>

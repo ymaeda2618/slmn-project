@@ -2121,7 +2121,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= '        <input type="hidden" id="unit_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_id]" value="' . $slip_num . '">';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
-        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][notax_price]" value="' . $slip_num . '" readonly>';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][notax_price]" value="0" readonly>';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="origin_area_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_text]" placeholder="産地欄" readonly>';

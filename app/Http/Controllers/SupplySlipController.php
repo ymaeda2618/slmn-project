@@ -982,8 +982,12 @@ class SupplySlipController extends Controller
             // 製品DB取得
             $productList = DB::table('products AS Product')
             ->select(
-                'Product.name  AS product_name'
-            )->where([
+                'Product.name  AS product_name',
+                'Product.code AS product_code',
+                'Unit.name AS unit_name'
+            )->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
+            })->where([
                     ['Product.active', '=', '1'],
             ])->where(function($query) use ($input_text){
                 $query
@@ -996,7 +1000,10 @@ class SupplySlipController extends Controller
 
                 foreach ($productList as $product_val) {
 
-                    array_push($auto_complete_array, $product_val->product_name);
+                    // サジェスト表示を「コード 商品名 単位」にする
+                    $suggest_text = '【' . $product_val->product_code . '】 ' . $product_val->product_name . ' (' . $product_val->unit_name . ')';
+
+                    array_push($auto_complete_array, $suggest_text);
                 }
             }
         }

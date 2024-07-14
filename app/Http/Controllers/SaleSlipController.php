@@ -814,7 +814,7 @@ class SaleSlipController extends Controller
                 \App\SaleSlipDetail::where('sale_slip_id', $SaleSlipData['id'])->delete();
 
                 $sale_slip_detail = array();
-                $sort = 0;
+                $sort = 1;
                 $staffId = '';
 
                 $saleSlipDetailIds = array();
@@ -1921,7 +1921,7 @@ class SaleSlipController extends Controller
             $SaleSlipData['user_id'] = $user_info_id;
             $SaleSlip = $this->SaleSlip->insertSaleSlip($SaleSlipData);
 
-            $sort = 0;
+            $sort = 1;
             $staffId = '';
 
             foreach ($SaleSlipDetailData as $SaleSlipDetailKey => $SaleSlipDetailVal) {
@@ -1939,7 +1939,7 @@ class SaleSlipController extends Controller
                 if (empty($SaleSlipDetailVal['quality_id'])) $SaleSlipDetailVal['quality_id'] = 0;
                 if (isset($SaleSlipDetailVal['supply_count']) || empty($SaleSlipDetailVal['supply_count'])) $SaleSlipDetailVal['supply_count'] = 0;
                 if (isset($SaleSlipDetailVal['supply_unit_num']) || empty($SaleSlipDetailVal['supply_unit_num'])) $SaleSlipDetailVal['supply_unit_num'] = 0;
-                if (isset($SaleSlipDetailVal['sort']) || empty($SaleSlipDetailVal['sort'])) $SaleSlipDetailVal['sort'] = 0;
+                // if (isset($SaleSlipDetailVal['sort']) || empty($SaleSlipDetailVal['sort'])) $SaleSlipDetailVal['sort'] = 0;
 
                 // sale_slip_detailsを登録する
                 $SaleSlipDetail                     = new SaleSlipDetail;

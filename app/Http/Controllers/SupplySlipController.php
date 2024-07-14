@@ -657,7 +657,7 @@ class SupplySlipController extends Controller
                 \App\SupplySlipDetail::where('supply_slip_id', $SupplySlipData['id'])->delete();
 
                 $supply_slip_detail = array();
-                $sort = 0;
+                $sort = 1;
 
                 foreach($SupplySlipDetailData as $SupplySlipDetail){
 
@@ -1631,7 +1631,7 @@ class SupplySlipController extends Controller
             $supply_slip_new_id = $SupplySlip->id;
 
             $supply_slip_detail = array();
-            $sort = 0;
+            $sort = 1;
 
             foreach($SupplySlipDetailData as $SupplySlipDetail){
 

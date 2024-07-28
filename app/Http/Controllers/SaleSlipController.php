@@ -249,7 +249,7 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->if(!empty($condition_no_display), function ($query) {
-                return $query->where('SaleSlip.external_slip_no', '=', 0);
+                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
             })
             ->where('SaleSlip.active', '=', '1')
             //->orderBy('SaleSlip.date', 'desc')
@@ -309,7 +309,7 @@ class SaleSlipController extends Controller
                 return $query->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->if(!empty($condition_no_display), function ($query) {
-                return $query->where('SaleSlip.external_slip_no', '=', 0);
+                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
             })
             ->where('SaleSlip.active', '=', '1')
             ->get();
@@ -424,7 +424,7 @@ class SaleSlipController extends Controller
                 return $queryDetail->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })
             ->if(!empty($condition_no_display), function ($query) {
-                return $query->where('SaleSlip.external_slip_no', '=', 0);
+                return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
             })
             ->whereIn('SaleSlip.id', $sale_slip_id_arr)
             ->orderBy('SaleSlip.id', 'desc')

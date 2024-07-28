@@ -327,7 +327,7 @@ class CsvUploadController extends Controller
                     $sale_slip_check = DB::table('sale_slips AS SaleSlip')
                     ->where([
                         ['SaleSlip.active', '=', '1'],
-                        ['SaleSlip.external_slip_no', '=', $slip_no],
+                        ['SaleSlip.info_mart_slip_no', '=', $slip_no],
                     ])->first();
 
                     // 対象の伝票が存在する場合
@@ -345,7 +345,7 @@ class CsvUploadController extends Controller
                     }
 
                     $SaleSlip = new SaleSlip();
-                    $SaleSlip->external_slip_no  = $slip_no;              // インフォマート伝票番号
+                    $SaleSlip->info_mart_slip_no  = $slip_no;              // インフォマート伝票番号
                     $SaleSlip->date               = $slip_date;            // 伝票日付
                     $SaleSlip->delivery_date      = $delivery_date;        // 納品日
                     $SaleSlip->sale_company_id    = $sale_company_id;      // 売上先ID

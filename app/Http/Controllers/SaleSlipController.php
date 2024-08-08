@@ -1143,7 +1143,8 @@ class SaleSlipController extends Controller
                 'SaleCompany.code  AS code',
                 'SaleCompany.id    AS id',
                 'SaleCompany.name  AS name',
-                'SaleCompany.tax_calc_type  AS tax_calc_type',
+                'SaleCompany.tax_calc_type AS tax_calc_type',
+                'SaleCompany.closing_date  AS closing_date',
             )
             ->if(!empty($input_code), function ($query) use ($input_code) {
                 return $query->where('SaleCompany.code', '=', $input_code);
@@ -1158,10 +1159,23 @@ class SaleSlipController extends Controller
                 $output_id   = $saleCompanyList->id;
                 $output_name = $saleCompanyList->name;
                 $output_tax_calc_type = $saleCompanyList->tax_calc_type;
+
+                // 締日
+                $closing_date = (int)$saleCompanyList->closing_date;
+                if ($closing_date === 99) {
+                    // 月末
+                    $output_cloging_date = date('Y-m-t', strtotime(date('Y-m-01')));
+                } elseif ($closing_date === 88) {
+                    // 都度
+                    $output_cloging_date = date('Y-m-d');
+                } else {
+                    // 日付指定
+                    $output_cloging_date = date('Y-m-d', strtotime(date('Y-m-' . $closing_date)));
+                }
             }
         }
 
-        $returnArray = array($output_code, $output_id, $output_name, $output_tax_calc_type);
+        $returnArray = array($output_code, $output_id, $output_name, $output_tax_calc_type, $output_cloging_date);
 
         return json_encode($returnArray);
     }

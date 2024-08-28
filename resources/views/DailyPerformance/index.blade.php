@@ -143,6 +143,8 @@
                         </td>
                         <td>
                             <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount'], 2))}}円
+                            (現金：{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount_0'], 2))}}円, 
+                            売掛：{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount_1'], 2))}}円)
                         </td>
                     </tr>
                 </tbody>
@@ -318,32 +320,6 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSaleShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 製品ID
-            //-------------------------------------
-            $(".product_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteProduct",
                         type: "POST",
                         cache: false,
                         dataType: "json",

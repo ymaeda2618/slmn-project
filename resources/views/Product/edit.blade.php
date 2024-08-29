@@ -13,7 +13,7 @@
             {{ csrf_field() }}
             <div class="form-group ">
                 <label class="column-label " for="code ">コード番号</label>
-                <input type="tel " class="form-control " id="code " name="data[Product][code] " value="{{$editProduct->product_code}}">
+                <input type="tel " class="form-control product_code_input" id="code " name="data[Product][code] " value="{{$editProduct->product_code}}">
             </div>
             <div class="form-group">
                 <label class="column-label" for="product_type">製品種別</label>
@@ -57,7 +57,7 @@
             </div>
             <div class="form-group">
                 <label class="column-label" for="product_name">品名</label>
-                <input type="text" class="form-control" id="product_name" name="data[Product][product_name]" value="{{$editProduct->product_name}}">
+                <input type="text" class="form-control product_name_input" id="product_name" name="data[Product][product_name]" value="{{$editProduct->product_name}}">
             </div>
             <div class="form-group">
                 <label class="column-label" for="yomi">ヨミガナ</label>
@@ -90,8 +90,9 @@
     </div>
 </div>
 @endsection
-
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <script type="text/javascript">
     (function($) {
         jQuery(window).load(function() {
@@ -120,6 +121,60 @@
             var inventory_unit_id_selected = $("#inventory_unit_id_selected").val();
             // 検索条件で設定された値を設定
             $('#inventory_unit_id').val(inventory_unit_id_selected);
+        });
+
+        $(document).ready(function() {
+            //-------------------------------------
+            // autocomplete処理 製品ID
+            //-------------------------------------
+            $(".product_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteProduct",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
+            //-------------------------------------
+            // autocomplete処理 製品名
+            //-------------------------------------
+            $(".product_name_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteProduct",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
         });
 
         //------------

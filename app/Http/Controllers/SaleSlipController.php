@@ -71,7 +71,7 @@ class SaleSlipController extends Controller
             $condition_product_text  = $request->session()->get('condition_product_text');
             // トップページから遷移してくる場合があるので、条件判定
             $request_submit_type = $request->input('sale_submit_type');
-            if (!is_null($request_submit_type)) {
+            if (!empty($request_submit_type)) {
                 $condition_submit_type = $request_submit_type;
             } else {
                 $condition_submit_type = $request->session()->get('condition_submit_type');

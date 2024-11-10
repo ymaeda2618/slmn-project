@@ -523,6 +523,26 @@
                             $("#" + selector_text).val(data[2]);
 
                         });
+                } else if (selector_code.match(/staff/)) { // 担当者IDの部分
+
+                    $.ajax({
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetStaff",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
+
+                            $("#" + selector_code).val(data[0]);
+                            $("#" + selector_id).val(data[1]);
+                            $("#" + selector_text).val(data[2]);
+
+                        });
                 }
             });
         });

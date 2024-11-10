@@ -241,7 +241,7 @@ class SaleSlipController extends Controller
             /*->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
             })*/
-            ->if(!empty($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
+            ->if(!is_null($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
                 return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
@@ -296,7 +296,7 @@ class SaleSlipController extends Controller
             /*->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
                 return $query->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
             })*/
-            ->if(!empty($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
+            ->if(!is_null($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
                 return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
@@ -413,7 +413,7 @@ class SaleSlipController extends Controller
             /*->if(!empty($condition_shop_id), function ($queryDetail) use ($condition_shop_id) {
                 return $queryDetail->where('SaleSlip.sale_shop_id', '=', $condition_shop_id);
             })*/
-            ->if(!empty($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
+            ->if(!is_null($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
                 return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
             ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {

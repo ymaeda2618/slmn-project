@@ -69,9 +69,9 @@ class SaleSlipController extends Controller
             $condition_product_code  = $request->session()->get('condition_product_code');
             $condition_product_id    = $request->session()->get('condition_product_id');
             $condition_product_text  = $request->session()->get('condition_product_text');
-            $condition_staff_code  = $request->session()->get('condition_staff_code');
-            $condition_staff_id    = $request->session()->get('condition_staff_id');
-            $condition_staff_text  = $request->session()->get('condition_staff_text');
+            $condition_staff_code    = $request->session()->get('condition_staff_code');
+            $condition_staff_id      = $request->session()->get('condition_staff_id');
+            $condition_staff_text    = $request->session()->get('condition_staff_text');
             // トップページから遷移してくる場合があるので、条件判定
             $request_submit_type = $request->input('sale_submit_type');
             if (!empty($request_submit_type)) {
@@ -109,9 +109,9 @@ class SaleSlipController extends Controller
                 $condition_product_code  = $request->data['SaleSlipDetail']['product_code'];
                 $condition_product_id    = $request->data['SaleSlipDetail']['product_id'];
                 $condition_product_text  = $request->data['SaleSlipDetail']['product_text'];
-                $condition_staff_code  = $request->data['SaleSlipDetail']['staff_code'];
-                $condition_staff_id    = $request->data['SaleSlipDetail']['staff_id'];
-                $condition_staff_text  = $request->data['SaleSlipDetail']['staff_text'];
+                $condition_staff_code    = $request->data['SaleSlipDetail']['staff_code'];
+                $condition_staff_id      = $request->data['SaleSlipDetail']['staff_id'];
+                $condition_staff_text    = $request->data['SaleSlipDetail']['staff_text'];
                 $condition_submit_type   = isset($request->data['SaleSlip']['sale_submit_type']) ? $request->data['SaleSlip']['sale_submit_type'] : 0;
                 $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
                 $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;
@@ -165,9 +165,9 @@ class SaleSlipController extends Controller
                 $condition_product_code  = null;
                 $condition_product_id    = null;
                 $condition_product_text  = null;
-                $condition_staff_code  = null;
-                $condition_staff_id    = null;
-                $condition_staff_text  = null;
+                $condition_staff_code    = null;
+                $condition_staff_id      = null;
+                $condition_staff_text    = null;
                 $condition_submit_type   = 0;
                 $condition_display_sort  = 0;
                 $condition_display_num   = 20;
@@ -523,6 +523,9 @@ class SaleSlipController extends Controller
             "condition_product_code"     => $condition_product_code,
             "condition_product_id"       => $condition_product_id,
             "condition_product_text"     => $condition_product_text,
+            "condition_staff_code"       => $condition_staff_code,
+            "condition_staff_id"         => $condition_staff_id,
+            "condition_staff_text"       => $condition_staff_text,
             "condition_submit_type"      => $condition_submit_type,
             "saleSlipList"               => $saleSlipList,
             "SaleSlipDetailList"         => $SaleSlipDetailList,

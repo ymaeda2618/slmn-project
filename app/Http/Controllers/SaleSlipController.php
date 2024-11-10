@@ -200,8 +200,8 @@ class SaleSlipController extends Controller
             // sale_slip_detailsのサブクエリを作成
             $product_sub_query = null;
             if(
-                !empty($condition_staff_id) &&
-                !empty($condition_product_id)
+                !empty($condition_product_id) &&
+                !empty($condition_staff_id)
             ) {
 
                 $product_sub_query = DB::table('sale_slip_details as SubTable')
@@ -214,6 +214,12 @@ class SaleSlipController extends Controller
                 $product_sub_query = DB::table('sale_slip_details as SubTable')
                 ->select('SubTable.sale_slip_id AS sale_slip_id')
                 ->where('SubTable.product_id', '=', $condition_product_id)
+                ->groupBy('SubTable.sale_slip_id');
+            } else if(!empty($condition_staff_id)) {
+
+                $product_sub_query = DB::table('sale_slip_details as SubTable')
+                ->select('SubTable.sale_slip_id AS sale_slip_id')
+                ->where('SubTable.staff_id', '=', $condition_staff_id)
                 ->groupBy('SubTable.sale_slip_id');
             }
 

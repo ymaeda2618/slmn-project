@@ -450,6 +450,9 @@ class SaleSlipController extends Controller
             ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
                 return $queryDetail->where('SaleSlipDetail.product_id', '=', $condition_product_id);
             })
+            ->if(!empty($condition_staff_id), function ($queryDetail) use ($condition_staff_id) {
+                return $queryDetail->where('SaleSlipDetail.staff_id', '=', $condition_staff_id);
+            })
             ->if(!empty($condition_submit_type), function ($queryDetail) use ($condition_submit_type) {
                 return $queryDetail->where('SaleSlip.sale_submit_type', '=', $condition_submit_type);
             })

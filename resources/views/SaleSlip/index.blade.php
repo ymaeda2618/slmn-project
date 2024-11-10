@@ -78,7 +78,7 @@
 
             <!--総計表示エリア-->
             <div class='sum-display-area'>
-                @if(empty($condition_product_id))
+                @if(empty($condition_staff_id) || empty($condition_product_id))
                 <div class='sum-display-div'>伝票件数:{{number_format($sale_slip_num)}}件</div>
                 <div class='sum-display-div'>総配送額:{{number_format($delivery_price_amount)}}円</div>
                 <div class='sum-display-div'>総調整額:{{number_format($adjust_price_amount)}}円</div>

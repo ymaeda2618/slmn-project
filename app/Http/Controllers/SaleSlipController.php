@@ -69,6 +69,9 @@ class SaleSlipController extends Controller
             $condition_product_code  = $request->session()->get('condition_product_code');
             $condition_product_id    = $request->session()->get('condition_product_id');
             $condition_product_text  = $request->session()->get('condition_product_text');
+            $condition_staff_code  = $request->session()->get('condition_staff_code');
+            $condition_staff_id    = $request->session()->get('condition_staff_id');
+            $condition_staff_text  = $request->session()->get('condition_staff_text');
             // トップページから遷移してくる場合があるので、条件判定
             $request_submit_type = $request->input('sale_submit_type');
             if (!empty($request_submit_type)) {
@@ -106,6 +109,9 @@ class SaleSlipController extends Controller
                 $condition_product_code  = $request->data['SaleSlipDetail']['product_code'];
                 $condition_product_id    = $request->data['SaleSlipDetail']['product_id'];
                 $condition_product_text  = $request->data['SaleSlipDetail']['product_text'];
+                $condition_staff_code  = $request->data['SaleSlipDetail']['staff_code'];
+                $condition_staff_id    = $request->data['SaleSlipDetail']['staff_id'];
+                $condition_staff_text  = $request->data['SaleSlipDetail']['staff_text'];
                 $condition_submit_type   = isset($request->data['SaleSlip']['sale_submit_type']) ? $request->data['SaleSlip']['sale_submit_type'] : 0;
                 $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
                 $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;
@@ -135,6 +141,9 @@ class SaleSlipController extends Controller
                 $request->session()->put('condition_product_code', $condition_product_code);
                 $request->session()->put('condition_product_id', $condition_product_id);
                 $request->session()->put('condition_product_text', $condition_product_text);
+                $request->session()->put('condition_staff_code', $condition_staff_code);
+                $request->session()->put('condition_staff_id', $condition_staff_id);
+                $request->session()->put('condition_staff_text', $condition_staff_text);
                 $request->session()->put('condition_submit_type', $condition_submit_type);
                 $request->session()->put('condition_display_sort', $condition_display_sort);
                 $request->session()->put('condition_display_num', $condition_display_num);
@@ -156,6 +165,9 @@ class SaleSlipController extends Controller
                 $condition_product_code  = null;
                 $condition_product_id    = null;
                 $condition_product_text  = null;
+                $condition_staff_code  = null;
+                $condition_staff_id    = null;
+                $condition_staff_text  = null;
                 $condition_submit_type   = 0;
                 $condition_display_sort  = 0;
                 $condition_display_num   = 20;
@@ -173,6 +185,9 @@ class SaleSlipController extends Controller
                 $request->session()->forget('condition_product_code');
                 $request->session()->forget('condition_product_id');
                 $request->session()->forget('condition_product_text');
+                $request->session()->forget('condition_staff_code');
+                $request->session()->forget('condition_staff_id');
+                $request->session()->forget('condition_staff_text');
                 $request->session()->forget('condition_submit_type');
                 $request->session()->forget('condition_display_sort');
                 $request->session()->forget('condition_display_num');
@@ -184,7 +199,17 @@ class SaleSlipController extends Controller
 
             // sale_slip_detailsのサブクエリを作成
             $product_sub_query = null;
-            if(!empty($condition_product_id)) {
+            if(
+                !empty($condition_staff_id) &&
+                !empty($condition_product_id)
+            ) {
+
+                $product_sub_query = DB::table('sale_slip_details as SubTable')
+                ->select('SubTable.sale_slip_id AS sale_slip_id')
+                ->where('SubTable.product_id', '=', $condition_product_id)
+                ->where('SubTable.staff_id', '=', $condition_staff_id)
+                ->groupBy('SubTable.sale_slip_id');
+            } else if(!empty($condition_product_id)) {
 
                 $product_sub_query = DB::table('sale_slip_details as SubTable')
                 ->select('SubTable.sale_slip_id AS sale_slip_id')
@@ -224,7 +249,7 @@ class SaleSlipController extends Controller
             /*->leftJoin('sale_shops AS SaleShop', function ($join) {
                 $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
             })*/
-            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+            ->if(!empty($product_sub_query), function ($query) use ($product_sub_query) {
                 return $query
                        ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
                        ->mergeBindings($product_sub_query);
@@ -299,7 +324,7 @@ class SaleSlipController extends Controller
             ->if(!is_null($condition_payment_method_type), function ($query) use ($condition_payment_method_type) {
                 return $query->where('SaleSlip.payment_method_type', '=', $condition_payment_method_type);
             })
-            ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
+            ->if(!empty($product_sub_query), function ($query) use ($product_sub_query) {
                 return $query
                        ->join(DB::raw('('. $product_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
                        ->mergeBindings($product_sub_query);

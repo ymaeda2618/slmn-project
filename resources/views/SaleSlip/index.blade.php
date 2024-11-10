@@ -56,14 +56,13 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="product_text" name="data[SaleSlipDetail][product_text]" value="{{$condition_product_text}}" readonly>
                                 </div>
-                                <div class="table-th">状態</div>
-                                <div class="table-double-td">
-                                    <select class="search-control " id="sale_submit_type " name="data[SaleSlip][sale_submit_type] ">
-                                    <option value="0 " selected>全て</option>
-                                    <option value="1 ">登録済</option>
-                                    <option value="2 ">一時保存</option>
-                                </select>
-                                    <input type='hidden' id='sale_submit_type_selected' value='{{$condition_submit_type}}'>
+                                <div class="table-th">担当者</div>
+                                <div class="table-td table-code-td">
+                                    <input type="text" class="search-control staff_code_input" id="staff_code" name="data[SaleSlipDetail][staff_code]" value="{{$condition_staff_code}}" tabindex="5">
+                                    <input type="hidden" id="staff_id" name="data[SaleSlipDetail][staff_id]" value="{{$condition_staff_id}}">
+                                </div>
+                                <div class="table-td table-name-td">
+                                    <input type="text" class="search-control" id="staff_text" name="data[SaleSlipDetail][staff_text]" value="{{$condition_staff_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -401,6 +400,32 @@
             });
 
             //-------------------------------------
+            // autocomplete処理 担当者ID
+            //-------------------------------------
+            $(".staff_code_input").autocomplete({
+                source: function(req, resp) {
+                    $.ajax({
+                        headers: {
+                            "X-CSRF-TOKEN": $("[name='_token']").val()
+                        },
+                        url: "./AjaxAutoCompleteStaff",
+                        type: "POST",
+                        cache: false,
+                        dataType: "json",
+                        data: {
+                            inputText: req.term
+                        },
+                        success: function(o) {
+                            resp(o);
+                        },
+                        error: function(xhr, ts, err) {
+                            resp(['']);
+                        }
+                    });
+                }
+            });
+
+            //-------------------------------------
             // フォーカスアウトしたときの処理
             //-------------------------------------
             $(document).on("blur", "input", function(event) {
@@ -506,7 +531,7 @@
 
 <style>
     /* 共通 */
-
+    
     .search-control {
         display: block;
         width: 100%;
@@ -521,16 +546,16 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .float-clear {
         clear: both;
     }
-
+    
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-
+    
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -538,18 +563,18 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-
+    
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-
+    
     #index-search-form {
         width: 100%;
         margin-bottom: auto;
     }
-
+    
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -558,12 +583,12 @@
         border-radius: 5px;
         margin: auto;
     }
-
+    
     .search-area table {
         margin: auto;
         width: 100%;
     }
-
+    
     .table-th {
         width: 10%;
         padding: 15px 0px 0px 10px;
@@ -571,40 +596,40 @@
         float: left;
         font-weight: bolder;
     }
-
+    
     .table-td {
         width: 20%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .table-code-td {
         padding-right: 0px;
     }
-
+    
     .table-name-td {
         padding-left: 0px;
     }
-
+    
     .table-double-td {
         width: 40%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .radio_box {
         padding-top: 15px;
     }
-
+    
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-
+    
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -613,7 +638,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-
+    
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -623,7 +648,7 @@
         margin-left: 2%;
     }
     /*総額エリア*/
-
+    
     .sum-display-area {
         max-width: 1300px;
         width: 90%;
@@ -631,14 +656,14 @@
         padding-left: 20px;
         margin: auto;
     }
-
+    
     .sum-display-div {
         float: left;
         margin-right: 1rem;
         font-weight: bold;
         font-size: 14px;
     }
-
+    
     .display-condition-div {
         float: right;
         margin-right: 1rem;
@@ -646,7 +671,7 @@
         font-size: 12px;
         padding: 2px;
     }
-
+    
     .display-condition-select {
         font-size: 10px;
         color: #495057;
@@ -656,7 +681,7 @@
         border-radius: 0.25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .no-display-area {
         max-width: 1300px;
         width: 90%;
@@ -666,23 +691,23 @@
         font-weight: bold;
         font-size: 14px;
     }
-
+    
     #no_display {
         position: relative;
         top: 2px
     }
-
+    
     .no-display-area label {
         margin-left: 10px;
     }
     /*伝票表示エリア*/
-
+    
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-
+    
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -690,7 +715,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-
+    
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -702,7 +727,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-
+    
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -710,35 +735,35 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-
+    
     .double-width {
         width: 20%!important;
     }
-
+    
     .triple-width {
         width: 30%!important;
     }
-
+    
     .forth-width {
         width: 40%!important;
     }
-
+    
     .width-10 {
         width: 10%!important;
     }
-
+    
     .width-15 {
         width: 15%!important;
     }
-
+    
     .width-20 {
         width: 20%!important;
     }
-
+    
     .width-30 {
         width: 30%!important;
     }
-
+    
     .edit-btn,
     .delivery-slip-btn {
         border-radius: 5px;
@@ -750,26 +775,26 @@
         text-align: center;
         padding: 5px;
     }
-
+    
     .delivery-slip-btn {
         background-color: #e3342fa6!important;
         border: #e3342fa6!important;
     }
-
+    
     .regis-complete {
         background-color: #D2F0F0;
         font-weight: bold;
         border-left: 3px solid #0099CB!important;
         text-align: center;
     }
-
+    
     .regis-temp {
         background-color: #f0d2d2;
         font-weight: bold;
         border-left: 3px solid #cb0000!important;
         text-align: center;
     }
-
+    
     .bold-tr {
         font-weight: bold;
     }

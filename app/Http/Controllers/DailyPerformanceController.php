@@ -313,7 +313,7 @@ class DailyPerformanceController extends Controller
                 $saleSlipList = DB::table('sale_slip_details AS SaleSlipDetail')
                 ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
                 ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
-                ->selectRaw('SUM(COALESCE(SaleSlip.notax_price,0))           AS sale_daily_amount')
+                ->selectRaw('SUM(COALESCE(SaleSlipDetail.notax_price,0))           AS sale_daily_amount')
                 ->join('sale_slips as SaleSlip', function ($join) {
                     $join->on('SaleSlip.id', '=', 'SaleSlipDetail.sale_slip_id')
                     ->where('SaleSlip.active', '=', true);

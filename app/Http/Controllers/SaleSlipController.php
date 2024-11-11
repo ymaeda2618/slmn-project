@@ -302,6 +302,26 @@ class SaleSlipController extends Controller
             // 売上一覧を総額集計
             //---------------------
 
+            // 全体で何件伝票があるのかカウント
+            $sale_slip_num = 0;
+            // 全体の配送金額をカウント
+            $delivery_price_amount = 0;
+            // 全体の調整額をカウント
+            $adjust_price_amount = 0;
+            // 全体の税抜小計額をカウント
+            $notax_sub_total_amount = 0;
+            // 全体の税込小計額をカウント
+            $notax_sub_total_amount = 0;
+            // 全体の総額をカウント
+            $sale_slip_amount = 0;
+            // 全体の税込総額をカウント
+            $sale_slip_tax_amount = 0;
+
+            // 条件指定された時の伝票の枚数
+            $sale_slip_condition_num  = 0;
+            // 条件指定された伝票詳細の税抜小計
+            $sale_slip_condition_notax_sub_total  = 0;
+
             if ( // 製品IDと担当者IDの絞りがない場合
                 empty($condition_staff_id) &&
                 empty($condition_product_id)
@@ -343,21 +363,6 @@ class SaleSlipController extends Controller
                 ->where('SaleSlip.active', '=', '1')
                 ->get();
 
-                // 全体で何件伝票があるのかカウント
-                $sale_slip_num = 0;
-                // 全体の配送金額をカウント
-                $delivery_price_amount = 0;
-                // 全体の調整額をカウント
-                $adjust_price_amount = 0;
-                // 全体の税抜小計額をカウント
-                $notax_sub_total_amount = 0;
-                // 全体の税込小計額をカウント
-                $notax_sub_total_amount = 0;
-                // 全体の総額をカウント
-                $sale_slip_amount = 0;
-                // 全体の税込総額をカウント
-                $sale_slip_tax_amount = 0;
-
                 if (!empty($saleSlipSumList)) {
 
                     // 最初の要素を取得
@@ -372,7 +377,7 @@ class SaleSlipController extends Controller
                     $sale_slip_tax_amount   = ($delivery_price_amount + $adjust_price_amount + $sub_total_amount);
                 }
 
-            } else {
+            } else { // 製品IDと担当者IDの絞りがある場合
 
                 $saleSlipDetailSumList = DB::table('sale_slip_details AS SaleSlipDetail')
                 ->selectRaw('COUNT(SaleSlipDetail.id) AS sale_slip_detail_num')
@@ -430,9 +435,6 @@ class SaleSlipController extends Controller
                     return $query->where('SaleSlip.info_mart_slip_no', '=', 0);
                 })
                 ->get();
-
-                $sale_slip_condition_num               = 0;       // 条件指定された時の伝票の枚数
-                $sale_slip_condition_notax_sub_total   = 0;       // 条件指定された伝票詳細の税抜小計
 
                 if (!empty($saleSlipDetailSumList)) {
 

@@ -360,7 +360,13 @@ class DailyPerformanceController extends Controller
                 ->if(!empty($dp_staff_id), function ($queryDetail) use ($dp_staff_id) {
                     return $queryDetail->where('SaleSlipDetail.staff_id', '=', $dp_staff_id);
                 })
-                ->get();
+                ->where('SaleSlip.active', '=', '1')
+                ->if($dp_date_type == 1, function ($query) {
+                    return $query->groupBy('SaleSlip.date');
+                })
+                ->if($dp_date_type == 2, function ($query) {
+                    return $query->groupBy('SaleSlip.delivery_date');
+                })->get();
 
 
             } else {
@@ -407,10 +413,8 @@ class DailyPerformanceController extends Controller
                         $sale_date = $saleSlipVal->sale_slip_delivery_date;
                     }
 
-                    $sale_daily_amount  = $saleSlipVal->sale_daily_amount;
-
                     $sale_date_arr[$sale_date] = [
-                        "sale_daily_amount"  => $sale_daily_amount
+                        "sale_daily_amount"  => $saleSlipVal->sale_daily_amount
                     ];
                 }
             }

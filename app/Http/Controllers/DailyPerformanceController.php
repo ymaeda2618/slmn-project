@@ -243,7 +243,7 @@ class DailyPerformanceController extends Controller
 
             ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
-            ->selectRaw('SUM(COALESCE(SupplySlip.total,0))              AS supply_daily_amount')
+            ->selectRaw('SUM(COALESCE(SupplySlip.notax_sub_total,0))       AS supply_daily_amount')
             ->if(!empty($dp_product_id), function ($query) {
                 return $query->selectRaw('SUM(COALESCE(SupplySlipDetail.sub_supply_detail_daily_amount,0)) AS supply_detail_daily_amount');
             })

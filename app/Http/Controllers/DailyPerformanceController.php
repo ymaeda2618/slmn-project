@@ -243,7 +243,7 @@ class DailyPerformanceController extends Controller
 
             ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d")          AS supply_slip_date')
             ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
-            ->selectRaw('SUM(COALESCE(SupplySlip.total,0))              AS supply_daily_amount')
+            ->selectRaw('SUM(COALESCE(SupplySlip.notax_sub_total,0))       AS supply_daily_amount')
             ->if(!empty($dp_product_id), function ($query) {
                 return $query->selectRaw('SUM(COALESCE(SupplySlipDetail.sub_supply_detail_daily_amount,0)) AS supply_detail_daily_amount');
             })
@@ -306,69 +306,102 @@ class DailyPerformanceController extends Controller
             //---------------------
             // 売上額を取得
             //---------------------
-            // supply_slip_detailsのサブクエリを作成
-            $dp_sale_sub_query = null;
+
+            // 製品IDとスタッフIDのいずれかが存在する場合
             if(!empty($dp_product_id) || !empty($dp_staff_id)) {
 
-                $dp_sale_sub_query = DB::table('sale_slip_details as SaleSubTable')
-                ->select('SaleSubTable.sale_slip_id AS sale_slip_id')
-                ->selectRaw(
-                    'CASE
-                       WHEN SubProduct.tax_id = 1 THEN SUM(COALESCE(SaleSubTable.notax_price,0))*1.08
-                       WHEN SubProduct.tax_id = 2 THEN SUM(COALESCE(SaleSubTable.notax_price,0))*1.10
-                     END AS sub_sale_detail_daily_amount'
-                    )
-                ->join('products AS SubProduct', function ($join) {
-                    $join->on('SubProduct.id', '=', 'SaleSubTable.product_id');
+                $saleSlipList = DB::table('sale_slip_details AS SaleSlipDetail')
+                ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
+                ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
+                ->selectRaw('SUM(COALESCE(SaleSlipDetail.notax_price,0))           AS sale_daily_amount')
+                ->join('sale_slips as SaleSlip', function ($join) {
+                    $join->on('SaleSlip.id', '=', 'SaleSlipDetail.sale_slip_id')
+                    ->where('SaleSlip.active', '=', true);
                 })
-                ->if(!empty($dp_product_id), function ($dp_sale_sub_query) use ($dp_product_id) {
-                    return $dp_sale_sub_query->where('SaleSubTable.product_id', '=', $dp_product_id);
+                ->join('products as Product', function ($join) {
+                    $join->on('Product.id', '=', 'SaleSlipDetail.product_id')
+                    ->where('Product.active', '=', true);
                 })
-                ->if(!empty($dp_staff_id), function ($dp_sale_sub_query) use ($dp_staff_id) {
-                    return $dp_sale_sub_query->where('SaleSubTable.staff_id', '=', $dp_staff_id);
+                ->leftJoin('standards as Standard', function ($join) {
+                    $join->on('Standard.id', '=', 'SaleSlipDetail.standard_id')
+                    ->where('Standard.active', '=', true);
                 })
-                ->groupBy('SaleSubTable.sale_slip_id');
+                ->join('units as Unit', function ($join) {
+                    $join->on('Unit.id', '=', 'SaleSlipDetail.unit_id')
+                    ->where('Unit.active', '=', true);
+                })
+                ->leftJoin('staffs as Staff', function ($join) {
+                    $join->on('Staff.id', '=', 'SaleSlipDetail.staff_id')
+                    ->where('Staff.active', '=', true);
+                })
+                ->leftJoin('units as InventoryUnit', function ($join) {
+                    $join->on('InventoryUnit.id', '=', 'SaleSlipDetail.inventory_unit_id')
+                    ->where('InventoryUnit.active', '=', true);
+                })
+                ->leftJoin('sale_companies as SaleCompany', function ($join) {
+                    $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id')
+                    ->where('SaleCompany.active', '=', true);
+                })
+                ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
+                    return $query->whereBetween('SaleSlip.date', [$first_date, $last_date]);
+                })
+                ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 2, function ($query) use ($first_date, $last_date) {
+                    return $query->whereBetween('SaleSlip.delivery_date', [$first_date, $last_date]);
+                })
+                ->if(!empty($dp_sale_company_id), function ($query) use ($dp_sale_company_id) {
+                    return $query->where('SaleSlip.sale_company_id', '=', $dp_sale_company_id);
+                })
+                ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
+                    return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
+                })
+                ->if(!empty($dp_product_id), function ($queryDetail) use ($dp_product_id) {
+                    return $queryDetail->where('SaleSlipDetail.product_id', '=', $dp_product_id);
+                })
+                ->if(!empty($dp_staff_id), function ($queryDetail) use ($dp_staff_id) {
+                    return $queryDetail->where('SaleSlipDetail.staff_id', '=', $dp_staff_id);
+                })
+                ->where('SaleSlip.active', '=', '1')
+                ->if($dp_date_type == 1, function ($query) {
+                    return $query->groupBy('SaleSlip.date');
+                })
+                ->if($dp_date_type == 2, function ($query) {
+                    return $query->groupBy('SaleSlip.delivery_date');
+                })->get();
+
+
+            } else {
+
+                $saleSlipList = DB::table('sale_slips AS SaleSlip')
+
+                ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
+                ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
+                ->selectRaw('SUM(COALESCE(SaleSlip.notax_sub_total,0))       AS sale_daily_amount')
+                ->join('sale_companies AS SaleCompany', function ($join) {
+                    $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
+                })
+                ->leftJoin('sale_shops AS SaleShop', function ($join) {
+                    $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
+                })
+                ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
+                    return $query->whereBetween('SaleSlip.date', [$first_date, $last_date]);
+                })
+                ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 2, function ($query) use ($first_date, $last_date) {
+                    return $query->whereBetween('SaleSlip.delivery_date', [$first_date, $last_date]);
+                })
+                ->if(!empty($dp_sale_company_id), function ($query) use ($dp_sale_company_id) {
+                    return $query->where('SaleSlip.sale_company_id', '=', $dp_sale_company_id);
+                })
+                ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
+                    return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
+                })
+                ->where('SaleSlip.active', '=', '1')
+                ->if($dp_date_type == 1, function ($query) {
+                    return $query->groupBy('SaleSlip.date');
+                })
+                ->if($dp_date_type == 2, function ($query) {
+                    return $query->groupBy('SaleSlip.delivery_date');
+                })->get();
             }
-
-            $saleSlipList = DB::table('sale_slips AS SaleSlip')
-
-            ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
-            ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
-            ->selectRaw('SUM(COALESCE(SaleSlip.total,0))                 AS sale_daily_amount')
-            ->if(!empty($dp_sale_sub_query), function ($query) {
-                return $query->selectRaw('SUM(COALESCE(SaleSlipDetail.sub_sale_detail_daily_amount,0)) AS sale_detail_daily_amount');
-            })
-            ->join('sale_companies AS SaleCompany', function ($join) {
-                $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
-            })
-            ->leftJoin('sale_shops AS SaleShop', function ($join) {
-                $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
-            })
-            ->if(!empty($dp_sale_sub_query), function ($query) use ($dp_sale_sub_query) {
-                return $query
-                       ->join(DB::raw('('. $dp_sale_sub_query->toSql() .') as SaleSlipDetail'), 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                       ->mergeBindings($dp_sale_sub_query);
-            })
-            ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
-                return $query->whereBetween('SaleSlip.date', [$first_date, $last_date]);
-            })
-            ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 2, function ($query) use ($first_date, $last_date) {
-                return $query->whereBetween('SaleSlip.delivery_date', [$first_date, $last_date]);
-            })
-            ->if(!empty($dp_sale_company_id), function ($query) use ($dp_sale_company_id) {
-                return $query->where('SaleSlip.sale_company_id', '=', $dp_sale_company_id);
-            })
-            ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
-                return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
-            })
-            ->where('SaleSlip.active', '=', '1')
-            ->if($dp_date_type == 1, function ($query) {
-                return $query->groupBy('SaleSlip.date');
-            })
-            ->if($dp_date_type == 2, function ($query) {
-                return $query->groupBy('SaleSlip.delivery_date');
-            })->get();
-
             // 配列を組みなおす
             $sale_date_arr = array();
             if (!empty($saleSlipList)) {
@@ -380,14 +413,8 @@ class DailyPerformanceController extends Controller
                         $sale_date = $saleSlipVal->sale_slip_delivery_date;
                     }
 
-                    if(!empty($dp_product_id)){
-                        $sale_daily_amount  = $saleSlipVal->sale_detail_daily_amount;
-                    } else {
-                        $sale_daily_amount  = $saleSlipVal->sale_daily_amount;
-                    }
-
                     $sale_date_arr[$sale_date] = [
-                        "sale_daily_amount"  => $sale_daily_amount
+                        "sale_daily_amount"  => $saleSlipVal->sale_daily_amount
                     ];
                 }
             }

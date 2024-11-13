@@ -597,6 +597,7 @@ class CsvUploadController extends Controller
                 $company_name       = $lines[16]; // 仕入先名
             }
 
+            $seri_no            = $lines[32];// セリNO
             $origin_area        = $lines[62];// 産地
             $inventory_unit_num = $lines[86];// 個数
             if(empty($lines[89])){ // もし数量が空欄の場合は個数の方を入れる
@@ -749,7 +750,8 @@ class CsvUploadController extends Controller
                 "unit_id"             => $unit_id,
                 "notax_price"         => $notax_price,
                 "origin_area_id"      => $origin_area_id,
-                "staff_id"            => 1
+                "staff_id"            => 1,
+                "seri_no"             => $seri_no
             ];
 
             // 各金額を格納

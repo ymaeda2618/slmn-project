@@ -595,4 +595,50 @@ class ProductController extends Controller
         return $returnArray;
     }
 
+    /**
+     * 製品ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteProduct(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            $productList = DB::table('products AS Product')
+            ->select(
+                'Product.name AS product_name',
+                'Product.code AS product_code',
+                'Unit.name AS unit_name'
+            )->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
+            })->where([
+                    ['Product.active', '=', '1'],
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('Product.name', 'like', "%{$input_text}%")
+                ->orWhere('Product.yomi', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($productList)) {
+
+                foreach ($productList as $product_val) {
+
+                    // サジェスト表示を「コード 商品名 単位」にする
+                    $suggest_text = '【' . $product_val->product_code . '】 ' . $product_val->product_name . ' (' . $product_val->unit_name . ')';
+
+                    array_push($auto_complete_array, $suggest_text);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
+    }
 }

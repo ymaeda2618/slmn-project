@@ -657,7 +657,7 @@ class SupplySlipController extends Controller
                 \App\SupplySlipDetail::where('supply_slip_id', $SupplySlipData['id'])->delete();
 
                 $supply_slip_detail = array();
-                $sort = 0;
+                $sort = 1;
 
                 foreach($SupplySlipDetailData as $SupplySlipDetail){
 
@@ -982,8 +982,12 @@ class SupplySlipController extends Controller
             // 製品DB取得
             $productList = DB::table('products AS Product')
             ->select(
-                'Product.name  AS product_name'
-            )->where([
+                'Product.name  AS product_name',
+                'Product.code AS product_code',
+                'Unit.name AS unit_name'
+            )->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
+            })->where([
                     ['Product.active', '=', '1'],
             ])->where(function($query) use ($input_text){
                 $query
@@ -996,7 +1000,10 @@ class SupplySlipController extends Controller
 
                 foreach ($productList as $product_val) {
 
-                    array_push($auto_complete_array, $product_val->product_name);
+                    // サジェスト表示を「コード 商品名 単位」にする
+                    $suggest_text = '【' . $product_val->product_code . '】 ' . $product_val->product_name . ' (' . $product_val->unit_name . ')';
+
+                    array_push($auto_complete_array, $suggest_text);
                 }
             }
         }
@@ -1631,7 +1638,7 @@ class SupplySlipController extends Controller
             $supply_slip_new_id = $SupplySlip->id;
 
             $supply_slip_detail = array();
-            $sort = 0;
+            $sort = 1;
 
             foreach($SupplySlipDetailData as $SupplySlipDetail){
 
@@ -1740,7 +1747,7 @@ class SupplySlipController extends Controller
         $ajaxHtml1 .= '        <input type="hidden" id="unit_id_' . $slip_num . '" name="data[SupplySlipDetail][' . $slip_num . '][unit_id]" value="' . $slip_num . '">';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
-        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SupplySlipDetail][' . $slip_num . '][notax_price]" value="' . $slip_num . '" readonly>';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SupplySlipDetail][' . $slip_num . '][notax_price]" value="0" readonly>';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="origin_area_text_' . $slip_num . '" name="data[SupplySlipDetail][' . $slip_num . '][origin_area_text]" placeholder="産地欄" readonly>';

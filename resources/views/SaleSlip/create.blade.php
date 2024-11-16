@@ -53,71 +53,71 @@
                     <th class="width-20" colspan="3">担当者 / 摘要</th>
                     <th class="width-5">削除</th>
                 </tr>
-                <tr id="slip-partition-0" class="partition-area"></tr>
-                <input type="hidden" name="sort-0" id="sort" value="0">
-                <input type="hidden" name="data[SaleSlipDetail][0][id]" id="id-0" value="">
-                <tr id="slip-upper-0">
-                    <td class="index-td" rowspan="2">0</td>
+                <tr id="slip-partition-1" class="partition-area"></tr>
+                <input type="hidden" name="sort-1" id="sort" value="1">
+                <input type="hidden" name="data[SaleSlipDetail][1][id]" id="id-1" value="">
+                <tr id="slip-upper-1">
+                    <td class="index-td" rowspan="2">1</td>
                     <td colspan="2">
-                        <input type="text" class="form-control product_code_input" id="product_code_0" name="data[SaleSlipDetail][0][product_code]" tabindex="3">
-                        <input type="hidden" id="product_id_0" name="data[SaleSlipDetail][0][product_id]">
-                        <input type='hidden' id='tax_id_0' name="data[SaleSlipDetail][0][tax_id]" value="0">
+                        <input type="text" class="form-control product_code_input" id="product_code_1" name="data[SaleSlipDetail][1][product_code]" tabindex="3">
+                        <input type="hidden" id="product_id_1" name="data[SaleSlipDetail][1][product_id]">
+                        <input type='hidden' id='tax_id_1' name="data[SaleSlipDetail][1][tax_id]" value="1">
                     </td>
                     <td>
-                        <input type="number" class="form-control" id="inventory_unit_num_0" name="data[SaleSlipDetail][0][inventory_unit_num]" tabindex="4">
+                        <input type="number" class="form-control" id="inventory_unit_num_1" name="data[SaleSlipDetail][1][inventory_unit_num]" tabindex="4">
                     </td>
                     <td>
-                        <input type="number" class="form-control" id="unit_num_0" name="data[SaleSlipDetail][0][unit_num]" onchange='javascript:priceNumChange(0)' tabindex="5">
+                        <input type="number" class="form-control" id="unit_num_1" name="data[SaleSlipDetail][1][unit_num]" onchange='javascript:priceNumChange(1)' tabindex="5">
                     </td>
                     <td colspan="2">
-                        <input type="number" class="form-control" id="unit_price_0" name="data[SaleSlipDetail][0][unit_price]" onchange='javascript:priceNumChange(0)' tabindex="6">
+                        <input type="number" class="form-control" id="unit_price_1" name="data[SaleSlipDetail][1][unit_price]" onchange='javascript:priceNumChange(1)' tabindex="6">
                     </td>
                     <td colspan="2">
-                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_0" name="data[SaleSlipDetail][0][origin_area_code]" tabindex="7">
-                        <input type="hidden" id="origin_area_id_0" name="data[SaleSlipDetail][0][origin_area_id]">
+                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_1" name="data[SaleSlipDetail][1][origin_area_code]" tabindex="7">
+                        <input type="hidden" id="origin_area_id_1" name="data[SaleSlipDetail][1][origin_area_id]">
                     </td>
                     <td>
-                        <input type="text" class="form-control staff_code_input" id="staff_code_0" name="data[SaleSlipDetail][0][staff_code]" value="1009" tabindex="8">
-                        <input type="hidden" id="staff_id_0" name="data[SaleSlipDetail][0][staff_id]" value="9">
+                        <input type="text" class="form-control staff_code_input" id="staff_code_1" name="data[SaleSlipDetail][1][staff_code]" value="1009" tabindex="8">
+                        <input type="hidden" id="staff_id_1" name="data[SaleSlipDetail][1][staff_id]" value="9">
                     </td>
                     <td colspan="2">
-                        <input type="text" class="form-control" id="staff_text_0" name="data[SaleSlipDetail][0][staff_text]" placeholder="担当欄" value="石塚 貞雄" readonly>
+                        <input type="text" class="form-control" id="staff_text_1" name="data[SaleSlipDetail][1][staff_text]" placeholder="担当欄" value="石塚 貞雄" readonly>
                     </td>
                     <td rowspan="2">
-                        <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary" onclick='javascript:removeSlip(0) '>削除</button>
+                        <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary" onclick='javascript:removeSlip(1) '>削除</button>
                     </td>
                 </tr>
-                <tr id="slip-lower-0">
+                <tr id="slip-lower-1">
                     <td colspan="2">
-                        <input type="text" class="form-control" id="product_text_0" name="data[SaleSlipDetail][0][product_text]" placeholder="製品欄" readonly>
+                        <input type="text" class="form-control" id="product_text_1" name="data[SaleSlipDetail][1][product_text]" placeholder="製品欄" readonly>
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="inventory_unit_text_0" name="data[SaleSlipDetail][0][inventory_unit_text]" placeholder="個数欄" readonly>
-                        <input type="hidden" id="inventory_unit_id_0" name="data[SaleSlipDetail][0][inventory_unit_id]" value="0">
+                        <input type="text" class="form-control" id="inventory_unit_text_1" name="data[SaleSlipDetail][1][inventory_unit_text]" placeholder="個数欄" readonly>
+                        <input type="hidden" id="inventory_unit_id_1" name="data[SaleSlipDetail][1][inventory_unit_id]" value="1">
                     </td>
                     <td>
-                        <input type="text" class="form-control" id="unit_text_0" name="data[SaleSlipDetail][0][unit_text]" placeholder="数量欄" readonly>
-                        <input type="hidden" id="unit_id_0" name="data[SaleSlipDetail][0][unit_id]" value="0">
+                        <input type="text" class="form-control" id="unit_text_1" name="data[SaleSlipDetail][1][unit_text]" placeholder="数量欄" readonly>
+                        <input type="hidden" id="unit_id_1" name="data[SaleSlipDetail][1][unit_id]" value="1">
                     </td>
                     <td colspan="2">
-                        <input type="text" class="form-control" id="notax_price_0" name="data[SaleSlipDetail][0][notax_price]" value="0" readonly>
+                        <input type="text" class="form-control" id="notax_price_1" name="data[SaleSlipDetail][1][notax_price]" value="0" readonly>
                     </td>
                     <td colspan="2">
-                        <input type="text" class="form-control" id="origin_area_text_0" name="data[SaleSlipDetail][0][origin_area_text]" placeholder="産地欄" readonly>
+                        <input type="text" class="form-control" id="origin_area_text_1" name="data[SaleSlipDetail][1][origin_area_text]" placeholder="産地欄" readonly>
                     </td>
                     <td colspan="3">
-                        <input type="text" class="form-control" id="memo_0" name="data[SaleSlipDetail][0][memo]" placeholder="摘要欄" tabindex="9">
+                        <input type="text" class="form-control" id="memo_1" name="data[SaleSlipDetail][1][memo]" placeholder="摘要欄" tabindex="9">
                     </td>
                 </tr>
             </table>
 
             <div id="supply-slip-area">
-                <div id="supply-slip-area-0"></div>
+                <div id="supply-slip-area-1"></div>
             </div>
             <br><br>
             <div class="add-slip-btn-area">
                 <button id="add-slip-btn" type="button" class="btn add-slip-btn btn-primary">伝票追加</button>
-                <input type='hidden' name="slip_num" id="slip_num" value="1">
+                <input type='hidden' name="slip_num" id="slip_num" value="2">
             </div>
 
             <table class="total-table">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CompanySetting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -904,8 +905,35 @@ class DepositController extends Controller
         ->get();
 
         // ------------------------
+        // 企業情報を取得する
+        // ------------------------
+        $companyDatas = CompanySetting::getCompanyData();
+
+        // ------------------------
         // 取得してきたデータを整形する
         // ------------------------
+
+        // 請求元企業情報の整形
+        // 初期化
+        $companyInfo = array();
+        $bank_type = array(
+            1 => '普通',
+            2 => '当座',
+            3 => 'その他',
+        );
+
+        $companyInfo['name']            = $companyDatas[0]->name;
+        $companyInfo['postal_code']     = $companyDatas[0]->postal_code;
+        $companyInfo['address']         = $companyDatas[0]->address;
+        $companyInfo['office_tel']      = $companyDatas[0]->office_tel;
+        $companyInfo['office_fax']      = $companyDatas[0]->office_fax;
+        $companyInfo['shop_tel']        = $companyDatas[0]->shop_tel;
+        $companyInfo['shop_fax']        = $companyDatas[0]->shop_fax;
+        $companyInfo['invoice_form_id'] = $companyDatas[0]->invoice_form_id;
+        $companyInfo['bank_name']       = $companyDatas[0]->bank_name;
+        $companyInfo['branch_name']     = $companyDatas[0]->branch_name;
+        $companyInfo['bank_type']       = $bank_type[$companyDatas[0]->bank_type];
+        $companyInfo['bank_account']    = $companyDatas[0]->bank_account;
 
         // 初期化処理
         $calcDepositList = array();
@@ -1164,7 +1192,8 @@ class DepositController extends Controller
         //return view('pdf.pdf_tamplate')->with(['depositList'=> $calcDepositList]);
 
         $pdf = \PDF::view('pdf.pdf_tamplate', [
-            'depositList' => $calcDepositList
+            'depositList' => $calcDepositList,
+            'companyInfo' => $companyInfo
         ])
         ->setOption('encoding', 'utf-8')
         ->setOption('margin-bottom', 8)

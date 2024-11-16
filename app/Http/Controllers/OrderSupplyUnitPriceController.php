@@ -83,6 +83,11 @@ class OrderSupplyUnitPriceController extends Controller
                 if (empty($condition_date_from) && !empty($condition_date_to)) {
                     $condition_date_from = $condition_date_to;
                 }
+                // どちらも入力されていない場合はどちらも当日を入れる
+                if (empty($condition_date_from) && empty($condition_date_to)) {
+                    $condition_date_from = date('Y-m-d');
+                    $condition_date_to = date('Y-m-d');
+                }
 
                 $request->session()->put('order_supply_condition_date_from', $condition_date_from);
                 $request->session()->put('order_supply_condition_date_to', $condition_date_to);

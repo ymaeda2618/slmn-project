@@ -10,6 +10,7 @@ use App\SaleSlip;
 use App\SaleSlipDetail;
 use App\SupplySlipDetail;
 use App\InventoryManage;
+use App\CompanySetting;
 use Carbon\Carbon;
 
 class SaleSlipController extends Controller
@@ -918,7 +919,7 @@ class SaleSlipController extends Controller
                 \App\SaleSlipDetail::where('sale_slip_id', $SaleSlipData['id'])->delete();
 
                 $sale_slip_detail = array();
-                $sort = 0;
+                $sort = 1;
                 $staffId = '';
 
                 $saleSlipDetailIds = array();
@@ -1247,7 +1248,8 @@ class SaleSlipController extends Controller
                 'SaleCompany.code  AS code',
                 'SaleCompany.id    AS id',
                 'SaleCompany.name  AS name',
-                'SaleCompany.tax_calc_type  AS tax_calc_type',
+                'SaleCompany.tax_calc_type AS tax_calc_type',
+                'SaleCompany.closing_date  AS closing_date',
             )
             ->if(!empty($input_code), function ($query) use ($input_code) {
                 return $query->where('SaleCompany.code', '=', $input_code);
@@ -1262,10 +1264,23 @@ class SaleSlipController extends Controller
                 $output_id   = $saleCompanyList->id;
                 $output_name = $saleCompanyList->name;
                 $output_tax_calc_type = $saleCompanyList->tax_calc_type;
+
+                // 締日
+                $closing_date = (int)$saleCompanyList->closing_date;
+                if ($closing_date === 99) {
+                    // 月末
+                    $output_cloging_date = date('Y-m-t', strtotime(date('Y-m-01')));
+                } elseif ($closing_date === 88) {
+                    // 都度
+                    $output_cloging_date = date('Y-m-d');
+                } else {
+                    // 日付指定
+                    $output_cloging_date = date('Y-m-d', strtotime(date('Y-m-' . $closing_date)));
+                }
             }
         }
 
-        $returnArray = array($output_code, $output_id, $output_name, $output_tax_calc_type);
+        $returnArray = array($output_code, $output_id, $output_name, $output_tax_calc_type, $output_cloging_date);
 
         return json_encode($returnArray);
     }
@@ -1408,8 +1423,12 @@ class SaleSlipController extends Controller
             // 製品DB取得
             $productList = DB::table('products AS Product')
             ->select(
-                'Product.name  AS product_name'
-            )->where([
+                'Product.name AS product_name',
+                'Product.code AS product_code',
+                'Unit.name AS unit_name'
+            )->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
+            })->where([
                     ['Product.active', '=', '1'],
             ])->where(function($query) use ($input_text){
                 $query
@@ -1422,7 +1441,10 @@ class SaleSlipController extends Controller
 
                 foreach ($productList as $product_val) {
 
-                    array_push($auto_complete_array, $product_val->product_name);
+                    // サジェスト表示を「コード 商品名 単位」にする
+                    $suggest_text = '【' . $product_val->product_code . '】 ' . $product_val->product_name . ' (' . $product_val->unit_name . ')';
+
+                    array_push($auto_complete_array, $suggest_text);
                 }
             }
         }
@@ -2025,7 +2047,7 @@ class SaleSlipController extends Controller
             $SaleSlipData['user_id'] = $user_info_id;
             $SaleSlip = $this->SaleSlip->insertSaleSlip($SaleSlipData);
 
-            $sort = 0;
+            $sort = 1;
             $staffId = '';
 
             foreach ($SaleSlipDetailData as $SaleSlipDetailKey => $SaleSlipDetailVal) {
@@ -2043,7 +2065,7 @@ class SaleSlipController extends Controller
                 if (empty($SaleSlipDetailVal['quality_id'])) $SaleSlipDetailVal['quality_id'] = 0;
                 if (isset($SaleSlipDetailVal['supply_count']) || empty($SaleSlipDetailVal['supply_count'])) $SaleSlipDetailVal['supply_count'] = 0;
                 if (isset($SaleSlipDetailVal['supply_unit_num']) || empty($SaleSlipDetailVal['supply_unit_num'])) $SaleSlipDetailVal['supply_unit_num'] = 0;
-                if (isset($SaleSlipDetailVal['sort']) || empty($SaleSlipDetailVal['sort'])) $SaleSlipDetailVal['sort'] = 0;
+                // if (isset($SaleSlipDetailVal['sort']) || empty($SaleSlipDetailVal['sort'])) $SaleSlipDetailVal['sort'] = 0;
 
                 // sale_slip_detailsを登録する
                 $SaleSlipDetail                     = new SaleSlipDetail;
@@ -2225,7 +2247,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= '        <input type="hidden" id="unit_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_id]" value="' . $slip_num . '">';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
-        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][notax_price]" value="' . $slip_num . '" readonly>';
+        $ajaxHtml1 .= '        <input type="text" class="form-control" id="notax_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][notax_price]" value="0" readonly>';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td colspan="2">';
         $ajaxHtml1 .= '        <input type="text" class="form-control" id="origin_area_text_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_text]" placeholder="産地欄" readonly>';
@@ -2796,6 +2818,33 @@ class SaleSlipController extends Controller
         ->get();
 
         // ------------------------
+        // 企業情報を取得する
+        // ------------------------
+        $companyDatas = CompanySetting::getCompanyData();
+
+        // 企業情報の整形
+        // 初期化
+        $companyInfo = array();
+        $bank_type = array(
+            1 => '普通',
+            2 => '当座',
+            3 => 'その他',
+        );
+
+        $companyInfo['name']            = $companyDatas[0]->name;
+        $companyInfo['postal_code']     = $companyDatas[0]->postal_code;
+        $companyInfo['address']         = $companyDatas[0]->address;
+        $companyInfo['office_tel']      = $companyDatas[0]->office_tel;
+        $companyInfo['office_fax']      = $companyDatas[0]->office_fax;
+        $companyInfo['shop_tel']        = $companyDatas[0]->shop_tel;
+        $companyInfo['shop_fax']        = $companyDatas[0]->shop_fax;
+        $companyInfo['invoice_form_id'] = $companyDatas[0]->invoice_form_id;
+        $companyInfo['bank_name']       = $companyDatas[0]->bank_name;
+        $companyInfo['branch_name']     = $companyDatas[0]->branch_name;
+        $companyInfo['bank_type']       = $bank_type[$companyDatas[0]->bank_type];
+        $companyInfo['bank_account']    = $companyDatas[0]->bank_account;
+
+        // ------------------------
         // 取得してきたデータを整形する
         // ------------------------
 
@@ -2953,7 +3002,8 @@ class SaleSlipController extends Controller
         }
 
         $pdf = \PDF::view('pdf.pdfDeliverySlip', [
-            'depositList' => $calcDepositList
+            'depositList' => $calcDepositList,
+            'companyInfo' => $companyInfo
         ])
         ->setOption('encoding', 'utf-8')
         ->setOption('margin-bottom', 8)

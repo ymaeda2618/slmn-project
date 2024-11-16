@@ -9,7 +9,7 @@
 
             <div class="form-group">
                 <label class="column-label payment-date-label" for="payment_date">支払期日</label>
-                <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d',strtotime('+1 month'));?>" tabindex="2">
+                <input type="date" class="form-control " id="deposit_company_payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d',strtotime('+1 month'));?>" tabindex="2">
             </div>
 
             <div class="search-area">
@@ -219,7 +219,7 @@
         jQuery(window).load(function() {
 
             // 一番最初は売上先企業にフォーカスする
-            $('#sale_company_code').focus();
+            $('#deposit_company_code').focus();
 
             // 初期化処理
             notax_sub_total_8 = 0;
@@ -369,6 +369,7 @@
                 var selector_id = selector_code.replace('_code', '_id');
                 var selector_text = selector_code.replace('_code', '_text');
                 var selector_tax_calc_type = selector_code.replace('_code', '_tax_calc_type');
+                var selector_payment_date = selector_code.replace('_code', '_payment_date');
 
                 var fd = new FormData();
                 fd.append("inputText", set_val);
@@ -387,11 +388,11 @@
                             contentType: false
                         })
                         .done(function(data) {
-
                             $("#" + selector_code).val(data[0]);
                             $("#" + selector_id).val(data[1]);
                             $("#" + selector_text).val(data[2]);
                             $("#" + selector_tax_calc_type).val(data[3]);
+                            $("#" + selector_payment_date).val(data[4]);
                         });
 
                 } else if (selector_code.match(/deposit_shop/)) { // 売上店舗

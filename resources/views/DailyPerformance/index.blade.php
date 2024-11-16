@@ -115,8 +115,8 @@
 
         <!--総計表示エリア-->
         <div class='sum-display-area'>
-            <div class='sum-display-div'>仕入総額:{{preg_replace("/\.?0+$/","",number_format($supply_total_amount, 2))}}円</div>
-            <div class='sum-display-div'>売上総額:{{preg_replace("/\.?0+$/","",number_format($sale_total_amount, 2))}}円</div>
+            <div class='sum-display-div'>仕入税抜額:{{preg_replace("/\.?0+$/","",number_format($supply_total_amount, 2))}}円</div>
+            <div class='sum-display-div'>売上税抜額:{{preg_replace("/\.?0+$/","",number_format($sale_total_amount, 2))}}円</div>
         </div>
 
         <!--一覧表示エリア-->
@@ -512,23 +512,23 @@
                 } else if (selector_code.match(/staff/)) { // 担当者IDの部分
 
                     $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxSetStaff",
-                        type: "POST",
-                        dataType: "JSON",
-                        data: fd,
-                        processData: false,
-                        contentType: false
-                    })
-                    .done(function (data) {
+                            headers: {
+                                "X-CSRF-TOKEN": $("[name='_token']").val()
+                            },
+                            url: "./AjaxSetStaff",
+                            type: "POST",
+                            dataType: "JSON",
+                            data: fd,
+                            processData: false,
+                            contentType: false
+                        })
+                        .done(function(data) {
 
-                        $("#" + selector_code).val(data[0]);
-                        $("#" + selector_id).val(data[1]);
-                        $("#" + selector_text).val(data[2]);
+                            $("#" + selector_code).val(data[0]);
+                            $("#" + selector_id).val(data[1]);
+                            $("#" + selector_text).val(data[2]);
 
-                    });
+                        });
                 }
             });
 
@@ -538,7 +538,7 @@
 
 <style>
     /* 共通 */
-
+    
     .search-control {
         display: block;
         width: 100%;
@@ -553,12 +553,12 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-
+    
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -566,13 +566,13 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-
+    
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-
+    
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -580,12 +580,12 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-
+    
     .search-area table {
         margin: auto;
         width: 100%;
     }
-
+    
     .table-th {
         width: 10%;
         padding: 15px 0px 0px 10px;
@@ -593,40 +593,40 @@
         float: left;
         font-weight: bolder;
     }
-
+    
     .table-td {
         width: 20%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .table-code-td {
         padding-right: 0px;
     }
-
+    
     .table-name-td {
         padding-left: 0px;
     }
-
+    
     .table-double-td {
         width: 40%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-
+    
     .radio_box {
         padding-top: 15px;
     }
-
+    
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-
+    
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -635,7 +635,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-
+    
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -645,14 +645,14 @@
         margin-left: 2%;
     }
     /*総額エリア*/
-
+    
     .sum-display-area {
         max-width: 1300px;
         width: 90%;
         padding-top: 20px;
         padding-left: 20px;
     }
-
+    
     .sum-display-div {
         float: left;
         margin-right: 1rem;
@@ -660,18 +660,18 @@
         font-size: 14px;
     }
     /*伝票表示エリア*/
-
+    
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 20px auto 50px;
     }
-
+    
     .index-table {
         width: 100%;
         letter-spacing: 2px;
     }
-
+    
     .index-table th {
         width: 40%;
         padding: 10px;
@@ -683,11 +683,11 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-
+    
     .index-table th:first-of-type {
         width: 20%;
     }
-
+    
     .index-table td {
         font-size: 12px;
         padding: 8px;
@@ -698,7 +698,7 @@
         text-align: right;
         font-weight: bold;
     }
-
+    
     .index-table td:first-of-type {
         font-size: 12px;
         padding: 8px;

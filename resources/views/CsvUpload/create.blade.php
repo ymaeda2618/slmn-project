@@ -39,7 +39,7 @@
                 <tr>
                     <th class="table-th">データファイル</th>
                     <td>
-                        <input type="file" class="upload-file-input" name="uploadCsvFile" id="uploadCsvFile" accept=".csv">
+                        <input type="file" class="upload-file-input" name="uploadCsvFiles[]" id="uploadCsvFiles" accept=".csv" multiple>
                     </td>
                 </tr>
             </table>
@@ -331,20 +331,22 @@
                 var fd = new FormData();
                 fd.append("data_type_val", $("#data_type_val").val());
                 fd.append("slip_type_val", $("#slip_type_val").val());
-                fd.append("uploadCsvFile", $("#uploadCsvFile").prop('files')[0]);
 
-                // ファイルがない場合はアラートを飛ばす
-                if (!$("#uploadCsvFile").val()) {
+                // ファイルが選択されていない場合
+                var files = $("#uploadCsvFiles").prop('files');
+                if (files.length === 0) {
                     alert("csvファイルが選択されておりません。");
                     $("#overlay").fadeOut(0);
                     return;
-                } else { // ファイルが存在する場合
+                }
 
-                    // ファイルの拡張子を取得
-                    var file_ext = getExt($("#uploadCsvFile").prop('files')[0].name);
+                // ファイルごとに拡張子をチェックし、FormDataに追加
+                for (var i = 0; i < files.length; i++) {
+                    fd.append("uploadCsvFiles[]", files[i]);
+                    var file_ext = getExt(files[i].name);
 
-                    if (file_ext != "csv") {
-                        alert("選択されたファイルがCSVではありません。");
+                    if (file_ext !== "csv") {
+                        alert("選択されたファイルの中にCSVではないファイルがあります。");
                         $("#overlay").fadeOut(0);
                         return;
                     }

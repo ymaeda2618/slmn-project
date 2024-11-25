@@ -314,6 +314,8 @@ class DailyPerformanceController extends Controller
                 ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
                 ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
                 ->selectRaw('SUM(COALESCE(SaleSlipDetail.notax_price,0))           AS sale_daily_amount')
+                ->selectRaw('CASE WHEN payment_method_type = 0 THEN SUM(COALESCE(SaleSlip.notax_price,0)) ELSE 0 END AS sale_daily_amount_0')
+                ->selectRaw('CASE WHEN payment_method_type = 1 THEN SUM(COALESCE(SaleSlip.notax_price,0)) ELSE 0 END AS sale_daily_amount_1')
                 ->join('sale_slips as SaleSlip', function ($join) {
                     $join->on('SaleSlip.id', '=', 'SaleSlipDetail.sale_slip_id')
                     ->where('SaleSlip.active', '=', true);
@@ -362,12 +364,11 @@ class DailyPerformanceController extends Controller
                 })
                 ->where('SaleSlip.active', '=', '1')
                 ->if($dp_date_type == 1, function ($query) {
-                    return $query->groupBy('SaleSlip.date');
+                    return $query->groupBy('SaleSlip.date', 'SaleSlip.payment_method_type');
                 })
                 ->if($dp_date_type == 2, function ($query) {
-                    return $query->groupBy('SaleSlip.delivery_date');
+                    return $query->groupBy('SaleSlip.delivery_date', 'SaleSlip.payment_method_type');
                 })->get();
-
 
             } else {
 
@@ -376,6 +377,8 @@ class DailyPerformanceController extends Controller
                 ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
                 ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
                 ->selectRaw('SUM(COALESCE(SaleSlip.notax_sub_total,0))       AS sale_daily_amount')
+                ->selectRaw('CASE WHEN payment_method_type = 0 THEN SUM(COALESCE(SaleSlip.notax_sub_total,0)) ELSE 0 END AS sale_daily_amount_0')
+                ->selectRaw('CASE WHEN payment_method_type = 1 THEN SUM(COALESCE(SaleSlip.notax_sub_total,0)) ELSE 0 END AS sale_daily_amount_1')
                 ->join('sale_companies AS SaleCompany', function ($join) {
                     $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
                 })
@@ -396,12 +399,13 @@ class DailyPerformanceController extends Controller
                 })
                 ->where('SaleSlip.active', '=', '1')
                 ->if($dp_date_type == 1, function ($query) {
-                    return $query->groupBy('SaleSlip.date');
+                    return $query->groupBy('SaleSlip.date', 'SaleSlip.payment_method_type');
                 })
                 ->if($dp_date_type == 2, function ($query) {
-                    return $query->groupBy('SaleSlip.delivery_date');
+                    return $query->groupBy('SaleSlip.delivery_date', 'SaleSlip.payment_method_type');
                 })->get();
             }
+
             // 配列を組みなおす
             $sale_date_arr = array();
             if (!empty($saleSlipList)) {
@@ -413,9 +417,22 @@ class DailyPerformanceController extends Controller
                         $sale_date = $saleSlipVal->sale_slip_delivery_date;
                     }
 
-                    $sale_date_arr[$sale_date] = [
-                        "sale_daily_amount"  => $saleSlipVal->sale_daily_amount
-                    ];
+                    if (!isset($sale_date_arr[$sale_date])) {
+                        $sale_date_arr[$sale_date] = [
+                            "sale_daily_amount"    => 0,
+                            "sale_daily_amount_0"  => 0,
+                            "sale_daily_amount_1"  => 0,
+                        ];
+                    }
+
+                    $sale_date_arr[$sale_date]["sale_daily_amount"] += $saleSlipVal->sale_daily_amount;
+                    if (empty($sale_date_arr[$sale_date]["sale_daily_amount_0"])) {
+                        $sale_date_arr[$sale_date]["sale_daily_amount_0"] = $saleSlipVal->sale_daily_amount_0;
+                    }
+                    if (empty($sale_date_arr[$sale_date]["sale_daily_amount_1"])) {
+                        $sale_date_arr[$sale_date]["sale_daily_amount_1"] = $saleSlipVal->sale_daily_amount_1;
+                    }
+
                 }
             }
 
@@ -431,13 +448,21 @@ class DailyPerformanceController extends Controller
 
                 $supply_daily_amount = 0;
                 $sale_daily_amount   = 0;
+                $sale_daily_amount_0 = 0;
+                $sale_daily_amount_1 = 0;
 
                 if (isset($supply_date_arr[$date_val])) $supply_daily_amount = $supply_date_arr[$date_val]['supply_daily_amount'];
-                if (isset($sale_date_arr[$date_val]))   $sale_daily_amount   = $sale_date_arr[$date_val]['sale_daily_amount'];
+                if (isset($sale_date_arr[$date_val])) {
+                    $sale_daily_amount = $sale_date_arr[$date_val]['sale_daily_amount'];
+                    $sale_daily_amount_0 = $sale_date_arr[$date_val]['sale_daily_amount_0'];
+                    $sale_daily_amount_1 = $sale_date_arr[$date_val]['sale_daily_amount_1'];
+                }
 
                 $daily_performance_arr[$date_val] = [
-                    "supply_daily_amount"    => $supply_daily_amount,
-                    "sale_daily_amount"      => $sale_daily_amount,
+                    "supply_daily_amount" => $supply_daily_amount,
+                    "sale_daily_amount"   => $sale_daily_amount,
+                    "sale_daily_amount_0" => $sale_daily_amount_0,
+                    "sale_daily_amount_1" => $sale_daily_amount_1,
                 ];
 
                 $supply_total_amount   += $supply_daily_amount;
@@ -792,8 +817,12 @@ class DailyPerformanceController extends Controller
             // 製品DB取得
             $productList = DB::table('products AS Product')
             ->select(
-                'Product.name  AS product_name'
-            )->where([
+                'Product.name  AS product_name',
+                'Product.code AS product_code',
+                'Unit.name AS unit_name'
+            )->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
+            })->where([
                     ['Product.active', '=', '1'],
             ])->where(function($query) use ($input_text){
                 $query
@@ -806,7 +835,10 @@ class DailyPerformanceController extends Controller
 
                 foreach ($productList as $product_val) {
 
-                    array_push($auto_complete_array, $product_val->product_name);
+                    // サジェスト表示を「コード 商品名 単位」にする
+                    $suggest_text = '【' . $product_val->product_code . '】 ' . $product_val->product_name . ' (' . $product_val->unit_name . ')';
+
+                    array_push($auto_complete_array, $suggest_text);
                 }
             }
         }
@@ -824,7 +856,6 @@ class DailyPerformanceController extends Controller
         // 入力された値を取得
         $input_text = $request->inputText;
 
-        // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
             $product_code = $input_text;
             $product_name = null;

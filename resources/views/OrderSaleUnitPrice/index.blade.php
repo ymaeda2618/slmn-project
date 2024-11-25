@@ -136,21 +136,17 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 検索されて選択状態の企業を取得
-            var sale_submit_type_selected = $("#sale_submit_type_selected").val();
-            // 検索条件で設定された企業を設定
-            $('#sale_submit_type').val(sale_submit_type_selected);
-
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
             //-------------------------------------
-            $(document).on("keyup", "input", function(event) {
+            $(document).on("keydown", "input", function(event) {
 
                 if (event.keyCode === 13) { // Enterが押された時
 
                     var this_id = $(this).attr('id');
 
                     var tabindex = parseInt($(this).attr('tabindex'), 10);
+
                     if (isNaN(tabindex) && this_id == "search-btn") {
                         $('#index-search-form').submit();
                         return;

@@ -76,7 +76,8 @@ class SaleCompanyController extends Controller
                 'SaleCompany.closing_date  AS closing_date',
             )
             ->if(!empty($sale_company_name), function ($query) use ($sale_company_name) {
-                return $query->whereRaw('SaleCompany.name like "%'.$sale_company_name.'%"');
+                return $query->orWhere('SaleCompany.name', 'like', "%{$sale_company_name}%")
+                ->orWhere('SaleCompany.code', 'like', "%{$sale_company_name}%");
             })
             ->if(!empty($closing_date), function ($query) use ($closing_date) {
                 return $query->where('SaleCompany.closing_date', '=', $closing_date);

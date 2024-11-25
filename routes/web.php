@@ -42,6 +42,8 @@ Route::post('ProductConfirm', 'ProductController@confirm');
 Route::post('ProductComplete', 'ProductController@complete');
 Route::post('ProductEditComplete', 'ProductController@editComplete');
 Route::post('ProductAjaxAddStandard', 'ProductController@AjaxAddStandard');
+Route::post('ProductAjaxAutoCompleteProduct', 'ProductController@AjaxAutoCompleteProduct');
+Route::post('ProductEdit/AjaxAutoCompleteProduct', 'ProductController@AjaxAutoCompleteProduct');
 
 // 仕入先企業関連
 Route::get('SupplyCompanyEdit/{supply_company_id}', 'SupplyCompanyController@edit');

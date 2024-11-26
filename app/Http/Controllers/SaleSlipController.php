@@ -1461,9 +1461,14 @@ class SaleSlipController extends Controller
     {
         // 入力された値を取得
         $input_text = $request->inputText;
+        $brackets_forward = mb_strpos($input_text, "【");
+        $brackets_backward = mb_strpos($input_text, "】");
 
-        // すべて数字かどうかチェック
-        if (is_numeric($input_text)) {
+        if($brackets_forward == 0 && $brackets_backward != false) {
+            $length = $brackets_backward-1;
+            $product_code = substr($input_text, 3, $length); // substrでは「【」は2文字取る扱い
+            $product_name = null;
+        } else if (is_numeric($input_text)) { // すべて数字かどうかチェック
             $product_code = $input_text;
             $product_name = null;
         } else {

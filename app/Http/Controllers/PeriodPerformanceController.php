@@ -677,6 +677,7 @@ class PeriodPerformanceController extends Controller
             )->join('units AS Unit', function ($join) {
                 $join->on('Unit.id', '=', 'Product.unit_id');
             })->where([
+                    ['Product.display_flg', '=', '1'],
                     ['Product.active', '=', '1'],
             ])->where(function($query) use ($input_text){
                 $query

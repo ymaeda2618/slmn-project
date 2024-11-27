@@ -75,6 +75,13 @@
                     @endforeach
                 </select>
             </div>
+            <div class="form-group">
+                <label class="column-label" for="display_flg">サジェスト表示</label>
+                <select class="file-control" id="display_flg" name="data[Product][display_flg]">
+                    <option value="1">表示</option>
+                    <option value="0">非表示</option>
+                </select>
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
             <input type='hidden' name="submit_type" value="1">

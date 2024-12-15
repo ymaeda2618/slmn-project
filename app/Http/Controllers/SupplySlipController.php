@@ -74,23 +74,25 @@ class SupplySlipController extends Controller
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
-                $condition_date_type     = $request->data['SupplySlip']['date_type'];
-                $condition_company_code  = $request->data['SupplySlip']['supply_company_code'];
-                $condition_company_id    = $request->data['SupplySlip']['supply_company_id'];
-                $condition_company_text  = $request->data['SupplySlip']['supply_company_text'];
-                $condition_shop_code     = $request->data['SupplySlip']['supply_shop_code'];
-                $condition_shop_id       = $request->data['SupplySlip']['supply_shop_id'];
-                $condition_shop_text     = $request->data['SupplySlip']['supply_shop_text'];
-                $condition_product_code  = $request->data['SupplySlipDetail']['product_code'];
-                $condition_product_id    = $request->data['SupplySlipDetail']['product_id'];
-                $condition_product_text  = $request->data['SupplySlipDetail']['product_text'];
-                $condition_submit_type   = isset($request->data['SupplySlip']['supply_submit_type']) ? $request->data['SupplySlip']['supply_submit_type'] : 0;
+                $req_data = $request->data['SupplySlip'];
+
+                $condition_date_type     = isset($req_data['date_type']) ? $req_data['date_type'] : 1;
+                $condition_company_code  = isset($req_data['supply_company_code']) ? $req_data['supply_company_code'] : NULL;
+                $condition_company_id    = isset($req_data['supply_company_id']) ? $req_data['supply_company_id'] : NULL;
+                $condition_company_text  = isset($req_data['supply_company_text']) ? $req_data['supply_company_text'] : NULL;
+                $condition_shop_code     = isset($req_data['supply_shop_code']) ? $req_data['supply_shop_code'] : NULL;
+                $condition_shop_id       = isset($req_data['supply_shop_id']) ? $req_data['supply_shop_id'] : NULL;
+                $condition_shop_text     = isset($req_data['supply_shop_text']) ? $req_data['supply_shop_text'] : NULL;
+                $condition_product_code  = isset($req_data['product_code']) ? $req_data['product_code'] : NULL;
+                $condition_product_id    = isset($req_data['product_id']) ? $req_data['product_id'] : NULL;
+                $condition_product_text  = isset($req_data['product_text']) ? $req_data['product_text'] : NULL;
+                $condition_submit_type   = isset($req_data['supply_submit_type']) ? $req_data['supply_submit_type'] : 0;
                 $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
                 $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;
 
                 // 日付の設定
-                $condition_date_from     = $request->data['SupplySlip']['supply_date_from'];
-                $condition_date_to       = $request->data['SupplySlip']['supply_date_to'];
+                $condition_date_from     = isset($req_data['supply_date_from']) ? $req_data['supply_date_from'] : NULL;
+                $condition_date_to       = isset($req_data['supply_date_to']) ? $req_data['supply_date_to'] : NULL;
                 // どちらか片方しか入力されなかった場合は同じ日付を入れる
                 if (!empty($condition_date_from) && empty($condition_date_to)) {
                     $condition_date_to = $condition_date_from;

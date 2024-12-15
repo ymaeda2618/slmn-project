@@ -47,8 +47,7 @@ class SaleSlipController extends Controller
         }
 
         // postできたか、getできたか
-        if ($_SERVER["REQUEST_METHOD"] != "POST"
-        ) { // ページング処理
+        if ($_SERVER["REQUEST_METHOD"] != "POST") { // ページング処理
 
             $condition_date_type     = $request->session()->get('condition_date_type');
             $condition_date_from     = $request->session()->get('condition_date_from');
@@ -62,9 +61,6 @@ class SaleSlipController extends Controller
             $condition_company_code  = $request->session()->get('condition_company_code');
             $condition_company_id    = $request->session()->get('condition_company_id');
             $condition_company_text  = $request->session()->get('condition_company_text');
-            //$condition_shop_id       = $request->session()->get('condition_shop_id');
-            //$condition_shop_code     = $request->session()->get('condition_shop_code');
-            //$condition_shop_text     = $request->session()->get('condition_shop_text');
             $condition_payment_method_type      = $request->session()->get('condition_payment_method_type');
             $condition_payment_method_type_text = $request->session()->get('condition_payment_method_type_text');
             $condition_product_code  = $request->session()->get('condition_product_code');
@@ -94,33 +90,32 @@ class SaleSlipController extends Controller
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
-                $condition_date_type     = $request->data['SaleSlip']['date_type'];
-                $condition_company_code  = $request->data['SaleSlip']['sale_company_code'];
-                $condition_company_id    = $request->data['SaleSlip']['sale_company_id'];
-                $condition_company_text  = $request->data['SaleSlip']['sale_company_text'];
-                //$condition_shop_code     = $request->data['SaleSlip']['sale_shop_code'];
-                //$condition_shop_id       = $request->data['SaleSlip']['sale_shop_id'];
-                //$condition_shop_text     = $request->data['SaleSlip']['sale_shop_text'];
-                $condition_payment_method_type      = $request->data['SaleSlip']['payment_method_type'];
+                $req_data = $request->data['SaleSlip'];
+
+                $condition_date_type     = isset($req_data['date_type']) ? $req_data['date_type'] : NULL;
+                $condition_company_code  = isset($req_data['sale_company_code']) ? $req_data['sale_company_code'] : NULL;
+                $condition_company_id    = isset($req_data['sale_company_id']) ? $req_data['sale_company_id'] : NULL;
+                $condition_company_text  = isset($req_data['sale_company_text']) ? $req_data['sale_company_text'] : NULL;
+                $condition_payment_method_type = isset($req_data['sale_company_text']) ? $req_data['payment_method_type'] : NULL;
                 if($condition_payment_method_type == "") {
                     $condition_payment_method_type_text = "";
                 } else {
                     $condition_payment_method_type_text = $request->data['SaleSlip']['payment_method_type_text'];
                 }
-                $condition_product_code  = $request->data['SaleSlipDetail']['product_code'];
-                $condition_product_id    = $request->data['SaleSlipDetail']['product_id'];
-                $condition_product_text  = $request->data['SaleSlipDetail']['product_text'];
-                $condition_staff_code    = $request->data['SaleSlipDetail']['staff_code'];
-                $condition_staff_id      = $request->data['SaleSlipDetail']['staff_id'];
-                $condition_staff_text    = $request->data['SaleSlipDetail']['staff_text'];
+                $condition_product_code  = isset($req_data['product_code']) ? $req_data['product_code'] : NULL;
+                $condition_product_id    = isset($req_data['product_id']) ? $req_data['product_id'] : NULL;
+                $condition_product_text  = isset($req_data['product_text']) ? $req_data['product_text'] : NULL;
+                $condition_staff_code    = isset($req_data['staff_code']) ? $req_data['staff_code'] : NULL;
+                $condition_staff_id      = isset($req_data['staff_id']) ? $req_data['staff_id'] : NULL;
+                $condition_staff_text    = isset($req_data['staff_text']) ? $req_data['staff_text'] : NULL;
                 $condition_submit_type   = isset($request->data['SaleSlip']['sale_submit_type']) ? $request->data['SaleSlip']['sale_submit_type'] : 0;
                 $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
                 $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;
                 $condition_no_display    = isset($request->no_display) ? $request->no_display : 0;
 
                 // 日付の設定
-                $condition_date_from     = $request->data['SaleSlip']['sale_date_from'];
-                $condition_date_to       = $request->data['SaleSlip']['sale_date_to'];
+                $condition_date_from     = isset($req_data['sale_date_from']) ? $req_data['sale_date_from'] : NULL;
+                $condition_date_to       = isset($req_data['sale_date_to']) ? $req_data['sale_date_to'] : NULL;
                 // どちらか片方しか入力されなかった場合は同じ日付を入れる
                 if (!empty($condition_date_from) && empty($condition_date_to)) {
                     $condition_date_to = $condition_date_from;

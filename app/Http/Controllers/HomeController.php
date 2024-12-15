@@ -178,6 +178,123 @@ class HomeController extends Controller
         ]);
     }
 
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function top()
+    {
+        $supply_index_action = '../SupplySlipIndex';
+        $sale_index_action = '../SaleSlipIndex';
+
+        try {
+
+            // 本日を含めて過去3日のデータを集計する。
+            $today = date("Y-m-d");
+            $yesterday = date("Y-m-d", strtotime("-1 day"));
+            $the_day_before_yesterday = date("Y-m-d", strtotime("-2 day"));
+
+            // 実績のデータを入れる配列
+            $achievementsArray= [];
+
+            // 実績の日付を入れる
+            $achievementsArray = [
+                $today => [
+                    'date' => date("m月d日"),
+                    'supply' => [
+                        'count' => 0,
+                        'notax_amount' => 0,
+                    ],
+                    'sale' => [
+                        'count' => 0,
+                        'notax_amount' => 0,
+                    ],
+                ],
+                $yesterday => [
+                    'date' => date("m月d日", strtotime("-1 day")),
+                    'supply' => [
+                        'count' => 0,
+                        'notax_amount' => 0,
+                    ],
+                    'sale' => [
+                        'count' => 0,
+                        'notax_amount' => 0,
+                    ],
+                ],
+                $the_day_before_yesterday => [
+                    'date' => date("m月d日", strtotime("-2 day")),
+                    'supply' => [
+                        'count' => 0,
+                        'notax_amount' => 0,
+                    ],
+                    'sale' => [
+                        'count' => 0,
+                        'notax_amount' => 0,
+                    ],
+                ]
+            ];
+
+            // -----------
+            // 仕入金額取得
+            // -----------
+            $tmpSupplySlipInfoList = DB::table('supply_slips AS SupplySlip')
+            ->select(
+                'SupplySlip.date AS supply_slip_date'
+            )
+            ->selectRaw('count(SupplySlip.id) AS count')
+            ->selectRaw('SUM(COALESCE(SupplySlip.notax_sub_total,0)) AS notax_amount')
+            ->whereBetween('SupplySlip.date', [$the_day_before_yesterday, $today])
+            ->where('SupplySlip.active', '=', '1')
+            ->groupBy('SupplySlip.date')
+            ->get();
+
+
+            foreach ($tmpSupplySlipInfoList as $supplySlipInfo) {
+
+                // 件数と合計額を挿入する
+                $achievementsArray[$supplySlipInfo->supply_slip_date]['supply']['count'] = $supplySlipInfo->count;
+                $achievementsArray[$supplySlipInfo->supply_slip_date]['supply']['notax_amount'] = $supplySlipInfo->notax_amount;
+            }
+
+            // ---------
+            // 売上額取得
+            // ---------
+            $tmpSaleSlipInfoList = DB::table('sale_slips AS SaleSlip')
+            ->select(
+                'SaleSlip.date AS sale_slip_date'
+            )
+            ->selectRaw('count(SaleSlip.id) AS count')
+            ->selectRaw('SUM(COALESCE(SaleSlip.notax_sub_total,0)) AS notax_amount')
+            ->whereBetween('SaleSlip.date', [$the_day_before_yesterday, $today])
+            ->where('SaleSlip.active', '=', '1')
+            ->groupBy('SaleSlip.date')
+            ->get();
+
+            // 取得してきたデータを整形する
+            foreach ($tmpSaleSlipInfoList as $saleSlipInfo) {
+
+                // 件数と合計額を挿入する
+                $achievementsArray[$saleSlipInfo->sale_slip_date]['sale']['count'] = $saleSlipInfo->count;
+                $achievementsArray[$saleSlipInfo->sale_slip_date]['sale']['notax_amount'] = $saleSlipInfo->notax_amount;
+            }
+
+
+        } catch (\Exception $e) {
+
+            return view('home')->with([
+                'errorMessage' => $e
+            ]);
+
+        }
+
+        return view('homeindex')->with([
+            'supply_index_action' => $supply_index_action,
+            'sale_index_action'   => $sale_index_action,
+            'achievementsArray'   => $achievementsArray,
+        ]);
+    }
+
     public static function authOwnerCheck() {
 
         // ユーザ情報取得

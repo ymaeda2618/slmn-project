@@ -81,6 +81,14 @@
                 </select>
                 <input type='hidden' id='inventory_unit_id_selected' value='{{$editProduct->inventory_unit_id}}'>
             </div>
+            <div class="form-group">
+                <label class="column-label" for="display_flg">サジェスト表示</label>
+                <select class="file-control" id="display_flg" name="data[Product][display_flg]">
+                    <option value="1">表示</option>
+                    <option value="0">非表示</option>
+                </select>
+                <input type='hidden' id='display_flg_selected' value='{{$editProduct->display_flg}}'>
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">編集確認画面へ</button>
             <input type='hidden' name="data[Product][product_id]" value="{{$editProduct->product_id}}">
@@ -121,6 +129,11 @@
             var inventory_unit_id_selected = $("#inventory_unit_id_selected").val();
             // 検索条件で設定された値を設定
             $('#inventory_unit_id').val(inventory_unit_id_selected);
+
+            // 選択された値を取得
+            var display_selected = $("#display_flg_selected").val();
+            // 検索条件で設定された値を設定
+            $('#display_flg').val(display_selected);
         });
 
         $(document).ready(function() {

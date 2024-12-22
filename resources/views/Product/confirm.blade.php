@@ -51,6 +51,11 @@
                 <input type="text" class="form-control" value="{{$request->inventory_unit_name}}" readonly>
                 <input type="hidden" name="data[Product][inventory_unit_id]" value="{{$request->data['Product']['inventory_unit_id']}}">
             </div>
+            <div class="form-group">
+                <label class="column-label" for="display_flg">サジェスト表示</label>
+                <input type="text" class="form-control" value="{{$request->display_flg_name}}" readonly>
+                <input type="hidden" name="data[Product][display_flg]" value="{{$request->data['Product']['display_flg']}}">
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
             <input type='hidden' name="data[Product][product_id]" value="{{isset($request->data['Product']['product_id']) ? $request->data['Product']['product_id'] : 0}}">

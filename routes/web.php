@@ -17,8 +17,8 @@
 
 Auth::routes();
 
-Route::get('/', 'HomeController@index')->name('home');
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'HomeController@top')->name('top');
+Route::get('/home', 'HomeController@top')->name('top');
 
 // スタッフ関連
 Route::get('StaffEdit/{staff_id}', 'StaffController@edit');

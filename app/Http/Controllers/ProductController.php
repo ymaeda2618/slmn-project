@@ -8,7 +8,7 @@ use App\Product;
 use App\Standard;
 use App\Status;
 use App\Tax;
-use App\Unit;;
+use App\Unit;
 use Carbon\Carbon;
 use Exception;
 
@@ -199,7 +199,8 @@ class ProductController extends Controller
             'Product.name              AS product_name',
             'Product.yomi              AS yomi',
             'Product.unit_id           AS unit_id',
-            'Product.inventory_unit_id AS inventory_unit_id'
+            'Product.inventory_unit_id AS inventory_unit_id',
+            'Product.display_flg       AS display_flg'
         )
         ->where([
             ['Product.id', '=', $product_id],
@@ -309,6 +310,7 @@ class ProductController extends Controller
         $request->tax_name            = $taxList->name;
         $request->unit_name           = $unitList->name;
         $request->inventory_unit_name = $inventoryUnitList->name;
+        $request->display_flg_name    = $request->data['Product']['display_flg'] === "1" ? '表示' : '非表示';
 
         return view('Product.confirm')->with([
             "action_url"           => $action_url,
@@ -371,6 +373,7 @@ class ProductController extends Controller
             $Product->yomi              = $request->data['Product']['yomi'];                // ヨミガナ
             $Product->unit_id           = $request->data['Product']['unit_id'];             // 単位
             $Product->inventory_unit_id = $request->data['Product']['inventory_unit_id'];   // 仕入単位
+            $Product->display_flg       = $request->data['Product']['display_flg'];         // サジェスト表示
             $Product->modified_user_id  = $user_info_id;                                    // 更新者ユーザーID
             $Product->modified          = Carbon::now();                                    // 更新時間
 
@@ -504,6 +507,7 @@ class ProductController extends Controller
             $Product->yomi              = $request->data['Product']['yomi'];                // ヨミガナ
             $Product->unit_id           = $request->data['Product']['unit_id'];             // 単位
             $Product->inventory_unit_id = $request->data['Product']['inventory_unit_id'];   // 仕入単位
+            $Product->display_flg       = $request->data['Product']['display_flg'];         // サジェスト表示
             $Product->sort              = 100;                                              // 表示順
             $Product->created_user_id   = $user_info_id;                                    // 作成者ユーザーID
             $Product->created           = Carbon::now();                                    // 作成時間
@@ -619,6 +623,7 @@ class ProductController extends Controller
             )->join('units AS Unit', function ($join) {
                 $join->on('Unit.id', '=', 'Product.unit_id');
             })->where([
+                    ['Product.display_flg', '=', '1'],
                     ['Product.active', '=', '1'],
             ])->where(function($query) use ($input_text){
                 $query

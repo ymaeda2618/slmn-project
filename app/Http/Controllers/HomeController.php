@@ -185,8 +185,8 @@ class HomeController extends Controller
      */
     public function top()
     {
-        $supply_index_action = '../SupplySlipIndex';
-        $sale_index_action = '../SaleSlipIndex';
+        $supply_index_action = './SupplySlipIndex';
+        $sale_index_action = './SaleSlipIndex';
 
         try {
 

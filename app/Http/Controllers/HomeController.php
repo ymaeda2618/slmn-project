@@ -288,7 +288,7 @@ class HomeController extends Controller
 
         }
 
-        return view('homeindex')->with([
+        return view('top')->with([
             'supply_index_action' => $supply_index_action,
             'sale_index_action'   => $sale_index_action,
             'achievementsArray'   => $achievementsArray,

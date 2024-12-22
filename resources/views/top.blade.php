@@ -218,7 +218,8 @@
             border-radius: 0px 0px 10px 10px;
             display: flex;
             padding-top: 15px;
-            padding-left: 40px;
+            padding-left: 10px;
+            font-size: 13px;
         }
 
         .achievements {

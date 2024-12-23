@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Exception;
@@ -54,6 +55,7 @@ class CsvUploadController extends Controller
         $data_type_arr = [
             0 => "売上登録",
             1 => "マリネット仕入登録",
+            2 => "自動レジ登録",
         ];
 
         // tab_index=2の場合、履歴テーブルを取得
@@ -138,6 +140,11 @@ class CsvUploadController extends Controller
 
                     // マリネットデータ登録
                     $this->registerMarinetData($file, $user_info_id);
+
+                } elseif ($data_type == 2) {
+
+                    // 自動レジデータ登録
+                    $this->registerSmartOroshiData($file, $user_info_id);
 
                 } else {
 
@@ -901,6 +908,325 @@ class CsvUploadController extends Controller
         }
 
         return true;
+
+    }
+
+    /**
+     * 自動レジデータ登録
+     *
+     * @ file
+     * @ user_info_id
+     *
+     * CSV利用項目
+     * 3   日付
+     * 5   伝票番号
+     * 1  売上先コード
+     *   売上先名
+     *   売上先コード※水長水産のコード
+     *   売上先名 ※水長
+     * 24  商品コード
+     * 30  個数
+     * 29  数量
+     *   単位名
+     * 28  単価
+     * 35  金額(単価×数量)
+     * 25  商品名
+     * 27  税率名
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function registerSmartOroshiData($file, $user_info_id) {
+
+        $lines = [];
+        $csv_slip_details = []; // 伝票詳細配列を作成
+
+        $slip_no = 0;
+        $prev_slip_no = 0;
+
+        $notax_sub_total_8  = 0; // 8%課税対象額
+        $notax_sub_total_10 = 0; // 10%課税対象額
+        $notax_sub_total    = 0; // 課税対象額
+        $tax_total_8        = 0; // 8%税額
+        $tax_total_10       = 0; // 10%税額
+        $tax_total          = 0; // 税額合計
+        $sub_total_8        = 0; // 8%税込額
+        $sub_total_10       = 0; // 10%税込額
+        $sub_total          = 0; // 税込小計
+        $total              = 0; // 調整後税込額
+
+        foreach ($file as $key => $line) {
+
+            // ヘッダー行を飛ばす
+            if ($key == 0) {
+                continue;
+            }
+
+            // 想定するカラム数じゃない場合はエラーを飛ばす
+            if (count($line) != 36) {
+                throw new Exception("カラム数が想定と異なります。");
+            }
+
+            // 文字コード変換
+            $lines = mb_convert_encoding($line, 'UTF-8', 'ASCII, JIS, UTF-8, SJIS-win');
+
+            // =============================
+            // 登録対象のデータか確認する start
+            // =============================
+            // ------------------------------------
+            // 対象の企業がマスタに存在しているかチェック
+            // ------------------------------------
+            $sale_company_code = $lines[1];
+            $sale_company_result = DB::table('sale_companies AS SaleCompany')
+                ->where([
+                    ['SaleCompany.active', '=', '1'],
+                    ['SaleCompany.code', '=', $sale_company_code],
+                ])->first();
+
+            // 存在しない場合はデータ登録しない
+            if (empty($sale_company_result)) {
+                throw new Exception("対象の売上企業が存在しません。");
+            }
+
+            // ------------------------------------
+            // 対象の商品がマスタに存在しているかチェック
+            // ------------------------------------
+            $product_code = $lines[24];
+            $product_result = DB::table('products AS Product')
+            ->where([
+                ['Product.active', '=', '1'],
+                ['Product.code', '=', $product_code],
+            ])->first();
+
+            // 存在しない場合はデータ登録しない
+            if (empty($product_result)) {
+                throw new Exception("対象の商品が存在しません。");
+            }
+
+            // ------------------------
+            // 税率コード取得 1:8% 2:10%
+            // ------------------------
+            if ($lines[27] == 1) {
+                $tax_id = 2;
+            } elseif ($lines[27] == 3) {
+                $tax_id = 1;
+            } else {
+                throw new Exception("税率が設定されていません。");
+            }
+            // =============================
+            // 登録対象のデータか確認する end
+            // =============================
+
+            // 企業と商品関連情報を格納する
+            $sale_company_id   = $sale_company_result->id;
+            $product_id        = $product_result->id;
+            $product_name      = $product_result->name;
+            $unit_id           = $product_result->unit_id;
+            $inventory_unit_id = $product_result->inventory_unit_id;
+
+            // 前伝票番号を格納
+            $prev_slip_no = $slip_no;
+
+            // 伝票番号
+            $slip_no = $lines[5];
+
+            // 対象の伝票番号の配列の有無を確認
+            if (!isset($csv_slip_details[$slip_no])) {
+                if (!empty($prev_slip_no)) { // 前伝票番号が存在する場合はこちらの処理を行う
+                    $notax_sub_total    = $notax_sub_total_8 + $notax_sub_total_10; // 課税対象額
+                    $tax_total          = $tax_total_8 + $tax_total_10;             // 税額合計
+                    $sub_total          = $sub_total_8 + $sub_total_10;             // 税込小計
+                    $total              = $sub_total_8 + $sub_total_10;             // 調整後税込額 ※インフォマートでは調整額がないために同額
+
+                    // 前伝票番号の配列に計算データを入れる
+                    $csv_slip_details[$prev_slip_no]["notax_sub_total_8"]   = $notax_sub_total_8;   // 8%課税対象額
+                    $csv_slip_details[$prev_slip_no]["notax_sub_total_10"]  = $notax_sub_total_10;  // 10%課税対象額
+                    $csv_slip_details[$prev_slip_no]["notax_sub_total"]     = $notax_sub_total;     // 課税対象額
+                    $csv_slip_details[$prev_slip_no]["tax_total_8"]         = $tax_total_8;         // 8%税額
+                    $csv_slip_details[$prev_slip_no]["tax_total_10"]        = $tax_total_10;        // 10%税額
+                    $csv_slip_details[$prev_slip_no]["tax_total"]           = $tax_total;           // 税額合計
+                    $csv_slip_details[$prev_slip_no]["sub_total_8"]         = $sub_total_8;         // 8%税込額
+                    $csv_slip_details[$prev_slip_no]["sub_total_10"]        = $sub_total_10;        // 10%税込額
+                    $csv_slip_details[$prev_slip_no]["sub_total"]           = $sub_total;           // 税込小計
+                    $csv_slip_details[$prev_slip_no]["total"]               = $total;               // 調整後税込額
+                }
+
+                // 伝票番号の配列を新規作成
+                $csv_slip_details[$slip_no] = [
+                    "slip_date"           => $lines[3],             // 伝票日付
+                    "delivery_date"       => $lines[3],             // 納品日
+                    "slip_no"             => $slip_no,              // 伝票番号
+                    "company_id"          => $sale_company_id,      // 企業ID
+                    "staus_code"          => $lines[6],             // 取引種別
+                    "slip_detail"         => [],                    // 伝票詳細配列
+                ];
+
+                // 各変数を初期化
+                $notax_sub_total_8  = 0; // 8%課税対象額
+                $notax_sub_total_10 = 0; // 10%課税対象額
+                $notax_sub_total    = 0; // 課税対象額
+                $tax_total_8        = 0; // 8%税額
+                $tax_total_10       = 0; // 10%税額
+                $tax_total          = 0; // 税額合計
+                $sub_total_8        = 0; // 8%税込額
+                $sub_total_10       = 0; // 10%税込額
+                $sub_total          = 0; // 税込小計
+                $total              = 0; // 調整後税込額
+            }
+
+            $notax_price = $lines[35];
+
+            // 伝票詳細配列を作成する
+            $csv_slip_details[$slip_no]["slip_detail"][] = [
+                "product_id"          => $product_id,
+                "product_code"        => $product_code,
+                "product_name"        => $product_name,
+                "inventory_unit_id"   => $inventory_unit_id,
+                "inventory_unit_num"  => $lines[30],
+                "unit_id"             => $unit_id,
+                "unit_price"          => $lines[28],
+                "unit_num"            => $lines[29],
+                "notax_price"         => $notax_price,
+            ];
+
+            // 各金額を格納
+            if ($tax_id == 1) { // 8%対象商品の場合
+                $tax_price             = round($notax_price * 0.08);
+                $slip_detail_sub_total = $notax_price + $tax_price;
+
+                $notax_sub_total_8  += $notax_price;           // 8%課税対象額
+                $tax_total_8        += $tax_price;             // 8%税額
+                $sub_total_8        += $slip_detail_sub_total; // 8%税込額
+            } else { // 10%対象商品の場合
+                $tax_price             = round($notax_price * 0.1);
+                $slip_detail_sub_total = $notax_price + $tax_price;
+
+                $notax_sub_total_10 += $notax_price;           // 10%課税対象額
+                $tax_total_10       += $tax_price;             // 10%税額
+                $sub_total_10       += $slip_detail_sub_total; // 10%税込額
+            }
+
+        }
+
+        // 配列ループの最後の値を入れる
+        if (!empty($slip_no)) { // 前伝票番号が存在する場合はこちらの処理を行う
+            $notax_sub_total    = $notax_sub_total_8 + $notax_sub_total_10; // 課税対象額
+            $tax_total          = $tax_total_8 + $tax_total_10;             // 税額合計
+            $sub_total          = $sub_total_8 + $sub_total_10;             // 税込小計
+            $total              = $sub_total_8 + $sub_total_10;             // 調整後税込額 ※インフォマートでは調整額がないために同額
+
+            // 前伝票番号の配列に計算データを入れる
+            $csv_slip_details[$slip_no]["notax_sub_total_8"]   = $notax_sub_total_8;   // 8%課税対象額
+            $csv_slip_details[$slip_no]["notax_sub_total_10"]  = $notax_sub_total_10;  // 10%課税対象額
+            $csv_slip_details[$slip_no]["notax_sub_total"]     = $notax_sub_total;     // 課税対象額
+            $csv_slip_details[$slip_no]["tax_total_8"]         = $tax_total_8;         // 8%税額
+            $csv_slip_details[$slip_no]["tax_total_10"]        = $tax_total_10;        // 10%税額
+            $csv_slip_details[$slip_no]["tax_total"]           = $tax_total;           // 税額合計
+            $csv_slip_details[$slip_no]["sub_total_8"]         = $sub_total_8;         // 8%税込額
+            $csv_slip_details[$slip_no]["sub_total_10"]        = $sub_total_10;        // 10%税込額
+            $csv_slip_details[$slip_no]["sub_total"]           = $sub_total;           // 税込小計
+            $csv_slip_details[$slip_no]["total"]               = $total;               // 調整後税込額
+        }
+
+        ksort($csv_slip_details);
+
+        // 作成した伝票配列を登録する
+        foreach ($csv_slip_details as $key => $csv_slip_detail_val) {
+            // 配列から変数取得
+            $slip_date           = $csv_slip_detail_val["slip_date"];           // 伝票日付
+            $delivery_date       = $csv_slip_detail_val["delivery_date"];       // 納品日
+            $slip_no             = $csv_slip_detail_val["slip_no"];             // 伝票番号
+            $notax_sub_total_8   = $csv_slip_detail_val["notax_sub_total_8"];   // 8%課税対象額
+            $notax_sub_total_10  = $csv_slip_detail_val["notax_sub_total_10"];  // 10%課税対象額
+            $notax_sub_total     = $csv_slip_detail_val["notax_sub_total"];     // 課税対象額
+            $tax_total_8         = $csv_slip_detail_val["tax_total_8"];         // 8%税額
+            $tax_total_10        = $csv_slip_detail_val["tax_total_10"];        // 10%税額
+            $tax_total           = $csv_slip_detail_val["tax_total"];           // 税額合計
+            $sub_total_8         = $csv_slip_detail_val["sub_total_8"];         // 8%税込額
+            $sub_total_10        = $csv_slip_detail_val["sub_total_10"];        // 10%税込額
+            $sub_total           = $csv_slip_detail_val["sub_total"];           // 税込小計
+            $total               = $csv_slip_detail_val["total"];               // 調整後税込額
+
+            // 伝票を登録
+            $sale_slip_check = DB::table('sale_slips AS SaleSlip')
+            ->where([
+                ['SaleSlip.active', '=', '1'],
+                ['SaleSlip.info_mart_slip_no', '=', $slip_no],
+            ])->first();
+
+            // 対象の伝票が存在する場合
+            if (!empty($sale_slip_check)) {
+                // sale_slipsのIDを取得
+                $sale_slip_id = $sale_slip_check->id;
+
+                // sale_slipsと紐づくsale_slip_detailsを更新
+                SaleSlip::where('id', '=', $sale_slip_id)->update([
+                    'active' => 0
+                ]);
+                SaleSlipDetail::where('sale_slip_id', '=', $sale_slip_id)->update([
+                    'active' => 0
+                ]);
+            }
+
+            $SaleSlip = new SaleSlip();
+            $SaleSlip->info_mart_slip_no  = 0;                     // インフォマートではないので0固定
+            $SaleSlip->date               = $slip_date;            // 伝票日付
+            $SaleSlip->delivery_date      = $delivery_date;        // 納品日
+            $SaleSlip->sale_company_id    = $sale_company_id;      // 売上先ID
+            $SaleSlip->notax_sub_total_8  = $notax_sub_total_8;    // 8%課税対象額
+            $SaleSlip->notax_sub_total_10 = $notax_sub_total_10;   // 10%課税対象額
+            $SaleSlip->notax_sub_total    = $notax_sub_total;      // 税抜合計額
+            $SaleSlip->tax_total_8        = $tax_total_8;          // 8%課税対象額
+            $SaleSlip->tax_total_10       = $tax_total_10;         // 10%課税対象額
+            $SaleSlip->tax_total          = $tax_total;            // 税抜合計額
+            $SaleSlip->sub_total_8        = $sub_total_8;          // 8%合計額
+            $SaleSlip->sub_total_10       = $sub_total_10;         // 10%合計額
+            $SaleSlip->sub_total          = $sub_total;            // 配送額
+            $SaleSlip->delivery_price     = 0;                     // 配送額
+            $SaleSlip->adjust_price       = 0;                     // 調整額
+            $SaleSlip->total              = $total;                // 合計額
+            $SaleSlip->sale_submit_type   = 1;                     // 登録タイプ
+            $SaleSlip->sort               = 100;                   // ソート
+            $SaleSlip->created_user_id    = $user_info_id;         // 作成者ユーザーID
+            $SaleSlip->created            = Carbon::now();         // 作成時間
+            $SaleSlip->modified_user_id   = $user_info_id;         // 更新者ユーザーID
+            $SaleSlip->modified           = Carbon::now();         // 更新時間
+            $SaleSlip->save();
+            $sale_slip_id = $SaleSlip->id;
+
+
+            // 伝票詳細の登録処理
+            $slip_detail_no = 1;
+            foreach ($csv_slip_detail_val["slip_detail"] as $slip_detail) {
+                $product_id           = $slip_detail["product_id"];           // 製品ID
+                $product_code         = $slip_detail["product_code"];         // 製品code
+                $product_name         = $slip_detail["product_name"];         // 製品名
+                $inventory_unit_id    = $slip_detail["inventory_unit_id"];    // 入数ID
+                $inventory_unit_num   = $slip_detail["inventory_unit_num"];   // 入数
+                $unit_price           = $slip_detail["unit_price"];           // 単価
+                $unit_num             = $slip_detail["unit_num"];             // 数量
+                $notax_price          = $slip_detail["notax_price"];          // 金額
+
+                // sale_slip_detailsを登録する
+                $SaleSlipDetail                     = new SaleSlipDetail();
+                $SaleSlipDetail->sale_slip_id       = $sale_slip_id;
+                $SaleSlipDetail->product_id         = $product_id;
+                $SaleSlipDetail->unit_price         = $unit_price;
+                $SaleSlipDetail->unit_num           = $unit_num;
+                $SaleSlipDetail->notax_price        = $notax_price;
+                $SaleSlipDetail->unit_id            = $unit_id;
+                $SaleSlipDetail->inventory_unit_id  = $inventory_unit_id;
+                $SaleSlipDetail->inventory_unit_num = $inventory_unit_num;
+                $SaleSlipDetail->staff_id           = 9;
+                $SaleSlipDetail->sort               = $slip_detail_no;
+                $SaleSlipDetail->created_user_id    = $user_info_id;
+                $SaleSlipDetail->created            = Carbon::now();
+                $SaleSlipDetail->modified_user_id   = $user_info_id;
+                $SaleSlipDetail->modified           = Carbon::now();
+                $SaleSlipDetail->save();
+
+                $slip_detail_no++;
+            }
+        }
 
     }
 }

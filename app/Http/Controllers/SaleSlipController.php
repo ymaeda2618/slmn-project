@@ -91,7 +91,11 @@ class SaleSlipController extends Controller
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
                 $req_data = $request->data['SaleSlip'];
-                $req_detail_data = $request->data['SaleSlipDetail'];
+                if (isset($request->data['SaleSlipDetail'])) {
+                    $req_detail_data = $request->data['SaleSlipDetail'];
+                } else {
+                    $req_detail_data = null;
+                }
 
                 $condition_date_type     = isset($req_data['date_type']) ? $req_data['date_type'] : NULL;
                 $condition_company_code  = isset($req_data['sale_company_code']) ? $req_data['sale_company_code'] : NULL;

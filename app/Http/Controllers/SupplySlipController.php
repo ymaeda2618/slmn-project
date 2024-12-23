@@ -75,6 +75,7 @@ class SupplySlipController extends Controller
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
                 $req_data = $request->data['SupplySlip'];
+                $req_detail_data = $request->data['SupplySlipDetail'];
 
                 $condition_date_type     = isset($req_data['date_type']) ? $req_data['date_type'] : 1;
                 $condition_company_code  = isset($req_data['supply_company_code']) ? $req_data['supply_company_code'] : NULL;
@@ -83,9 +84,9 @@ class SupplySlipController extends Controller
                 $condition_shop_code     = isset($req_data['supply_shop_code']) ? $req_data['supply_shop_code'] : NULL;
                 $condition_shop_id       = isset($req_data['supply_shop_id']) ? $req_data['supply_shop_id'] : NULL;
                 $condition_shop_text     = isset($req_data['supply_shop_text']) ? $req_data['supply_shop_text'] : NULL;
-                $condition_product_code  = isset($req_data['product_code']) ? $req_data['product_code'] : NULL;
-                $condition_product_id    = isset($req_data['product_id']) ? $req_data['product_id'] : NULL;
-                $condition_product_text  = isset($req_data['product_text']) ? $req_data['product_text'] : NULL;
+                $condition_product_code  = isset($req_detail_data['product_code']) ? $req_detail_data['product_code'] : NULL;
+                $condition_product_id    = isset($req_detail_data['product_id']) ? $req_detail_data['product_id'] : NULL;
+                $condition_product_text  = isset($req_detail_data['product_text']) ? $req_detail_data['product_text'] : NULL;
                 $condition_submit_type   = isset($req_data['supply_submit_type']) ? $req_data['supply_submit_type'] : 0;
                 $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
                 $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;

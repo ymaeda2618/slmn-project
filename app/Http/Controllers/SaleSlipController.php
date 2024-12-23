@@ -91,6 +91,7 @@ class SaleSlipController extends Controller
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
                 $req_data = $request->data['SaleSlip'];
+                $req_detail_data = $request->data['SaleSlipDetail'];
 
                 $condition_date_type     = isset($req_data['date_type']) ? $req_data['date_type'] : NULL;
                 $condition_company_code  = isset($req_data['sale_company_code']) ? $req_data['sale_company_code'] : NULL;
@@ -102,12 +103,12 @@ class SaleSlipController extends Controller
                 } else {
                     $condition_payment_method_type_text = $request->data['SaleSlip']['payment_method_type_text'];
                 }
-                $condition_product_code  = isset($req_data['product_code']) ? $req_data['product_code'] : NULL;
-                $condition_product_id    = isset($req_data['product_id']) ? $req_data['product_id'] : NULL;
-                $condition_product_text  = isset($req_data['product_text']) ? $req_data['product_text'] : NULL;
-                $condition_staff_code    = isset($req_data['staff_code']) ? $req_data['staff_code'] : NULL;
-                $condition_staff_id      = isset($req_data['staff_id']) ? $req_data['staff_id'] : NULL;
-                $condition_staff_text    = isset($req_data['staff_text']) ? $req_data['staff_text'] : NULL;
+                $condition_product_code  = isset($req_detail_data['product_code']) ? $req_detail_data['product_code'] : NULL;
+                $condition_product_id    = isset($req_detail_data['product_id']) ? $req_detail_data['product_id'] : NULL;
+                $condition_product_text  = isset($req_detail_data['product_text']) ? $req_detail_data['product_text'] : NULL;
+                $condition_staff_code    = isset($req_detail_data['staff_code']) ? $req_detail_data['staff_code'] : NULL;
+                $condition_staff_id      = isset($req_detail_data['staff_id']) ? $req_detail_data['staff_id'] : NULL;
+                $condition_staff_text    = isset($req_detail_data['staff_text']) ? $req_detail_data['staff_text'] : NULL;
                 $condition_submit_type   = isset($request->data['SaleSlip']['sale_submit_type']) ? $request->data['SaleSlip']['sale_submit_type'] : 0;
                 $condition_display_sort  = isset($request->display_sort) ? $request->display_sort : 0;
                 $condition_display_num   = isset($request->display_num) ? $request->display_num : 20;

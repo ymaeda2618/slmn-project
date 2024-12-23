@@ -75,7 +75,11 @@ class SupplySlipController extends Controller
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
                 $req_data = $request->data['SupplySlip'];
-                $req_detail_data = $request->data['SupplySlipDetail'];
+                if (isset($request->data['SupplySlipDetail'])) {
+                    $req_detail_data = $request->data['SupplySlipDetail'];
+                } else {
+                    $req_detail_data = null;
+                }
 
                 $condition_date_type     = isset($req_data['date_type']) ? $req_data['date_type'] : 1;
                 $condition_company_code  = isset($req_data['supply_company_code']) ? $req_data['supply_company_code'] : NULL;

@@ -314,8 +314,8 @@ class DailyPerformanceController extends Controller
                 ->selectRaw('DATE_FORMAT(SaleSlip.date, "%Y-%m-%d")          AS sale_slip_date')
                 ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%Y-%m-%d") AS sale_slip_delivery_date')
                 ->selectRaw('SUM(COALESCE(SaleSlipDetail.notax_price,0))           AS sale_daily_amount')
-                ->selectRaw('CASE WHEN payment_method_type = 0 THEN SUM(COALESCE(SaleSlip.notax_price,0)) ELSE 0 END AS sale_daily_amount_0')
-                ->selectRaw('CASE WHEN payment_method_type = 1 THEN SUM(COALESCE(SaleSlip.notax_price,0)) ELSE 0 END AS sale_daily_amount_1')
+                ->selectRaw('CASE WHEN payment_method_type = 0 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0)) ELSE 0 END AS sale_daily_amount_0')
+                ->selectRaw('CASE WHEN payment_method_type = 1 THEN SUM(COALESCE(SaleSlipDetail.notax_price,0)) ELSE 0 END AS sale_daily_amount_1')
                 ->join('sale_slips as SaleSlip', function ($join) {
                     $join->on('SaleSlip.id', '=', 'SaleSlipDetail.sale_slip_id')
                     ->where('SaleSlip.active', '=', true);

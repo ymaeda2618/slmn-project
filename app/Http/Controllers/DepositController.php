@@ -852,10 +852,12 @@ class DepositController extends Controller
             'SaleCompany.postal_code                     AS company_postal_code',
             'SaleCompany.address                         AS company_address',
             'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
-            'SaleShop.id                                 AS shop_id',
-            'SaleShop.name                               AS shop_name',
-            'SaleShop.postal_code                        AS shop_postal_code',
-            'SaleShop.address                            AS shop_address',
+            'SaleCompany.invoice_display_name            AS company_invoice_display_name',
+            'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
+            // 'SaleShop.id                                 AS shop_id',
+            // 'SaleShop.name                               AS shop_name',
+            // 'SaleShop.postal_code                        AS shop_postal_code',
+            // 'SaleShop.address                            AS shop_address',
             'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
             'SaleSlipDetail.unit_price                   AS unit_price',
             'SaleSlipDetail.unit_num                     AS unit_num',
@@ -870,10 +872,10 @@ class DepositController extends Controller
         ->join('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
         })
-        ->leftJoin('sale_shops as SaleShop', function ($join) {
-            $join->on('SaleShop.id', '=', 'Deposit.sale_shop_id')
-                 ->where('SaleShop.active', '=', true);
-        })
+        // ->leftJoin('sale_shops as SaleShop', function ($join) {
+        //     $join->on('SaleShop.id', '=', 'Deposit.sale_shop_id')
+        //          ->where('SaleShop.active', '=', true);
+        // })
         ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
             $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
                  ->where('DepositWithdrawalDetail.type', '=', '2'); // 入出金タイプ 1:出金, 2:入金
@@ -1007,7 +1009,11 @@ class DepositController extends Controller
 
                 } else {
                     $companyId = $depositDatas->company_id;
-                    $calcDepositList['company_info']['name']    = $depositDatas->company_name;
+                    $calcDepositList['company_info']['name'] = $depositDatas->company_name;
+                    // 請求書用フラグが有効の場合は請求書用の名前を使用する
+                    if ($depositDatas->company_invoice_display_flg) {
+                        $calcDepositList['company_info']['name'] = $depositDatas->company_invoice_display_name;
+                    }
                     $calcDepositList['company_info']['address'] = $depositDatas->company_address;
                     // 郵便番号は間にハイフンを入れる
                     $calcDepositList['company_info']['code'] = '';

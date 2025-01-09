@@ -105,6 +105,17 @@
                 <label class="column-label" for="bank_account">口座番号<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="bank_account" name="data[SaleCompany][bank_account]">
             </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_flg">請求書表示フラグ<font color="red">※任意</font></label>
+                <select class="file-control" id="invoice_display_flg" name="data[SaleCompany][invoice_display_flg]">
+                    <option value="0">無効</option>
+                    <option value="1">有効</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_name" name="data[SaleCompany][invoice_display_name]">
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
             <input type='hidden' name="submit_type" value="1">

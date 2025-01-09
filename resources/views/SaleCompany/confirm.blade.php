@@ -68,6 +68,16 @@
                 <label class="column-label" for="bank_account">口座番号<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="bank_account" name="data[SaleCompany][bank_account]" value="{{$request->data['SaleCompany']['bank_account']}}" readonly>
             </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_flg">請求書表示フラグ<font color="red">※任意</font></label> @if($request->data['SaleCompany']['invoice_display_flg'] == 0)
+                <input type="text" class="form-control" id="invoice_display_flg_text" name="data[SaleCompany][invoice_display_flg_text]" value="無効" readonly> @else
+                <input type="text" class="form-control" id="invoice_display_flg_text" name="data[SaleCompany][invoice_display_flg_text]" value="有効" readonly> @endif
+                <input type='hidden' name="data[SaleCompany][invoice_display_flg]" value="{{$request->data['SaleCompany']['invoice_display_flg']}}">
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_name" name="data[SaleCompany][invoice_display_name]" value="{{$request->data['SaleCompany']['invoice_display_name']}}" readonly>
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
             <input type='hidden' name="data[SaleCompany][sale_company_id]" value="{{isset($request->data['SaleCompany']['sale_company_id']) ? $request->data['SaleCompany']['sale_company_id'] : 0}}">

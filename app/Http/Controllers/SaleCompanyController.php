@@ -32,7 +32,7 @@ class SaleCompanyController extends Controller
         $path_array   = explode('/', $request_path);
 
         // ページングの番号の有無でindexのaction先を変更
-        if(count($path_array) > 1){
+        if (count($path_array) > 1) {
             $search_action = '../SaleCompanyIndex';
         } else {
             $search_action = './SaleCompanyIndex';
@@ -97,8 +97,8 @@ class SaleCompanyController extends Controller
 
         return view('SaleCompany.index')->with([
             "sale_company_name" => $sale_company_name,
-            "closing_date"        => $closing_date,
-            "search_action"       => $search_action,
+            "closing_date"      => $closing_date,
+            "search_action"     => $search_action,
             "saleCompanyList"   => $saleCompanyList,
         ]);
     }
@@ -113,20 +113,22 @@ class SaleCompanyController extends Controller
         // 売上先企業を取得
         $editSaleCompany = DB::table('sale_companies AS SaleCompany')
         ->select(
-            'SaleCompany.id            AS sale_company_id',
-            'SaleCompany.code          AS code',
-            'SaleCompany.name          AS sale_company_name',
-            'SaleCompany.yomi          AS yomi',
-            'SaleCompany.tax_calc_type AS tax_calc_type',
-            'SaleCompany.closing_date  AS closing_date',
-            'SaleCompany.postal_code   AS postal_code',
-            'SaleCompany.address       AS address',
-            'SaleCompany.bank_code     AS bank_code',
-            'SaleCompany.bank_name     AS bank_name',
-            'SaleCompany.branch_code   AS branch_code',
-            'SaleCompany.branch_name   AS branch_name',
-            'SaleCompany.bank_type     AS bank_type',
-            'SaleCompany.bank_account  AS bank_account',
+            'SaleCompany.id                   AS sale_company_id',
+            'SaleCompany.code                 AS code',
+            'SaleCompany.name                 AS sale_company_name',
+            'SaleCompany.yomi                 AS yomi',
+            'SaleCompany.tax_calc_type        AS tax_calc_type',
+            'SaleCompany.closing_date         AS closing_date',
+            'SaleCompany.postal_code          AS postal_code',
+            'SaleCompany.address              AS address',
+            'SaleCompany.bank_code            AS bank_code',
+            'SaleCompany.bank_name            AS bank_name',
+            'SaleCompany.branch_code          AS branch_code',
+            'SaleCompany.branch_name          AS branch_name',
+            'SaleCompany.bank_type            AS bank_type',
+            'SaleCompany.bank_account         AS bank_account',
+            'SaleCompany.invoice_display_flg  AS invoice_display_flg',
+            'SaleCompany.invoice_display_name AS invoice_display_name',
         )
         ->where([
             ['SaleCompany.id', '=', $sale_company_id],
@@ -135,7 +137,7 @@ class SaleCompanyController extends Controller
         ->first();
 
         // エラーメッセージ取得
-        $error_message       = $request->session()->get('error_message');
+        $error_message = $request->session()->get('error_message');
         $request->session()->forget('error_message');
 
         return view('SaleCompany.edit')->with([
@@ -153,7 +155,7 @@ class SaleCompanyController extends Controller
     public function create(Request $request)
     {
         // エラーメッセージ取得
-        $error_message       = $request->session()->get('error_message');
+        $error_message = $request->session()->get('error_message');
         $request->session()->forget('error_message');
 
         return view('SaleCompany.create')->with([
@@ -162,14 +164,14 @@ class SaleCompanyController extends Controller
     }
 
      /**
-     * スタッフ新規追加　確認
+     * 売上先企業入力内容　確認
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function confirm(Request $request)
     {
 
-        if($request->submit_type == 1){
+        if ($request->submit_type == 1) {
             $action_url = './SaleCompanyComplete';
         } else {
             $action_url = './SaleCompanyEditComplete';
@@ -215,7 +217,7 @@ class SaleCompanyController extends Controller
                 ['SaleCompany.code', '=', $sale_company_code],
             ])->orderBy('id', 'desc')->first();
 
-            if (!empty($SaleCompanyCodeCheck)){
+            if (!empty($SaleCompanyCodeCheck)) {
 
                 $exception_type = 1;
 
@@ -226,21 +228,23 @@ class SaleCompanyController extends Controller
             // 保存処理を行う
             //---------------
             $SaleCompany = \App\SaleCompany::find($request->data['SaleCompany']['sale_company_id']);
-            $SaleCompany->code              = $sale_company_code;
-            $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
-            $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
-            $SaleCompany->tax_calc_type     = $request->data['SaleCompany']['tax_calc_type'];
-            $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
-            $SaleCompany->postal_code       = $request->data['SaleCompany']['postal_code'];
-            $SaleCompany->address           = $request->data['SaleCompany']['address'];
-            $SaleCompany->bank_code         = $request->data['SaleCompany']['bank_code'];
-            $SaleCompany->bank_name         = $request->data['SaleCompany']['bank_name'];
-            $SaleCompany->branch_code       = $request->data['SaleCompany']['branch_code'];
-            $SaleCompany->branch_name       = $request->data['SaleCompany']['branch_name'];
-            $SaleCompany->bank_type         = $request->data['SaleCompany']['bank_type'];
-            $SaleCompany->bank_account      = $request->data['SaleCompany']['bank_account'];
-            $SaleCompany->modified_user_id  = $user_info_id;               // 更新者ユーザーID
-            $SaleCompany->modified          = Carbon::now();               // 更新時間
+            $SaleCompany->code                 = $sale_company_code;
+            $SaleCompany->name                 = $request->data['SaleCompany']['sale_company_name'];
+            $SaleCompany->yomi                 = $request->data['SaleCompany']['yomi'];
+            $SaleCompany->tax_calc_type        = $request->data['SaleCompany']['tax_calc_type'];
+            $SaleCompany->closing_date         = $request->data['SaleCompany']['closing_date'];
+            $SaleCompany->postal_code          = $request->data['SaleCompany']['postal_code'];
+            $SaleCompany->address              = $request->data['SaleCompany']['address'];
+            $SaleCompany->bank_code            = $request->data['SaleCompany']['bank_code'];
+            $SaleCompany->bank_name            = $request->data['SaleCompany']['bank_name'];
+            $SaleCompany->branch_code          = $request->data['SaleCompany']['branch_code'];
+            $SaleCompany->branch_name          = $request->data['SaleCompany']['branch_name'];
+            $SaleCompany->bank_type            = $request->data['SaleCompany']['bank_type'];
+            $SaleCompany->bank_account         = $request->data['SaleCompany']['bank_account'];
+            $SaleCompany->invoice_display_flg  = $request->data['SaleCompany']['invoice_display_flg'];
+            $SaleCompany->invoice_display_name = $request->data['SaleCompany']['invoice_display_name'];
+            $SaleCompany->modified_user_id     = $user_info_id;               // 更新者ユーザーID
+            $SaleCompany->modified             = Carbon::now();               // 更新時間
 
             $SaleCompany->save();
 
@@ -249,7 +253,7 @@ class SaleCompanyController extends Controller
 
             DB::rollback();
 
-            if($exception_type == 1){ // 登録済みのコードを指定の場合
+            if ($exception_type == 1) { // 登録済みのコードを指定の場合
 
                 $errorMsg = "指定のコードは既に登録済みです。";
                 $request->session()->put('error_message', $errorMsg);
@@ -289,7 +293,7 @@ class SaleCompanyController extends Controller
         try {
 
             // codeが入力されていない場合
-            if(empty($request->data['SaleCompany']['code'])){
+            if (empty($request->data['SaleCompany']['code'])) {
 
                 do {
 
@@ -347,25 +351,27 @@ class SaleCompanyController extends Controller
             // 保存処理を行う
             //---------------
             $SaleCompany = new SaleCompany;
-            $SaleCompany->code              = $sale_company_code;
-            $SaleCompany->name              = $request->data['SaleCompany']['sale_company_name'];
-            $SaleCompany->yomi              = $request->data['SaleCompany']['yomi'];
-            $SaleCompany->tax_calc_type     = $request->data['SaleCompany']['tax_calc_type'];
-            $SaleCompany->closing_date      = $request->data['SaleCompany']['closing_date'];
-            $SaleCompany->postal_code       = $request->data['SaleCompany']['postal_code'];
-            $SaleCompany->address           = $request->data['SaleCompany']['address'];
-            $SaleCompany->bank_code         = $request->data['SaleCompany']['bank_code'];
-            $SaleCompany->bank_name         = $request->data['SaleCompany']['bank_name'];
-            $SaleCompany->branch_code       = $request->data['SaleCompany']['branch_code'];
-            $SaleCompany->branch_name       = $request->data['SaleCompany']['branch_name'];
-            $SaleCompany->bank_type         = $request->data['SaleCompany']['bank_type'];
-            $SaleCompany->bank_account      = $request->data['SaleCompany']['bank_account'];
-            $SaleCompany->sort              = 100;
-            $SaleCompany->active            = 1;
-            $SaleCompany->created_user_id   = $user_info_id;               // 作成者ユーザーID
-            $SaleCompany->created           = Carbon::now();               // 作成時間
-            $SaleCompany->modified_user_id  = $user_info_id;               // 更新者ユーザーID
-            $SaleCompany->modified          = Carbon::now();               // 更新時間
+            $SaleCompany->code                 = $sale_company_code;
+            $SaleCompany->name                 = $request->data['SaleCompany']['sale_company_name'];
+            $SaleCompany->yomi                 = $request->data['SaleCompany']['yomi'];
+            $SaleCompany->tax_calc_type        = $request->data['SaleCompany']['tax_calc_type'];
+            $SaleCompany->closing_date         = $request->data['SaleCompany']['closing_date'];
+            $SaleCompany->postal_code          = $request->data['SaleCompany']['postal_code'];
+            $SaleCompany->address              = $request->data['SaleCompany']['address'];
+            $SaleCompany->bank_code            = $request->data['SaleCompany']['bank_code'];
+            $SaleCompany->bank_name            = $request->data['SaleCompany']['bank_name'];
+            $SaleCompany->branch_code          = $request->data['SaleCompany']['branch_code'];
+            $SaleCompany->branch_name          = $request->data['SaleCompany']['branch_name'];
+            $SaleCompany->bank_type            = $request->data['SaleCompany']['bank_type'];
+            $SaleCompany->bank_account         = $request->data['SaleCompany']['bank_account'];
+            $SaleCompany->invoice_display_flg  = $request->data['SaleCompany']['invoice_display_flg'];
+            $SaleCompany->invoice_display_name = $request->data['SaleCompany']['invoice_display_name'];
+            $SaleCompany->sort                 = 100;
+            $SaleCompany->active               = 1;
+            $SaleCompany->created_user_id      = $user_info_id;               // 作成者ユーザーID
+            $SaleCompany->created              = Carbon::now();               // 作成時間
+            $SaleCompany->modified_user_id     = $user_info_id;               // 更新者ユーザーID
+            $SaleCompany->modified             = Carbon::now();               // 更新時間
 
             $SaleCompany->save();
 
@@ -374,7 +380,7 @@ class SaleCompanyController extends Controller
 
             DB::rollback();
 
-            if($exception_type == 1){ // 登録済みのコードを指定の場合
+            if ($exception_type == 1) { // 登録済みのコードを指定の場合
 
                 $errorMsg = "指定のコードは既に登録済みです。";
                 $request->session()->put('error_message', $errorMsg);

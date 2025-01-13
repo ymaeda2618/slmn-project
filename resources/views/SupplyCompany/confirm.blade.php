@@ -63,7 +63,7 @@
                 <input type="text" class="form-control" id="bank_account" name="data[SupplyCompany][bank_account]" value="{{$request->data['SupplyCompany']['bank_account']}}" readonly>
             </div>
             <br>
-            <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
+            <button id="create-submit-btn" type="submit" class="btn btn-primary">登録完了画面へ</button>
             <input type='hidden' name="data[SupplyCompany][supply_company_id]" value="{{isset($request->data['SupplyCompany']['supply_company_id']) ? $request->data['SupplyCompany']['supply_company_id'] : 0}}">
         </form>
 

@@ -24,20 +24,6 @@
                 <input type='hidden' id='product_type_selected' value='{{$editProduct-> product_type}}'>
             </div>
             <div class="form-group">
-                <label class="column-label" for="standard_id">規格</label>
-                <table id='standart_list_area'>
-                    @foreach ($standardList as $standards)
-                    <tr id='standart_list_{{ $standards->status_sort }}' class='standard_list'>
-                        <td>
-                            <input type="text" class="form-control" id="standard_id" name="data[standard][standard_name][{{ $standards->standard_id }}]" value='{{ $standards->standard_name }}'>
-                        </td>
-                    </tr>
-                    @endforeach
-                </table>
-                <input type='hidden' name="standard_count" id="standard_count" value="{{ count($standardList) }}">
-                <div class="attention-title">規格の数は修正できません。※名称のみ変更可能</div>
-            </div>
-            <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <select class="file-control" id="status_id" name="data[Product][status_id]">
                     @foreach ($statusList as $statuses)

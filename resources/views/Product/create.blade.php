@@ -23,19 +23,6 @@
                 </select>
             </div>
             <div class="form-group">
-                <label class="column-label" for="standard_id">規格</label>
-                <table id='standart_list_area'>
-                    <tr id='standart_list_0' class='standard_list'>
-                        <td>
-                            <input type="text" class="form-control" id="standard_id" name="data[standard][standard_name][0]" value='規格0'>
-                        </td>
-                        <td>-</td>
-                    </tr>
-                </table>
-                <input type='hidden' name="standard_count" id="standard_count" value="1">
-                <button id="standard_add_btn" type="button" class="btn standard_del_btn" onclick='javascript:addStandardList()'>規格追加</button>
-            </div>
-            <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <select class="file-control" id="status_id" name="data[Product][status_id]">
                     @foreach ($statusList as $statuses)

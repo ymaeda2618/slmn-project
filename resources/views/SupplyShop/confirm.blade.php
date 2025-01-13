@@ -33,7 +33,7 @@
                 <input type="text" class="form-control" id="address" name="data[SupplyShop][address]" value="{{$request->data['SupplyShop']['address']}}" readonly>
             </div>
             <br>
-            <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
+            <button id="create-submit-btn" type="submit" class="btn btn-primary">登録完了へ</button>
             <input type='hidden' name="data[SupplyShop][supply_shop_id]" value="{{isset($request->data['SupplyShop']['supply_shop_id']) ? $request->data['SupplyShop']['supply_shop_id'] : 0}}">
         </form>
 
@@ -43,7 +43,7 @@
 
 <style>
     /* 共通 */
-    
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -51,7 +51,7 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .confirm-title {
         font-size: 0.9em;
         font-weight: bold;
@@ -60,23 +60,23 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-    
+
     .form-group {
         margin-bottom: 3rem !important;
     }
-    
+
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-    
+
     .column-label {
         font-size: 0.9em;
         font-weight: bold;

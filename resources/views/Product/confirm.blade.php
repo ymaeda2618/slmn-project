@@ -57,7 +57,7 @@
                 <input type="hidden" name="data[Product][display_flg]" value="{{$request->data['Product']['display_flg']}}">
             </div>
             <br>
-            <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
+            <button id="create-submit-btn" type="submit" class="btn btn-primary">登録完了画面へ</button>
             <input type='hidden' name="data[Product][product_id]" value="{{isset($request->data['Product']['product_id']) ? $request->data['Product']['product_id'] : 0}}">
         </form>
 

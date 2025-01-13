@@ -33,7 +33,7 @@
                 <input type="text" class="form-control" id="address" name="data[SaleShop][address]" value="{{$request->data['SaleShop']['address']}}" readonly>
             </div>
             <br>
-            <button id="create-submit-btn" type="submit" class="btn btn-primary">登録完了へ</button>
+            <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
             <input type='hidden' name="data[SaleShop][sale_shop_id]" value="{{isset($request->data['SaleShop']['sale_shop_id']) ? $request->data['SaleShop']['sale_shop_id'] : 0}}">
         </form>
 

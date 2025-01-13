@@ -23,7 +23,7 @@
                 </select>
                 <input type='hidden' id='product_type_selected' value='{{$editProduct-> product_type}}'>
             </div>
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label class="column-label" for="standard_id">規格</label>
                 <table id='standart_list_area'>
                     @foreach ($standardList as $standards)
@@ -36,7 +36,7 @@
                 </table>
                 <input type='hidden' name="standard_count" id="standard_count" value="{{ count($standardList) }}">
                 <div class="attention-title">規格の数は修正できません。※名称のみ変更可能</div>
-            </div>
+            </div> --}}
             <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <select class="file-control" id="status_id" name="data[Product][status_id]">

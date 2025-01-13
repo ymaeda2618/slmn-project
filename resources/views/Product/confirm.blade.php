@@ -17,12 +17,12 @@
                 <input type="text" class="form-control" name="product_type" value="その他" readonly> @endif
                 <input type="hidden" class="form-control" name="data[Product][product_type]" value="{{$request->data['Product']['product_type']}}">
             </div>
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label class="column-label" for="standard_id">規格</label> @foreach ($request->data['standard']['standard_name'] as $key => $standards)
                 <input type="text" class="form-control" name="standard_name" value="{{$standards}}" readonly>
                 <input type='hidden' name="data[standard][standard_name][{{$key}}]" value='{{$standards}}'> @endforeach
                 <input type='hidden' name="standard_count" id="standard_count" value="{{$request->standard_count}}">
-            </div>
+            </div> --}}
             <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <input type="text" class="form-control" value="{{$request->status_name}}" readonly>
@@ -57,7 +57,7 @@
                 <input type="hidden" name="data[Product][display_flg]" value="{{$request->data['Product']['display_flg']}}">
             </div>
             <br>
-            <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
+            <button id="create-submit-btn" type="submit" class="btn btn-primary">登録完了画面へ</button>
             <input type='hidden' name="data[Product][product_id]" value="{{isset($request->data['Product']['product_id']) ? $request->data['Product']['product_id'] : 0}}">
         </form>
 

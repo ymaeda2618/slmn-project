@@ -17,12 +17,12 @@
                 <input type="text" class="form-control" name="product_type" value="その他" readonly> @endif
                 <input type="hidden" class="form-control" name="data[Product][product_type]" value="{{$request->data['Product']['product_type']}}">
             </div>
-            <div class="form-group">
+            {{-- <div class="form-group">
                 <label class="column-label" for="standard_id">規格</label> @foreach ($request->data['standard']['standard_name'] as $key => $standards)
                 <input type="text" class="form-control" name="standard_name" value="{{$standards}}" readonly>
                 <input type='hidden' name="data[standard][standard_name][{{$key}}]" value='{{$standards}}'> @endforeach
                 <input type='hidden' name="standard_count" id="standard_count" value="{{$request->standard_count}}">
-            </div>
+            </div> --}}
             <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <input type="text" class="form-control" value="{{$request->status_name}}" readonly>

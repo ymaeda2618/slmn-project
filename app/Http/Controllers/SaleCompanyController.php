@@ -113,22 +113,24 @@ class SaleCompanyController extends Controller
         // 売上先企業を取得
         $editSaleCompany = DB::table('sale_companies AS SaleCompany')
         ->select(
-            'SaleCompany.id                   AS sale_company_id',
-            'SaleCompany.code                 AS code',
-            'SaleCompany.name                 AS sale_company_name',
-            'SaleCompany.yomi                 AS yomi',
-            'SaleCompany.tax_calc_type        AS tax_calc_type',
-            'SaleCompany.closing_date         AS closing_date',
-            'SaleCompany.postal_code          AS postal_code',
-            'SaleCompany.address              AS address',
-            'SaleCompany.bank_code            AS bank_code',
-            'SaleCompany.bank_name            AS bank_name',
-            'SaleCompany.branch_code          AS branch_code',
-            'SaleCompany.branch_name          AS branch_name',
-            'SaleCompany.bank_type            AS bank_type',
-            'SaleCompany.bank_account         AS bank_account',
-            'SaleCompany.invoice_display_flg  AS invoice_display_flg',
-            'SaleCompany.invoice_display_name AS invoice_display_name',
+            'SaleCompany.id                          AS sale_company_id',
+            'SaleCompany.code                        AS code',
+            'SaleCompany.name                        AS sale_company_name',
+            'SaleCompany.yomi                        AS yomi',
+            'SaleCompany.tax_calc_type               AS tax_calc_type',
+            'SaleCompany.closing_date                AS closing_date',
+            'SaleCompany.postal_code                 AS postal_code',
+            'SaleCompany.address                     AS address',
+            'SaleCompany.bank_code                   AS bank_code',
+            'SaleCompany.bank_name                   AS bank_name',
+            'SaleCompany.branch_code                 AS branch_code',
+            'SaleCompany.branch_name                 AS branch_name',
+            'SaleCompany.bank_type                   AS bank_type',
+            'SaleCompany.bank_account                AS bank_account',
+            'SaleCompany.invoice_display_flg         AS invoice_display_flg',
+            'SaleCompany.invoice_display_name        AS invoice_display_name',
+            'SaleCompany.invoice_display_address     AS invoice_display_address',
+            'SaleCompany.invoice_display_postal_code AS invoice_display_postal_code',
         )
         ->where([
             ['SaleCompany.id', '=', $sale_company_id],
@@ -178,8 +180,8 @@ class SaleCompanyController extends Controller
         }
 
         return view('SaleCompany.confirm')->with([
-            "action_url"           => $action_url,
-            "request"              => $request,
+            "action_url" => $action_url,
+            "request"    => $request,
         ]);
     }
 
@@ -228,21 +230,23 @@ class SaleCompanyController extends Controller
             // 保存処理を行う
             //---------------
             $SaleCompany = \App\SaleCompany::find($request->data['SaleCompany']['sale_company_id']);
-            $SaleCompany->code                 = $sale_company_code;
-            $SaleCompany->name                 = $request->data['SaleCompany']['sale_company_name'];
-            $SaleCompany->yomi                 = $request->data['SaleCompany']['yomi'];
-            $SaleCompany->tax_calc_type        = $request->data['SaleCompany']['tax_calc_type'];
-            $SaleCompany->closing_date         = $request->data['SaleCompany']['closing_date'];
-            $SaleCompany->postal_code          = $request->data['SaleCompany']['postal_code'];
-            $SaleCompany->address              = $request->data['SaleCompany']['address'];
-            $SaleCompany->bank_code            = $request->data['SaleCompany']['bank_code'];
-            $SaleCompany->bank_name            = $request->data['SaleCompany']['bank_name'];
-            $SaleCompany->branch_code          = $request->data['SaleCompany']['branch_code'];
-            $SaleCompany->branch_name          = $request->data['SaleCompany']['branch_name'];
-            $SaleCompany->bank_type            = $request->data['SaleCompany']['bank_type'];
-            $SaleCompany->bank_account         = $request->data['SaleCompany']['bank_account'];
-            $SaleCompany->invoice_display_flg  = $request->data['SaleCompany']['invoice_display_flg'];
-            $SaleCompany->invoice_display_name = $request->data['SaleCompany']['invoice_display_name'];
+            $SaleCompany->code                        = $sale_company_code;
+            $SaleCompany->name                        = $request->data['SaleCompany']['sale_company_name'];
+            $SaleCompany->yomi                        = $request->data['SaleCompany']['yomi'];
+            $SaleCompany->tax_calc_type               = $request->data['SaleCompany']['tax_calc_type'];
+            $SaleCompany->closing_date                = $request->data['SaleCompany']['closing_date'];
+            $SaleCompany->postal_code                 = $request->data['SaleCompany']['postal_code'];
+            $SaleCompany->address                     = $request->data['SaleCompany']['address'];
+            $SaleCompany->bank_code                   = $request->data['SaleCompany']['bank_code'];
+            $SaleCompany->bank_name                   = $request->data['SaleCompany']['bank_name'];
+            $SaleCompany->branch_code                 = $request->data['SaleCompany']['branch_code'];
+            $SaleCompany->branch_name                 = $request->data['SaleCompany']['branch_name'];
+            $SaleCompany->bank_type                   = $request->data['SaleCompany']['bank_type'];
+            $SaleCompany->bank_account                = $request->data['SaleCompany']['bank_account'];
+            $SaleCompany->invoice_display_flg         = $request->data['SaleCompany']['invoice_display_flg'];
+            $SaleCompany->invoice_display_name        = $request->data['SaleCompany']['invoice_display_name'];
+            $SaleCompany->invoice_display_address     = $request->data['SaleCompany']['invoice_display_address'];
+            $SaleCompany->invoice_display_postal_code = $request->data['SaleCompany']['invoice_display_postal_code'];
             $SaleCompany->modified_user_id     = $user_info_id;               // 更新者ユーザーID
             $SaleCompany->modified             = Carbon::now();               // 更新時間
 
@@ -351,27 +355,29 @@ class SaleCompanyController extends Controller
             // 保存処理を行う
             //---------------
             $SaleCompany = new SaleCompany;
-            $SaleCompany->code                 = $sale_company_code;
-            $SaleCompany->name                 = $request->data['SaleCompany']['sale_company_name'];
-            $SaleCompany->yomi                 = $request->data['SaleCompany']['yomi'];
-            $SaleCompany->tax_calc_type        = $request->data['SaleCompany']['tax_calc_type'];
-            $SaleCompany->closing_date         = $request->data['SaleCompany']['closing_date'];
-            $SaleCompany->postal_code          = $request->data['SaleCompany']['postal_code'];
-            $SaleCompany->address              = $request->data['SaleCompany']['address'];
-            $SaleCompany->bank_code            = $request->data['SaleCompany']['bank_code'];
-            $SaleCompany->bank_name            = $request->data['SaleCompany']['bank_name'];
-            $SaleCompany->branch_code          = $request->data['SaleCompany']['branch_code'];
-            $SaleCompany->branch_name          = $request->data['SaleCompany']['branch_name'];
-            $SaleCompany->bank_type            = $request->data['SaleCompany']['bank_type'];
-            $SaleCompany->bank_account         = $request->data['SaleCompany']['bank_account'];
-            $SaleCompany->invoice_display_flg  = $request->data['SaleCompany']['invoice_display_flg'];
-            $SaleCompany->invoice_display_name = $request->data['SaleCompany']['invoice_display_name'];
-            $SaleCompany->sort                 = 100;
-            $SaleCompany->active               = 1;
-            $SaleCompany->created_user_id      = $user_info_id;               // 作成者ユーザーID
-            $SaleCompany->created              = Carbon::now();               // 作成時間
-            $SaleCompany->modified_user_id     = $user_info_id;               // 更新者ユーザーID
-            $SaleCompany->modified             = Carbon::now();               // 更新時間
+            $SaleCompany->code                        = $sale_company_code;
+            $SaleCompany->name                        = $request->data['SaleCompany']['sale_company_name'];
+            $SaleCompany->yomi                        = $request->data['SaleCompany']['yomi'];
+            $SaleCompany->tax_calc_type               = $request->data['SaleCompany']['tax_calc_type'];
+            $SaleCompany->closing_date                = $request->data['SaleCompany']['closing_date'];
+            $SaleCompany->postal_code                 = $request->data['SaleCompany']['postal_code'];
+            $SaleCompany->address                     = $request->data['SaleCompany']['address'];
+            $SaleCompany->bank_code                   = $request->data['SaleCompany']['bank_code'];
+            $SaleCompany->bank_name                   = $request->data['SaleCompany']['bank_name'];
+            $SaleCompany->branch_code                 = $request->data['SaleCompany']['branch_code'];
+            $SaleCompany->branch_name                 = $request->data['SaleCompany']['branch_name'];
+            $SaleCompany->bank_type                   = $request->data['SaleCompany']['bank_type'];
+            $SaleCompany->bank_account                = $request->data['SaleCompany']['bank_account'];
+            $SaleCompany->invoice_display_flg         = $request->data['SaleCompany']['invoice_display_flg'];
+            $SaleCompany->invoice_display_name        = $request->data['SaleCompany']['invoice_display_name'];
+            $SaleCompany->invoice_display_address     = $request->data['SaleCompany']['invoice_display_address'];
+            $SaleCompany->invoice_display_postal_code = $request->data['SaleCompany']['invoice_display_postal_code'];
+            $SaleCompany->sort                        = 100;
+            $SaleCompany->active                      = 1;
+            $SaleCompany->created_user_id             = $user_info_id;               // 作成者ユーザーID
+            $SaleCompany->created                     = Carbon::now();               // 作成時間
+            $SaleCompany->modified_user_id            = $user_info_id;               // 更新者ユーザーID
+            $SaleCompany->modified                    = Carbon::now();               // 更新時間
 
             $SaleCompany->save();
 

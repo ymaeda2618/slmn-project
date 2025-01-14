@@ -853,6 +853,8 @@ class DepositController extends Controller
             'SaleCompany.address                         AS company_address',
             'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
             'SaleCompany.invoice_display_name            AS company_invoice_display_name',
+            'SaleCompany.invoice_display_address         AS company_invoice_display_address',
+            'SaleCompany.invoice_display_postal_code     AS company_invoice_display_postal_code',
             'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
             // 'SaleShop.id                                 AS shop_id',
             // 'SaleShop.name                               AS shop_name',
@@ -1010,10 +1012,6 @@ class DepositController extends Controller
                 } else {
                     $companyId = $depositDatas->company_id;
                     $calcDepositList['company_info']['name'] = $depositDatas->company_name;
-                    // 請求書用フラグが有効の場合は請求書用の名前を使用する
-                    if ($depositDatas->company_invoice_display_flg) {
-                        $calcDepositList['company_info']['name'] = $depositDatas->company_invoice_display_name;
-                    }
                     $calcDepositList['company_info']['address'] = $depositDatas->company_address;
                     // 郵便番号は間にハイフンを入れる
                     $calcDepositList['company_info']['code'] = '';
@@ -1021,6 +1019,17 @@ class DepositController extends Controller
                         $codeBefore = substr($depositDatas->company_postal_code, 0, 3);
                         $codeAfter  = substr($depositDatas->company_postal_code, 3, 4);
                         $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                    }
+                    // 請求書用フラグが有効の場合は請求書用の名前、郵便番号、住所を使用する
+                    if ($depositDatas->company_invoice_display_flg) {
+                        $calcDepositList['company_info']['name'] = $depositDatas->company_invoice_display_name;
+                        $calcDepositList['company_info']['address'] = $depositDatas->company_invoice_display_address;
+                        // 郵便番号は間にハイフンを入れる
+                        if (!empty($depositDatas->company_invoice_display_postal_code)) {
+                            $codeBefore = substr($depositDatas->company_invoice_display_postal_code, 0, 3);
+                            $codeAfter  = substr($depositDatas->company_invoice_display_postal_code, 3, 4);
+                            $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                        }
                     }
                 }
 

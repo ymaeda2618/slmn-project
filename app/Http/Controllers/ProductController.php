@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Product;
-use App\Standard;
 use App\Status;
 use App\Tax;
 use App\Unit;
@@ -208,19 +207,6 @@ class ProductController extends Controller
         ])
         ->first();
 
-        // 規格一覧を取得
-        $standardList = DB::table('standards AS Standard')
-        ->select(
-            'Standard.id     AS standard_id',
-            'Standard.name   AS standard_name',
-            'Standard.sort   AS status_sort'
-        )
-        ->where([
-            ['Standard.product_id', '=', $product_id],
-            ['Standard.active', '=', '1'],
-        ])
-        ->orderBy('Standard.sort', 'asc')->get();
-
         // エラーメッセージ取得
         $error_message       = $request->session()->get('error_message');
         $request->session()->forget('error_message');
@@ -231,7 +217,6 @@ class ProductController extends Controller
             "taxList"       => $taxList,
             "unitList"      => $unitList,
             "editProduct"   => $editProduct,
-            "standardList"  => $standardList,
             "error_message" => $error_message,
         ]);
     }
@@ -380,26 +365,6 @@ class ProductController extends Controller
             // 保存処理
             $Product->save();
 
-            // 作成したIDを取得する
-            $product_new_id = $Product->id;
-
-            // 規格テーブルの保存処理
-            $standardArray = [];
-            $sort = 0;
-
-            foreach ($request->data['standard']['standard_name'] as $standardKey => $standards) {
-
-                $Standard = \App\Standard::find($standardKey);
-                $Standard->product_id       = $product_new_id;
-                $Standard->name             = $standards;
-                $Standard->modified_user_id = $user_info_id;
-                $Standard->modified         = Carbon::now();
-
-                // 保存処理
-                $Standard->save();
-
-            }
-
         } catch (\Exception $e) {
 
             DB::rollback();
@@ -411,6 +376,9 @@ class ProductController extends Controller
 
                 return redirect('./ProductEdit/'.$request->data['Product']['product_id']);
             }
+
+            var_dump($e);
+            die;
 
             return view('Product.complete')->with([
                 'errorMessage' => $e
@@ -516,34 +484,6 @@ class ProductController extends Controller
 
             // 保存処理
             $Product->save();
-
-            // 作成したIDを取得する
-            $product_new_id = $Product->id;
-
-            // 規格テーブルの保存処理
-            $standardArray = [];
-            $sort = 0;
-            $standard_code = 1;
-
-            foreach ($request->data['standard']['standard_name'] as $standards) {
-
-                $standardArray[] = [
-                    'product_id'       => $product_new_id,
-                    'name'             => $standards,
-                    'code'             => $standard_code,
-                    'sort'             => $sort,
-                    'created_user_id'  => $user_info_id,
-                    'created'          => Carbon::now(),
-                    'modified_user_id' => $user_info_id,
-                    'modified'         => Carbon::now(),
-                ];
-
-                $standard_code++;
-                $sort ++;
-            }
-
-            DB::table('standards')->insert($standardArray);
-
             DB::connection()->commit();
 
         } catch (\Exception $e) {

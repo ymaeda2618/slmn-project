@@ -120,6 +120,14 @@
                 <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="invoice_display_name" name="data[SaleCompany][invoice_display_name]" value="{{$editSaleCompany->invoice_display_name}}">
             </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_postal_code">郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_postal_code" name="data[SaleCompany][invoice_display_postal_code]" value="{{$editSaleCompany->invoice_display_postal_code}}">
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_address">住所<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_address" name="data[SaleCompany][invoice_display_address]" value="{{$editSaleCompany->invoice_display_address}}">
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">編集確認画面へ</button>
             <input type='hidden' name="data[SaleCompany][sale_company_id]" value="{{$editSaleCompany->sale_company_id}}">

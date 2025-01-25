@@ -78,6 +78,14 @@
                 <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="invoice_display_name" name="data[SaleCompany][invoice_display_name]" value="{{$request->data['SaleCompany']['invoice_display_name']}}" readonly>
             </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_postal_code">郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_postal_code" name="data[SaleCompany][invoice_display_postal_code]" value="{{$request->data['SaleCompany']['invoice_display_postal_code']}}" readonly>
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_address">住所<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_address" name="data[SaleCompany][invoice_display_address]" value="{{$request->data['SaleCompany']['invoice_display_address']}}" readonly>
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">登録完了画面へ</button>
             <input type='hidden' name="data[SaleCompany][sale_company_id]" value="{{isset($request->data['SaleCompany']['sale_company_id']) ? $request->data['SaleCompany']['sale_company_id'] : 0}}">

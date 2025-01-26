@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Product;
+use App\ProductType;
 use App\Status;
 use App\Tax;
 use App\Unit;
@@ -87,6 +88,10 @@ class ProductController extends Controller
         }
 
         try {
+            // カテゴリーカテゴリー
+            $productTypeList = ProductType::where([
+                ['active', 1],
+            ])->orderBy('sort', 'asc')->get();
 
             // 製品状態
             $statusList = Status::where([
@@ -109,14 +114,15 @@ class ProductController extends Controller
                 'Product.id             AS product_id',
                 'Product.code           AS product_code',
                 'Product.product_type   AS product_type',
+                'ProductType.name       AS product_type_name',
                 'Status.name            AS status_name',
                 'Tax.name               AS tax_name',
                 'Product.name           AS product_name',
                 'Unit.name              AS unit_name'
             )
-            ->selectRaw(
-                'CASE WHEN Product.product_type = 1 THEN "魚" ELSE "その他" END AS product_type_name'
-            )
+            ->join('product_types AS ProductType', function ($join) {
+                $join->on('ProductType.id', '=', 'Product.product_type');
+            })
             ->join('statuses AS Status', function ($join) {
                 $join->on('Status.id', '=', 'Product.status_id');
             })
@@ -132,7 +138,10 @@ class ProductController extends Controller
             ->if(!empty($product_code), function ($query) use ($product_code) {
                 return $query->where('Product.code', '=', $product_code);
             })
-            ->where('Product.active', '=', '1')
+            ->where([
+                ['Product.new_product_flg', '=', '1'],
+                ['Product.active', '=', '1'],
+            ])
             ->orderBy('Product.created', 'asc')->paginate(20);
 
             // 対象日付のチェック
@@ -158,6 +167,7 @@ class ProductController extends Controller
             "product_search_type_code" => $product_search_type_code,
             "product_search_text"      => $product_search_text,
             "search_action"            => $search_action,
+            "productTypeList"          => $productTypeList,
             "statusList"               => $statusList,
             "taxList"                  => $taxList,
             "unitList"                 => $unitList,
@@ -172,6 +182,11 @@ class ProductController extends Controller
      */
     public function edit(Request $request, $product_id)
     {
+        // カテゴリーカテゴリー
+        $productTypeList = ProductType::where([
+            ['active', 1],
+        ])->orderBy('sort', 'asc')->get();
+
         // 製品状態
         $statusList = Status::where([
             ['active', 1],
@@ -213,6 +228,7 @@ class ProductController extends Controller
 
 
         return view('Product.edit')->with([
+            "productTypeList"  => $productTypeList,
             "statusList"    => $statusList,
             "taxList"       => $taxList,
             "unitList"      => $unitList,
@@ -229,6 +245,11 @@ class ProductController extends Controller
      */
     public function create(Request $request)
     {
+        // カテゴリーカテゴリー
+        $productTypeList = ProductType::where([
+            ['active', 1],
+        ])->orderBy('sort', 'asc')->get();
+
         // 製品状態
         $statusList = Status::where([
             ['active', 1],
@@ -250,6 +271,7 @@ class ProductController extends Controller
 
 
         return view('Product.create')->with([
+            "productTypeList"           => $productTypeList,
             "statusList"                => $statusList,
             "taxList"                   => $taxList,
             "unitList"                  => $unitList,
@@ -269,6 +291,11 @@ class ProductController extends Controller
         } else {
             $action_url = './ProductEditComplete';
         }
+
+        // 商品カテゴリー
+        $productTypeList = ProductType::where([
+            ['id', $request->data['Product']['product_type']],
+        ])->first();
 
         // 製品状態
         $statusList = Status::where([
@@ -291,6 +318,7 @@ class ProductController extends Controller
         ])->first();
 
         // 各種名称を格納
+        $request->product_type_name   = $productTypeList->name;
         $request->status_name         = $statusList->name;
         $request->tax_name            = $taxList->name;
         $request->unit_name           = $unitList->name;
@@ -414,18 +442,28 @@ class ProductController extends Controller
             // codeが入力されていない場合
             if(empty($request->data['Product']['code'])){
 
-                do {
-
-                    // codeのMAX値を取得
-                    $productCode = DB::table('products AS Product')
+                // codeのMAX値を取得
+                /*$productCode = DB::table('products AS Product')
                     ->select(
                         'Product.code AS code'
                     )
+                    ->whereRaw('Product.code REGEXP "^[0-9]+$"')
+                    ->whereRaw('Product.code < 3000')
                     ->where([
                         ['Product.active', '=', '1'],
                     ])->orderBy('id', 'desc')->first();
 
-                    $product_code = $productCode->code + 1;
+                $product_code = intval($productCode->code);
+
+                // int型変換が上手く行かない場合は0が返ってくるので、その場合はエラー
+                if(empty($product_code)) throw new Exception;*/
+
+                // 空いている部分コードに入れたいので、1からにする。
+                $product_code = 1;
+
+                do {
+
+                    $product_code = $product_code + 1;
 
                     // codeが存在するかチェック
                     $productCodeCheck = DB::table('products AS Product')

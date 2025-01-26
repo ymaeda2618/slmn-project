@@ -18,23 +18,11 @@
             <div class="form-group">
                 <label class="column-label" for="product_type">製品種別</label>
                 <select class="file-control" id="product_type" name="data[Product][product_type]">
-                    <option value="1">魚</option>
-                    <option value="2">その他</option>
+                    @foreach ($productTypeList as $product_types)
+                    <option value="{{$product_types->id}}">{{$product_types->name}}</option>
+                    @endforeach
                 </select>
             </div>
-            {{-- <div class="form-group">
-                <label class="column-label" for="standard_id">規格</label>
-                <table id='standart_list_area'>
-                    <tr id='standart_list_0' class='standard_list'>
-                        <td>
-                            <input type="text" class="form-control" id="standard_id" name="data[standard][standard_name][0]" value='規格0'>
-                        </td>
-                        <td>-</td>
-                    </tr>
-                </table>
-                <input type='hidden' name="standard_count" id="standard_count" value="1">
-                <button id="standard_add_btn" type="button" class="btn standard_del_btn" onclick='javascript:addStandardList()'>規格追加</button>
-            </div> --}}
             <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <select class="file-control" id="status_id" name="data[Product][status_id]">
@@ -234,19 +222,19 @@
 </script>
 <style>
     /* 共通 */
-
+    
     .container {
         max-width: 800px!important;
     }
-
+    
     .form-control {
         font-size: 10px!important;
     }
-
+    
     .btn {
         font-size: 10px!important;
     }
-
+    
     .top-title {
         font-size: 14px;
         font-weight: bold;
@@ -254,18 +242,18 @@
         text-align: center;
         padding: 15px 0px;
     }
-
+    
     .error-alert {
         color: red;
         font-weight: bold;
     }
-
+    
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .file-control {
         font-size: 10px;
         display: block;
@@ -280,29 +268,29 @@
         border-radius: .25rem;
         transition: border-color .15s;
     }
-
+    
     .column-label {
         font-size: 10px;
         font-weight: bold;
     }
-
+    
     #standard_add_btn {
         margin: 10px auto 0px;
         font-size: 10px;
     }
-
+    
     #standart_list_area {
         width: 100%;
     }
-
+    
     .standard_list td {
         width: 10%;
     }
-
+    
     .standard_list td:first-of-type {
         width: 90%;
     }
-
+    
     .standard_del_btn {
         margin: auto 5px;
     }

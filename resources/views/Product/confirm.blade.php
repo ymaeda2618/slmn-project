@@ -12,17 +12,10 @@
                 <input type="text" class="form-control" name="data[Product][code]" value="{{$request->data['Product']['code']}}" readonly>
             </div>
             <div class="form-group">
-                <label class="column-label" for="product_type">製品種別</label> @if($request->data['Product']['product_type'] == 1)
-                <input type="text" class="form-control" name="product_type" value="魚" readonly> @else
-                <input type="text" class="form-control" name="product_type" value="その他" readonly> @endif
+                <label class="column-label" for="product_type">製品種別</label>
+                <input type="text" class="form-control" value="{{$request->product_type_name}}" readonly>
                 <input type="hidden" class="form-control" name="data[Product][product_type]" value="{{$request->data['Product']['product_type']}}">
             </div>
-            {{-- <div class="form-group">
-                <label class="column-label" for="standard_id">規格</label> @foreach ($request->data['standard']['standard_name'] as $key => $standards)
-                <input type="text" class="form-control" name="standard_name" value="{{$standards}}" readonly>
-                <input type='hidden' name="data[standard][standard_name][{{$key}}]" value='{{$standards}}'> @endforeach
-                <input type='hidden' name="standard_count" id="standard_count" value="{{$request->standard_count}}">
-            </div> --}}
             <div class="form-group">
                 <label class="column-label" for="status_id">製品状態</label>
                 <input type="text" class="form-control" value="{{$request->status_name}}" readonly>
@@ -68,7 +61,7 @@
 
 <style>
     /* 共通 */
-
+    
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -76,7 +69,7 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .confirm-title {
         font-size: 0.9em;
         font-weight: bold;
@@ -85,23 +78,23 @@
         text-align: center;
         padding: 25px 0px;
     }
-
+    
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-
+    
     .form-group {
         margin-bottom: 3rem !important;
     }
-
+    
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-
+    
     .column-label {
         font-size: 0.9em;
         font-weight: bold;

@@ -116,6 +116,14 @@
                 <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="invoice_display_name" name="data[SaleCompany][invoice_display_name]">
             </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_postal_code">請求書表示郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_postal_code" name="data[SaleCompany][invoice_display_postal_code]">
+            </div>
+            <div class="form-group">
+                <label class="column-label" for="invoice_display_address">請求書表示住所<font color="red">※任意</font></label>
+                <input type="text" class="form-control" id="invoice_display_address" name="data[SaleCompany][invoice_display_address]">
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">確認登録画面へ</button>
             <input type='hidden' name="submit_type" value="1">

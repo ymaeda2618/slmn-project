@@ -361,6 +361,7 @@ class ProductController extends Controller
             )
             ->where([
                 ['Product.id', '!=', $request->data['Product']['product_id']],
+                ['Product.new_product_flg', '=', '1'],
                 ['Product.active', '=', '1'],
                 ['Product.code', '=', $product_code],
             ])->orderBy('id', 'desc')->first();
@@ -472,6 +473,7 @@ class ProductController extends Controller
                     )
                     ->where([
                         ['Product.active', '=', '1'],
+                        ['Product.new_product_flg', '=', '1'],
                         ['Product.code', '=', $product_code],
                     ])->orderBy('id', 'desc')->first();
 
@@ -489,6 +491,7 @@ class ProductController extends Controller
                 )
                 ->where([
                     ['Product.active', '=', '1'],
+                    ['Product.new_product_flg', '=', '1'],
                     ['Product.code', '=', $product_code],
                 ])->orderBy('id', 'desc')->first();
 

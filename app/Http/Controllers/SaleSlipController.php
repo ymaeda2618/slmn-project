@@ -2837,18 +2837,24 @@ class SaleSlipController extends Controller
             3 => 'その他',
         );
 
-        $companyInfo['name']            = $companyDatas[0]->name;
-        $companyInfo['postal_code']     = $companyDatas[0]->postal_code;
-        $companyInfo['address']         = $companyDatas[0]->address;
-        $companyInfo['office_tel']      = $companyDatas[0]->office_tel;
-        $companyInfo['office_fax']      = $companyDatas[0]->office_fax;
-        $companyInfo['shop_tel']        = $companyDatas[0]->shop_tel;
-        $companyInfo['shop_fax']        = $companyDatas[0]->shop_fax;
-        $companyInfo['invoice_form_id'] = $companyDatas[0]->invoice_form_id;
-        $companyInfo['bank_name']       = $companyDatas[0]->bank_name;
-        $companyInfo['branch_name']     = $companyDatas[0]->branch_name;
-        $companyInfo['bank_type']       = $bank_type[$companyDatas[0]->bank_type];
-        $companyInfo['bank_account']    = $companyDatas[0]->bank_account;
+        $companyInfo['name']            = empty($companyDatas[0]->name)            ? '' : $companyDatas[0]->name;
+        $companyInfo['address']         = empty($companyDatas[0]->address)         ? '' : $companyDatas[0]->address;
+        $companyInfo['office_tel']      = empty($companyDatas[0]->office_tel)      ? '' : $companyDatas[0]->office_tel;
+        $companyInfo['office_fax']      = empty($companyDatas[0]->office_fax)      ? '' : $companyDatas[0]->office_fax;
+        $companyInfo['shop_tel']        = empty($companyDatas[0]->shop_tel)        ? '' : $companyDatas[0]->shop_tel;
+        $companyInfo['shop_fax']        = empty($companyDatas[0]->shop_fax)        ? '' : $companyDatas[0]->shop_fax;
+        $companyInfo['invoice_form_id'] = empty($companyDatas[0]->invoice_form_id) ? '' : $companyDatas[0]->invoice_form_id;
+        $companyInfo['bank_name']       = empty($companyDatas[0]->bank_name)       ? '' : $companyDatas[0]->bank_name;
+        $companyInfo['branch_name']     = empty($companyDatas[0]->branch_name)     ? '' : $companyDatas[0]->branch_name;
+        $companyInfo['bank_type']       = empty($companyDatas[0]->bank_type)       ? '' : $bank_type[$companyDatas[0]->bank_type];
+        $companyInfo['bank_account']    = empty($companyDatas[0]->bank_account)    ? '' : $companyDatas[0]->bank_account;
+
+        // 郵便番号は間にハイフンを入れる
+        if (!empty($companyDatas[0]->postal_code)) {
+            $codeBefore = substr($companyDatas[0]->postal_code, 0, 3);
+            $codeAfter  = substr($companyDatas[0]->postal_code, 3, 4);
+            $companyInfo['postal_code'] = $codeBefore . '-' . $codeAfter;
+        }
 
         // ------------------------
         // 取得してきたデータを整形する

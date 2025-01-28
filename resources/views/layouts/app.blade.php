@@ -82,6 +82,7 @@
                                 <a href="{{ asset('/') }}ProductIndex" class="dropdown-item">製品一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyCompanyCreate" class="dropdown-item">仕入先企業登録</a> @endif
                                 <a href="{{ asset('/') }}SupplyCompanyIndex" class="dropdown-item">仕入先企業一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleCompanyCreate" class="dropdown-item">売上先企業登録</a> @endif
                                 <a href="{{ asset('/') }}SaleCompanyIndex" class="dropdown-item">売上先企業一覧</a>
+                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}CompanySettingIndex" class="dropdown-item">企業情報登録</a> @endif
                             </div>
                         </li>
                         <li class="nav-item dropdown">

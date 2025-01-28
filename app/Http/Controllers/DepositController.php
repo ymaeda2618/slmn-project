@@ -856,10 +856,6 @@ class DepositController extends Controller
             'SaleCompany.invoice_display_address         AS company_invoice_display_address',
             'SaleCompany.invoice_display_postal_code     AS company_invoice_display_postal_code',
             'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
-            // 'SaleShop.id                                 AS shop_id',
-            // 'SaleShop.name                               AS shop_name',
-            // 'SaleShop.postal_code                        AS shop_postal_code',
-            // 'SaleShop.address                            AS shop_address',
             'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
             'SaleSlipDetail.unit_price                   AS unit_price',
             'SaleSlipDetail.unit_num                     AS unit_num',
@@ -874,10 +870,6 @@ class DepositController extends Controller
         ->join('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
         })
-        // ->leftJoin('sale_shops as SaleShop', function ($join) {
-        //     $join->on('SaleShop.id', '=', 'Deposit.sale_shop_id')
-        //          ->where('SaleShop.active', '=', true);
-        // })
         ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
             $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
                  ->where('DepositWithdrawalDetail.type', '=', '2'); // 入出金タイプ 1:出金, 2:入金
@@ -926,18 +918,24 @@ class DepositController extends Controller
             3 => 'その他',
         );
 
-        $companyInfo['name']            = $companyDatas[0]->name;
-        $companyInfo['postal_code']     = $companyDatas[0]->postal_code;
-        $companyInfo['address']         = $companyDatas[0]->address;
-        $companyInfo['office_tel']      = $companyDatas[0]->office_tel;
-        $companyInfo['office_fax']      = $companyDatas[0]->office_fax;
-        $companyInfo['shop_tel']        = $companyDatas[0]->shop_tel;
-        $companyInfo['shop_fax']        = $companyDatas[0]->shop_fax;
-        $companyInfo['invoice_form_id'] = $companyDatas[0]->invoice_form_id;
-        $companyInfo['bank_name']       = $companyDatas[0]->bank_name;
-        $companyInfo['branch_name']     = $companyDatas[0]->branch_name;
-        $companyInfo['bank_type']       = $bank_type[$companyDatas[0]->bank_type];
-        $companyInfo['bank_account']    = $companyDatas[0]->bank_account;
+        $companyInfo['name']            = empty($companyDatas[0]->name)            ? '' : $companyDatas[0]->name;
+        $companyInfo['address']         = empty($companyDatas[0]->address)         ? '' : $companyDatas[0]->address;
+        $companyInfo['office_tel']      = empty($companyDatas[0]->office_tel)      ? '' : $companyDatas[0]->office_tel;
+        $companyInfo['office_fax']      = empty($companyDatas[0]->office_fax)      ? '' : $companyDatas[0]->office_fax;
+        $companyInfo['shop_tel']        = empty($companyDatas[0]->shop_tel)        ? '' : $companyDatas[0]->shop_tel;
+        $companyInfo['shop_fax']        = empty($companyDatas[0]->shop_fax)        ? '' : $companyDatas[0]->shop_fax;
+        $companyInfo['invoice_form_id'] = empty($companyDatas[0]->invoice_form_id) ? '' : $companyDatas[0]->invoice_form_id;
+        $companyInfo['bank_name']       = empty($companyDatas[0]->bank_name)       ? '' : $companyDatas[0]->bank_name;
+        $companyInfo['branch_name']     = empty($companyDatas[0]->branch_name)     ? '' : $companyDatas[0]->branch_name;
+        $companyInfo['bank_type']       = empty($companyDatas[0]->bank_type)       ? '' : $bank_type[$companyDatas[0]->bank_type];
+        $companyInfo['bank_account']    = empty($companyDatas[0]->bank_account)    ? '' : $companyDatas[0]->bank_account;
+
+        // 郵便番号は間にハイフンを入れる
+        if (!empty($companyDatas[0]->postal_code)) {
+            $codeBefore = substr($companyDatas[0]->postal_code, 0, 3);
+            $codeAfter  = substr($companyDatas[0]->postal_code, 3, 4);
+            $companyInfo['postal_code'] = $codeBefore . '-' . $codeAfter;
+        }
 
         // 初期化処理
         $calcDepositList = array();

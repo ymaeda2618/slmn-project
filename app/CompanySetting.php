@@ -28,7 +28,7 @@ class CompanySetting extends Model
         // 企業IDを取得
         $companyId = env('COMPANY_ID', '0001');
 
-        return $companyData = DB::table((new self)->table . ' AS CompanySetting')
+        return DB::table((new self)->table . ' AS CompanySetting')
                 ->where('company_id', $companyId)
                 ->get();
     }

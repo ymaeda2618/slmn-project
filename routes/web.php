@@ -242,6 +242,13 @@ Route::get('todayDeliverySlips', 'SaleSlipNonAuthController@todayDeliverySlips')
 Route::get('csvUpload', 'CsvUploadController@create');
 Route::post('AjaxUploadCsv', 'CsvUploadController@AjaxUploadCsv');
 
+// 企業情報関連
+Route::get('CompanySettingIndex', 'CompanySettingController@index');
+Route::post('CompanySettingIndex', 'CompanySettingController@index');
+Route::get('CompanySettingEdit', 'CompanySettingController@edit');
+Route::post('CompanySettingConfirm', 'CompanySettingController@confirm');
+Route::post('CompanySettingEditComplete', 'CompanySettingController@editComplete');
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

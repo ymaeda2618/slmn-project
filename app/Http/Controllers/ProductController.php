@@ -121,10 +121,10 @@ class ProductController extends Controller
                 'Product.name           AS product_name',
                 'Unit.name              AS unit_name'
             )
-            ->join('product_types AS ProductType', function ($join) {
+            ->leftJoin('product_types AS ProductType', function ($join) {
                 $join->on('ProductType.id', '=', 'Product.product_type');
             })
-            ->join('statuses AS Status', function ($join) {
+            ->leftJoin('statuses AS Status', function ($join) {
                 $join->on('Status.id', '=', 'Product.status_id');
             })
             ->join('taxes AS Tax', function ($join) {
@@ -142,6 +142,7 @@ class ProductController extends Controller
             ->where([
                 ['Product.new_product_flg', '=', '1'],
                 ['Product.active', '=', '1'],
+                ['ProductType.auto_regis_type_flg', '=', '0'],
             ])
             ->orderBy('Product.created', 'asc')->paginate(20);
 

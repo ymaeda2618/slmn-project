@@ -90,6 +90,7 @@ class ProductController extends Controller
         try {
             // カテゴリーカテゴリー
             $productTypeList = ProductType::where([
+                ['auto_regis_type_flg', 0],
                 ['active', 1],
             ])->orderBy('sort', 'asc')->get();
 
@@ -184,6 +185,7 @@ class ProductController extends Controller
     {
         // カテゴリーカテゴリー
         $productTypeList = ProductType::where([
+            ['auto_regis_type_flg', 0],
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
@@ -247,6 +249,7 @@ class ProductController extends Controller
     {
         // カテゴリーカテゴリー
         $productTypeList = ProductType::where([
+            ['auto_regis_type_flg', 0],
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
@@ -442,22 +445,6 @@ class ProductController extends Controller
 
             // codeが入力されていない場合
             if(empty($request->data['Product']['code'])){
-
-                // codeのMAX値を取得
-                /*$productCode = DB::table('products AS Product')
-                    ->select(
-                        'Product.code AS code'
-                    )
-                    ->whereRaw('Product.code REGEXP "^[0-9]+$"')
-                    ->whereRaw('Product.code < 3000')
-                    ->where([
-                        ['Product.active', '=', '1'],
-                    ])->orderBy('id', 'desc')->first();
-
-                $product_code = intval($productCode->code);
-
-                // int型変換が上手く行かない場合は0が返ってくるので、その場合はエラー
-                if(empty($product_code)) throw new Exception;*/
 
                 // 空いている部分コードに入れたいので、1からにする。
                 $product_code = 1;

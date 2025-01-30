@@ -670,6 +670,7 @@ class CsvUploadController extends Controller
             // 商品コードが存在するチェックし、存在しない場合は暫定で新規登録する
             $product_result = DB::table('products AS Product')
             ->where([
+                ['Product.new_product_flg', '=', '1'],
                 ['Product.active', '=', '1'],
                 ['Product.name', '=', $product_name],
             ])->first();
@@ -712,20 +713,11 @@ class CsvUploadController extends Controller
                     $unit_id = $unit_check->id;
                 }
 
+                // マリネットのデータは1万からにする
+                $product_code = 10000;
+
                 do {
-
-                    // codeのMAX値を取得
-                    $productCode = DB::table('products AS Product')
-                    ->select(
-                        'Product.code AS code'
-                    )
-                    ->where([
-                        ['Product.active', '=', '1'],
-                    ])
-                    ->whereRaw("code < 9000")
-                    ->orderByRaw("cast(code as SIGNED) desc")->first();
-
-                    $product_code = $productCode->code + 1;
+                    $product_code += 1;
 
                     // codeが存在するかチェック
                     $productCodeCheck = DB::table('products AS Product')
@@ -733,15 +725,15 @@ class CsvUploadController extends Controller
                         'Product.code AS code'
                     )
                     ->where([
+                        ['Product.new_product_flg', '=', '1'],
                         ['Product.active', '=', '1'],
                         ['Product.code', '=', $product_code],
-                    ])
-                    ->whereRaw("code < 9000")
-                    ->orderByRaw("cast(code as SIGNED) desc")->first();
+                    ])->first();
 
                 } while (!empty($productCodeCheck));
 
                 $Product = new Product();
+                $Product->product_type      = 100;                  // マリネット商品種別
                 $Product->tax_id            = $tax_id;              // 税率
                 $Product->code              = $product_code;        // コード
                 $Product->name              = $product_name;        // 製品名

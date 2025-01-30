@@ -90,6 +90,7 @@ class ProductController extends Controller
         try {
             // カテゴリーカテゴリー
             $productTypeList = ProductType::where([
+                ['auto_regis_type_flg', 0],
                 ['active', 1],
             ])->orderBy('sort', 'asc')->get();
 
@@ -120,10 +121,10 @@ class ProductController extends Controller
                 'Product.name           AS product_name',
                 'Unit.name              AS unit_name'
             )
-            ->join('product_types AS ProductType', function ($join) {
+            ->leftJoin('product_types AS ProductType', function ($join) {
                 $join->on('ProductType.id', '=', 'Product.product_type');
             })
-            ->join('statuses AS Status', function ($join) {
+            ->leftJoin('statuses AS Status', function ($join) {
                 $join->on('Status.id', '=', 'Product.status_id');
             })
             ->join('taxes AS Tax', function ($join) {
@@ -141,6 +142,7 @@ class ProductController extends Controller
             ->where([
                 ['Product.new_product_flg', '=', '1'],
                 ['Product.active', '=', '1'],
+                ['ProductType.auto_regis_type_flg', '=', '0'],
             ])
             ->orderBy('Product.created', 'asc')->paginate(20);
 
@@ -184,6 +186,7 @@ class ProductController extends Controller
     {
         // カテゴリーカテゴリー
         $productTypeList = ProductType::where([
+            ['auto_regis_type_flg', 0],
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
@@ -247,6 +250,7 @@ class ProductController extends Controller
     {
         // カテゴリーカテゴリー
         $productTypeList = ProductType::where([
+            ['auto_regis_type_flg', 0],
             ['active', 1],
         ])->orderBy('sort', 'asc')->get();
 
@@ -442,22 +446,6 @@ class ProductController extends Controller
 
             // codeが入力されていない場合
             if(empty($request->data['Product']['code'])){
-
-                // codeのMAX値を取得
-                /*$productCode = DB::table('products AS Product')
-                    ->select(
-                        'Product.code AS code'
-                    )
-                    ->whereRaw('Product.code REGEXP "^[0-9]+$"')
-                    ->whereRaw('Product.code < 3000')
-                    ->where([
-                        ['Product.active', '=', '1'],
-                    ])->orderBy('id', 'desc')->first();
-
-                $product_code = intval($productCode->code);
-
-                // int型変換が上手く行かない場合は0が返ってくるので、その場合はエラー
-                if(empty($product_code)) throw new Exception;*/
 
                 // 空いている部分コードに入れたいので、1からにする。
                 $product_code = 1;

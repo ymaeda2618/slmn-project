@@ -64,7 +64,9 @@
                 <input type="text" class="form-control" value="<?= $company_setting_data[0]->invoice_form_id ?>" readonly>
             </div>
             <br>
-            <a href="./CompanySettingEdit/" id="create-submit-btn" class="btn btn-primary">編集画面へ</a>
+            <div class="form-group">
+                <a href="./CompanySettingEdit/" id="create-submit-btn" class="btn btn-primary">編集画面へ</a>
+            </div>
         </div>
 
     </div>

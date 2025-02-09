@@ -11,6 +11,8 @@ use App\Tax;
 use App\Unit;
 use Carbon\Carbon;
 use Exception;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -87,6 +89,12 @@ class ProductController extends Controller
             }
         }
 
+        // CSV出力種別を設定
+        $csv_type_arr = [
+            0 => '自動レジ用アップロード',
+          //  1 => '通常商品マスタ',
+        ];
+
         try {
             // カテゴリーカテゴリー
             $productTypeList = ProductType::where([
@@ -144,7 +152,7 @@ class ProductController extends Controller
                 ['Product.active', '=', '1'],
                 ['ProductType.auto_regis_type_flg', '=', '0'],
             ])
-            ->orderBy('Product.created', 'asc')->paginate(20);
+            ->orderBy('Product.created', 'desc')->paginate(20);
 
             // 対象日付のチェック
             $product_search_type_name = "";
@@ -174,6 +182,7 @@ class ProductController extends Controller
             "taxList"                  => $taxList,
             "unitList"                 => $unitList,
             "productList"              => $productList,
+            "csv_type_arr"             => $csv_type_arr,
         ]);
     }
 
@@ -284,7 +293,7 @@ class ProductController extends Controller
     }
 
      /**
-     * 製品新規追加　確認
+     * 製品新規追加 確認
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -336,7 +345,7 @@ class ProductController extends Controller
     }
 
     /**
-     * 製品新規追加　修正登録
+     * 製品新規追加 修正登録
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -425,7 +434,7 @@ class ProductController extends Controller
     }
 
     /**
-     * 製品新規追加　登録
+     * 製品新規追加 登録
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -539,7 +548,7 @@ class ProductController extends Controller
     }
 
     /**
-     * イベント新規追加　登録
+     * イベント新規追加 登録
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
@@ -614,5 +623,169 @@ class ProductController extends Controller
         }
 
         return json_encode($auto_complete_array);
+    }
+
+    /**
+     * 製品ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function csvDownLoad(Request $request)
+    {
+        $fileName = "product.csv";
+
+        // セッションにある検索条件を取得する
+
+        $product_search_type = $request->session()->get('product_search_type');
+        $product_search_text = $request->session()->get('product_search_text');
+
+        if ($product_search_type == 1) { // 製品名検索の場合
+            $product_name = $product_search_text;
+            $product_code = '';
+        } else { // 製品コード検索の場合
+            $product_name = '';
+            $product_code = $product_search_text;
+        }
+
+        try {
+
+            // 製品一覧を取得
+            $productList = DB::table('products AS Product')
+            ->select(
+                'Product.id             AS product_id',
+                'Product.code           AS product_code',
+                'Product.tax_id         AS tax_id',
+                'Product.name           AS product_name',
+            )
+            ->leftJoin('product_types AS ProductType', function ($join) {
+                $join->on('ProductType.id', '=', 'Product.product_type');
+            })
+            ->join('taxes AS Tax', function ($join) {
+                $join->on('Tax.id', '=', 'Product.tax_id');
+            })
+            ->if(!empty($product_name), function ($query) use ($product_name) {
+                return $query->where('Product.name', 'like', '%'.$product_name.'%');
+            })
+            ->if(!empty($product_code), function ($query) use ($product_code) {
+                return $query->where('Product.code', '=', $product_code);
+            })
+            ->where([
+                ['Product.new_product_flg', '=', '1'],
+                ['Product.active', '=', '1'],
+                ['ProductType.auto_regis_type_flg', '=', '0'],
+            ])
+            ->orderByRaw('CAST(Product.code AS SIGNED) ASC') // 文字列を数値としてソート
+            ->get();
+
+            // csv配列作成
+            $product_data = [];
+            foreach ($productList as $product) {
+
+                if($product->tax_id == 1){ // 8%の場合
+                    $tax_id = 1;
+                } else {
+                    $tax_id = 3;
+                }
+
+                // 自動レジは30文字MAX
+                $product_name = Str::limit($product->product_name, 27);
+
+                $product_data[] = [
+                    0 => $product->product_code,   // 商品コード
+                    1 => $product_name,            //商品名称
+                    2 => '' ,                      //レシート表示
+                    3 => 0 ,                       //単価
+                    4 => 0 ,                       //原価
+                    5 => '' ,                      //バーコード
+                    6 => 1 ,                       //大グループコード
+                    7 => 1 ,                       //グループコード
+                    8 => 1 ,                       //部門コード
+                    9 => '' ,                      //クラスコード
+                    10 => $tax_id ,                //課税
+                    11 => 0 ,                      //値引・割引許可
+                    12 => 0 ,                      //ポイント計算対象
+                    13 => 0 ,                      //商品ポイント（任意）
+                    14 => 0 ,                      //商品ポイント（利用）
+                    15 => '' ,                     //メモ
+                    16 => 0 ,                      //在庫管理対象
+                    17 => 0 ,                      //原価計算区分
+                    18 => 1 ,                      //商品販売区分
+                    19 => 0 ,                      //会員単価対象区分
+                    20 => 0 ,                      //会員単価
+                    21 => 1 ,                      //計算間隔
+                    22 => 0 ,                      //最低料金
+                    23 => 0 ,                      //最大料金（１日）
+                    24 => '' ,                     //延長リンク商品コード
+                    25 => '0000-0000-0-0' ,        //時間帯１（開始・終了・料金・間隔）
+                    26 => '0000-0000-0-0' ,        //時間帯２（開始・終了・料金・間隔）
+                    27 => '0000-0000-0-0' ,        //時間帯３（開始・終了・料金・間隔）
+                    28 => '0000-0000-0-0' ,        //時間帯４（開始・終了・料金・間隔）
+                    29 => '0000-0000-0-0' ,        //時間帯５（開始・終了・料金・間隔）
+                ];
+
+            }
+
+            // レスポンスをストリームで返す
+            $response = new StreamedResponse(function () use($product_data) {
+
+                $handle = fopen('php://output', 'w');
+
+                // ヘッダー行を追加
+                fputcsv($handle, array_map(function ($value) {
+                    return mb_convert_encoding($value, 'SJIS-win', 'UTF-8');
+                }, [
+                    '商品コード',
+                    '商品名称',
+                    'レシート表示',
+                    '単価',
+                    '原価',
+                    'バーコード',
+                    '大グループコード',
+                    'グループコード',
+                    '部門コード',
+                    'クラスコード',
+                    '課税',
+                    '値引・割引許可',
+                    'ポイント計算対象',
+                    '商品ポイント（任意）',
+                    '商品ポイント（利用）',
+                    'メモ',
+                    '在庫管理対象',
+                    '原価計算区分',
+                    '商品販売区分',
+                    '会員単価対象区分',
+                    '会員単価',
+                    '計算間隔',
+                    '最低料金',
+                    '最大料金（１日）',
+                    '延長リンク商品コード',
+                    '時間帯１（開始・終了・料金・間隔）',
+                    '時間帯２（開始・終了・料金・間隔）',
+                    '時間帯３（開始・終了・料金・間隔）',
+                    '時間帯４（開始・終了・料金・間隔）',
+                    '時間帯５（開始・終了・料金・間隔）'
+                ]));
+
+                // データをCSVに書き込む
+                foreach ($product_data as $row) {
+                    fputcsv($handle, array_map(function ($value) {
+                        return mb_convert_encoding($value, 'SJIS-win', 'UTF-8');
+                    }, $row));
+                }
+
+                fclose($handle);
+            });
+
+            // HTTPヘッダーを設定
+            $response->headers->set('Content-Type', 'text/csv; charset=Shift_JIS');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+
+            return $response;
+        } catch (\Exception $e) {
+
+            dd($e);
+
+            return null;
+        }
     }
 }

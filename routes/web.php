@@ -32,6 +32,7 @@ Route::post('StaffEditComplete', 'StaffController@editComplete');
 Route::post('StaffComplete', 'StaffController@complete');
 
 // 製品関連
+Route::get('Product/csv-downloag', 'ProductController@csvDownLoad');
 Route::get('ProductEdit/{product_id}', 'ProductController@edit');
 Route::get('ProductIndex', 'ProductController@index');
 Route::get('ProductIndex/{page_num}', 'ProductController@index');

@@ -50,7 +50,7 @@
                     </tr>
                 </table>
                 <div class="csv-btn-area">
-                    <a href="/Product/csv-downloag">
+                    <a href="./Product/csv-downloag">
                         <input type='button' class='search-btn btn-primary' name='search-btn' id="1" value='CSVダウンロード'>
                     </a>
                 </div>
@@ -131,7 +131,7 @@
 
 <style>
     /* 共通 */
-
+    
     .search-control {
         display: block;
         width: 100%;
@@ -146,7 +146,7 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-
+    
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -154,18 +154,18 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-
+    
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-
+    
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-
+    
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -173,12 +173,12 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-
+    
     .search-area table {
         margin: auto;
         width: 100%;
     }
-
+    
     .table-th {
         width: 30%;
         padding: 15px 50px 0px 0px;
@@ -187,28 +187,28 @@
         font-weight: bolder;
         text-align: right;
     }
-
+    
     .table-td {
         font-size: 12px;
         float: left;
         padding: 10px 0px;
         width: 30%;
     }
-
+    
     .radio_box {
         width: 20%;
         padding: 17px 10px;
         font-size: 12px;
         float: left;
     }
-
+    
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-
+    
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -217,7 +217,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-
+    
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -226,13 +226,13 @@
         border-radius: 10px;
         margin-left: 2%;
     }
-
+    
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-
+    
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -240,7 +240,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-
+    
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -252,7 +252,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-
+    
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -260,11 +260,11 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-
+    
     .double-width {
         width: 20%!important;
     }
-
+    
     .edit-btn {
         border-radius: 5px;
         color: #fff;
@@ -276,7 +276,7 @@
         padding: 10px;
     }
     /* アコーディオン全体のデザイン */
-
+    
     .accordion {
         max-width: 1300px;
         width: 90%;
@@ -286,7 +286,7 @@
         overflow: hidden;
     }
     /* アコーディオン全体 */
-
+    
     .accordion {
         max-width: 1300px;
         width: 90%;
@@ -296,7 +296,7 @@
         overflow: hidden;
     }
     /* ヘッダー部分（ボタン） */
-
+    
     .accordion-header {
         padding: 5px;
         cursor: pointer;
@@ -304,18 +304,18 @@
         display: flex;
         align-items: center;
     }
-
+    
     .accordion-header span {
         margin-left: 10px;
     }
     /* 矢印アイコン */
-
+    
     .accordion-arrow {
         font-size: 12px;
         transition: transform 0.3s ease;
     }
     /* アコーディオンの内容（最初は非表示） */
-
+    
     .accordion-content {
         display: none;
         padding: 15px;
@@ -323,25 +323,25 @@
         border-top: 1px solid #ccc;
     }
     /* 矢印が回転するクラス */
-
+    
     .rotate {
         transform: rotate(180deg);
     }
-
+    
     .csv-type-table-area th {
         font-size: 12px;
     }
-
+    
     .csv-type-table-area td select {
         font-size: 12px;
         border-radius: 5px;
         margin-left: 20px;
     }
-
+    
     .csv-btn-area {
         margin-top: 20px;
     }
-
+    
     .csv-btn-area input {
         max-width: 120px;
     }

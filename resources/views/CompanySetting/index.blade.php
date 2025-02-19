@@ -63,6 +63,14 @@
                 <label class="column-label" for="invoice_form_id">適格請求書発行事業者登録番号：</label>
                 <input type="text" class="form-control" value="<?= $company_setting_data[0]->invoice_form_id ?>" readonly>
             </div>
+            <div class="form-group">
+                <label class="column-label" for="company_image">会社角印：</label>
+                @if($company_setting_data[0]->company_image)
+                    <img src="{{ asset('../storage/app/images/' . $company_setting_data[0]->company_image) }}" width="300px">
+                @else
+                    <p>登録された角印はありません。</p>
+                @endif
+            </div>
             <br>
             <div class="form-group">
                 <a href="./CompanySettingEdit/" id="create-submit-btn" class="btn btn-primary">編集画面へ</a>

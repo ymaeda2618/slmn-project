@@ -14,6 +14,9 @@
         <div id='right-contents'>
             <h1>納品書</h1>
             <br>
+            @if($companyInfo['company_image'])
+                <img src={{ asset('../storage/app/images/' . $companyInfo['company_image']) }} class="company-image">
+            @endempty
             <h2>{{$companyInfo['name']}}</h2>
             <p>〒{{$companyInfo['postal_code']}}　{{$companyInfo['address']}}</p>
             <p>売り場店舗 TEL：{{$companyInfo['shop_tel']}}　FAX：{{$companyInfo['shop_fax']}}</p>
@@ -101,6 +104,7 @@
 <style>
     #wrapper {
         width: 100%;
+        position: relative;
     }
 
     #top-contents {
@@ -261,5 +265,13 @@
 
     .page:last-child {
         page-break-after: auto;
+    }
+
+    .company-image {
+        position: absolute;
+        top: 60px;
+        right: 100px;
+        width: 160px;
+        z-index: -1;
     }
 </style>

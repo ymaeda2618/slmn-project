@@ -929,6 +929,7 @@ class DepositController extends Controller
         $companyInfo['branch_name']     = empty($companyDatas[0]->branch_name)     ? '' : $companyDatas[0]->branch_name;
         $companyInfo['bank_type']       = empty($companyDatas[0]->bank_type)       ? '' : $bank_type[$companyDatas[0]->bank_type];
         $companyInfo['bank_account']    = empty($companyDatas[0]->bank_account)    ? '' : $companyDatas[0]->bank_account;
+        $companyInfo['company_image']   = empty($companyDatas[0]->company_image)   ? '' : $companyDatas[0]->company_image;
 
         // 郵便番号は間にハイフンを入れる
         if (!empty($companyDatas[0]->postal_code)) {

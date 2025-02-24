@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\CompanySetting;
 use Carbon\Carbon;
@@ -75,6 +76,7 @@ class CompanySettingController extends Controller
             'data.CompanySetting.shop_tel'        => ['nullable', 'regex:/^\d+$/'],
             'data.CompanySetting.shop_fax'        => ['nullable', 'regex:/^\d+$/'],
             'data.CompanySetting.invoice_form_id' => ['nullable', 'regex:/^\d+$/'],
+            'data.CompanySetting.company_image'   => ['nullable', 'image', 'mimes:png', 'max:1024'],
         ],[
             'data.CompanySetting.postal_code.regex'     => '郵便番号は半角数字のみで入力してください。',
             'data.CompanySetting.bank_code.regex'       => '銀行コードは半角数字のみで入力してください。',
@@ -85,7 +87,21 @@ class CompanySettingController extends Controller
             'data.CompanySetting.shop_tel.regex'        => '店舗TELは半角数字のみで入力してください。',
             'data.CompanySetting.shop_fax.regex'        => '店舗FAXは半角数字のみで入力してください。',
             'data.CompanySetting.invoice_form_id.regex' => '適格請求書発行事業者登録番号は半角数字のみで入力してください。',
+            'data.CompanySetting.company_image.image'   => '角印は1M以内のPNGで登録してください。',
+            'data.CompanySetting.company_image.mimes'   => '角印は1M以内のPNGで登録してください。',
+            'data.CompanySetting.company_image.max'     => '角印は1M以内のPNGで登録してください。',
         ]);
+
+        if ($request->hasFile('data.CompanySetting.company_image')) {
+            // imagesディレクトリがなければ作成
+            if (!Storage::exists('images')) {
+                Storage::makeDirectory('images');
+            }
+
+            $imageName = 'company_' . time() . '.' . $request->file('data.CompanySetting.company_image')->extension();
+            $request->file('data.CompanySetting.company_image')->storeAs('images', $imageName);
+            session(['company_image' => $imageName]);
+        }
 
         $action_url = './CompanySettingEditComplete';
 
@@ -134,6 +150,11 @@ class CompanySettingController extends Controller
             $CompanySetting->invoice_form_id  = $request->data['CompanySetting']['invoice_form_id'];
             $CompanySetting->modified_user_id = $user_info_id;               // 更新者ユーザーID
             $CompanySetting->modified         = Carbon::now();               // 更新時間
+
+            // 画像アップロード処理追加
+            if (session('company_image')) {
+                $CompanySetting->company_image = session('company_image');
+            }
 
             $CompanySetting->save();
 

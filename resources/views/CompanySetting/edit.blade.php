@@ -99,6 +99,18 @@
                 @enderror
                 <input type="text" class="form-control" id="invoice_form_id" name="data[CompanySetting][invoice_form_id]" value="{{old('data.CompanySetting.invoice_form_id', $company_setting_data[0]->invoice_form_id)}}">
             </div>
+            <div class="form-group">
+                <label class="column-label" for="company_image">会社角印：</label>
+                @if($company_setting_data[0]->company_image)
+                    <p>現在登録されている画像：</p>
+                    <img src="{{ asset('../storage/app/images/' . $company_setting_data[0]->company_image) }}" width="300px"><br>
+                @endif
+                @error('data.CompanySetting.company_image')
+                <div class="text-red-500">{{ $message }}</div>
+                @enderror
+                <input type="file" class="" id="company_image" name="data[CompanySetting][company_image]"><br>
+                <small>※新しい画像を選択すると上書きされます</small>
+            </div>
             <br>
             <button id="create-submit-btn" type="submit" class="btn btn-primary">編集確認画面へ</button>
             <input type='hidden' name="data[CompanySetting][id]" value="{{$company_setting_data[0]->id}}">

@@ -35,6 +35,7 @@
                                             </option>
                                         @endforeach
                                     </select>
+                                    <input type="hidden" id="product_type_selected" value="{{ $condition_product_type }}">
                                 </div>
                             </td>
                             <td>
@@ -47,6 +48,7 @@
                                         </option>
                                         @endforeach
                                     </select>
+                                    <input type="hidden" id="status_id_selected" value="{{ $condition_status_id }}">
                                 </div>
                             </td>
                         </tr>
@@ -148,6 +150,15 @@
 <script type="text/javascript">
     (function($) {
         jQuery(window).load(function() {
+
+            // 検索されて選択状態の役職を取得
+            var product_type_selected = $("#product_type_selected").val();
+            // 検索条件で設定された役職を設定
+            $('#product_type').val(product_type_selected);
+            // 検索されて選択状態の役職を取得
+            var status_id_selected = $("#status_id_selected").val();
+            // 検索条件で設定された役職を設定
+            $('#status_id').val(status_id_selected);
 
             // CSVダウンロードメニュー
             $(".accordion-header").click(function() {

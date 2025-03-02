@@ -53,39 +53,70 @@ class ProductController extends Controller
         // postできたか、getできたか
         if ($_SERVER["REQUEST_METHOD"] != "POST") { // ページング処理
 
-            $product_search_type = $request->session()->get('product_search_type');
-            $product_search_text = $request->session()->get('product_search_text');
+            $condition_date_from     = $request->session()->get('condition_date_from');
+            $condition_date_to       = $request->session()->get('condition_date_to');
 
-            if($product_search_type == 1){ // 製品名検索の場合
-                $product_name = $product_search_text;
-            } else { // 製品コード検索の場合
-                $product_code = $product_search_text;
-            }
+            $condition_product_type  = $request->session()->get('condition_product_type');
+            $condition_status_id     = $request->session()->get('condition_status_id');
+
+            $condition_search_text   = $request->session()->get('condition_search_text');
+            $condition_product_code  = $request->session()->get('condition_product_code');
+            $condition_product_id    = $request->session()->get('condition_product_id');
+            $condition_product_text  = $request->session()->get('condition_product_text');
 
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
-                $product_search_type = $request->data['Product']['product_search_type'];
-                $product_search_text = $request->data['Product']['product_search_text'];
-
-                if ($product_search_type == 1) { // 製品名検索の場合
-                    $product_name        = $product_search_text;
-                } else { // 製品コード検索の場合
-                    $product_code        = $product_search_text;
+                if (isset($request->data['product'])) {
+                    $req_product_data = $request->data['product'];
                 }
 
-                $request->session()->put('product_search_type', $product_search_type);
-                $request->session()->put('product_search_text', $product_search_text);
-                $request->session()->put('product_name', $product_name);
-                $request->session()->put('product_code', $product_code);
+                 // 日付の設定
+                $condition_date_from     = isset($req_product_data['date_from']) ? $req_product_data['date_from'] : NULL;
+                $condition_date_to       = isset($req_product_data['date_to']) ? $req_product_data['date_to'] : NULL;
+                // どちらか片方しか入力されなかった場合は同じ日付を入れる
+                if (!empty($condition_date_from) && empty($condition_date_to)) {
+                    $condition_date_to = $condition_date_from;
+                }
+                if (empty($condition_date_from) && !empty($condition_date_to)) {
+                    $condition_date_from = $condition_date_to;
+                }
+                $condition_product_type  = isset($req_product_data['product_type']) ? $req_product_data['product_type'] : NULL;
+                $condition_status_id     = isset($req_product_data['status_id']) ? $req_product_data['status_id'] : NULL;
+                $condition_search_text   = isset($req_product_data['search_text']) ? $req_product_data['search_text'] : NULL;
+                $condition_product_code  = isset($req_product_data['product_code']) ? $req_product_data['product_code'] : NULL;
+                $condition_product_id    = isset($req_product_data['product_id']) ? $req_product_data['product_id'] : NULL;
+                $condition_product_text  = isset($req_product_data['product_text']) ? $req_product_data['product_text'] : NULL;
+
+                $request->session()->put('condition_date_from', $condition_date_from);
+                $request->session()->put('condition_date_to', $condition_date_to);
+                $request->session()->put('condition_product_type', $condition_product_type);
+                $request->session()->put('condition_status_id', $condition_status_id);
+                $request->session()->put('condition_search_text', $condition_search_text);
+                $request->session()->put('condition_product_code', $condition_product_code);
+                $request->session()->put('condition_product_id', $condition_product_id);
+                $request->session()->put('condition_product_text', $condition_product_text);
 
             } else { // リセットボタンが押された時の処理
 
-                $request->session()->forget('product_search_type');
-                $request->session()->forget('product_search_text');
-                $request->session()->forget('product_name');
-                $request->session()->forget('product_code');
+                $condition_date_from     = null;
+                $condition_date_to       = null;
+                $condition_product_type  = null;
+                $condition_status_id     = null;
+                $condition_search_text   = null;
+                $condition_product_code  = null;
+                $condition_product_id    = null;
+                $condition_product_text  = null;
+
+                $request->session()->forget('condition_date_from');
+                $request->session()->forget('condition_date_to');
+                $request->session()->forget('condition_product_type');
+                $request->session()->forget('condition_status_id');
+                $request->session()->forget('condition_search_text');
+                $request->session()->forget('condition_product_code');
+                $request->session()->forget('condition_product_id');
+                $request->session()->forget('condition_product_text');
             }
         }
 
@@ -141,11 +172,20 @@ class ProductController extends Controller
             ->join('units AS Unit', function ($join) {
                 $join->on('Unit.id', '=', 'Product.unit_id');
             })
-            ->if(!empty($product_name), function ($query) use ($product_name) {
-                return $query->where('Product.name', 'like', '%'.$product_name.'%');
+            ->if(!empty($condition_date_from) && !empty($condition_date_to), function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('Product.created', [$condition_date_from, $condition_date_to]);
             })
-            ->if(!empty($product_code), function ($query) use ($product_code) {
-                return $query->where('Product.code', '=', $product_code);
+            ->if(!empty($condition_product_type), function ($queryDetail) use ($condition_product_type) {
+                return $queryDetail->where('Product.product_type', '=', $condition_product_type);
+            })
+            ->if(!empty($condition_status_id), function ($queryDetail) use ($condition_status_id) {
+                return $queryDetail->where('Product.status_id', '=', $condition_status_id);
+            })
+            ->if(!empty($condition_search_text), function ($queryDetail) use ($condition_search_text) {
+                return $queryDetail->where('Product.name', 'like', '%'.$condition_search_text.'%');
+            })
+            ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
+                return $queryDetail->where('Product.id', '=', $condition_product_id);
             })
             ->where([
                 ['Product.new_product_flg', '=', '1'],
@@ -172,10 +212,14 @@ class ProductController extends Controller
 
         return view('Product.index')->with([
             "action"                   => $search_action,
-            "product_search_type"      => $product_search_type,
-            "product_search_type_name" => $product_search_type_name,
-            "product_search_type_code" => $product_search_type_code,
-            "product_search_text"      => $product_search_text,
+            "condition_date_from"     => $condition_date_from,
+            "condition_date_to"        => $condition_date_to,
+            "condition_product_type"   => $condition_product_type,
+            "condition_status_id"      => $condition_status_id,
+            "condition_search_text"   => $condition_search_text,
+            "condition_product_code"   => $condition_product_code,
+            "condition_product_id"     => $condition_product_id,
+            "condition_product_text"   => $condition_product_text,
             "search_action"            => $search_action,
             "productTypeList"          => $productTypeList,
             "statusList"               => $statusList,
@@ -636,18 +680,19 @@ class ProductController extends Controller
 
         // セッションにある検索条件を取得する
 
-        $product_search_type = $request->session()->get('product_search_type');
-        $product_search_text = $request->session()->get('product_search_text');
+        $condition_date_from     = $request->session()->get('condition_date_from');
+        $condition_date_to       = $request->session()->get('condition_date_to');
 
-        if ($product_search_type == 1) { // 製品名検索の場合
-            $product_name = $product_search_text;
-            $product_code = '';
-        } else { // 製品コード検索の場合
-            $product_name = '';
-            $product_code = $product_search_text;
-        }
+        $condition_product_type  = $request->session()->get('condition_product_type');
+        $condition_status_id     = $request->session()->get('condition_status_id');
+
+        $condition_search_text   = $request->session()->get('condition_search_text');
+        $condition_product_code  = $request->session()->get('condition_product_code');
+        $condition_product_id    = $request->session()->get('condition_product_id');
+        $condition_product_text  = $request->session()->get('condition_product_text');
 
         try {
+
 
             // 製品一覧を取得
             $productList = DB::table('products AS Product')
@@ -660,21 +705,35 @@ class ProductController extends Controller
             ->leftJoin('product_types AS ProductType', function ($join) {
                 $join->on('ProductType.id', '=', 'Product.product_type');
             })
+            ->leftJoin('statuses AS Status', function ($join) {
+                $join->on('Status.id', '=', 'Product.status_id');
+            })
             ->join('taxes AS Tax', function ($join) {
                 $join->on('Tax.id', '=', 'Product.tax_id');
             })
-            ->if(!empty($product_name), function ($query) use ($product_name) {
-                return $query->where('Product.name', 'like', '%'.$product_name.'%');
+            ->join('units AS Unit', function ($join) {
+                $join->on('Unit.id', '=', 'Product.unit_id');
             })
-            ->if(!empty($product_code), function ($query) use ($product_code) {
-                return $query->where('Product.code', '=', $product_code);
+            ->if(!empty($condition_date_from) && !empty($condition_date_to), function ($query) use ($condition_date_from, $condition_date_to) {
+                return $query->whereBetween('Product.created', [$condition_date_from, $condition_date_to]);
+            })
+            ->if(!empty($condition_product_type), function ($queryDetail) use ($condition_product_type) {
+                return $queryDetail->where('Product.product_type', '=', $condition_product_type);
+            })
+            ->if(!empty($condition_status_id), function ($queryDetail) use ($condition_status_id) {
+                return $queryDetail->where('Product.status_id', '=', $condition_status_id);
+            })
+            ->if(!empty($condition_search_text), function ($queryDetail) use ($condition_search_text) {
+                return $queryDetail->where('Product.name', 'like', '%'.$condition_search_text.'%');
+            })
+            ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
+                return $queryDetail->where('Product.id', '=', $condition_product_id);
             })
             ->where([
                 ['Product.new_product_flg', '=', '1'],
                 ['Product.active', '=', '1'],
                 ['ProductType.auto_regis_type_flg', '=', '0'],
-            ])
-            ->orderByRaw('CAST(Product.code AS SIGNED) ASC') // 文字列を数値としてソート
+            ])->orderByRaw('CAST(Product.code AS SIGNED) ASC') // 文字列を数値としてソート
             ->get();
 
             // csv配列作成
@@ -688,7 +747,7 @@ class ProductController extends Controller
                 }
 
                 // 自動レジは30文字MAX
-                $product_name = Str::limit($product->product_name, 27);
+                $product_name = Str::limit($product->product_name, 26);
 
                 $product_data[] = [
                     0 => $product->product_code,   // 商品コード

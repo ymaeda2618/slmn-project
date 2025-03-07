@@ -124,6 +124,7 @@ Route::post('editRegisterSupplySlips', 'SupplySlipController@editRegister');
 Route::post('getOrderSupplyUnitPrice', 'SupplySlipController@getOrderSupplyUnitPrice');
 
 // 売上登録
+Route::get('SaleSlip/csv-downloag', 'SaleSlipController@csvDownLoad');
 Route::get('SaleSlipIndex', 'SaleSlipController@index');
 Route::get('SaleSlipIndex/{page_num}', 'SaleSlipController@index');
 Route::post('SaleSlipIndex', 'SaleSlipController@index');

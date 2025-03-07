@@ -3020,12 +3020,9 @@ class SaleSlipController extends Controller
         $date_from    = $request->session()->get('condition_date_from');
         $date_to      = $request->session()->get('condition_date_to');
         $company_id   = $request->session()->get('condition_company_id');
-        $company_code = $request->session()->get('condition_company_code');
         $payment_type = $request->session()->get('condition_payment_method_type');
         $product_id   = $request->session()->get('condition_product_id');
-        $product_code = $request->session()->get('condition_product_code');
         $staff_id     = $request->session()->get('condition_staff_id');
-        $staff_code   = $request->session()->get('condition_staff_code');
         $submit_type  = $request->session()->get('condition_submit_type');
         $display_sort = $request->session()->get('condition_display_sort');
         $no_display   = $request->session()->get('condition_no_display');
@@ -3111,45 +3108,6 @@ class SaleSlipController extends Controller
                 ->orderBy('SaleSlip.id', 'desc')
                 ->get();
 
-            // ---------------------------
-            // 製品IDと担当者IDフィルタリング
-            // ---------------------------
-            $saleSlipDetailSumList = DB::table('sale_slip_details AS SaleSlipDetail')
-                ->selectRaw('COUNT(SaleSlipDetail.id) AS sale_slip_detail_num')
-                ->selectRaw('SUM(SaleSlipDetail.notax_price) AS notax_price_sum')
-                ->join('sale_slips AS SaleSlip', 'SaleSlip.id', '=', 'SaleSlipDetail.sale_slip_id')
-                ->join('products AS Product', 'Product.id', '=', 'SaleSlipDetail.product_id')
-                ->leftJoin('standards AS Standard', 'Standard.id', '=', 'SaleSlipDetail.standard_id')
-                ->join('units AS Unit', 'Unit.id', '=', 'SaleSlipDetail.unit_id')
-                ->leftJoin('staffs AS Staff', 'Staff.id', '=', 'SaleSlipDetail.staff_id')
-                ->leftJoin('sale_companies AS SaleCompany', 'SaleCompany.id', '=', 'SaleSlip.sale_company_id')
-                ->when(!empty($date_from) && !empty($date_to) && $date_type == 1, function ($query) use ($date_from, $date_to) {
-                    return $query->whereBetween('SaleSlip.date', [$date_from, $date_to]);
-                })
-                ->when(!empty($date_from) && !empty($date_to) && $date_type == 2, function ($query) use ($date_from, $date_to) {
-                    return $query->whereBetween('SaleSlip.delivery_date', [$date_from, $date_to]);
-                })
-                ->when(!empty($company_id), function ($query) use ($company_id) {
-                    return $query->where('SaleSlip.sale_company_id', $company_id);
-                })
-                ->when(!is_null($payment_type), function ($query) use ($payment_type) {
-                    return $query->where('SaleSlip.payment_method_type', $payment_type);
-                })
-                ->when(!empty($product_id), function ($query) use ($product_id) {
-                    return $query->where('SaleSlipDetail.product_id', $product_id);
-                })
-                ->when(!empty($staff_id), function ($query) use ($staff_id) {
-                    return $query->where('SaleSlipDetail.staff_id', $staff_id);
-                })
-                ->when(!empty($submit_type), function ($query) use ($submit_type) {
-                    return $query->where('SaleSlip.sale_submit_type', $submit_type);
-                })
-                ->when(!empty($no_display), function ($query) {
-                    return $query->where('SaleSlip.info_mart_slip_no', 0);
-                })
-                ->where('SaleSlip.active', 1)
-                ->get();
-
             // ---------------
             // 伝票詳細を取得
             // ---------------
@@ -3192,6 +3150,12 @@ class SaleSlipController extends Controller
                 ->leftJoin('origin_areas AS OriginArea', 'OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
                 ->when(!empty($sale_slip_id_arr), function ($query) use ($sale_slip_id_arr) {
                     return $query->whereIn('SaleSlip.id', $sale_slip_id_arr);
+                })
+                ->when(!empty($product_id), function ($query) use ($product_id) {
+                    return $query->where('SaleSlipDetail.product_id', $product_id);
+                })
+                ->when(!empty($staff_id), function ($query) use ($staff_id) {
+                    return $query->where('SaleSlipDetail.staff_id', $staff_id);
                 })
                 ->orderBy('SaleSlip.id', 'desc')
                 ->orderBy('SaleSlipDetail.sort', 'asc')

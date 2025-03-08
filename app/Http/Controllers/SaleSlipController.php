@@ -3127,6 +3127,8 @@ class SaleSlipController extends Controller
                     'Product.tax_id AS product_tax_id',
                     'Standard.name AS standard_name',
                     'SaleSlipDetail.id AS sale_slip_detail_id',
+                    'SaleSlipDetail.inventory_unit_num AS inventory_unit_num',
+                    'InventoryUnit.name AS inventory_unit_name',
                     'SaleSlipDetail.unit_price AS unit_price',
                     'SaleSlipDetail.unit_num AS unit_num',
                     'Unit.name AS unit_name',
@@ -3145,6 +3147,7 @@ class SaleSlipController extends Controller
                 ->join('products AS Product', 'Product.id', '=', 'SaleSlipDetail.product_id')
                 ->leftJoin('standards AS Standard', 'Standard.id', '=', 'SaleSlipDetail.standard_id')
                 ->join('units AS Unit', 'Unit.id', '=', 'SaleSlipDetail.unit_id')
+                ->leftJoin('units AS InventoryUnit', 'InventoryUnit.id', '=', 'SaleSlipDetail.inventory_unit_id')
                 ->leftJoin('staffs AS Staff', 'Staff.id', '=', 'SaleSlipDetail.staff_id')
                 ->leftJoin('sale_companies AS SaleCompany', 'SaleCompany.id', '=', 'SaleSlip.sale_company_id')
                 ->leftJoin('origin_areas AS OriginArea', 'OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
@@ -3198,8 +3201,8 @@ class SaleSlipController extends Controller
                     5  => $sale_data[$saleSlipId]['payment_type_name'],     // 支払方法名称
                     6  => $detailData->product_code,                        // 製品コード
                     7  => $product_name,                                    // 製品名
-                    8  => '',                                               // 個数
-                    9  => '',                                               // 個数単位
+                    8  => $detailData->inventory_unit_num,                  // 個数
+                    9  => $detailData->inventory_unit_name,                 // 個数単位
                     10 => $detailData->unit_num,                            // 数量
                     11 => $detailData->unit_name,                           // 数量単位
                     12 => $detailData->unit_price,                          // 単価

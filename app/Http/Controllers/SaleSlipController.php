@@ -3171,7 +3171,16 @@ class SaleSlipController extends Controller
                 $sale_data[$saleData->sale_slip_id]['company_code']        = $saleData->sale_company_code;
                 $sale_data[$saleData->sale_slip_id]['company_name']        = $saleData->sale_company_name;
                 $sale_data[$saleData->sale_slip_id]['payment_method_type'] = $saleData->payment_method_type;
-                $sale_data[$saleData->sale_slip_id]['payment_type_name']   = $payment_type_name[$saleData->payment_method_type];
+                if(
+                    isset($saleData->payment_method_type) && (
+                        $saleData->payment_method_type == 0 ||
+                        $saleData->payment_method_type == 1
+                    )
+                ) {
+                    $sale_data[$saleData->sale_slip_id]['payment_type_name']   = $payment_type_name[$saleData->payment_method_type];
+                } else {
+                    $sale_data[$saleData->sale_slip_id]['payment_type_name']   = '';
+                }
             }
 
             // csv配列作成

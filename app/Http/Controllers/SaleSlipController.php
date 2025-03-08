@@ -3011,8 +3011,8 @@ class SaleSlipController extends Controller
         $fileName = "sales_list.csv";
 
         $payment_type_name = [
-            0 => '現金売り',
-            1 => '掛け売り'
+            0 => '掛け売り',
+            1 => '現金売り'
         ];
 
         // セッションにある検索条件を取得する

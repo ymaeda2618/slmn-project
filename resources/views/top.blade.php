@@ -113,10 +113,10 @@
                         <p>仕入/売上企業登録</p>
                         <ul>
                             <li>
-                                <a href="./SupplyShopIndex" class="edit-btn">仕入先企業一覧</a>
+                                <a href="./SupplyCompanyIndex" class="edit-btn">仕入先企業一覧</a>
                             </li>
                             <li>
-                                <a href="./SupplyShopCreate" class="edit-btn">仕入先企業登録</a>
+                                <a href="./SupplyCompanyCreate" class="edit-btn">仕入先企業登録</a>
                             </li>
                             <li>
                                 <a href="./SaleCompanyIndex" class="edit-btn">売上先企業一覧</a>
@@ -140,6 +140,18 @@
                             </li>
                             <li>
                                 <a href="./ProductCreate" class="edit-btn">製品登録</a>
+                            </li>
+                            <li>
+                                <a href="./OrderSupplyUnitPriceIndex" class="edit-btn">仕入発注単価一覧</a>
+                            </li>
+                            <li>
+                                <a href="./OrderSupplyUnitPriceCreate" class="edit-btn">仕入発注単価登録</a>
+                            </li>
+                            <li>
+                                <a href="./OrderSaleUnitPriceIndex" class="edit-btn">売上発注単価一覧</a>
+                            </li>
+                            <li>
+                                <a href="./OrderSaleUnitPriceCreate" class="edit-btn">売上発注単価登録</a>
                             </li>
                         </ul>
                     </li>

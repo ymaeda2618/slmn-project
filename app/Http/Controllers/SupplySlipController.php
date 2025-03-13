@@ -9,6 +9,8 @@ use App\Staff;
 use App\SupplySlip;
 use App\SupplySlipDetail;
 use Carbon\Carbon;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Support\Str;
 
 class SupplySlipController extends Controller
 {
@@ -722,6 +724,268 @@ class SupplySlipController extends Controller
     public function create()
     {
         return view('SupplySlip.create');
+    }
+
+    /**
+     * 仕入一覧のcsvダウンロード処理
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function csvDownLoad(Request $request)
+    {
+        $fileName = "supply_list.csv";
+
+        $supply_submit_name = [
+            0 => '全て',
+            1 => '登録済み',
+            2 => '一時保存',
+        ];
+
+        // セッションにある検索条件を取得する
+        $date_type    = $request->session()->get('condition_date_type');
+        $date_from    = $request->session()->get('condition_date_from');
+        $date_to      = $request->session()->get('condition_date_to');
+        $company_id   = $request->session()->get('condition_company_id');
+        $product_id   = $request->session()->get('condition_product_id');
+        $shop_id      = $request->session()->get('condition_shop_id');
+        $submit_type  = $request->session()->get('condition_submit_type');
+        $display_sort = $request->session()->get('condition_display_sort');
+        $display_num  = $request->session()->get('condition_display_num');
+
+        // sessionにデータない場合
+        if (empty($date_type)) $date_type = 1;
+        if (empty($date_from)) $date_from = date('Y-m-d');
+        if (empty($date_to)) $date_to = date('Y-m-d');
+
+        try {
+
+            // ------------------
+            // 仕入一覧データを取得
+            // ------------------
+            $supplySlipList = DB::table('supply_slips AS SupplySlip')
+                ->select([
+                    'SupplySlip.id AS supply_slip_id',
+                    'SupplySlip.delivery_price AS delivery_price',
+                    'SupplySlip.adjust_price AS adjust_price',
+                    'SupplySlip.notax_sub_total AS notax_sub_total',
+                    'SupplySlip.supply_submit_type AS supply_submit_type',
+                    'SupplyCompany.code AS supply_company_code',
+                    'SupplyCompany.name AS supply_company_name'
+                ])
+                ->selectRaw('
+                    DATE_FORMAT(SupplySlip.date, "%Y/%m/%d") AS supply_slip_date,
+                    DATE_FORMAT(SupplySlip.delivery_date, "%Y/%m/%d") AS supply_slip_delivery_date,
+                    DATE_FORMAT(SupplySlip.modified, "%m-%d %H:%i") AS supply_slip_modified
+                ')
+                ->join('supply_companies AS SupplyCompany', 'SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
+                ->leftJoin('supply_shops AS SupplyShop', 'SupplyShop.id', '=', 'SupplySlip.supply_shop_id')
+                ->when(!empty($product_id), function ($query) use ($product_id) {
+                    return $query->whereExists(function ($subQuery) use ($product_id) {
+                        $subQuery->select(DB::raw(1))
+                            ->from('supply_slip_details AS SubTable')
+                            ->whereColumn('SubTable.supply_slip_id', 'SupplySlip.id')
+                            ->where('SubTable.product_id', '=', $product_id)
+                            ->where('SubTable.active', '=', '1');
+                    });
+                })
+                ->when(!empty($date_from) && !empty($date_to) && $date_type == 1, function ($query) use ($date_from, $date_to) {
+                    return $query->whereBetween('SupplySlip.date', [$date_from, $date_to]);
+                })
+                ->when(!empty($date_from) && !empty($date_to) && $date_type == 2, function ($query) use ($date_from, $date_to) {
+                    return $query->whereBetween('SupplySlip.delivery_date', [$date_from, $date_to]);
+                })
+                ->when(!empty($company_id), function ($query) use ($company_id) {
+                    return $query->where('SupplySlip.supply_company_id', '=', $company_id);
+                })
+                ->when(!empty($shop_id), function ($query) use ($shop_id) {
+                    return $query->where('SupplySlip.supply_shop_id', '=', $shop_id);
+                })
+                ->when(!empty($submit_type), function ($query) use ($submit_type) {
+                    return $query->where('SupplySlip.supply_submit_type', '=', $submit_type);
+                })
+                ->when($display_sort === 0, function ($query) {
+                    return $query->orderBy('SupplySlip.date', 'desc');
+                })
+                ->when($display_sort === 1, function ($query) {
+                    return $query->orderBy('SupplySlip.date', 'asc');
+                })
+                ->when($display_sort === 2, function ($query) {
+                    return $query->orderBy('SupplySlip.delivery_date', 'desc');
+                })
+                ->when($display_sort === 3, function ($query) {
+                    return $query->orderBy('SupplySlip.delivery_date', 'asc');
+                })
+                ->where('SupplySlip.active', 1)
+                ->orderBy('SupplySlip.id', 'desc')
+                ->get();
+
+            // ---------------
+            // 伝票詳細を取得
+            // ---------------
+            $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
+                ->select([
+                    'SupplySlip.id AS supply_slip_id',
+                    'SupplySlip.total AS supply_slip_total',
+                    'SupplySlip.supply_submit_type AS supply_submit_type',
+                    'SupplyCompany.code AS supply_company_code',
+                    'SupplyCompany.name AS supply_company_name',
+                    'Product.code AS product_code',
+                    'Product.name AS product_name',
+                    'Product.tax_id AS product_tax_id',
+                    'Standard.name AS standard_name',
+                    'SupplySlipDetail.id AS supply_slip_detail_id',
+                    'SupplySlipDetail.inventory_unit_num AS inventory_unit_num',
+                    'InventoryUnit.name AS inventory_unit_name',
+                    'SupplySlipDetail.unit_price AS unit_price',
+                    'SupplySlipDetail.unit_num AS unit_num',
+                    'Unit.name AS unit_name',
+                    'SupplySlipDetail.memo AS memo',
+                    'Staff.code AS staff_code',
+                    'OriginArea.id AS origin_area_id',
+                    'OriginArea.name AS origin_area_name',
+                ])
+                ->selectRaw('
+                    DATE_FORMAT(SupplySlip.date, "%Y/%m/%d") AS supply_slip_date,
+                    DATE_FORMAT(SupplySlip.delivery_date, "%Y/%m/%d") AS supply_slip_delivery_date,
+                    DATE_FORMAT(SupplySlip.modified, "%m-%d %H:%i") AS supply_slip_modified,
+                    CONCAT(Staff.name_sei, " ", Staff.name_mei) AS staff_name
+                ')
+                ->join('supply_slips AS SupplySlip', 'SupplySlip.id', '=', 'SupplySlipDetail.supply_slip_id')
+                ->join('products AS Product', 'Product.id', '=', 'SupplySlipDetail.product_id')
+                ->leftJoin('standards AS Standard', 'Standard.id', '=', 'SupplySlipDetail.standard_id')
+                ->join('units AS Unit', 'Unit.id', '=', 'SupplySlipDetail.unit_id')
+                ->leftJoin('units AS InventoryUnit', 'InventoryUnit.id', '=', 'SupplySlipDetail.inventory_unit_id')
+                ->leftJoin('staffs AS Staff', 'Staff.id', '=', 'SupplySlipDetail.staff_id')
+                ->leftJoin('supply_companies AS SupplyCompany', 'SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
+                ->leftJoin('origin_areas AS OriginArea', 'OriginArea.id', '=', 'SupplySlipDetail.origin_area_id')
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('supply_slips AS s')
+                        ->whereColumn('s.id', 'SupplySlipDetail.supply_slip_id')
+                        ->where('s.active', 1);
+                })
+                ->when(!empty($date_from) && !empty($date_to) && $date_type == 1, function ($query) use ($date_from, $date_to) {
+                    return $query->whereBetween('SupplySlip.date', [$date_from, $date_to]);
+                })
+                ->when(!empty($date_from) && !empty($date_to) && $date_type == 2, function ($query) use ($date_from, $date_to) {
+                    return $query->whereBetween('SupplySlip.delivery_date', [$date_from, $date_to]);
+                })
+                ->when(!empty($company_id), function ($query) use ($company_id) {
+                    return $query->where('SupplySlip.supply_company_id', '=', $company_id);
+                })
+                ->when(!empty($shop_id), function ($query) use ($shop_id) {
+                    return $query->where('SupplySlip.supply_shop_id', '=', $shop_id);
+                })
+                ->when(!empty($product_id), function ($query) use ($product_id) {
+                    return $query->where('SupplySlipDetail.product_id', '=', $product_id);
+                })
+                ->when(!empty($submit_type), function ($query) use ($submit_type) {
+                    return $query->where('SupplySlip.supply_submit_type', '=', $submit_type);
+                })
+                ->orderBy('SupplySlip.id', 'desc')
+                ->orderBy('SupplySlipDetail.sort', 'asc')
+                ->get();
+
+            $supply_data = [];
+            foreach ($supplySlipList as $supplyData) {
+                $supply_data[$supplyData->supply_slip_id]['date']                = $supplyData->supply_slip_date;
+                $supply_data[$supplyData->supply_slip_id]['delivery_date']       = $supplyData->supply_slip_delivery_date;
+                $supply_data[$supplyData->supply_slip_id]['company_code']        = $supplyData->supply_company_code;
+                $supply_data[$supplyData->supply_slip_id]['company_name']        = $supplyData->supply_company_name;
+            }
+
+            // csv配列作成
+            $csv_data = [];
+            foreach ($SupplySlipDetailList as $detailData) {
+
+                $supplySlipId = $detailData->supply_slip_id;
+
+                // 税抜金額
+                $notax_total = $detailData->unit_price * $detailData->unit_num;
+                // 税込金額
+                if ($detailData->product_tax_id == 1) { // 8%の場合
+                    $total = floor($notax_total * 1.08);
+                } else {
+                    $total = floor($notax_total * 1.1);
+                }
+
+                // 自動レジは30文字MAX
+                $product_name = Str::limit($detailData->product_name, 27);
+
+                $csv_data[] = [
+                    0  => $supply_data[$supplySlipId]['date'],                  // 仕入日付
+                    1  => $supply_data[$supplySlipId]['delivery_date'],         // 納品日付
+                    2  => $supply_data[$supplySlipId]['company_code'],          // 仕入企業コード
+                    3  => $supply_data[$supplySlipId]['company_name'],          // 仕入企業名
+                    4  => $detailData->product_code,                            // 製品コード
+                    5  => $product_name,                                        // 製品名
+                    6  => $detailData->inventory_unit_num,                      // 個数
+                    7  => $detailData->inventory_unit_name,                     // 個数単位
+                    8  => $detailData->unit_num,                                // 数量
+                    9  => $detailData->unit_name,                               // 数量単位
+                    10 => $detailData->unit_price,                              // 単価
+                    11 => $notax_total,                                         // 税抜合計金額
+                    12 => $total,                                               // 税込合計金額
+                    13 => $detailData->origin_area_id,                          // 産地コード
+                    14 => $detailData->origin_area_name,                        // 産地名
+                    15 => $detailData->staff_code,                              // 担当者コード
+                    16 => $detailData->staff_name,                              // 担当者名
+                    17 => $detailData->memo,                                    // 摘要
+                ];
+
+            }
+
+            // レスポンスをストリームで返す
+            $response = new StreamedResponse(function () use($csv_data) {
+
+                $handle = fopen('php://output', 'w');
+
+                // ヘッダー行を追加
+                fputcsv($handle, array_map(function ($value) {
+                    return mb_convert_encoding($value, 'SJIS-win', 'UTF-8');
+                }, [
+                    '仕入日付',
+                    '納品日付',
+                    '仕入企業コード',
+                    '仕入企業名',
+                    '製品コード',
+                    '製品名',
+                    '個数',
+                    '個数単位',
+                    '数量',
+                    '数量単位',
+                    '単価',
+                    '税抜合計金額',
+                    '税込合計金額',
+                    '産地コード',
+                    '産地名',
+                    '担当者コード',
+                    '担当者名',
+                    '摘要',
+                ]));
+
+                // データをCSVに書き込む
+                foreach ($csv_data as $row) {
+                    fputcsv($handle, array_map(function ($value) {
+                        return mb_convert_encoding($value, 'SJIS-win', 'UTF-8');
+                    }, $row));
+                }
+
+                fclose($handle);
+            });
+
+            // HTTPヘッダーを設定
+            $response->headers->set('Content-Type', 'text/csv; charset=Shift_JIS');
+            $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
+
+            return $response;
+        } catch (\Exception $e) {
+
+            dd($e);
+
+            return null;
+        }
     }
 
     /**
@@ -1696,7 +1960,7 @@ class SupplySlipController extends Controller
     }
 
     /**
-     * 伝票新規追加　登録
+     * 伝票新規追加 登録
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */

@@ -95,6 +95,7 @@ Route::post('SaleShopEditComplete', 'SaleShopController@editComplete');
 Route::post('SaleShopAjaxAddStandard', 'SaleShopController@AjaxAddStandard');
 
 // 仕入登録
+Route::get('SupplySlip/csv-downloag', 'SupplySlipController@csvDownLoad');
 Route::get('SupplySlipIndex', 'SupplySlipController@index');
 Route::get('SupplySlipIndex/{page_num}', 'SupplySlipController@index');
 Route::post('SupplySlipIndex', 'SupplySlipController@index');

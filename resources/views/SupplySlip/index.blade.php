@@ -78,6 +78,21 @@
                 </div>
             </div>
 
+            {{-- csv出力エリア --}}
+            <div class="accordion">
+                <div class="accordion-header">
+                    <span class="accordion-arrow">▼</span>
+                    <span>CSV出力メニュー</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="csv-btn-area">
+                        <a href="./SupplySlip/csv-downloag">
+                            <input type='button' class='search-btn btn-primary' name='search-btn' id="1" value='CSVダウンロード'>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
             <!--総計表示エリア-->
             <div class='sum-display-area'>
                 @if($supply_slip_num != 0)
@@ -253,6 +268,12 @@
             //-------------------------------------
             $('#display-num').change(function() {
                 $('#search-btn').click();
+            });
+
+            // CSVダウンロードメニュー
+            $(".accordion-header").click(function() {
+                $(".accordion-content").slideToggle(); // アニメーション付きで開閉
+                $(".accordion-arrow").toggleClass("rotate"); // 矢印を回転
             });
 
 
@@ -602,6 +623,74 @@
         border-radius: 10px;
         margin-left: 2%;
     }
+
+    /* アコーディオン全体のデザイン */
+
+    .accordion {
+        max-width: 1300px;
+        width: 90%;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    /* アコーディオン全体 */
+
+    .accordion {
+        max-width: 1300px;
+        width: 90%;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    /* ヘッダー部分（ボタン） */
+
+    .accordion-header {
+        padding: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+    }
+
+    .accordion-header span {
+        margin-left: 10px;
+    }
+    /* 矢印アイコン */
+
+    .accordion-arrow {
+        font-size: 12px;
+        transition: transform 0.3s ease;
+    }
+    /* アコーディオンの内容（最初は非表示） */
+
+    .accordion-content {
+        display: none;
+        padding: 15px;
+        background: #f9f9f9;
+        border-top: 1px solid #ccc;
+    }
+    /* 矢印が回転するクラス */
+
+    .rotate {
+        transform: rotate(180deg);
+    }
+
+    .csv-type-table-area th {
+        font-size: 12px;
+    }
+
+    .csv-type-table-area td select {
+        font-size: 12px;
+        border-radius: 5px;
+        margin-left: 20px;
+    }
+
+    .csv-btn-area input {
+        max-width: 120px;
+    }
+
     /*総額エリア*/
 
     .sum-display-area {

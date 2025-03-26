@@ -107,7 +107,7 @@ class SaleSlipController extends Controller
                 $condition_company_code  = isset($req_data['sale_company_code']) ? $req_data['sale_company_code'] : NULL;
                 $condition_company_id    = isset($req_data['sale_company_id']) ? $req_data['sale_company_id'] : NULL;
                 $condition_company_text  = isset($req_data['sale_company_text']) ? $req_data['sale_company_text'] : NULL;
-                $condition_payment_method_type = isset($req_data['sale_company_text']) ? $req_data['payment_method_type'] : NULL;
+                $condition_payment_method_type = isset($req_data['payment_method_type']) ? $req_data['payment_method_type'] : NULL;
                 if($condition_payment_method_type == "") {
                     $condition_payment_method_type_text = "";
                 } else {

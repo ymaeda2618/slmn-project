@@ -60,7 +60,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../../AjaxAutoCompleteSaleCompany",
+                        url: "./../AjaxAutoCompleteSaleCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -102,7 +102,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../../AjaxSetSaleCompany",
+                        url: "./../AjaxSetSaleCompany",
                         type: "POST",
                         dataType: "JSON",
                         data: fd,

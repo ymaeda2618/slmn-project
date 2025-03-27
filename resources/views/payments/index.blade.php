@@ -164,7 +164,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../../AjaxAutoCompleteSaleCompany",
+                        url: "./../AjaxAutoCompleteSaleCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -190,7 +190,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../../AjaxAutoCompleteStaff",
+                        url: "./../AjaxAutoCompleteStaff",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -270,7 +270,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./../../AjaxSetSaleCompany",
+                            url: "./../AjaxSetSaleCompany",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -290,7 +290,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./../../AjaxSetStaff",
+                            url: "./../AjaxSetStaff",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -314,7 +314,7 @@
                 e.preventDefault();
 
                 const selectedType = $('#data_type_val').val();
-                const downloadUrl = `./payment/csv-download?type=${encodeURIComponent(selectedType)}`;
+                const downloadUrl = `./csv-download?type=${encodeURIComponent(selectedType)}`;
 
                 // CSVファイルをダウンロード
                 window.location.href = downloadUrl;

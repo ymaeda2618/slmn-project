@@ -83,7 +83,7 @@ class SaleCompanyController extends Controller
                 return $query->where('SaleCompany.closing_date', '=', $closing_date);
             })
             ->orderBy('SaleCompany.sort', 'asc')
-            ->orderBy('SaleCompany.created', 'asc')->paginate(20);
+            ->orderBy('SaleCompany.created', 'desc')->paginate(20);
 
 
         } catch (\Exception $e) {

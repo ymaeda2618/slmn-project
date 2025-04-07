@@ -749,8 +749,11 @@ class ProductController extends Controller
                 // 自動レジは30文字MAX
                 $product_name = Str::limit($product->product_name, 26);
 
+                 // 商品コードを5桁に変換（先頭に0を付ける）
+                 $formatted_product_code = str_pad($product->product_code, 5, '0', STR_PAD_LEFT);
+
                 $product_data[] = [
-                    0 => $product->product_code,   // 商品コード
+                    0 => $formatted_product_code,  // 商品コード
                     1 => $product_name,            //商品名称
                     2 => '' ,                      //レシート表示
                     3 => 0 ,                       //単価

@@ -234,6 +234,7 @@
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 <script type="text/javascript">
     var notax_sub_total_8;
     var tax_total_8;
@@ -1289,7 +1290,7 @@
         }
 
         function calcDecimal(unitPrice, unitNum) {
-            return Math.floor(unitPrice * unitNum);
+            return Decimal.mul(unitPrice, unitNum).floor().toNumber();
         }
 
         let slipCount = parseInt($("#slip_num").val(), 10);
@@ -1303,17 +1304,15 @@
             let $taxId = $("#tax_id_" + i);
             let $notaxPrice = $("#notax_price_" + i);
 
-            // 存在チェック（削除された行はスキップ）
             if ($unitPrice.length === 0 || $unitNum.length === 0 || $taxId.length === 0) continue;
 
             let unitPrice = toNumber($unitPrice.val());
             let unitNum = toNumber($unitNum.val());
 
-            // 表示用に変換（無効値防止）
             $unitPrice.val(unitPrice);
             $unitNum.val(unitNum);
 
-            let calc = calcDecimal(unitPrice, unitNum);
+            let calc = calcDecimal(unitPrice, unitNum); // ← Decimal.js 使用
             $notaxPrice.val(calc);
 
             let taxId = parseInt($taxId.val(), 10);
@@ -1324,9 +1323,9 @@
             }
         }
 
-        // 税額計算（小数→切り捨て）
-        let taxTotal8 = Math.floor(notaxTotal8 * 0.08);
-        let taxTotal10 = Math.floor(notaxTotal10 * 0.1);
+        // 税計算にも Decimal.jsを使ってもOK（以下はその例）
+        let taxTotal8 = Decimal.mul(notaxTotal8, 0.08).floor().toNumber();
+        let taxTotal10 = Decimal.mul(notaxTotal10, 0.1).floor().toNumber();
 
         let subTotal8 = notaxTotal8 + taxTotal8;
         let subTotal10 = notaxTotal10 + taxTotal10;
@@ -1352,6 +1351,11 @@
         $("#tax_total").val(taxTotal);
         $("#sub_total").val(subTotal);
         $("#total").val(total);
+    }
+
+    function calcDecimal(unitPrice, unitNum) {
+        // Decimal.jsを使用して乗算＆切り捨て（floor）
+        return Decimal.mul(unitPrice, unitNum).floor().toNumber();
     }
 
     function productIdChange(slip_num) {

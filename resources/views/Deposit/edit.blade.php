@@ -9,8 +9,8 @@
 
             <input type="hidden" id="deposit_id" name="data[Deposit][id]" value="{{$depositDatas->deposit_id}}">
             <div class="form-group">
-                <label class="column-label payment-date-label" for="payment_date">支払期日</label>
-                <input type="date" class="form-control " id="payment_date" name="data[Deposit][payment_date]" tabindex="2" value="{{$depositDatas->payment_date}}">
+                <label class="column-label payment-date-label" for="deposit_company_payment_date">支払期日</label>
+                <input type="date" class="form-control " id="deposit_company_payment_date" name="data[Deposit][payment_date]" tabindex="2" value="{{$depositDatas->payment_date}}">
             </div>
 
             <div class="search-area">
@@ -24,29 +24,31 @@
                     <input type="date" class="form-control width-45 sale_to_date" id="sale_to_date" name="data[Deposit][sale_to_date]" onchange='javascript:changeCalcFlg()' tabindex="4" value="{{$depositDatas->sale_to_date}}">
                 </div>
 
+                <div class="form-group" style="margin-bottom: 0 !important;">
+                    <div class="radio_box">
+                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="0" onchange="toggleCompanyInput()" @if ($depositDatas->invoice_output_type == 0) checked @endif> 本部企業毎</label>
+                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="1" onchange="toggleCompanyInput()" @if ($depositDatas->invoice_output_type == 1) checked @endif> 店舗毎</label>
+                    </div>
+                </div>
+
                 <table class="deposit-from-table">
                     <tr>
-                        <th colspan="2" class="sale-label">売上企業</th>
-                        <th colspan="2" class="sale-label">売上店舗</th>
+                        <th colspan="2" class="sales-label owner_company_area">本部企業</th>
+                        <th colspan="2" class="sales-label sale_company_area" style="display: none;">売上企業</th>
                     </tr>
                     <tr>
-                        <td class="width-20">
-                            <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='javascript:changeCalcFlg()' tabindex="5" value="{{$depositDatas->sale_company_code}}">
+                        <td colspan="2" class="width-50 owner_company_area" id="owner_company_area">
+                            <input type="text" class="form-control deposit_owner_code_input" id="deposit_owner_code" name="data[Deposit][deposit_owner_code]" onchange='changeCalcFlg()' tabindex="5" value="{{$depositDatas->owner_company_code}}">
+                            <input type="hidden" id="deposit_owner_id" name="data[Deposit][deposit_owner_id]" value="{{$depositDatas->owner_company_id}}">
+                            <input type="text" class="form-control mt-1" id="deposit_owner_text" name="data[Deposit][deposit_owner_text]" value="{{$depositDatas->owner_company_name}}" readonly>
+                        </td>
+                        <td colspan="2" class="width-50 sale_company_area" id="sale_company_area" style="display: none;">
+                            <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='changeCalcFlg()' tabindex="6" value="{{$depositDatas->sale_company_code}}">
                             <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]" value="{{$depositDatas->sale_company_id}}">
                             <input type="hidden" id="deposit_company_tax_calc_type" name="data[Deposit][deposit_company_tax_calc_type]" value="{{$depositDatas->sale_company_tax_calc_type}}">
-                        </td>
-                        <td class="width-30">
-                            <input type="text" class="form-control" id="deposit_company_text" name="data[Deposit][deposit_company_text]" value="{{$depositDatas->sale_company_name}}" readonly>
-                        </td>
-                        <td class="width-20">
-                            <input type="text" class="form-control deposit_shop_code_input" id="deposit_shop_code" name="data[Deposit][deposit_shop_code]" value="{{$depositDatas->sale_shop_code}}" tabindex="6">
-                            <input type="hidden" id="deposit_shop_id" name="data[Deposit][deposit_shop_id]" value="{{$depositDatas->sale_shop_id}}">
-                        </td>
-                        <td class="width-30">
-                            <input type="text" class="form-control" id="deposit_shop_text" name="data[Deposit][deposit_shop_text]" value="{{$depositDatas->sale_shop_name}}" readonly>
+                            <input type="text" class="form-control mt-1" id="deposit_company_text" name="data[Deposit][deposit_company_text]" value="{{$depositDatas->sale_company_name}}" readonly>
                         </td>
                     </tr>
-
                 </table>
                 <button id="search-btn" class="search-btn btn btn-primary" type="button" onclick='javascript:searchSaleSlips()'>抽出</button>
                 <button id="calc-btn" class="calc-btn btn btn-primary" type="button" onclick="javascript:calcSalePrice()">計算</button>
@@ -84,12 +86,7 @@
                     $total           = $subTotal + $delivery_price + $adjust_price;          // 調整後総合計額
                     $saleFlg         = $saleSlipData->sale_flg;                              // 入金フラグ
 
-                        $checked = '';
-                        foreach ($depositDetailDatas as $depositDetailData) {
-                            if ($depositDetailData->sale_slip_id == $saleSlipData->id) {
-                                $checked = 'checked';
-                            }
-                        }
+                    $checked = in_array($saleSlipData->id, $depositDetailDatas) ? 'checked' : '';
 
                     ?>
                         <tr>
@@ -286,9 +283,6 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 一番最初は売上企業にフォーカスする
-            $('#sale_company_code').focus();
-
             // 初期化処理
             notax_sub_total_8 = 0;
             tax_total_8 = 0;
@@ -311,6 +305,8 @@
             checkbox_all.addEventListener('change', change_all);
             //チェックボックスのリスト
             checkbox_list = document.querySelectorAll(".checkbox_list");
+
+            toggleCompanyInput();
 
             //-------------------------------------
             // Enterと-を押したときにタブ移動する処理
@@ -463,13 +459,13 @@
                             $("#" + selector_tax_calc_type).val(data[3]);
                         });
 
-                } else if (selector_code.match(/deposit_shop/)) { // 売上店舗
+                } else if (selector_code.match(/deposit_owner/)) { // 本部企業
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./../AjaxSetSaleShop",
+                            url: "./../AjaxSetOwnerCompany",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -534,13 +530,13 @@
             //-------------------------------------
             // autocomplete処理 売上店舗ID
             //-------------------------------------
-            $(".deposit_shop_code_input").autocomplete({
+            $(".deposit_owner_code_input").autocomplete({
                 source: function(req, resp) {
                     $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./../AjaxAutoCompleteSaleShop",
+                        url: "./../AjaxAutoCompleteOwnerCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -659,7 +655,7 @@
         var sale_from_date = $('#sale_from_date').val();
         var sale_to_date = $('#sale_to_date').val();
         var sale_company = $('#deposit_company_id').val();
-        var search_date_val = $('input:radio[name="data[Deposit][search_date]"]:checked').val();
+        var output_type = $('input:radio[name="data[Deposit][invoice_output_type]"]:checked').val();
         var action = 'edit';
 
         if (!search_date_val) {
@@ -672,17 +668,30 @@
             return;
         }
 
-        if (sale_company == '') {
-            alert('売上企業を入力してください。');
-            return;
-        }
-
         var fd = new FormData();
         fd.append("sales_from_date", sale_from_date);
         fd.append("sales_to_date", sale_to_date);
-        fd.append("sales_company", sale_company);
         fd.append("search_date_val", search_date_val);
+        fd.append("output_type", output_type);
         fd.append("action", action);
+
+        if (output_type === "0") {
+            // 本部企業で検索
+            var owner_company = $('#deposit_owner_id').val();
+            if (owner_company == '') {
+                alert('本部企業を入力してください。');
+                return;
+            }
+            fd.append("owner_company_id", owner_company);
+        } else {
+            // 店舗で検索
+            var sales_company = $('#deposit_company_id').val();
+            if (sales_company == '') {
+                alert('売上企業を入力してください。');
+                return;
+            }
+            fd.append("sale_company_id", sales_company);
+        }
 
         // ajaxで対象範囲の売上金額を計算して持ってくる
         $.ajax({
@@ -697,7 +706,6 @@
                 contentType: false
             })
             .done(function(data) {
-
                 if (data != '') {
                     $(".result-table").html(data[0]);
                     // チェックボックスのリストを取得
@@ -705,7 +713,6 @@
                 } else {
                     alert("抽出対象が存在しません。");
                 }
-
             })
             .fail(function(XMLHttpRequest, textStatus, errorThrown) {
                 alert(XMLHttpRequest);
@@ -874,20 +881,21 @@
         var deposit_date = '';
         var sale_from_date = '';
         var sale_to_date = '';
-        var sale_company = '';
-        var sale_shop = '';
         var staff_code = '';
         var total_price = '';
 
-        // ----------
-        // 入力チェック
-        // ----------
-        deposit_date = $("#deposit_date").val();
+        // -------------------
+        // 入金日付チェック
+        // -------------------
+        deposit_date = $("#deposit_company_payment_date").val();
         if (deposit_date == '') {
             alert('入金日付を入力してください');
             return false;
         }
 
+        // -------------------
+        // 伝票日付チェック
+        // -------------------
         sale_from_date = $("#sale_from_date").val();
         sale_to_date = $("#sale_to_date").val();
         if (sale_from_date == '' || sale_to_date == '') {
@@ -895,30 +903,52 @@
             return false;
         }
 
-        sale_company = $("#deposit_company_code").val();
-        if (sale_company == '') {
-            alert('売上企業を入力してください');
-            return false;
+        // -------------------
+        // 出力タイプごとに企業コードチェック
+        // -------------------
+        const outputType = $('input[name="data[Deposit][invoice_output_type]"]:checked').val();
+        if (outputType === '0') {
+            const ownerCode = $("#deposit_owner_code").val();
+            if (ownerCode == '') {
+                alert('本部企業を入力してください');
+                return false;
+            }
+        } else {
+            const companyCode = $("#deposit_company_code").val();
+            if (companyCode == '') {
+                alert('売上企業を入力してください');
+                return false;
+            }
         }
 
+        // -------------------
+        // 担当者チェック
+        // -------------------
         staff_code = $("#staff_code").val();
         if (staff_code == '') {
             alert('担当者を入力してください');
             return false;
         }
 
+        // -------------------
+        // 金額チェック
+        // -------------------
         total_price = $("#total_price").val();
         if (total_price == '') {
             alert('調整後入金金額が空白です');
             return false;
         }
 
-        // 支払日付を変更した場合に、「抽出」ボタンを押して支払金額の計算をしたか確認する
+        // -------------------
+        // 抽出 → 計算実行済みか確認
+        // -------------------
         var calc_flg = $("#calc-flg").val();
         if (calc_flg == '0') {
             alert('売上伝票のチェックボックスが変更されています。計算ボタンを押してください。');
             return false;
         }
+
+        return true;
 
     }
 
@@ -952,10 +982,26 @@
             }
         }
     }
+
+    // --------------------
+    // 本部、売上企業の切り替え
+    // --------------------
+    function toggleCompanyInput() {
+        const type = $('input[name="data[Deposit][invoice_output_type]"]:checked').val();
+        if (type === "0") {
+            $('.owner_company_area').show();
+            $('.sale_company_area').hide();
+            $('#deposit_owner_code').focus();
+        } else {
+            $('.owner_company_area').hide();
+            $('.sale_company_area').show();
+            $('#deposit_company_code').focus();
+        }
+    }
 </script>
 <style>
     /* 共通 */
-    
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -963,102 +1009,102 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .smn-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-    
+
     .form-group {
         margin-bottom: 2rem !important;
     }
-    
+
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-    
+
     .column-label {
         display: block;
         width: 100%;
         font-size: 0.9em;
         font-weight: bold;
     }
-    
+
     .sale-label {
         font-size: 0.9em;
         font-weight: bold;
     }
-    
+
     .deposit-from-table {
         width: 100%;
     }
-    
+
     .deposit-table {
         width: 100%;
         margin-top: 4%;
     }
-    
+
     .width-5 {
         width: 5%!important;
     }
-    
+
     .width-10 {
         width: 10%!important;
     }
-    
+
     .width-15 {
         width: 15%!important;
     }
-    
+
     .width-20 {
         width: 20%!important;
     }
-    
+
     .width-30 {
         width: 30%!important;
     }
-    
+
     .width-40 {
         width: 40%!important;
     }
-    
+
     .width-45 {
         width: 45%!important;
     }
-    
+
     .slip-table {
         width: 100%;
     }
-    
+
     .partition-area {
         width: 100%;
         height: 1.0em;
     }
-    
+
     .remove-slip-btn {
         height: calc(4.2rem + 7px)!important;
         width: 100%;
     }
-    
+
     .sale-date-form {
         width: 100%;
         margin-bottom: 2%;
     }
-    
+
     .sale_from_date {
         float: left;
         display: block;
     }
-    
+
     .sale-block {
         float: left;
         width: 10%;
         text-align: center;
     }
-    
+
     .result-area {
         display: block;
         width: 100%;
@@ -1067,7 +1113,7 @@
         overflow: auto;
         min-height: 150px;
     }
-    
+
     .result-table {
         border-collapse: collapse;
         margin: auto;
@@ -1076,7 +1122,7 @@
         table-layout: fixed;
         font-size: 10px;
     }
-    
+
     .result-table th {
         border-right: 1px solid #bbb;
         text-align: center;
@@ -1090,52 +1136,52 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-    
+
     .result-table tr {
         padding: 1%;
         border-bottom: 1px solid #bbb;
     }
-    
+
     .result-table tr:last-child {
         border-bottom: none
     }
-    
+
     .result-table td {
         padding: 0.5%;
         border-right: 1px solid #bbb;
         text-align: center;
     }
-    
+
     .result-table th:last-child,
     .result-table td:last-child {
         border: none;
     }
-    
+
     .calc-btn {
         margin: 1%;
         background-color: #FF570D!important;
         border-color: #FF570D!important;
     }
-    
+
     .total-table {
         width: 100%;
         margin-top: 4%;
     }
-    
+
     .register-btn-table {
         width: 100%;
         text-align: center;
         margin-top: 4%;
     }
-    
+
     .register-btn {
         width: 85%;
     }
-    
+
     .payment-date-label {
         margin-top: 2%;
     }
-    
+
     .status-memo-area {
         width: 100%;
         padding: 20px 10px;

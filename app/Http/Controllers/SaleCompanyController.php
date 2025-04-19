@@ -82,8 +82,8 @@ class SaleCompanyController extends Controller
             ->if(!empty($closing_date), function ($query) use ($closing_date) {
                 return $query->where('SaleCompany.closing_date', '=', $closing_date);
             })
-            ->where('SaleCompany.active', '=', '1')
-            ->orderBy('SaleCompany.created', 'asc')->paginate(20);
+            ->orderBy('SaleCompany.sort', 'asc')
+            ->orderBy('SaleCompany.created', 'desc')->paginate(20);
 
 
         } catch (\Exception $e) {

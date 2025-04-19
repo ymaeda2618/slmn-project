@@ -210,6 +210,7 @@
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/decimal.js@10.4.3/decimal.min.js"></script>
 <script type="text/javascript">
     var notax_sub_total_8;
     var tax_total_8;
@@ -1134,7 +1135,7 @@
         });
     })(jQuery);
 
-    function priceNumChange(this_slip_num) {
+    /*function priceNumChange(this_slip_num) {
 
         // まず入力された仕入詳細の金額を計算する
         var this_unit_price = $("#unit_price_" + this_slip_num).val();
@@ -1257,6 +1258,81 @@
         $("#adjust_price").val(adjust_price);
         $("#total").val(total);
 
+    }*/
+
+    function priceNumChange(changedSlipNum) {
+        function toNumber(val) {
+            let num = parseFloat(val);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function calcDecimal(unitPrice, unitNum) {
+            return Decimal.mul(unitPrice, unitNum).floor().toNumber();
+        }
+
+        let slipCount = parseInt($("#slip_num").val(), 10);
+
+        let notaxTotal8 = 0;
+        let notaxTotal10 = 0;
+
+        for (let i = 1; i <= slipCount; i++) {
+            let $unitPrice = $("#unit_price_" + i);
+            let $unitNum = $("#unit_num_" + i);
+            let $taxId = $("#tax_id_" + i);
+            let $notaxPrice = $("#notax_price_" + i);
+
+            if ($unitPrice.length === 0 || $unitNum.length === 0 || $taxId.length === 0) continue;
+
+            let unitPrice = toNumber($unitPrice.val());
+            let unitNum = toNumber($unitNum.val());
+
+            $unitPrice.val(unitPrice);
+            $unitNum.val(unitNum);
+
+            let calc = calcDecimal(unitPrice, unitNum); // ← Decimal.js 使用
+            $notaxPrice.val(calc);
+
+            let taxId = parseInt($taxId.val(), 10);
+            if (taxId === 1) {
+                notaxTotal8 += calc;
+            } else if (taxId === 2) {
+                notaxTotal10 += calc;
+            }
+        }
+
+        // 税計算にも Decimal.jsを使ってもOK（以下はその例）
+        let taxTotal8 = Decimal.mul(notaxTotal8, 0.08).floor().toNumber();
+        let taxTotal10 = Decimal.mul(notaxTotal10, 0.1).floor().toNumber();
+
+        let subTotal8 = notaxTotal8 + taxTotal8;
+        let subTotal10 = notaxTotal10 + taxTotal10;
+
+        let notaxTotal = notaxTotal8 + notaxTotal10;
+        let taxTotal = taxTotal8 + taxTotal10;
+        let subTotal = notaxTotal + taxTotal;
+
+        let delivery = toNumber($("#delivery_price").val());
+        let adjust = toNumber($("#adjust_price").val());
+        let total = subTotal + delivery + adjust;
+
+        // 表示更新
+        $("#notax_sub_total_8").val(notaxTotal8);
+        $("#tax_total_8").val(taxTotal8);
+        $("#sub_total_8").val(subTotal8);
+
+        $("#notax_sub_total_10").val(notaxTotal10);
+        $("#tax_total_10").val(taxTotal10);
+        $("#sub_total_10").val(subTotal10);
+
+        $("#notax_sub_total").val(notaxTotal);
+        $("#tax_total").val(taxTotal);
+        $("#sub_total").val(subTotal);
+        $("#total").val(total);
+    }
+
+    function calcDecimal(unitPrice, unitNum) {
+        // Decimal.jsを使用して乗算＆切り捨て（floor）
+        return Decimal.mul(unitPrice, unitNum).floor().toNumber();
     }
 
     function productIdChange(slip_num) {

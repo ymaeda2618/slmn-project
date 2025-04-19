@@ -107,7 +107,7 @@ class SaleSlipController extends Controller
                 $condition_company_code  = isset($req_data['sale_company_code']) ? $req_data['sale_company_code'] : NULL;
                 $condition_company_id    = isset($req_data['sale_company_id']) ? $req_data['sale_company_id'] : NULL;
                 $condition_company_text  = isset($req_data['sale_company_text']) ? $req_data['sale_company_text'] : NULL;
-                $condition_payment_method_type = isset($req_data['sale_company_text']) ? $req_data['payment_method_type'] : NULL;
+                $condition_payment_method_type = isset($req_data['payment_method_type']) ? $req_data['payment_method_type'] : NULL;
                 if($condition_payment_method_type == "") {
                     $condition_payment_method_type_text = "";
                 } else {
@@ -2192,13 +2192,13 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= '        <input type="hidden" id="tax_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][tax_id]" value="' . $slip_num . '">';
         $ajaxHtml1 .= '    </td>';
         $ajaxHtml1 .= '    <td>';
-        $ajaxHtml1 .= '        <input type="number" class="form-control" id="inventory_unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_num]" tabindex="' . ($tabInitialNum + 2) . '">';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="inventory_unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][inventory_unit_num]" step="0.01" tabindex="' . ($tabInitialNum + 2) . '">';
         $ajaxHtml1 .= '   </td>';
         $ajaxHtml1 .= '   <td>';
-        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_num]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 3) . '">';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_num_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_num]" onchange="javascript:priceNumChange(' . $slip_num . ')" step="0.01" tabindex="' . ($tabInitialNum + 3) . '">';
         $ajaxHtml1 .= '   </td>';
         $ajaxHtml1 .= '   <td colspan="2">';
-        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_price]" onchange="javascript:priceNumChange(' . $slip_num . ')" tabindex="' . ($tabInitialNum + 4) . '">';
+        $ajaxHtml1 .= '        <input type="number" class="form-control" id="unit_price_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][unit_price]" onchange="javascript:priceNumChange(' . $slip_num . ')" step="0.01" tabindex="' . ($tabInitialNum + 4) . '">';
         $ajaxHtml1 .= '   </td>';
         $ajaxHtml1 .= '    <td colspan="2" id="origin-code-area-' . $slip_num . '">';
         $ajaxHtml1 .= '        <input type="hidden" id="origin_area_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][origin_area_id]">';

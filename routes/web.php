@@ -252,6 +252,23 @@ Route::get('CompanySettingEdit', 'CompanySettingController@edit');
 Route::post('CompanySettingConfirm', 'CompanySettingController@confirm');
 Route::post('CompanySettingEditComplete', 'CompanySettingController@editComplete');
 
+// 入金消込照合一覧
+Route::get('payments/index', 'PaymentController@index')->name('payments.index');
+Route::post('payments/index', 'PaymentController@index')->name('payments.index');
+Route::get('payments/csv-download', 'PaymentController@csvDownload');
+Route::get('payments/input', 'PaymentController@input')->name('payments.input');
+Route::post('payments/confirm', 'PaymentController@confirm')->name('payments.confirm');
+Route::post('payments/store', 'PaymentController@store')->name('payments.store');
+
+Route::get('payments/list', 'PaymentController@list')->name('payments.list');
+Route::post('payments/list', 'PaymentController@list')->name('payments.list');
+Route::get('payments/{id}/edit', 'PaymentController@edit')->name('payments.edit');
+Route::post('payments/{id}/edit-confirm', 'PaymentController@editConfirm')->name('payments.edit.confirm');
+Route::post('payments/{id}/update', 'PaymentController@update')->name('payments.update');
+
+
+
+
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {
 

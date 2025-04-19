@@ -91,6 +91,22 @@
                 </ul>
                 <ul>
                     <li class="btn-title">
+                        <p>売掛一覧/入金消込</p>
+                        <ul>
+                            <li>
+                                <a href="./payments/index" class="edit-btn">売掛・入金一覧</a>
+                            </li>
+                            <li>
+                                <a href="./payments/list" class="edit-btn">入金一覧</a>
+                            </li>
+                            <li>
+                                <a href="./payments/input" class="edit-btn">入金登録</a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="btn-title">
                         <p>データ入力/出力</p>
                         <ul>
                             <li>
@@ -102,12 +118,13 @@
                             <li>
                                 <a href="./csvUpload" class="edit-btn">CSV登録</a>
                             </li>
-                            <li>
-                                <a href="" onclick="alert('この機能は実装されておりません。'); return false;" class="edit-btn">CSV出力</a>
-                            </li>
                         </ul>
                     </li>
                 </ul>
+            </div>
+
+
+            <div class="menu-btn-area">
                 <ul>
                     <li class="btn-title">
                         <p>仕入/売上企業登録</p>
@@ -127,10 +144,6 @@
                         </ul>
                     </li>
                 </ul>
-            </div>
-
-
-            <div class="menu-btn-area">
                 <ul>
                     <li class="btn-title">
                         <p>製品登録</p>
@@ -141,6 +154,13 @@
                             <li>
                                 <a href="./ProductCreate" class="edit-btn">製品登録</a>
                             </li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="btn-title">
+                        <p>製品登録</p>
+                        <ul>
                             <li>
                                 <a href="./OrderSupplyUnitPriceIndex" class="edit-btn">仕入発注単価一覧</a>
                             </li>
@@ -186,23 +206,23 @@
             font-weight: bold;
             padding-left: 30px;
         }
-
+        
         .achievements-title-area p {
             margin-bottom: 0;
         }
-
+        
         .achievements-area {
             display: flex;
             width: 100%;
             margin: 0px auto 30px;
         }
-
+        
         .achievements-detail {
             font-weight: bold;
             width: 100%;
             margin: 10px;
         }
-
+        
         .achievements-detail-header {
             padding: .5em 1.5em;
             border: 2px solid #ccc;
@@ -210,19 +230,19 @@
             background-color: #f6f6f6;
             border-radius: 10px 10px 0px 0px;
         }
-
+        
         .achievements-detail:nth-child(1) .achievements-detail-header {
             background-color: #f19a9a;
         }
-
+        
         .achievements-detail:nth-child(2) .achievements-detail-header {
             background-color: #9aedf1;
         }
-
+        
         .achievements-detail:nth-child(3) .achievements-detail-header {
             background-color: #bff19a;
         }
-
+        
         .achievements-detail-body {
             padding: .5em .75em;
             border: 2px solid #ccc;
@@ -233,17 +253,17 @@
             padding-left: 10px;
             font-size: 13px;
         }
-
+        
         .achievements {
             width: 50%;
         }
-
+        
         .achievements-detail-list,
         .achievements-detail-list div {
             padding: 0px;
             margin: 0px;
         }
-
+        
         .achievements-detail-list div {
             list-style-type: none !important;
             list-style-image: none !important;
@@ -253,52 +273,52 @@
             font-size: 14px;
             font-weight: normal;
         }
-
+        
         .achievements-detail-list p {
             letter-spacing: 1px;
             margin-left: 10px;
         }
-
+        
         .achievements-form-btn {
             text-align: left;
             padding-left: 10px;
         }
-
+        
         .supply-index-btn,
         .sale-index-btn {
             border-radius: 20px;
             width: 100px;
         }
         /* ボタンエリア */
-
+        
         .menu-title-area {
             width: 100%;
             font-size: 20px;
             font-weight: bold;
             padding-left: 30px;
         }
-
+        
         .menu-btn-area {
             display: flex;
             width: 100%;
         }
-
+        
         .menu-btn-area ul {
             width: 100%;
             list-style: none;
             padding-left: 0;
             padding-top: 10px;
         }
-
+        
         .menu-btn-area li {
             list-style: none;
             padding-left: 0;
         }
-
+        
         .menu-btn-area .btn-title {
             padding-left: 30px;
         }
-
+        
         .menu-btn-area .btn-title p {
             font-size: 16px;
             font-weight: bold;
@@ -309,27 +329,27 @@
             border-radius: 5px;
             margin-bottom: 0px;
         }
-
+        
         .btn-title li {
             padding-left: 30px;
             margin-bottom: 10px;
             font-size: 16px;
         }
-
+        
         .btn-title li ::before {
             content: "»";
             color: #46b0f0;
             font-weight: bolder;
             padding-right: 5px;
         }
-
+        
         .menu-btn-category-area {
             width: 100%;
             margin: 10px;
             font-size: 20px;
             display: grid;
         }
-
+        
         .menu-btn-category-area a {
             width: 70%;
             margin: 10px auto;

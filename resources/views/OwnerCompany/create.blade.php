@@ -133,9 +133,10 @@
             </div>
             <div class="form-group">
                 <label class="column-label">店舗選択</label><br>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#shopSelectModal">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shopSelectModal">
                     店舗を選択
                 </button>
+                <span id="selectedShopCount" class="ml-3 font-weight-bold text-primary">選択中：0件</span>
                 <input type="hidden" name="data[OwnerCompany][selected_shop_ids]" id="selectedShopIds">
             </div>
             <br>
@@ -147,7 +148,7 @@
 </div>
 @endsection
 <div class="modal fade" id="shopSelectModal" tabindex="-1" role="dialog" aria-labelledby="shopModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xl custom-modal-wide" role="document">
       <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">店舗一覧から選択</h5>
@@ -157,18 +158,19 @@
         </div>
         <div class="modal-body">
             <div class="mb-2">
-                <input type="text" id="shopSearchInput" class="form-control" placeholder="コードまたは店舗名で検索">
+                <input type="text" id="shopSearchInput" class="form-control" placeholder="コードまたは店舗名、ヨミガナで検索">
             </div>
             <div class="modal-button mb-2">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
                 <button type="button" class="btn btn-primary" id="confirmShopSelection">選択を確定</button>
             </div>
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover shop-select-table">
                 <thead>
                 <tr>
                     <th>選択</th>
                     <th>コード</th>
                     <th>店舗名</th>
+                    <th>ヨミガナ</th>
                     <th>種別</th>
                 </tr>
                 </thead>
@@ -178,6 +180,7 @@
                     <td><input type="checkbox" class="shop-checkbox" value="sale:{{ $shop->id }}"></td>
                     <td>{{ $shop->code }}</td>
                     <td>{{ $shop->name }}</td>
+                    <td>{{ $shop->yomi ? $shop->yomi : '-' }}</td>
                     <td>売上</td>
                     </tr>
                 @endforeach
@@ -186,6 +189,7 @@
                     <td><input type="checkbox" class="shop-checkbox" value="supply:{{ $shop->id }}"></td>
                     <td>{{ $shop->code }}</td>
                     <td>{{ $shop->name }}</td>
+                    <td>{{ $shop->yomi ? $shop->yomi : '-' }}</td>
                     <td>仕入</td>
                     </tr>
                 @endforeach
@@ -251,6 +255,29 @@
     .standard_del_btn {
         margin: auto 5px;
     }
+
+    .custom-modal-wide {
+        max-width: 65% !important;
+    }
+
+    .shop-select-table th,
+    .shop-select-table td {
+        white-space: nowrap; /* 折り返さないようにする */
+        font-size: 13px;     /* 文字が大きければ小さく調整 */
+        vertical-align: middle;
+    }
+
+    .shop-select-table th:nth-child(1), /* 選択 */
+    .shop-select-table td:nth-child(1) {
+        width: 60px;
+        text-align: center;
+    }
+
+    .shop-select-table th:nth-child(5), /* 種別 */
+    .shop-select-table td:nth-child(5) {
+        width: 80px;
+        text-align: center;
+    }
 </style>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
@@ -262,8 +289,9 @@ $(document).ready(function () {
         $('#shopSelectModal tbody tr').each(function () {
             const code = $(this).find('td').eq(1).text().toLowerCase();  // コード
             const name = $(this).find('td').eq(2).text().toLowerCase();  // 店舗名
+            const yomi = $(this).find('td').eq(3).text().toLowerCase();  // ヨミガナ
 
-            if (code.includes(keyword) || name.includes(keyword)) {
+            if (code.includes(keyword) || name.includes(keyword) || yomi.includes(keyword)) {
                 $(this).show();
             } else {
                 $(this).hide();
@@ -279,6 +307,10 @@ $(document).ready(function () {
         });
 
         $('#selectedShopIds').val(selected.join(','));
+
+        // 件数をカウントして表示
+        $('#selectedShopCount').text(`選択中：${selected.length}件`);
+
         $('#shopSelectModal').modal('hide');
     });
 });

@@ -31,6 +31,35 @@ class SupplySlipController extends Controller
      */
     public function index(Request $request)
     {
+
+        // 現在のURL（このSupplySlipIndex）を取得
+        $current_url = $request->url();
+
+        // リファラー（直前のURL）を取得
+        $referer = $request->headers->get('referer');
+
+        // リファラーが存在し、かつこの画面以外から遷移してきた場合
+        if ($referer && strpos($referer, $current_url) === false) {
+            // セッション初期化
+            $request->session()->forget([
+                'condition_date_type',
+                'condition_date_from',
+                'condition_date_to',
+                'condition_company_code',
+                'condition_company_id',
+                'condition_company_text',
+                'condition_shop_code',
+                'condition_shop_id',
+                'condition_shop_text',
+                'condition_product_code',
+                'condition_product_id',
+                'condition_product_text',
+                'condition_submit_type',
+                'condition_display_sort',
+                'condition_display_num',
+            ]);
+        }
+
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);

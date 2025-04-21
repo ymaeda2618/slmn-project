@@ -111,7 +111,7 @@
 
         {{-- モーダル --}}
         <div class="modal fade" id="shopModal" tabindex="-1" role="dialog" aria-labelledby="shopModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-dialog modal-lg custom-modal-wide" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title"><span id="modalCompanyName"></span> の店舗一覧</h5>
@@ -125,6 +125,7 @@
                                 <tr>
                                     <th>コード</th>
                                     <th>店舗名</th>
+                                    <th>ヨミガナ</th>
                                     <th>種別</th>
                                 </tr>
                             </thead>
@@ -175,6 +176,7 @@
                                 <tr>
                                     <td>${shop.code}</td>
                                     <td>${shop.name}</td>
+                                    <td>${shop.yomi ? shop.yomi : '-'}</td>
                                     <td>${shop.type}</td>
                                 </tr>
                             `);
@@ -304,5 +306,9 @@
         display: block;
         text-align: center;
         padding: 10px;
+    }
+
+    .custom-modal-wide {
+        max-width: 65% !important;
     }
 </style>

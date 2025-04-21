@@ -983,6 +983,8 @@ class CsvUploadController extends Controller
             // 対象の商品がマスタに存在しているかチェック
             // ------------------------------------
             $product_code = $lines[24];
+            $product_code = (int) ltrim($product_code, '0'); // 自動レジのマスタは5桁で先頭に0⃣がついているのでそれを削る
+
             $product_result = DB::table('products AS Product')
             ->where([
                 ['Product.active', '=', '1'],

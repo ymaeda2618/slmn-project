@@ -37,15 +37,19 @@
                     </tr>
                     <tr>
                         <td colspan="2" class="width-50 owner_company_area" id="owner_company_area">
-                            <input type="text" class="form-control deposit_owner_code_input" id="deposit_owner_code" name="data[Deposit][deposit_owner_code]" onchange='changeCalcFlg()' tabindex="5">
+                            <div class="d-flex">
+                                <input type="text" class="form-control mr-2 deposit_owner_code_input" id="deposit_owner_code" name="data[Deposit][deposit_owner_code]" onchange='changeCalcFlg()' tabindex="5" style="width: 50%;">
+                                <input type="text" class="form-control" id="deposit_owner_text" name="data[Deposit][deposit_owner_text]" readonly style="width: 50%;">
+                            </div>
                             <input type="hidden" id="deposit_owner_id" name="data[Deposit][deposit_owner_id]">
-                            <input type="text" class="form-control mt-1" id="deposit_owner_text" name="data[Deposit][deposit_owner_text]" readonly>
                         </td>
                         <td colspan="2" class="width-50 sale_company_area" id="sale_company_area" style="display: none;">
-                            <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='changeCalcFlg()' tabindex="6">
+                            <div class="d-flex">
+                                <input type="text" class="form-control mr-2 deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='changeCalcFlg()' tabindex="6" style="width: 50%;">
+                                <input type="text" class="form-control" id="deposit_company_text" name="data[Deposit][deposit_company_text]" readonly style="width: 50%;">
+                            </div>
                             <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]">
                             <input type="hidden" id="deposit_company_tax_calc_type" name="data[Deposit][deposit_company_tax_calc_type]">
-                            <input type="text" class="form-control mt-1" id="deposit_company_text" name="data[Deposit][deposit_company_text]" readonly>
                         </td>
                     </tr>
 

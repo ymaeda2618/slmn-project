@@ -912,7 +912,7 @@ class CsvUploadController extends Controller
      * CSV利用項目
      * 3   日付
      * 5   伝票番号
-     * 1  売上先コード
+     * 8  売上先コード
      *   売上先名
      *   売上先コード※水長水産のコード
      *   売上先名 ※水長
@@ -967,7 +967,7 @@ class CsvUploadController extends Controller
             // ------------------------------------
             // 対象の企業がマスタに存在しているかチェック
             // ------------------------------------
-            $sale_company_code = $lines[1];
+            $sale_company_code = $lines[8];
             $sale_company_result = DB::table('sale_companies AS SaleCompany')
                 ->where([
                     ['SaleCompany.active', '=', '1'],
@@ -1129,6 +1129,7 @@ class CsvUploadController extends Controller
             $slip_date           = $csv_slip_detail_val["slip_date"];           // 伝票日付
             $delivery_date       = $csv_slip_detail_val["delivery_date"];       // 納品日
             $slip_no             = $csv_slip_detail_val["slip_no"];             // 伝票番号
+            $sale_company_id     = $csv_slip_detail_val["company_id"];          // 売上企業ID
             $notax_sub_total_8   = $csv_slip_detail_val["notax_sub_total_8"];   // 8%課税対象額
             $notax_sub_total_10  = $csv_slip_detail_val["notax_sub_total_10"];  // 10%課税対象額
             $notax_sub_total     = $csv_slip_detail_val["notax_sub_total"];     // 課税対象額

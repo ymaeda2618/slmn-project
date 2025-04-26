@@ -140,7 +140,7 @@ class OwnerCompanyController extends Controller
 
         // 売上店舗一覧（この企業に属する or 未所属）
         $saleCompanies = DB::table('sale_companies')
-            ->select('id', 'code', 'name', 'owner_company_id')
+            ->select('id', 'code', 'name', 'owner_company_id', 'yomi')
             ->where(function($query) use ($owner_company_id) {
                 $query->whereNull('owner_company_id')
                     ->orWhere('owner_company_id', $owner_company_id);
@@ -149,7 +149,7 @@ class OwnerCompanyController extends Controller
 
         // 仕入店舗一覧（この企業に属する or 未所属）
         $supplyCompanies = DB::table('supply_companies')
-            ->select('id', 'code', 'name', 'owner_company_id')
+            ->select('id', 'code', 'name', 'owner_company_id', 'yomi')
             ->where(function($query) use ($owner_company_id) {
                 $query->whereNull('owner_company_id')
                     ->orWhere('owner_company_id', $owner_company_id);
@@ -180,8 +180,8 @@ class OwnerCompanyController extends Controller
         $error_message = $request->session()->get('error_message');
         $request->session()->forget('error_message');
 
-        $saleCompanies = DB::table('sale_companies')->select('id', 'code', 'name')->whereNull('owner_company_id')->get();
-        $supplyCompanies = DB::table('supply_companies')->select('id', 'code', 'name')->whereNull('owner_company_id')->get();
+        $saleCompanies = DB::table('sale_companies')->select('id', 'code', 'name', 'yomi')->whereNull('owner_company_id')->get();
+        $supplyCompanies = DB::table('supply_companies')->select('id', 'code', 'name', 'yomi')->whereNull('owner_company_id')->get();
 
         return view('OwnerCompany.create')->with([
             "error_message"   => $error_message,
@@ -512,11 +512,11 @@ class OwnerCompanyController extends Controller
     public function AjaxGetShops($owner_company_id)
     {
         $saleCompanies = DB::table('sale_companies')
-            ->select('code', 'name', DB::raw("'売上' as type"))
+            ->select('code', 'name', 'yomi', DB::raw("'売上' as type"))
             ->where('owner_company_id', $owner_company_id);
 
         $supplyCompanies = DB::table('supply_companies')
-            ->select('code', 'name', DB::raw("'仕入' as type"))
+            ->select('code', 'name', 'yomi', DB::raw("'仕入' as type"))
             ->where('owner_company_id', $owner_company_id);
 
         $shops = $saleCompanies->unionAll($supplyCompanies)->get();

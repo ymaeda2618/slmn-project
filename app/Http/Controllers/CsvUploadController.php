@@ -1000,9 +1000,9 @@ class CsvUploadController extends Controller
             // 税率コード取得 1:8% 2:10%
             // ------------------------
             if ($lines[27] == 1) {
-                $tax_id = 2;
-            } elseif ($lines[27] == 3) {
                 $tax_id = 1;
+            } elseif ($lines[27] == 3) {
+                $tax_id = 2;
             } else {
                 throw new Exception("税率が設定されていません。");
             }

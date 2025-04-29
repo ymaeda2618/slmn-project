@@ -377,8 +377,8 @@ class DepositController extends Controller
         ->whereBetween('SaleSlip.date', [$depositDatas->sale_from_date, $depositDatas->sale_to_date])
         ->where('SaleSlip.active', '=', '1');
 
-        if ($depositDatas->invoice_output_type == 0) {
-            // 本部企業の場合、関連する全売上企業を取得
+        if (!empty($depositDatas->owner_company_id)) {
+            // 本部企業の場合、関連する全売上先店舗を取得
             $saleCompanyIds = DB::table('sale_companies')
                 ->where('owner_company_id', $depositDatas->owner_company_id)
                 ->where('active', true)
@@ -407,6 +407,11 @@ class DepositController extends Controller
             'depositDatas'       => $depositDatas,
             'saleSlipDatas'      => $saleSlipList,
             'depositDetailDatas' => $depositDetailIds,
+            'targetType'         => !empty($depositDatas->owner_company_id) ? 'owner' : 'sale',
+            'targetName'         => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_name : $depositDatas->sale_company_name,
+            'targetCode'         => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_code : $depositDatas->sale_company_code,
+            'targetId'           => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_id : $depositDatas->sale_company_id,
+            'targetTaxCalcType'  => $depositDatas->sale_company_tax_calc_type ?? 0,
         ]);
     }
 
@@ -854,421 +859,422 @@ class DepositController extends Controller
         // 1. 出力基準を取得（owner_companies.invoice_output_type）
         // ------------------------------
         $depositMeta = DB::table('deposits AS Deposit')
-        ->select(
-            'Deposit.sale_company_id',
-            'Deposit.owner_company_id',
-            'OwnerCompany.invoice_output_type'
-        )
-        ->leftJoin('owner_companies AS OwnerCompany', 'OwnerCompany.id', '=', 'Deposit.owner_company_id')
-        ->where('Deposit.id', $depositId)
-        ->first();
+            ->select(
+                'Deposit.sale_company_id',
+                'Deposit.owner_company_id',
+                'OwnerCompany.invoice_output_type'
+            )
+            ->leftJoin('owner_companies AS OwnerCompany', 'OwnerCompany.id', '=', 'Deposit.owner_company_id')
+            ->where('Deposit.id', $depositId)
+            ->first();
 
-    $invoiceOutputType = $depositMeta->invoice_output_type ?? 1; // デフォルトは 1（売上企業）
+        // 請求書出力フラグ
+        $invoiceOutputType = $depositMeta->invoice_output_type ?? 1;
 
-    // ------------------------------
-    // 2. 請求情報を取得（出力基準に応じて企業情報を切り替え）
-    // ------------------------------
-    $depositList = DB::table('deposits AS Deposit')
-        ->select(
-            'Deposit.id                                  AS deposit_id',
-            'Deposit.payment_date                        AS payment_date',
-            'Deposit.adjustment_amount                   AS deposit_adjust_price',
-            'Deposit.remarks                             AS remarks',
-            'Deposit.sale_from_date                      AS sale_from_date',
-            'Deposit.sale_to_date                        AS sale_to_date',
-            'DepositWithdrawalDetail.supply_sale_slip_id AS sale_slip_id',
-            'DepositWithdrawalDetail.delivery_price      AS delivery_price',
-            'DepositWithdrawalDetail.adjust_price        AS sale_adjust_price',
+        // ------------------------------
+        // 2. 請求情報を取得（出力基準に応じて企業情報を切り替え）
+        // ------------------------------
+        $depositList = DB::table('deposits AS Deposit')
+            ->select(
+                'Deposit.id                                  AS deposit_id',
+                'Deposit.payment_date                        AS payment_date',
+                'Deposit.adjustment_amount                   AS deposit_adjust_price',
+                'Deposit.remarks                             AS remarks',
+                'Deposit.sale_from_date                      AS sale_from_date',
+                'Deposit.sale_to_date                        AS sale_to_date',
+                'DepositWithdrawalDetail.supply_sale_slip_id AS sale_slip_id',
+                'DepositWithdrawalDetail.delivery_price      AS delivery_price',
+                'DepositWithdrawalDetail.adjust_price        AS sale_adjust_price',
 
-            // 本部企業用
-            'OwnerCompany.id                             AS owner_company_id',
-            'OwnerCompany.name                           AS owner_name',
-            'OwnerCompany.postal_code                    AS owner_postal_code',
-            'OwnerCompany.address                        AS owner_address',
-            'OwnerCompany.invoice_display_name           AS owner_invoice_display_name',
-            'OwnerCompany.invoice_display_postal_code    AS owner_invoice_display_postal_code',
-            'OwnerCompany.invoice_display_address        AS owner_invoice_display_address',
-            'OwnerCompany.invoice_display_flg            AS owner_invoice_display_flg',
+                // 本部企業用
+                'OwnerCompany.id                             AS owner_company_id',
+                'OwnerCompany.name                           AS owner_name',
+                'OwnerCompany.postal_code                    AS owner_postal_code',
+                'OwnerCompany.address                        AS owner_address',
+                'OwnerCompany.invoice_display_name           AS owner_invoice_display_name',
+                'OwnerCompany.invoice_display_postal_code    AS owner_invoice_display_postal_code',
+                'OwnerCompany.invoice_display_address        AS owner_invoice_display_address',
+                'OwnerCompany.invoice_display_flg            AS owner_invoice_display_flg',
 
-            // 売上企業用
-            'SaleCompany.id                              AS company_id',
-            'SaleCompany.name                            AS company_name',
-            'SaleCompany.postal_code                     AS company_postal_code',
-            'SaleCompany.address                         AS company_address',
-            'SaleCompany.invoice_display_name            AS company_invoice_display_name',
-            'SaleCompany.invoice_display_postal_code     AS company_invoice_display_postal_code',
-            'SaleCompany.invoice_display_address         AS company_invoice_display_address',
-            'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
-            'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
+                // 売上先店舗用
+                'SaleCompany.id                              AS company_id',
+                'SaleCompany.name                            AS company_name',
+                'SaleCompany.postal_code                     AS company_postal_code',
+                'SaleCompany.address                         AS company_address',
+                'SaleCompany.invoice_display_name            AS company_invoice_display_name',
+                'SaleCompany.invoice_display_postal_code     AS company_invoice_display_postal_code',
+                'SaleCompany.invoice_display_address         AS company_invoice_display_address',
+                'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
+                'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
 
-            // 明細関連
-            'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
-            'SaleSlipDetail.unit_price                   AS unit_price',
-            'SaleSlipDetail.unit_num                     AS unit_num',
-            'SaleSlipDetail.notax_price                  AS notax_price',
-            'SaleSlipDetail.memo                         AS memo',
-            'Product.name                                AS product_name',
-            'Product.tax_id                              AS tax_id',
-            'Unit.name                                   AS unit_name',
-            'OriginArea.name                             AS origin_name'
-        )
-        ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
-        ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
-            $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
-                ->where('DepositWithdrawalDetail.type', '=', '2');
-        })
-        ->join('sale_slips AS SaleSlip', 'SaleSlip.id', '=', 'DepositWithdrawalDetail.supply_sale_slip_id')
-        ->join('sale_slip_details AS SaleSlipDetail', 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-        ->join('products AS Product', 'SaleSlipDetail.product_id', '=', 'Product.id')
-        ->join('units AS Unit', 'Product.unit_id', '=', 'Unit.id')
-        ->leftJoin('origin_areas AS OriginArea', 'OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
-        ->leftJoin('sale_companies AS SaleCompany', 'SaleCompany.id', '=', 'Deposit.sale_company_id')
-        ->leftJoin('owner_companies AS OwnerCompany', 'OwnerCompany.id', '=', 'Deposit.owner_company_id')
-        ->where('Deposit.id', $depositId)
-        ->where('Deposit.active', 1)
-        ->orderBy('SaleSlip.delivery_date')
-        ->orderBy('SaleSlip.id')
-        ->orderBy('SaleSlipDetail.sort')
-        ->get();
+                // 明細関連
+                'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
+                'SaleSlipDetail.unit_price                   AS unit_price',
+                'SaleSlipDetail.unit_num                     AS unit_num',
+                'SaleSlipDetail.notax_price                  AS notax_price',
+                'SaleSlipDetail.memo                         AS memo',
+                'Product.name                                AS product_name',
+                'Product.tax_id                              AS tax_id',
+                'Unit.name                                   AS unit_name',
+                'OriginArea.name                             AS origin_name'
+            )
+            ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
+            ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
+                $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
+                    ->where('DepositWithdrawalDetail.type', '=', '2');
+            })
+            ->join('sale_slips AS SaleSlip', 'SaleSlip.id', '=', 'DepositWithdrawalDetail.supply_sale_slip_id')
+            ->join('sale_slip_details AS SaleSlipDetail', 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+            ->join('products AS Product', 'SaleSlipDetail.product_id', '=', 'Product.id')
+            ->join('units AS Unit', 'Product.unit_id', '=', 'Unit.id')
+            ->leftJoin('origin_areas AS OriginArea', 'OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
+            ->leftJoin('sale_companies AS SaleCompany', 'SaleCompany.id', '=', 'Deposit.sale_company_id')
+            ->leftJoin('owner_companies AS OwnerCompany', 'OwnerCompany.id', '=', 'Deposit.owner_company_id')
+            ->where('Deposit.id', $depositId)
+            ->where('Deposit.active', 1)
+            ->orderBy('SaleSlip.delivery_date')
+            ->orderBy('SaleSlip.id')
+            ->orderBy('SaleSlipDetail.sort')
+            ->get();
 
-    // ------------------------------
-    // 3. 出力基準企業の情報を設定
-    // ------------------------------
-    $row = $depositList->first();
-    $displayName = $invoiceOutputType == 0 ? $row->owner_name : $row->company_name;
-    $displayAddress = $invoiceOutputType == 0 ? $row->owner_address : $row->company_address;
-    $displayPostalCode = $invoiceOutputType == 0 ? $row->owner_postal_code : $row->company_postal_code;
-    $displayFlg = $invoiceOutputType == 0 ? $row->owner_invoice_display_flg : $row->company_invoice_display_flg;
-    $displayOverrideName = $invoiceOutputType == 0 ? $row->owner_invoice_display_name : $row->company_invoice_display_name;
-    $displayOverrideAddress = $invoiceOutputType == 0 ? $row->owner_invoice_display_address : $row->company_invoice_display_address;
-    $displayOverridePostal = $invoiceOutputType == 0 ? $row->owner_invoice_display_postal_code : $row->company_invoice_display_postal_code;
+        // ------------------------------
+        // 3. 出力基準企業の情報を設定
+        // ------------------------------
+        $row = $depositList->first();
+        $displayName            = $invoiceOutputType == 0 ? $row->owner_name : $row->company_name;
+        $displayAddress         = $invoiceOutputType == 0 ? $row->owner_address : $row->company_address;
+        $displayPostalCode      = $invoiceOutputType == 0 ? $row->owner_postal_code : $row->company_postal_code;
+        $displayFlg             = $invoiceOutputType == 0 ? $row->owner_invoice_display_flg : $row->company_invoice_display_flg;
+        $displayOverrideName    = $invoiceOutputType == 0 ? $row->owner_invoice_display_name : $row->company_invoice_display_name;
+        $displayOverrideAddress = $invoiceOutputType == 0 ? $row->owner_invoice_display_address : $row->company_invoice_display_address;
+        $displayOverridePostal  = $invoiceOutputType == 0 ? $row->owner_invoice_display_postal_code : $row->company_invoice_display_postal_code;
 
-    if ($displayFlg) {
-        if (!empty($displayOverrideName)) $displayName = $displayOverrideName;
-        if (!empty($displayOverrideAddress)) $displayAddress = $displayOverrideAddress;
-        if (!empty($displayOverridePostal)) $displayPostalCode = $displayOverridePostal;
-    }
-
-    $postal_code = '';
-    if (!empty($displayPostalCode)) {
-        $postal_code = substr($displayPostalCode, 0, 3) . '-' . substr($displayPostalCode, 3);
-    }
-
-    // ------------------------------
-    // 4. 請求元（自社）企業情報取得
-    // ------------------------------
-    $companyDatas = CompanySetting::getCompanyData();
-    $bank_type = [1 => '普通', 2 => '当座', 3 => 'その他'];
-
-    $companyInfo = [
-        'name'            => $companyDatas[0]->name ?? '',
-        'address'         => $companyDatas[0]->address ?? '',
-        'postal_code'     => !empty($companyDatas[0]->postal_code) ? substr($companyDatas[0]->postal_code, 0, 3) . '-' . substr($companyDatas[0]->postal_code, 3) : '',
-        'office_tel'      => $companyDatas[0]->office_tel ?? '',
-        'office_fax'      => $companyDatas[0]->office_fax ?? '',
-        'shop_tel'        => $companyDatas[0]->shop_tel ?? '',
-        'shop_fax'        => $companyDatas[0]->shop_fax ?? '',
-        'invoice_form_id' => $companyDatas[0]->invoice_form_id ?? '',
-        'bank_name'       => $companyDatas[0]->bank_name ?? '',
-        'branch_name'     => $companyDatas[0]->branch_name ?? '',
-        'bank_type'       => isset($companyDatas[0]->bank_type) ? $bank_type[$companyDatas[0]->bank_type] : '',
-        'bank_account'    => $companyDatas[0]->bank_account ?? '',
-        'company_image'   => $companyDatas[0]->company_image ?? '',
-    ];
-
-    // ------------------------------
-    // 5. 明細計算処理など（元コードと同様に続く）
-    // ------------------------------
-    // 初期化処理
-    $calcDepositList = array();
-    $companyTaxCalcType = 0;
-    $prev_sale_slip_id = 0;
-    $tax8PerSaleSlip = 0; // 伝票ごとの消費税を格納する変数
-    $tax10PerSaleSlip = 0; // 伝票ごとの消費税を格納する変数
-    $tax8  = 0; // 請求書の消費税合計を格納する変数
-    $tax10 = 0; // 請求書の消費税合計を格納する変数
-    $notaxSubTotal8Amount = 0;
-    $notaxSubTotal10Amount = 0;
-    $thedate_subtotal = 0;  // 日々の小計
-    $prev_thedate = "";     // 日々の小計に利用する前レコードの日付
-    foreach ($depositList as $depositDatas) {
-
-        // 前レコードと日付が変わっている場合は日々の小計データを入れる
-        if (!empty($prev_thedate) && $prev_thedate != $depositDatas->sale_slip_delivery_date) {
-            $calcDepositList['detail'][] = array(
-                'date'                => $prev_thedate,
-                'name'                => "小計",
-                'origin_name'         => "",
-                'inventory_unit_num'  => "",
-                'unit_price'          => "",
-                'unit_num'            => "",
-                'unit_name'           => "",
-                'notax_price'         => $thedate_subtotal,
-                'memo'                => "",
-            );
-
-            // 初期化
-            $thedate_subtotal = 0;
+        if ($displayFlg) {
+            if (!empty($displayOverrideName)) $displayName = $displayOverrideName;
+            if (!empty($displayOverrideAddress)) $displayAddress = $displayOverrideAddress;
+            if (!empty($displayOverridePostal)) $displayPostalCode = $displayOverridePostal;
         }
 
-        // 日付を格納
-        $prev_thedate = $depositDatas->sale_slip_delivery_date;
-        $thedate_subtotal += $depositDatas->notax_price;
+        $postal_code = '';
+        if (!empty($displayPostalCode)) {
+            $postal_code = substr($displayPostalCode, 0, 3) . '-' . substr($displayPostalCode, 3);
+        }
 
-         // 税計算種別が0:伝票ごとの場合
-        if (
-            $companyTaxCalcType == 0 &&
-            !empty($prev_sale_slip_id) &&
-            $prev_sale_slip_id != $depositDatas->sale_slip_id
-        ) {
+        // ------------------------------
+        // 4. 請求元（自社）企業情報取得
+        // ------------------------------
+        $companyDatas = CompanySetting::getCompanyData();
+        $bank_type = [1 => '普通', 2 => '当座', 3 => 'その他'];
+
+        $companyInfo = [
+            'name'            => $companyDatas[0]->name ?? '',
+            'address'         => $companyDatas[0]->address ?? '',
+            'postal_code'     => !empty($companyDatas[0]->postal_code) ? substr($companyDatas[0]->postal_code, 0, 3) . '-' . substr($companyDatas[0]->postal_code, 3) : '',
+            'office_tel'      => $companyDatas[0]->office_tel ?? '',
+            'office_fax'      => $companyDatas[0]->office_fax ?? '',
+            'shop_tel'        => $companyDatas[0]->shop_tel ?? '',
+            'shop_fax'        => $companyDatas[0]->shop_fax ?? '',
+            'invoice_form_id' => $companyDatas[0]->invoice_form_id ?? '',
+            'bank_name'       => $companyDatas[0]->bank_name ?? '',
+            'branch_name'     => $companyDatas[0]->branch_name ?? '',
+            'bank_type'       => isset($companyDatas[0]->bank_type) ? $bank_type[$companyDatas[0]->bank_type] : '',
+            'bank_account'    => $companyDatas[0]->bank_account ?? '',
+            'company_image'   => $companyDatas[0]->company_image ?? '',
+        ];
+
+        // ------------------------------
+        // 5. 明細計算処理など（元コードと同様に続く）
+        // ------------------------------
+        // 初期化処理
+        $calcDepositList = array();
+        $companyTaxCalcType = 0;
+        $prev_sale_slip_id = 0;
+        $tax8PerSaleSlip = 0; // 伝票ごとの消費税を格納する変数
+        $tax10PerSaleSlip = 0; // 伝票ごとの消費税を格納する変数
+        $tax8  = 0; // 請求書の消費税合計を格納する変数
+        $tax10 = 0; // 請求書の消費税合計を格納する変数
+        $notaxSubTotal8Amount = 0;
+        $notaxSubTotal10Amount = 0;
+        $thedate_subtotal = 0;  // 日々の小計
+        $prev_thedate = "";     // 日々の小計に利用する前レコードの日付
+        foreach ($depositList as $depositDatas) {
+
+            // 前レコードと日付が変わっている場合は日々の小計データを入れる
+            if (!empty($prev_thedate) && $prev_thedate != $depositDatas->sale_slip_delivery_date) {
+                $calcDepositList['detail'][] = array(
+                    'date'                => $prev_thedate,
+                    'name'                => "小計",
+                    'origin_name'         => "",
+                    'inventory_unit_num'  => "",
+                    'unit_price'          => "",
+                    'unit_num'            => "",
+                    'unit_name'           => "",
+                    'notax_price'         => $thedate_subtotal,
+                    'memo'                => "",
+                );
+
+                // 初期化
+                $thedate_subtotal = 0;
+            }
+
+            // 日付を格納
+            $prev_thedate = $depositDatas->sale_slip_delivery_date;
+            $thedate_subtotal += $depositDatas->notax_price;
+
+            // 税計算種別が0:伝票ごとの場合
+            if (
+                $companyTaxCalcType == 0 &&
+                !empty($prev_sale_slip_id) &&
+                $prev_sale_slip_id != $depositDatas->sale_slip_id
+            ) {
+                $tax8  += floor($tax8PerSaleSlip * 0.08);
+                $tax10 += floor($tax10PerSaleSlip * 0.1);
+                $tax8PerSaleSlip = 0;
+                $tax10PerSaleSlip = 0;
+            }
+            // 消費税計算するために前売上伝票IDを取得
+            $prev_sale_slip_id = $depositDatas->sale_slip_id;
+
+            // -------
+            // 会社情報
+            // -------
+            // 企業情報格納
+            if (!isset($calcDepositList['company_info'])) {
+
+                if (isset($depositDatas->owner_name) && !empty($depositDatas->owner_name)) { // 本部情報がある場合はこちらを入れる
+
+                    $companyId = $depositDatas->owner_company_id;
+                    $calcDepositList['company_info']['name']    = $depositDatas->owner_name;
+                    $company_name                               = $depositDatas->owner_name;
+                    $calcDepositList['company_info']['address'] = $depositDatas->owner_address;
+                    // 郵便番号は間にハイフンを入れる
+                    $calcDepositList['company_info']['code'] = '';
+                    if (!empty($depositDatas->owner_postal_code)) {
+                        $codeBefore = substr($depositDatas->owner_postal_code, 0, 3);
+                        $codeAfter  = substr($depositDatas->owner_postal_code, 3, 4);
+                        $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                    }
+                    // 請求書用フラグが有効の場合は請求書用の名前、郵便番号、住所を使用する
+                    if ($depositDatas->owner_invoice_display_flg) {
+                        $calcDepositList['company_info']['name'] = $depositDatas->owner_invoice_display_name;
+                        $calcDepositList['company_info']['address'] = $depositDatas->owner_invoice_display_address;
+                        // 郵便番号は間にハイフンを入れる
+                        if (!empty($depositDatas->owner_invoice_display_postal_code)) {
+                            $codeBefore = substr($depositDatas->owner_invoice_display_postal_code, 0, 3);
+                            $codeAfter  = substr($depositDatas->owner_invoice_display_postal_code, 3, 4);
+                            $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                        }
+                    }
+
+                } else {
+                    $companyId = $depositDatas->company_id;
+                    $calcDepositList['company_info']['name'] = $depositDatas->company_name;
+                    $calcDepositList['company_info']['address'] = $depositDatas->company_address;
+                    // 郵便番号は間にハイフンを入れる
+                    $calcDepositList['company_info']['code'] = '';
+                    if (!empty($depositDatas->company_postal_code)) {
+                        $codeBefore = substr($depositDatas->company_postal_code, 0, 3);
+                        $codeAfter  = substr($depositDatas->company_postal_code, 3, 4);
+                        $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                    }
+                    // 請求書用フラグが有効の場合は請求書用の名前、郵便番号、住所を使用する
+                    if ($depositDatas->company_invoice_display_flg) {
+                        $calcDepositList['company_info']['name'] = $depositDatas->company_invoice_display_name;
+                        $calcDepositList['company_info']['address'] = $depositDatas->company_invoice_display_address;
+                        // 郵便番号は間にハイフンを入れる
+                        if (!empty($depositDatas->company_invoice_display_postal_code)) {
+                            $codeBefore = substr($depositDatas->company_invoice_display_postal_code, 0, 3);
+                            $codeAfter  = substr($depositDatas->company_invoice_display_postal_code, 3, 4);
+                            $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                        }
+                    }
+                }
+
+                // 請求期間
+                $calcDepositList['company_info']['sale_from_to_date'] = date('Y年m月d日', strtotime($depositDatas->sale_from_date)) . '～' . date('Y年m月d日', strtotime($depositDatas->sale_to_date));
+
+                // 支払期日もここで入れる
+                $calcDepositList['company_info']['payment_date'] = date('Y年m月d日', strtotime($depositDatas->payment_date));
+
+                // 備考情報もここで入れる
+                $calcDepositList['company_info']['remarks'] = $depositDatas->remarks;
+
+                // 税計算種別(0:伝票ごと 1:請求書ごと)
+                $companyTaxCalcType = $depositDatas->company_tax_calc_type;
+            }
+
+            // -------------------
+            // 8%, 10%ごとの金額計算
+            // -------------------
+
+            $product_name = "";
+            if ($depositDatas->tax_id == 1) {// 税率が8%の場合
+                $product_name = $depositDatas->product_name . " *"; // 軽減税率対象商品がわかるようにする
+                $notaxSubTotal8Amount += $depositDatas->notax_price;
+                if ($companyTaxCalcType == 0) { //　伝票ごとに消費税算出する計算方式の場合
+                    $tax8PerSaleSlip += $depositDatas->notax_price;
+                }
+            } else {// 税率が10%の場合
+                $product_name = $depositDatas->product_name;
+                $notaxSubTotal10Amount += $depositDatas->notax_price;
+                if ($companyTaxCalcType == 0) { //　伝票ごとに消費税算出する計算方式の場合
+                    $tax10PerSaleSlip += $depositDatas->notax_price;
+                }
+            }
+
+            // 初期化
+            $calcDepositList['detail'][] = array(
+                'date'                => $depositDatas->sale_slip_delivery_date,
+                'name'                => $product_name,
+                'origin_name'         => $depositDatas->origin_name,
+                'inventory_unit_num'  => $depositDatas->inventory_unit_num,
+                'unit_price'          => $depositDatas->unit_price,
+                'unit_num'            => $depositDatas->unit_num,
+                'unit_name'           => $depositDatas->unit_name,
+                'notax_price'         => $depositDatas->notax_price,
+                'memo'                => $depositDatas->memo,
+            );
+
+            if (!isset($calcDepositList['total'])) {
+                $calcDepositList['total'] = array(
+                    'notax_subtotal_8'  => 0,
+                    'notax_subtotal_10' => 0,
+                    'tax_8'             => 0,
+                    'tax_10'            => 0,
+                    'total'             => 0
+                );
+            }
+        }
+
+        // レコードの最後に小計データを入れる
+        $calcDepositList['detail'][] = array(
+            'date'                => $prev_thedate,
+            'name'                => "小計",
+            'origin_name'         => "",
+            'inventory_unit_num'  => "",
+            'unit_price'          => "",
+            'unit_num'            =>"",
+            'unit_name'           => "",
+            'notax_price'         => $thedate_subtotal,
+            'memo'                => "",
+        );
+
+        // 税金計算
+        if ($companyTaxCalcType == 0) {
             $tax8  += floor($tax8PerSaleSlip * 0.08);
             $tax10 += floor($tax10PerSaleSlip * 0.1);
             $tax8PerSaleSlip = 0;
             $tax10PerSaleSlip = 0;
-        }
-        // 消費税計算するために前売上伝票IDを取得
-        $prev_sale_slip_id = $depositDatas->sale_slip_id;
-
-        // -------
-        // 会社情報
-        // -------
-        // 企業情報格納
-        if (!isset($calcDepositList['company_info'])) {
-
-            if (isset($depositDatas->owner_name) && !empty($depositDatas->owner_name)) { // 本部情報がある場合はこちらを入れる
-
-                $companyId = $depositDatas->owner_company_id;
-                $calcDepositList['company_info']['name']    = $depositDatas->owner_name;
-                $company_name                               = $depositDatas->owner_name;
-                $calcDepositList['company_info']['address'] = $depositDatas->owner_address;
-                // 郵便番号は間にハイフンを入れる
-                $calcDepositList['company_info']['code'] = '';
-                if (!empty($depositDatas->owner_postal_code)) {
-                    $codeBefore = substr($depositDatas->owner_postal_code, 0, 3);
-                    $codeAfter  = substr($depositDatas->owner_postal_code, 3, 4);
-                    $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
-                }
-                // 請求書用フラグが有効の場合は請求書用の名前、郵便番号、住所を使用する
-                if ($depositDatas->owner_invoice_display_flg) {
-                    $calcDepositList['company_info']['name'] = $depositDatas->owner_invoice_display_name;
-                    $calcDepositList['company_info']['address'] = $depositDatas->owner_invoice_display_address;
-                    // 郵便番号は間にハイフンを入れる
-                    if (!empty($depositDatas->owner_invoice_display_postal_code)) {
-                        $codeBefore = substr($depositDatas->owner_invoice_display_postal_code, 0, 3);
-                        $codeAfter  = substr($depositDatas->owner_invoice_display_postal_code, 3, 4);
-                        $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
-                    }
-                }
-
-            } else {
-                $companyId = $depositDatas->company_id;
-                $calcDepositList['company_info']['name'] = $depositDatas->company_name;
-                $calcDepositList['company_info']['address'] = $depositDatas->company_address;
-                // 郵便番号は間にハイフンを入れる
-                $calcDepositList['company_info']['code'] = '';
-                if (!empty($depositDatas->company_postal_code)) {
-                    $codeBefore = substr($depositDatas->company_postal_code, 0, 3);
-                    $codeAfter  = substr($depositDatas->company_postal_code, 3, 4);
-                    $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
-                }
-                // 請求書用フラグが有効の場合は請求書用の名前、郵便番号、住所を使用する
-                if ($depositDatas->company_invoice_display_flg) {
-                    $calcDepositList['company_info']['name'] = $depositDatas->company_invoice_display_name;
-                    $calcDepositList['company_info']['address'] = $depositDatas->company_invoice_display_address;
-                    // 郵便番号は間にハイフンを入れる
-                    if (!empty($depositDatas->company_invoice_display_postal_code)) {
-                        $codeBefore = substr($depositDatas->company_invoice_display_postal_code, 0, 3);
-                        $codeAfter  = substr($depositDatas->company_invoice_display_postal_code, 3, 4);
-                        $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
-                    }
-                }
-            }
-
-            // 請求期間
-            $calcDepositList['company_info']['sale_from_to_date'] = date('Y年m月d日', strtotime($depositDatas->sale_from_date)) . '～' . date('Y年m月d日', strtotime($depositDatas->sale_to_date));
-
-            // 支払期日もここで入れる
-            $calcDepositList['company_info']['payment_date'] = date('Y年m月d日', strtotime($depositDatas->payment_date));
-
-            // 備考情報もここで入れる
-            $calcDepositList['company_info']['remarks'] = $depositDatas->remarks;
-
-            // 税計算種別(0:伝票ごと 1:請求書ごと)
-            $companyTaxCalcType = $depositDatas->company_tax_calc_type;
+        } else if ($companyTaxCalcType == 1) { //　請求書ごとに消費税算出する計算方式の場合
+            $tax8  = floor($notaxSubTotal8Amount * 0.08);
+            $tax10 = floor($notaxSubTotal10Amount * 0.1);
         }
 
-        // -------------------
-        // 8%, 10%ごとの金額計算
-        // -------------------
+        // 税込小計
+        $subTotal8Amount  = $notaxSubTotal8Amount  + $tax8;
+        $subTotal10Amount = $notaxSubTotal10Amount + $tax10;
 
-        $product_name = "";
-        if ($depositDatas->tax_id == 1) {// 税率が8%の場合
-            $product_name = $depositDatas->product_name . " *"; // 軽減税率対象商品がわかるようにする
-            $notaxSubTotal8Amount += $depositDatas->notax_price;
-            if ($companyTaxCalcType == 0) { //　伝票ごとに消費税算出する計算方式の場合
-                $tax8PerSaleSlip += $depositDatas->notax_price;
+        // データ格納
+        $calcDepositList['total']['notax_subtotal_8']  = $notaxSubTotal8Amount;
+        $calcDepositList['total']['tax_8']             = $tax8 ;
+        $calcDepositList['total']['notax_subtotal_10'] = $notaxSubTotal10Amount;
+        $calcDepositList['total']['tax_10']            = $tax10;
+        $calcDepositList['total']['total']             = $subTotal8Amount + $subTotal10Amount;
+
+        // -----------------
+        // 調整額と配送額の計算
+        // -----------------
+        $calcDepositIds  = array();
+        $calcSaleSlipIds = array();
+        foreach ($depositList as $depositDatas) {
+            // 初期化
+            if (!isset($calcDepositList['detail']['adjust_price'])) {
+                $calcDepositList['detail']['adjust_price'] = array(
+                    'date'               => '',
+                    'name'                => '調整額',
+                    'origin_name'         => '',
+                    'inventory_unit_num'  => '',
+                    'unit_price'         => '',
+                    'unit_num'           => '',
+                    'unit_name'          => '',
+                    'notax_price'        => 0,
+                    'memo'               => '',
+                );
             }
-        } else {// 税率が10%の場合
-            $product_name = $depositDatas->product_name;
-            $notaxSubTotal10Amount += $depositDatas->notax_price;
-            if ($companyTaxCalcType == 0) { //　伝票ごとに消費税算出する計算方式の場合
-                $tax10PerSaleSlip += $depositDatas->notax_price;
+
+            if (!isset($calcDepositList['detail']['delivery_price'])) {
+                $calcDepositList['detail']['delivery_price'] = array(
+                    'date'                => '',
+                    'name'                => '配送額',
+                    'origin_name'         => '',
+                    'inventory_unit_num'  => '',
+                    'unit_price'          => '',
+                    'unit_num'            => '',
+                    'unit_name'           => '',
+                    'notax_price'         => 0,
+                    'memo'                => '',
+                );
+            }
+
+            // 入金伝票ごとに
+            if (!in_array($depositDatas->deposit_id, $calcDepositIds)) {
+                $calcDepositList['detail']['adjust_price']['notax_price'] += $depositDatas->deposit_adjust_price;
+                $calcDepositList['total']['total'] += $depositDatas->deposit_adjust_price;
+                $calcDepositIds[] = $depositDatas->deposit_id;
+            }
+            // 売上伝票ごとに
+            if (!in_array($depositDatas->sale_slip_id, $calcSaleSlipIds)) {
+                $calcDepositList['detail']['adjust_price']['notax_price'] += $depositDatas->sale_adjust_price;
+                $calcDepositList['detail']['delivery_price']['notax_price'] += $depositDatas->delivery_price;
+                $calcDepositList['total']['total'] += $depositDatas->sale_adjust_price + $depositDatas->delivery_price;
+                $calcSaleSlipIds[] = $depositDatas->sale_slip_id;
             }
         }
 
-        // 初期化
-        $calcDepositList['detail'][] = array(
-            'date'                => $depositDatas->sale_slip_delivery_date,
-            'name'                => $product_name,
-            'origin_name'         => $depositDatas->origin_name,
-            'inventory_unit_num'  => $depositDatas->inventory_unit_num,
-            'unit_price'          => $depositDatas->unit_price,
-            'unit_num'            => $depositDatas->unit_num,
-            'unit_name'           => $depositDatas->unit_name,
-            'notax_price'         => $depositDatas->notax_price,
-            'memo'                => $depositDatas->memo,
-        );
-
-        if (!isset($calcDepositList['total'])) {
-            $calcDepositList['total'] = array(
-                'notax_subtotal_8'  => 0,
-                'notax_subtotal_10' => 0,
-                'tax_8'             => 0,
-                'tax_10'            => 0,
-                'total'             => 0
-            );
-        }
-    }
-
-    // レコードの最後に小計データを入れる
-    $calcDepositList['detail'][] = array(
-        'date'                => $prev_thedate,
-        'name'                => "小計",
-        'origin_name'         => "",
-        'inventory_unit_num'  => "",
-        'unit_price'          => "",
-        'unit_num'            =>"",
-        'unit_name'           => "",
-        'notax_price'         => $thedate_subtotal,
-        'memo'                => "",
-    );
-
-    // 税金計算
-    if ($companyTaxCalcType == 0) {
-        $tax8  += floor($tax8PerSaleSlip * 0.08);
-        $tax10 += floor($tax10PerSaleSlip * 0.1);
-        $tax8PerSaleSlip = 0;
-        $tax10PerSaleSlip = 0;
-    } else if ($companyTaxCalcType == 1) { //　請求書ごとに消費税算出する計算方式の場合
-        $tax8  = floor($notaxSubTotal8Amount * 0.08);
-        $tax10 = floor($notaxSubTotal10Amount * 0.1);
-    }
-
-    // 税込小計
-    $subTotal8Amount  = $notaxSubTotal8Amount  + $tax8;
-    $subTotal10Amount = $notaxSubTotal10Amount + $tax10;
-
-    // データ格納
-    $calcDepositList['total']['notax_subtotal_8']  = $notaxSubTotal8Amount;
-    $calcDepositList['total']['tax_8']             = $tax8 ;
-    $calcDepositList['total']['notax_subtotal_10'] = $notaxSubTotal10Amount;
-    $calcDepositList['total']['tax_10']            = $tax10;
-    $calcDepositList['total']['total']             = $subTotal8Amount + $subTotal10Amount;
-
-    // -----------------
-    // 調整額と配送額の計算
-    // -----------------
-    $calcDepositIds  = array();
-    $calcSaleSlipIds = array();
-    foreach ($depositList as $depositDatas) {
-        // 初期化
-        if (!isset($calcDepositList['detail']['adjust_price'])) {
-            $calcDepositList['detail']['adjust_price'] = array(
-                'date'               => '',
-                'name'                => '調整額',
-                'origin_name'         => '',
-                'inventory_unit_num'  => '',
-                'unit_price'         => '',
-                'unit_num'           => '',
-                'unit_name'          => '',
-                'notax_price'        => 0,
-                'memo'               => '',
-            );
+        // 調整額が0円の場合は配列から除去する
+        if(empty($calcDepositList['detail']['adjust_price']['notax_price'])){
+            unset($calcDepositList['detail']['adjust_price']);
         }
 
-        if (!isset($calcDepositList['detail']['delivery_price'])) {
-            $calcDepositList['detail']['delivery_price'] = array(
-                'date'                => '',
-                'name'                => '配送額',
-                'origin_name'         => '',
-                'inventory_unit_num'  => '',
-                'unit_price'          => '',
-                'unit_num'            => '',
-                'unit_name'           => '',
-                'notax_price'         => 0,
-                'memo'                => '',
-            );
+        // 配送額が0円の場合は配列から除去する
+        if(empty($calcDepositList['detail']['delivery_price']['notax_price'])){
+            unset($calcDepositList['detail']['delivery_price']);
         }
 
-        // 入金伝票ごとに
-        if (!in_array($depositDatas->deposit_id, $calcDepositIds)) {
-            $calcDepositList['detail']['adjust_price']['notax_price'] += $depositDatas->deposit_adjust_price;
-            $calcDepositList['total']['total'] += $depositDatas->deposit_adjust_price;
-            $calcDepositIds[] = $depositDatas->deposit_id;
+        // 明細の数が10件未満なら10件まで空データを入れる
+        $detailCnt = count($calcDepositList['detail']);
+        if ($detailCnt < 15) {
+            $addLine = 15 - $detailCnt;
+            for ($i=1;$i<=$addLine;$i++) {
+                $calcDepositList['detail'][] = array(
+                    'date'                => '',
+                    'name'                => '',
+                    'origin_name'         => '',
+                    'inventory_unit_num'  => '',
+                    'unit_price'          => '',
+                    'unit_num'            => '',
+                    'unit_name'           => '',
+                    'notax_price'         => '',
+                    'memo'                => ''
+                );
+            }
         }
-        // 売上伝票ごとに
-        if (!in_array($depositDatas->sale_slip_id, $calcSaleSlipIds)) {
-            $calcDepositList['detail']['adjust_price']['notax_price'] += $depositDatas->sale_adjust_price;
-            $calcDepositList['detail']['delivery_price']['notax_price'] += $depositDatas->delivery_price;
-            $calcDepositList['total']['total'] += $depositDatas->sale_adjust_price + $depositDatas->delivery_price;
-            $calcSaleSlipIds[] = $depositDatas->sale_slip_id;
-        }
-    }
 
-    // 調整額が0円の場合は配列から除去する
-    if(empty($calcDepositList['detail']['adjust_price']['notax_price'])){
-        unset($calcDepositList['detail']['adjust_price']);
-    }
+        // 最後にPDF出力処理
+        $pdf = \PDF::view('pdf.pdf_tamplate', [
+            'depositList' => $calcDepositList,
+            'companyInfo' => $companyInfo
+        ])
+        ->setOption('encoding', 'utf-8')
+        ->setOption('margin-bottom', 8)
+        ->setOption('footer-center', '[page] ページ')
+        ->setOption('footer-font-size', 8)
+        ->setOption('footer-html', view('pdf.pdfFooter', [
+            'company_name' => $calcDepositList['company_info']['name']
+        ]));
 
-    // 配送額が0円の場合は配列から除去する
-    if(empty($calcDepositList['detail']['delivery_price']['notax_price'])){
-        unset($calcDepositList['detail']['delivery_price']);
-    }
-
-    // 明細の数が10件未満なら10件まで空データを入れる
-    $detailCnt = count($calcDepositList['detail']);
-    if ($detailCnt < 15) {
-        $addLine = 15 - $detailCnt;
-        for ($i=1;$i<=$addLine;$i++) {
-            $calcDepositList['detail'][] = array(
-                'date'                => '',
-                'name'                => '',
-                'origin_name'         => '',
-                'inventory_unit_num'  => '',
-                'unit_price'          => '',
-                'unit_num'            => '',
-                'unit_name'           => '',
-                'notax_price'         => '',
-                'memo'                => ''
-            );
-        }
-    }
-
-    // 最後にPDF出力処理
-    $pdf = \PDF::view('pdf.pdf_tamplate', [
-        'depositList' => $calcDepositList,
-        'companyInfo' => $companyInfo
-    ])
-    ->setOption('encoding', 'utf-8')
-    ->setOption('margin-bottom', 8)
-    ->setOption('footer-center', '[page] ページ')
-    ->setOption('footer-font-size', 8)
-    ->setOption('footer-html', view('pdf.pdfFooter', [
-        'company_name' => $calcDepositList['company_info']['name']
-    ]));
-
-    return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');    //ブラウザ上で開ける
-    // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード
+        return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');    //ブラウザ上で開ける
+        // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード
 
     }
 

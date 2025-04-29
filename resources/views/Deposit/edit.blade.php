@@ -26,27 +26,31 @@
 
                 <div class="form-group" style="margin-bottom: 0 !important;">
                     <div class="radio_box">
-                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="0" onchange="toggleCompanyInput()" @if ($depositDatas->invoice_output_type == 0) checked @endif> 本部企業毎</label>
-                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="1" onchange="toggleCompanyInput()" @if ($depositDatas->invoice_output_type == 1) checked @endif> 店舗毎</label>
+                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="0" onchange="toggleCompanyInput()" @if ($targetType == 'owner') checked @endif> 本部企業毎</label>
+                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="1" onchange="toggleCompanyInput()" @if ($targetType == 'sale') checked @endif> 売上先店舗毎</label>
                     </div>
                 </div>
 
                 <table class="deposit-from-table">
                     <tr>
                         <th colspan="2" class="sales-label owner_company_area">本部企業</th>
-                        <th colspan="2" class="sales-label sale_company_area" style="display: none;">売上企業</th>
+                        <th colspan="2" class="sales-label sale_company_area" style="display: none;">売上先店舗</th>
                     </tr>
                     <tr>
                         <td colspan="2" class="width-50 owner_company_area" id="owner_company_area">
-                            <input type="text" class="form-control deposit_owner_code_input" id="deposit_owner_code" name="data[Deposit][deposit_owner_code]" onchange='changeCalcFlg()' tabindex="5" value="{{$depositDatas->owner_company_code}}">
-                            <input type="hidden" id="deposit_owner_id" name="data[Deposit][deposit_owner_id]" value="{{$depositDatas->owner_company_id}}">
-                            <input type="text" class="form-control mt-1" id="deposit_owner_text" name="data[Deposit][deposit_owner_text]" value="{{$depositDatas->owner_company_name}}" readonly>
+                            <div class="d-flex">
+                                <input type="text" class="form-control mr-2 deposit_owner_code_input" id="deposit_owner_code" name="data[Deposit][deposit_owner_code]" onchange='changeCalcFlg()' tabindex="5" style="width: 50%;">
+                                <input type="text" class="form-control" id="deposit_owner_text" name="data[Deposit][deposit_owner_text]" readonly style="width: 50%;">
+                            </div>
+                            <input type="hidden" id="deposit_owner_id" name="data[Deposit][deposit_owner_id]">
                         </td>
                         <td colspan="2" class="width-50 sale_company_area" id="sale_company_area" style="display: none;">
-                            <input type="text" class="form-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='changeCalcFlg()' tabindex="6" value="{{$depositDatas->sale_company_code}}">
-                            <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]" value="{{$depositDatas->sale_company_id}}">
-                            <input type="hidden" id="deposit_company_tax_calc_type" name="data[Deposit][deposit_company_tax_calc_type]" value="{{$depositDatas->sale_company_tax_calc_type}}">
-                            <input type="text" class="form-control mt-1" id="deposit_company_text" name="data[Deposit][deposit_company_text]" value="{{$depositDatas->sale_company_name}}" readonly>
+                            <div class="d-flex">
+                                <input type="text" class="form-control mr-2 deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='changeCalcFlg()' tabindex="6" style="width: 50%;">
+                                <input type="text" class="form-control" id="deposit_company_text" name="data[Deposit][deposit_company_text]" readonly style="width: 50%;">
+                            </div>
+                            <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]">
+                            <input type="hidden" id="deposit_company_tax_calc_type" name="data[Deposit][deposit_company_tax_calc_type]">
                         </td>
                     </tr>
                 </table>
@@ -280,6 +284,33 @@
     //チェックボックスのリスト
     let checkbox_list;
 
+    document.addEventListener('DOMContentLoaded', function () {
+        initializeCompanyInputs();
+    });
+
+    // 初期表示時に会社情報をセットする
+    function initializeCompanyInputs() {
+        const invoiceType = $('input[name="data[Deposit][invoice_output_type]"]:checked').val();
+        if (invoiceType === "0") {
+            // 本部企業
+            $('#deposit_owner_code').val("{{ $depositDatas->owner_company_code ?? '' }}");
+            $('#deposit_owner_text').val("{{ $depositDatas->owner_company_name ?? '' }}");
+            $('#deposit_owner_id').val("{{ $depositDatas->owner_company_id ?? '' }}");
+
+            $('.owner_company_area').show();
+            $('.sale_company_area').hide();
+        } else {
+            // 売上先店舗
+            $('#deposit_company_code').val("{{ $depositDatas->sale_company_code ?? '' }}");
+            $('#deposit_company_text').val("{{ $depositDatas->sale_company_name ?? '' }}");
+            $('#deposit_company_id').val("{{ $depositDatas->sale_company_id ?? '' }}");
+            $('#deposit_company_tax_calc_type').val("{{ $depositDatas->sale_company_tax_calc_type ?? 0 }}");
+
+            $('.owner_company_area').hide();
+            $('.sale_company_area').show();
+        }
+    }
+
     (function($) {
         jQuery(window).load(function() {
 
@@ -438,7 +469,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/deposit_company/)) { // 売上企業
+                if (selector_code.match(/deposit_company/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {
@@ -502,7 +533,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上先店舗ID
             //-------------------------------------
             $(".deposit_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -687,7 +718,7 @@
             // 店舗で検索
             var sales_company = $('#deposit_company_id').val();
             if (sales_company == '') {
-                alert('売上企業を入力してください。');
+                alert('売上先店舗を入力してください。');
                 return;
             }
             fd.append("sale_company_id", sales_company);
@@ -916,7 +947,7 @@
         } else {
             const companyCode = $("#deposit_company_code").val();
             if (companyCode == '') {
-                alert('売上企業を入力してください');
+                alert('売上先店舗を入力してください');
                 return false;
             }
         }
@@ -984,17 +1015,39 @@
     }
 
     // --------------------
-    // 本部、売上企業の切り替え
+    // 本部、売上先店舗の切り替え
     // --------------------
     function toggleCompanyInput() {
         const type = $('input[name="data[Deposit][invoice_output_type]"]:checked').val();
         if (type === "0") {
+            // 本部企業毎
+
+            // 表示切替
             $('.owner_company_area').show();
             $('.sale_company_area').hide();
+
+            // 店舗側の入力値をクリア
+            $('#deposit_company_code').val('');
+            $('#deposit_company_text').val('');
+            $('#deposit_company_id').val('');
+            $('#deposit_company_tax_calc_type').val('');
+
+            // 本部コードにフォーカス
             $('#deposit_owner_code').focus();
+
         } else {
+            // 店舗毎
+
+            // 表示切替
             $('.owner_company_area').hide();
             $('.sale_company_area').show();
+
+            // 本部側の入力値をクリア
+            $('#deposit_owner_code').val('');
+            $('#deposit_owner_text').val('');
+            $('#deposit_owner_id').val('');
+
+            // 店舗コードにフォーカス
             $('#deposit_company_code').focus();
         }
     }

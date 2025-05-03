@@ -85,7 +85,7 @@
                         @foreach ($depositList as $deposit)
                         <tr>
                             <td class="width-10 {{ $deposit->owner_company_id ? 'type-honbu' : 'type-uriage' }}">
-                                {{ $deposit->owner_company_id ? '本部' : '売上' }}
+                                {{ $deposit->owner_company_id ? '本部' : '売上先店舗' }}
                             </td>
                             <td class="width-10">{{ $deposit->deposit_id }}</td>
                             <td>{{ $deposit->deposit_date }}</td>

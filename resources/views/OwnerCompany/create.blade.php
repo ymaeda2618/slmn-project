@@ -76,61 +76,79 @@
                 <label class="column-label" for="address">住所<font color="red">※任意</font></label>
                 <input type="text" class="form-control" id="address" name="data[OwnerCompany][address]">
             </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_code">金融機関コード<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="bank_code" name="data[OwnerCompany][bank_code]">
+            <div class="accordion">
+                <div class="accordion-header">
+                    <span class="accordion-arrow">▼</span>
+                    <span>銀行情報</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="form-group">
+                        <label class="column-label" for="bank_code">金融機関コード<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="bank_code" name="data[OwnerCompany][bank_code]">
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="bank_name">銀行名<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="bank_name" name="data[OwnerCompany][bank_name]">
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="branch_code">支店コード<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="branch_code" name="data[OwnerCompany][branch_code]">
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="branch_name">支店名<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="branch_name" name="data[OwnerCompany][branch_name]">
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="bank_type">口座種別<font color="red">※任意</font></label>
+                        <select class="file-control" id="bank_type" name="data[OwnerCompany][bank_type]">
+                            <option value="0">-</option>
+                            <option value="1">普通</option>
+                            <option value="2">当座</option>
+                            <option value="3">その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="bank_account">口座番号<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="bank_account" name="data[OwnerCompany][bank_account]">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_name">銀行名<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="bank_name" name="data[OwnerCompany][bank_name]">
+
+            <div class="accordion">
+                <div class="accordion-header">
+                    <span class="accordion-arrow">▼</span>
+                    <span>請求書情報</span>
+                </div>
+                <div class="accordion-content">
+                    <div class="form-group">
+                        <label class="column-label" for="invoice_output_type">請求書出力タイプ<font color="red">※任意</font></label>
+                        <select class="file-control" id="invoice_display_flg" name="data[OwnerCompany][invoice_output_type]">
+                            <option value="0">本部企業毎</option>
+                            <option value="1">店舗毎</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="invoice_display_flg">請求書表示フラグ<font color="red">※任意</font></label>
+                        <select class="file-control" id="invoice_display_flg" name="data[OwnerCompany][invoice_display_flg]">
+                            <option value="0">無効</option>
+                            <option value="1">有効</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="invoice_display_name" name="data[OwnerCompany][invoice_display_name]">
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="invoice_display_postal_code">請求書表示郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="invoice_display_postal_code" name="data[OwnerCompany][invoice_display_postal_code]">
+                    </div>
+                    <div class="form-group">
+                        <label class="column-label" for="invoice_display_address">請求書表示住所<font color="red">※任意</font></label>
+                        <input type="text" class="form-control" id="invoice_display_address" name="data[OwnerCompany][invoice_display_address]">
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_code">支店コード<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="branch_code" name="data[OwnerCompany][branch_code]">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_name">支店名<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="branch_name" name="data[OwnerCompany][branch_name]">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_type">口座種別<font color="red">※任意</font></label>
-                <select class="file-control" id="bank_type" name="data[OwnerCompany][bank_type]">
-                    <option value="0">-</option>
-                    <option value="1">普通</option>
-                    <option value="2">当座</option>
-                    <option value="3">その他</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_account">口座番号<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="bank_account" name="data[OwnerCompany][bank_account]">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="invoice_output_type">請求書出力タイプ<font color="red">※任意</font></label>
-                <select class="file-control" id="invoice_display_flg" name="data[OwnerCompany][invoice_output_type]">
-                    <option value="0">本部企業毎</option>
-                    <option value="1">店舗毎</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="invoice_display_flg">請求書表示フラグ<font color="red">※任意</font></label>
-                <select class="file-control" id="invoice_display_flg" name="data[OwnerCompany][invoice_display_flg]">
-                    <option value="0">無効</option>
-                    <option value="1">有効</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="invoice_display_name">請求書表示名<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="invoice_display_name" name="data[OwnerCompany][invoice_display_name]">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="invoice_display_postal_code">請求書表示郵便番号※ハイフンなし数字のみ<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="invoice_display_postal_code" name="data[OwnerCompany][invoice_display_postal_code]">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="invoice_display_address">請求書表示住所<font color="red">※任意</font></label>
-                <input type="text" class="form-control" id="invoice_display_address" name="data[OwnerCompany][invoice_display_address]">
-            </div>
+
             <div class="form-group">
                 <label class="column-label">店舗選択</label><br>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#shopSelectModal">
@@ -278,6 +296,59 @@
         width: 80px;
         text-align: center;
     }
+
+    /* アコーディオン全体のデザイン */
+
+    .accordion {
+        max-width: 1300px;
+        width: 90%;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    /* アコーディオン全体 */
+
+    .accordion {
+        max-width: 1300px;
+        width: 100%;
+        margin: 20px auto;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    /* ヘッダー部分（ボタン） */
+
+    .accordion-header {
+        padding: 5px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+    }
+
+    .accordion-header span {
+        margin-left: 10px;
+    }
+    /* 矢印アイコン */
+
+    .accordion-arrow {
+        font-size: 12px;
+        transition: transform 0.3s ease;
+    }
+    /* アコーディオンの内容（最初は非表示） */
+
+    .accordion-content {
+        display: none;
+        padding: 15px;
+        background: #f9f9f9;
+        border-top: 1px solid #ccc;
+    }
+    /* 矢印が回転するクラス */
+
+    .rotate {
+        transform: rotate(180deg);
+    }
 </style>
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
@@ -313,5 +384,11 @@ $(document).ready(function () {
 
         $('#shopSelectModal').modal('hide');
     });
+
+    $(".accordion-header").click(function() {
+        $(this).next(".accordion-content").slideToggle(); // 押したやつだけ開閉
+        $(this).find(".accordion-arrow").toggleClass("rotate"); // 押したやつだけ矢印回転
+    });
+
 });
 </script>

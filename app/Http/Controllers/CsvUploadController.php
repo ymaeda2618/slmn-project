@@ -1075,10 +1075,10 @@ class CsvUploadController extends Controller
                 "product_code"        => $product_code,
                 "product_name"        => $product_name,
                 "inventory_unit_id"   => $inventory_unit_id,
-                "inventory_unit_num"  => $lines[30],
+                "inventory_unit_num"  => $lines[29],
                 "unit_id"             => $unit_id,
                 "unit_price"          => $lines[28],
-                "unit_num"            => $lines[29],
+                "unit_num"            => $lines[30],
                 "notax_price"         => $notax_price,
             ];
 
@@ -1197,6 +1197,7 @@ class CsvUploadController extends Controller
                 $product_name         = $slip_detail["product_name"];         // 製品名
                 $inventory_unit_id    = $slip_detail["inventory_unit_id"];    // 入数ID
                 $inventory_unit_num   = $slip_detail["inventory_unit_num"];   // 入数
+                $unit_id              = $slip_detail["unit_id"];              // 単位ID
                 $unit_price           = $slip_detail["unit_price"];           // 単価
                 $unit_num             = $slip_detail["unit_num"];             // 数量
                 $notax_price          = $slip_detail["notax_price"];          // 金額

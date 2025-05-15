@@ -73,7 +73,7 @@
                             <th class="width-10">伝票NO</th>
                             <th>入金日付</th>
                             <th class="width-20">伝票日付</th>
-                            <th class="width-15">企業</th>
+                            <th class="width-15">企業名・店舗名</th>
                             <th>入金金額</th>
                             @if (Home::authClerkCheck())
                             <th>編集</th>

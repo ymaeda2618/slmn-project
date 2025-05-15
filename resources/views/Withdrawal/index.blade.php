@@ -26,7 +26,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">取引先企業</div>
+                                <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control withdrawal_company_code_input" id="withdrawal_company_code" name="data[Withdrawal][withdrawal_company_code]" value="{{$condition_company_code}}" tabindex="3">
                                     <input type="hidden" id="withdrawal_company_id" name="data[Withdrawal][withdrawal_company_id]" value="{{$condition_company_id}}">

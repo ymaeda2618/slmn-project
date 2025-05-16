@@ -930,12 +930,14 @@ class SupplySlipController extends Controller
 
                 $supplySlipId = $detailData->supply_slip_id;
 
+                $tax = '8%';
                 // 税抜金額
                 $notax_total = $detailData->unit_price * $detailData->unit_num;
                 // 税込金額
                 if ($detailData->product_tax_id == 1) { // 8%の場合
                     $total = floor($notax_total * 1.08);
                 } else {
+                    $tax = '10%';
                     $total = floor($notax_total * 1.1);
                 }
 
@@ -954,13 +956,14 @@ class SupplySlipController extends Controller
                     8  => $detailData->unit_num,                                // 数量
                     9  => $detailData->unit_name,                               // 数量単位
                     10 => $detailData->unit_price,                              // 単価
-                    11 => $notax_total,                                         // 税抜合計金額
-                    12 => $total,                                               // 税込合計金額
-                    13 => $detailData->origin_area_id,                          // 産地コード
-                    14 => $detailData->origin_area_name,                        // 産地名
-                    15 => $detailData->staff_code,                              // 担当者コード
-                    16 => $detailData->staff_name,                              // 担当者名
-                    17 => $detailData->memo,                                    // 摘要
+                    11 => $tax,                                                 // 税率
+                    12 => $notax_total,                                         // 税抜合計金額
+                    13 => $total,                                               // 税込合計金額
+                    14 => $detailData->origin_area_id,                          // 産地コード
+                    15 => $detailData->origin_area_name,                        // 産地名
+                    16 => $detailData->staff_code,                              // 担当者コード
+                    17 => $detailData->staff_name,                              // 担当者名
+                    18 => $detailData->memo,                                    // 摘要
                 ];
 
             }
@@ -985,6 +988,7 @@ class SupplySlipController extends Controller
                     '数量',
                     '数量単位',
                     '単価',
+                    '税率',
                     '税抜合計金額',
                     '税込合計金額',
                     '産地コード',

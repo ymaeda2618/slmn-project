@@ -3218,12 +3218,14 @@ class SaleSlipController extends Controller
 
                 $saleSlipId = $detailData->sale_slip_id;
 
+                $tax = '8%';
                 // 税抜金額
                 $notax_total = $detailData->unit_price * $detailData->unit_num;
                 // 税込金額
                 if ($detailData->product_tax_id == 1) { // 8%の場合
                     $total = floor($notax_total * 1.08);
                 } else {
+                    $tax = '10%';
                     $total = floor($notax_total * 1.1);
                 }
 
@@ -3244,13 +3246,14 @@ class SaleSlipController extends Controller
                     10 => $detailData->unit_num,                            // 数量
                     11 => $detailData->unit_name,                           // 数量単位
                     12 => $detailData->unit_price,                          // 単価
-                    13 => $notax_total,                                     // 税抜合計金額
-                    14 => $total,                                           // 税込合計金額
-                    15 => $detailData->origin_area_id,                      // 産地コード
-                    16 => $detailData->origin_area_name,                    // 産地名
-                    17 => $detailData->staff_code,                          // 担当者コード
-                    18 => $detailData->staff_name,                          // 担当者名
-                    19 => $detailData->memo,                                // 摘要
+                    13 => $tax,                                             // 税率
+                    14 => $notax_total,                                     // 税抜合計金額
+                    15 => $total,                                           // 税込合計金額
+                    16 => $detailData->origin_area_id,                      // 産地コード
+                    17 => $detailData->origin_area_name,                    // 産地名
+                    18 => $detailData->staff_code,                          // 担当者コード
+                    19 => $detailData->staff_name,                          // 担当者名
+                    20 => $detailData->memo,                                // 摘要
                 ];
 
             }
@@ -3277,6 +3280,7 @@ class SaleSlipController extends Controller
                     '数量',
                     '数量単位',
                     '単価',
+                    '税率',
                     '税抜合計金額',
                     '税込合計金額',
                     '産地コード',

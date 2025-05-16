@@ -52,13 +52,13 @@
 
                         <tr>
                             <td class="table-td-left">
-                                <div class="table-th">企業文字列検索</div>
+                                <div class="table-th">店舗文字列検索</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control" name="data[search_text]" value="{{$condition_search_text}}" tabindex="3">
                                 </div>
                             </td>
                             <td class="table-td-right">
-                                <div class="table-th-right">企業コード</div>
+                                <div class="table-th-right">店舗コード</div>
                                 <div class="table-td-code table-code-td">
                                     <input type="text" class="search-control company_code_input" id="company_code" name="data[company_code]" value="{{$condition_company_code}}" tabindex="4">
                                     <input type="hidden" id="company_id" name="data[company_id]" value="{{$condition_company_id}}">
@@ -156,7 +156,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
             $(".company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -264,7 +264,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/company/)) { // 売上先企業
+                if (selector_code.match(/company/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {
@@ -326,7 +326,7 @@
 
 <style>
     /* 共通 */
-    
+
     .search-control {
         display: block;
         width: 100%;
@@ -341,7 +341,7 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-    
+
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -349,18 +349,18 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-    
+
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-    
+
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-    
+
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -368,20 +368,20 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-    
+
     .search-area table {
         margin: auto;
         width: 100%;
     }
-    
+
     .table-td-left {
         width: 45%;
     }
-    
+
     .table-td-right {
         width: 55%;
     }
-    
+
     .table-th {
         width: 40%;
         padding: 15px 50px 0px 0px;
@@ -390,7 +390,7 @@
         font-weight: bolder;
         text-align: right;
     }
-    
+
     .table-th-create-date {
         width: 18%;
         padding: 15px 50px 0px 0px;
@@ -399,7 +399,7 @@
         font-weight: bolder;
         text-align: right;
     }
-    
+
     .table-th-right {
         width: 30%;
         padding: 15px 50px 0px 0px;
@@ -408,28 +408,28 @@
         font-weight: bolder;
         text-align: right;
     }
-    
+
     .table-td {
         font-size: 12px;
         float: left;
         padding: 10px 0px;
         width: 60%;
     }
-    
+
     .table-td-code {
         font-size: 12px;
         float: left;
         padding: 10px 0px;
         width: 35%;
     }
-    
+
     .table-td-text {
         font-size: 12px;
         float: left;
         padding: 10px 0px;
         width: 35%;
     }
-    
+
     .table-td-date {
         font-size: 12px;
         float: left;
@@ -437,25 +437,25 @@
         width: 30%;
         padding-right: 30px;
     }
-    
+
     .table-td select {
         width: 100%;
     }
-    
+
     .radio_box {
         width: 20%;
         padding: 17px 10px;
         font-size: 12px;
         float: left;
     }
-    
+
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-    
+
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -464,7 +464,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-    
+
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -473,13 +473,13 @@
         border-radius: 10px;
         margin-left: 2%;
     }
-    
+
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-    
+
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -487,7 +487,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-    
+
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -499,7 +499,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-    
+
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -507,15 +507,15 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-    
+
     .index-table td:nth-child(n+2) {
         text-align: right;
     }
-    
+
     .double-width {
         width: 20%!important;
     }
-    
+
     .edit-btn {
         border-radius: 5px;
         color: #fff;
@@ -527,7 +527,7 @@
         padding: 10px;
     }
     /* アコーディオン全体のデザイン */
-    
+
     .accordion {
         max-width: 1300px;
         width: 90%;
@@ -537,7 +537,7 @@
         overflow: hidden;
     }
     /* アコーディオン全体 */
-    
+
     .accordion {
         max-width: 1300px;
         width: 90%;
@@ -547,7 +547,7 @@
         overflow: hidden;
     }
     /* ヘッダー部分（ボタン） */
-    
+
     .accordion-header {
         padding: 5px;
         cursor: pointer;
@@ -555,18 +555,18 @@
         display: flex;
         align-items: center;
     }
-    
+
     .accordion-header span {
         margin-left: 10px;
     }
     /* 矢印アイコン */
-    
+
     .accordion-arrow {
         font-size: 12px;
         transition: transform 0.3s ease;
     }
     /* アコーディオンの内容（最初は非表示） */
-    
+
     .accordion-content {
         display: none;
         padding: 15px;
@@ -574,25 +574,25 @@
         border-top: 1px solid #ccc;
     }
     /* 矢印が回転するクラス */
-    
+
     .rotate {
         transform: rotate(180deg);
     }
-    
+
     .csv-type-table-area th {
         font-size: 12px;
     }
-    
+
     .csv-type-table-area td select {
         font-size: 12px;
         border-radius: 5px;
         margin-left: 20px;
     }
-    
+
     .csv-btn-area {
         margin-top: 20px;
     }
-    
+
     .csv-btn-area input {
         max-width: 120px;
     }

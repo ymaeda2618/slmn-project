@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">仕入先企業内容 確認画面</div>
+        <div class="top-title">仕入先店舗内容 確認画面</div>
 
         <form class="event-form" id="event-create-form" method="post" action="{{$action_url}}" enctype="multipart/form-data">
             {{ csrf_field() }}
@@ -12,7 +12,7 @@
                 <input type="text" class="form-control" id="yomi" name="data[SupplyCompany][code]" value="{{$request->data['SupplyCompany']['code']}}" readonly>
             </div>
             <div class="form-group">
-                <label class="column-label" for="supply_company_name">仕入先企業名</label>
+                <label class="column-label" for="supply_company_name">仕入先店舗名</label>
                 <input type="text" class="form-control" id="supply_company_name" name="data[SupplyCompany][supply_company_name]" value="{{$request->data['SupplyCompany']['supply_company_name']}}" readonly>
             </div>
             <div class="form-group">
@@ -73,7 +73,7 @@
 
 <style>
     /* 共通 */
-    
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -81,7 +81,7 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .confirm-title {
         font-size: 0.9em;
         font-weight: bold;
@@ -90,23 +90,23 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .event-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-    
+
     .form-group {
         margin-bottom: 3rem !important;
     }
-    
+
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-    
+
     .column-label {
         font-size: 0.9em;
         font-weight: bold;

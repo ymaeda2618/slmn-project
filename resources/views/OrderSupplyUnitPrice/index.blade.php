@@ -24,21 +24,13 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">取引先企業</div>
+                                <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[OrderSupplyUnitPrice][supply_company_code]" value="{{$condition_company_code}}" tabindex="3">
                                     <input type="hidden" id="supply_company_id" name="data[OrderSupplyUnitPrice][supply_company_id]" value="{{$condition_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[OrderSupplyUnitPrice][supply_company_text]" value="{{$condition_company_text}}" readonly>
-                                </div>
-                                <div class="table-th">取引先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[OrderSupplyUnitPrice][supply_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="supply_shop_id" name="data[OrderSupplyUnitPrice][supply_shop_id]" value="{{$condition_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[OrderSupplyUnitPrice][supply_shop_text]" value="{{$condition_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -136,9 +128,9 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 検索されて選択状態の企業を取得
+            // 検索されて選択状態の店舗を取得
             var supply_submit_type_selected = $("#supply_submit_type_selected").val();
-            // 検索条件で設定された企業を設定
+            // 検索条件で設定された店舗を設定
             $('#supply_submit_type').val(supply_submit_type_selected);
 
             //-------------------------------------
@@ -208,7 +200,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入企業ID
+            // autocomplete処理 仕入店舗ID
             //-------------------------------------
             $(".supply_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -304,7 +296,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/supply_company/)) { // 仕入先企業
+                if (selector_code.match(/supply_company/)) { // 仕入先店舗
 
                     $.ajax({
                             headers: {

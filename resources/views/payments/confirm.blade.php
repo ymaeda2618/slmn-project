@@ -11,8 +11,8 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>企業コード</th>
-                    <th>企業名</th>
+                    <th>店舗コード</th>
+                    <th>店舗名</th>
                     <th>入金額</th>
                 </tr>
             </thead>

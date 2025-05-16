@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">仕入先企業 新規成画面</div>
+        <div class="top-title">仕入先店舗 新規成画面</div>
 
         @if(!empty($error_message))
         <div class="error-alert">{{$error_message}}</div>
@@ -16,7 +16,7 @@
                 <input type="number" class="form-control" id="code" name="data[SupplyCompany][code]">
             </div>
             <div class="form-group">
-                <label class="column-label" for="supply_company_name">仕入先企業名</label>
+                <label class="column-label" for="supply_company_name">仕入先店舗名</label>
                 <input type="text" class="form-control" id="supply_company_name" name="data[SupplyCompany][supply_company_name]">
             </div>
             <div class="form-group">
@@ -116,7 +116,7 @@
         var supply_company_name = $('#supply_company_name').val();
 
         if (supply_company_name == "") {
-            alert('仕入先企業名が入力されておりません。');
+            alert('仕入先店舗名が入力されておりません。');
             return false;
         }
 
@@ -136,7 +136,7 @@
 </script>
 <style>
     /* 共通 */
-    
+
     .top-title {
         font-size: 1.4em;
         font-weight: bold;
@@ -144,49 +144,49 @@
         text-align: center;
         padding: 25px 0px;
     }
-    
+
     .error-alert {
         color: red;
         font-weight: bold;
     }
-    
+
     .smn-form {
         max-width: 1300px;
         width: 90%;
         margin: auto;
     }
-    
+
     .form-group {
         margin-bottom: 3rem !important;
     }
-    
+
     .file-control {
         width: 100%;
         height: calc(1.6em + 0.75rem + 2px);
         padding: 0.375rem 0.75rem;
     }
-    
+
     .column-label {
         font-size: 0.9em;
         font-weight: bold;
     }
-    
+
     #standard_add_btn {
         margin: 10px auto 0px;
     }
-    
+
     #standart_list_area {
         width: 100%;
     }
-    
+
     .standard_list td {
         width: 10%;
     }
-    
+
     .standard_list td:first-of-type {
         width: 90%;
     }
-    
+
     .standard_del_btn {
         margin: auto 5px;
     }

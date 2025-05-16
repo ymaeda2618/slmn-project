@@ -3,12 +3,12 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">売上先企業登録-完了画面</div>
+        <div class="top-title">売上先店舗登録-完了画面</div>
 
-        <div class="confirm-title">売上先企業登録処理が完了しました。</div>
+        <div class="confirm-title">売上先店舗登録処理が完了しました。</div>
 
         <div class='action-index-area'>
-            <a href="./SaleCompanyIndex" class='action-index-btn'>売上先企業一覧に戻る</a>
+            <a href="./SaleCompanyIndex" class='action-index-btn'>売上先店舗一覧に戻る</a>
         </div>
 
     </div>

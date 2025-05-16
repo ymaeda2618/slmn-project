@@ -17,8 +17,8 @@
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
-                    <th>企業コード</th>
-                    <th>企業名</th>
+                    <th>店舗コード</th>
+                    <th>店舗名</th>
                     <th>入金額</th>
                 </tr>
             </thead>
@@ -52,7 +52,7 @@
     (function($) {
         jQuery(window).load(function() {
             //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
             $(".company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -78,7 +78,7 @@
             });
 
             //-------------------------------------
-            // フォーカスアウト時に企業名取得
+            // フォーカスアウト時に店舗名取得
             //-------------------------------------
             $(document).on("blur", "input", function() {
                 var tabindex = parseInt($(this).attr('tabindex'), 10);
@@ -183,7 +183,7 @@
                         $('#' + dup.ids[1]).addClass('error-border');
                     });
 
-                    alert('同じ企業コードが複数行に入力されています。\n該当箇所を確認してください。');
+                    alert('同じ店舗コードが複数行に入力されています。\n該当箇所を確認してください。');
                     e.preventDefault();
                     return;
                 }
@@ -194,7 +194,7 @@
                         $(entry.amountInput).addClass('error-border');
                     });
 
-                    alert('企業コードが入力されている行で、入金額が未入力または0円です。\n該当箇所を確認してください。');
+                    alert('店舗コードが入力されている行で、入金額が未入力または0円です。\n該当箇所を確認してください。');
                     e.preventDefault();
                     return;
                 }
@@ -215,11 +215,11 @@
         text-align: center;
         vertical-align: middle;
     }
-    
+
     input[readonly] {
         background-color: #f9f9f9;
     }
-    
+
     input.error-border {
         border: 2px solid red !important;
         background-color: #fff0f0;

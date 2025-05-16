@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">売上先企業一覧</div>
+        <div class="top-title">売上先店舗一覧</div>
 
         <!--検索エリア-->
         <div class='search-area'>
@@ -13,7 +13,7 @@
                     <tbody>
                         <tr>
                             <td>
-                                <div class="table-th-v2">売上先企業名</div>
+                                <div class="table-th-v2">売上先店舗名</div>
                                 <div class="table-td-v2">
                                     <input type="text" class="form-control" id="sale_company_name" name="data[SaleCompany][sale_company_name]" value='{{$sale_company_name}}'>
                                 </div>
@@ -71,7 +71,7 @@
                 <tbody>
                     <tr>
                         <th>コード</th>
-                        <th>企業名</th>
+                        <th>店舗名</th>
                         <th>締め日</th>
                         @if (Home::authOwnerCheck()) <th>編集</th> @endif
                     </tr>
@@ -116,7 +116,7 @@
 
 <style>
     /* 共通 */
-    
+
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -124,7 +124,7 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-    
+
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -132,12 +132,12 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-    
+
     .search-area table {
         margin: auto;
         width: 100%;
     }
-    
+
     .table-th-v2 {
         width: 15%;
         padding: 20px 0px 0px 40px;
@@ -145,21 +145,21 @@
         float: left;
         font-weight: bolder;
     }
-    
+
     .table-td-v2 {
         width: 30%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-    
+
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-    
+
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -168,7 +168,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-    
+
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -177,13 +177,13 @@
         border-radius: 10px;
         margin-left: 2%;
     }
-    
+
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 25px auto 50px;
     }
-    
+
     .index-table {
         width: 100%;
         letter-spacing: 2px;
@@ -191,7 +191,7 @@
         border-bottom: solid 2px #ccc;
         margin: 5px 0px;
     }
-    
+
     .index-table th {
         width: 10%;
         padding: 10px;
@@ -203,7 +203,7 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-    
+
     .index-table td {
         font-size: 10px;
         padding-left: 20px;
@@ -211,11 +211,11 @@
         border: 1px solid #bcbcbc;
         width: 10%;
     }
-    
+
     .double-width {
         width: 20%!important;
     }
-    
+
     .edit-btn {
         border-radius: 5px;
         color: #fff;

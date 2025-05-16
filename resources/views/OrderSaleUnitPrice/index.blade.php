@@ -24,21 +24,13 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">取引先企業</div>
+                                <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[OrderSaleUnitPrice][sale_company_code]" value="{{$condition_company_code}}" tabindex="3">
                                     <input type="hidden" id="sale_company_id" name="data[OrderSaleUnitPrice][sale_company_id]" value="{{$condition_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="sale_company_text" name="data[OrderSaleUnitPrice][sale_company_text]" value="{{$condition_company_text}}" readonly>
-                                </div>
-                                <div class="table-th">取引先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[OrderSaleUnitPrice][sale_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="sale_shop_id" name="data[OrderSaleUnitPrice][sale_shop_id]" value="{{$condition_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[OrderSaleUnitPrice][sale_shop_text]" value="{{$condition_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -204,7 +196,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
             $(".sale_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -300,7 +292,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/sale_company/)) { // 売上先企業
+                if (selector_code.match(/sale_company/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {

@@ -127,19 +127,19 @@
             <div class="menu-btn-area">
                 <ul>
                     <li class="btn-title">
-                        <p>仕入/売上企業登録</p>
+                        <p>仕入/売上店舗登録</p>
                         <ul>
                             <li>
-                                <a href="./SupplyCompanyIndex" class="edit-btn">仕入先企業一覧</a>
+                                <a href="./SupplyCompanyIndex" class="edit-btn">仕入先店舗一覧</a>
                             </li>
                             <li>
-                                <a href="./SupplyCompanyCreate" class="edit-btn">仕入先企業登録</a>
+                                <a href="./SupplyCompanyCreate" class="edit-btn">仕入先店舗登録</a>
                             </li>
                             <li>
-                                <a href="./SaleCompanyIndex" class="edit-btn">売上先企業一覧</a>
+                                <a href="./SaleCompanyIndex" class="edit-btn">売上先店舗一覧</a>
                             </li>
                             <li>
-                                <a href="./SaleCompanyCreate" class="edit-btn">売上先企業登録</a>
+                                <a href="./SaleCompanyCreate" class="edit-btn">売上先店舗登録</a>
                             </li>
                         </ul>
                     </li>

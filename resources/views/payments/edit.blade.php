@@ -6,7 +6,7 @@
         {{ csrf_field() }}
 
         <div class="form-group">
-            <label>企業名</label>
+            <label>店舗名</label>
             <input type="text" class="form-control" value="{{ $payment->company_name }}" readonly>
         </div>
 

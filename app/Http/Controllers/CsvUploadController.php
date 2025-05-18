@@ -1146,6 +1146,12 @@ class CsvUploadController extends Controller
             $csv_slip_details[$slip_no]["sub_total_10"]        = $sub_total_10;        // 10%税込額
             $csv_slip_details[$slip_no]["sub_total"]           = $sub_total;           // 税込小計
             $csv_slip_details[$slip_no]["total"]               = $total;               // 調整後税込額
+
+            // 支払方法
+            $csv_slip_details[$slip_no]["payment_method_type_0"] = $payment_method_type_0;
+            $csv_slip_details[$slip_no]["payment_method_type_1"] = $payment_method_type_1;
+            $csv_slip_details[$slip_no]["payment_method_type_2"] = $payment_method_type_2;
+            $csv_slip_details[$slip_no]["payment_method_type_3"] = $payment_method_type_3;
         }
 
         ksort($csv_slip_details);

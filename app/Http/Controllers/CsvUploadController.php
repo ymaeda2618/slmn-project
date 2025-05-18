@@ -929,6 +929,9 @@ class CsvUploadController extends Controller
      */
     public function registerSmartOroshiData($file, $user_info_id) {
 
+        // システム作成ID
+        $system_user_id = 99;
+
         $lines = [];
         $csv_slip_details = []; // 伝票詳細配列を作成
 
@@ -945,6 +948,13 @@ class CsvUploadController extends Controller
         $sub_total_10       = 0; // 10%税込額
         $sub_total          = 0; // 税込小計
         $total              = 0; // 調整後税込額
+
+        // 支払方法
+        $payment_method_type_0 = 0; // 掛け売り
+        $payment_method_type_1 = 0; // 現金売り
+        $payment_method_type_2 = 0; // クレジット
+        $payment_method_type_3 = 0; // PAYPAY
+
 
         foreach ($file as $key => $line) {
 
@@ -1042,6 +1052,11 @@ class CsvUploadController extends Controller
                     $csv_slip_details[$prev_slip_no]["sub_total_10"]        = $sub_total_10;        // 10%税込額
                     $csv_slip_details[$prev_slip_no]["sub_total"]           = $sub_total;           // 税込小計
                     $csv_slip_details[$prev_slip_no]["total"]               = $total;               // 調整後税込額
+
+                    $csv_slip_details[$prev_slip_no]["payment_method_type_0"]  = $payment_method_type_0;  // 掛け売り
+                    $csv_slip_details[$prev_slip_no]["payment_method_type_1"]  = $payment_method_type_1;  // 現金売り
+                    $csv_slip_details[$prev_slip_no]["payment_method_type_2"]  = $payment_method_type_2;  // クレジット
+                    $csv_slip_details[$prev_slip_no]["payment_method_type_3"]  = $payment_method_type_3;  // PAYPAY
                 }
 
                 // 伝票番号の配列を新規作成
@@ -1065,6 +1080,12 @@ class CsvUploadController extends Controller
                 $sub_total_10       = 0; // 10%税込額
                 $sub_total          = 0; // 税込小計
                 $total              = 0; // 調整後税込額
+
+                // 支払方法
+                $payment_method_type_0   = 0; // 掛け売り
+                $payment_method_type_1   = 0; // 現金売り
+                $payment_method_type_2   = 0; // クレジット
+                $payment_method_type_3   = 0; // PAYPAY
             }
 
             $notax_price = $lines[35];
@@ -1077,7 +1098,7 @@ class CsvUploadController extends Controller
                 "inventory_unit_id"   => $inventory_unit_id,
                 "inventory_unit_num"  => $lines[29],
                 "unit_id"             => $unit_id,
-                "unit_price"          => $lines[28],
+                "unit_price"          => $lines[31],
                 "unit_num"            => $lines[30],
                 "notax_price"         => $notax_price,
             ];
@@ -1098,6 +1119,12 @@ class CsvUploadController extends Controller
                 $tax_total_10       += $tax_price;             // 10%税額
                 $sub_total_10       += $slip_detail_sub_total; // 10%税込額
             }
+
+            // 支払方法
+            $payment_method_type_0   = $lines[15]; // 掛け売り
+            $payment_method_type_1   = $lines[11]; // 現金売り
+            $payment_method_type_2   = $lines[17]; // クレジット
+            $payment_method_type_3   = $lines[16]; // PAYPAY
 
         }
 
@@ -1141,6 +1168,23 @@ class CsvUploadController extends Controller
             $sub_total           = $csv_slip_detail_val["sub_total"];           // 税込小計
             $total               = $csv_slip_detail_val["total"];               // 調整後税込額
 
+            // 支払方法
+            $payment_method_type     = null;
+            $payment_method_type_0   = $csv_slip_detail_val["payment_method_type_0"]; // 掛け売り
+            $payment_method_type_1   = $csv_slip_detail_val["payment_method_type_1"]; // 現金売り
+            $payment_method_type_2   = $csv_slip_detail_val["payment_method_type_2"]; // クレジット
+            $payment_method_type_3   = $csv_slip_detail_val["payment_method_type_3"]; // PAYPAY
+
+            if (!empty($payment_method_type_0)) {
+                $payment_method_type  = 0;
+            } else if (!empty($payment_method_type_1)) {
+                $payment_method_type  = 1;
+            } else if (!empty($payment_method_type_2)) {
+                $payment_method_type  = 2;
+            } else if (!empty($payment_method_type_3)) {
+                $payment_method_type  = 3;
+            }
+
             // 伝票を登録
             $sale_slip_check = DB::table('sale_slips AS SaleSlip')
             ->where([
@@ -1167,6 +1211,7 @@ class CsvUploadController extends Controller
             $SaleSlip->date               = $slip_date;            // 伝票日付
             $SaleSlip->delivery_date      = $delivery_date;        // 納品日
             $SaleSlip->sale_company_id    = $sale_company_id;      // 売上先ID
+            $SaleSlip->payment_method_type = $payment_method_type; // 支払方法
             $SaleSlip->notax_sub_total_8  = $notax_sub_total_8;    // 8%課税対象額
             $SaleSlip->notax_sub_total_10 = $notax_sub_total_10;   // 10%課税対象額
             $SaleSlip->notax_sub_total    = $notax_sub_total;      // 税抜合計額
@@ -1181,7 +1226,7 @@ class CsvUploadController extends Controller
             $SaleSlip->total              = $total;                // 合計額
             $SaleSlip->sale_submit_type   = 1;                     // 登録タイプ
             $SaleSlip->sort               = 100;                   // ソート
-            $SaleSlip->created_user_id    = $user_info_id;         // 作成者ユーザーID
+            $SaleSlip->created_user_id    = $system_user_id;       // 作成者ユーザーID
             $SaleSlip->created            = Carbon::now();         // 作成時間
             $SaleSlip->modified_user_id   = $user_info_id;         // 更新者ユーザーID
             $SaleSlip->modified           = Carbon::now();         // 更新時間

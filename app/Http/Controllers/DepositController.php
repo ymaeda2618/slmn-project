@@ -238,22 +238,21 @@ class DepositController extends Controller
             $insertParams = array(
                 'owner_company_id'    => $owner_company_id,
                 'sale_company_id'     => $sale_company_id,
-                'sale_shop_id'         => $depositDatas['deposit_shop_id'] ?? null,
-                'date'                 => $depositDatas['payment_date'],            // 入金日付には支払期限を入れる
-                'sale_from_date'       => $depositDatas['sales_from_date'],
-                'sale_to_date'         => $depositDatas['sales_to_date'],
-                'payment_date'         => $depositDatas['payment_date'],
-                'staff_id'             => $depositDatas['staff_id'],
-                'sub_total'            => $depositDatas['price'],
-                'adjustment_amount'    => $depositDatas['adjustment_price'],
-                'amount'               => $depositDatas['total_price'],
-                'deposit_method_id'    => $depositDatas['deposit_method_id'],
-                'remarks'              => $depositDatas['memo'],
-                'deposit_submit_type'  => $depositDatas['deposit_submit_type'],
-                'created_user_id'      => $user_info_id,
-                'created'              => Carbon::now(),
-                'modified_user_id'     => $user_info_id,
-                'modified'             => Carbon::now(),
+                'date'                => $depositDatas['payment_date'],            // 入金日付には支払期限を入れる
+                'sale_from_date'      => $depositDatas['sales_from_date'],
+                'sale_to_date'        => $depositDatas['sales_to_date'],
+                'payment_date'        => $depositDatas['payment_date'],
+                'staff_id'            => $depositDatas['staff_id'],
+                'sub_total'           => $depositDatas['price'],
+                'adjustment_amount'   => $depositDatas['adjustment_price'],
+                'amount'              => $depositDatas['total_price'],
+                'deposit_method_id'   => $depositDatas['deposit_method_id'],
+                'remarks'             => $depositDatas['memo'],
+                'deposit_submit_type' => $depositDatas['deposit_submit_type'],
+                'created_user_id'     => $user_info_id,
+                'created'             => Carbon::now(),
+                'modified_user_id'    => $user_info_id,
+                'modified'            => Carbon::now(),
             );
 
             $depositNewId = DB::table('deposits')->insertGetId($insertParams);
@@ -329,13 +328,10 @@ class DepositController extends Controller
             'Deposit.remarks                  AS remarks',
             'Deposit.deposit_submit_type      AS deposit_submit_type',
             'Deposit.sale_company_id          AS sale_company_id',
-            'Deposit.sale_shop_id             AS sale_shop_id',
             'Deposit.owner_company_id         AS owner_company_id',
             'SaleCompany.name                 AS sale_company_name',
             'SaleCompany.code                 AS sale_company_code',
             'SaleCompany.tax_calc_type        AS sale_company_tax_calc_type',
-            'SaleShop.name                    AS sale_shop_name',
-            'SaleShop.code                    AS sale_shop_code',
             'Staff.code                       AS staff_code',
             'OwnerCompany.name                AS owner_company_name',
             'OwnerCompany.code                AS owner_company_code',
@@ -344,10 +340,6 @@ class DepositController extends Controller
         ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
         ->leftJoin('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
-        })
-        ->leftJoin('sale_shops as SaleShop', function ($join) {
-            $join->on('SaleShop.id', '=', 'Deposit.sale_shop_id')
-                 ->where('SaleShop.active', '=', true);
         })
         ->join('staffs as Staff', function ($join) {
             $join->on('Staff.id', '=', 'Deposit.staff_id')

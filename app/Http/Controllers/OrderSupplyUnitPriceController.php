@@ -52,9 +52,6 @@ class OrderSupplyUnitPriceController extends Controller
             $condition_company_code = $request->session()->get('order_supply_condition_company_code');
             $condition_company_id   = $request->session()->get('order_supply_condition_company_id');
             $condition_company_text = $request->session()->get('order_supply_condition_company_text');
-            $condition_shop_code    = $request->session()->get('order_supply_condition_shop_code');
-            $condition_shop_id      = $request->session()->get('order_supply_condition_shop_id');
-            $condition_shop_text    = $request->session()->get('order_supply_condition_shop_text');
             $condition_product_code = $request->session()->get('order_supply_condition_product_code');
             $condition_product_id   = $request->session()->get('order_supply_condition_product_id');
             $condition_product_text = $request->session()->get('order_supply_condition_product_text');
@@ -66,9 +63,6 @@ class OrderSupplyUnitPriceController extends Controller
                 $condition_company_code = $request->data['OrderSupplyUnitPrice']['supply_company_code'];
                 $condition_company_id   = $request->data['OrderSupplyUnitPrice']['supply_company_id'];
                 $condition_company_text = $request->data['OrderSupplyUnitPrice']['supply_company_text'];
-                $condition_shop_code    = $request->data['OrderSupplyUnitPrice']['supply_shop_code'];
-                $condition_shop_id      = $request->data['OrderSupplyUnitPrice']['supply_shop_id'];
-                $condition_shop_text    = $request->data['OrderSupplyUnitPrice']['supply_shop_text'];
                 $condition_product_code = $request->data['OrderSupplyUnitPrice']['product_code'];
                 $condition_product_id   = $request->data['OrderSupplyUnitPrice']['product_id'];
                 $condition_product_text = $request->data['OrderSupplyUnitPrice']['product_text'];
@@ -94,9 +88,6 @@ class OrderSupplyUnitPriceController extends Controller
                 $request->session()->put('order_supply_condition_company_code', $condition_company_code);
                 $request->session()->put('order_supply_condition_company_id', $condition_company_id);
                 $request->session()->put('order_supply_condition_company_text', $condition_company_text);
-                $request->session()->put('order_supply_condition_shop_code', $condition_shop_code);
-                $request->session()->put('order_supply_condition_shop_id', $condition_shop_id);
-                $request->session()->put('order_supply_condition_shop_text', $condition_shop_text);
                 $request->session()->put('order_supply_condition_product_code', $condition_product_code);
                 $request->session()->put('order_supply_condition_product_id', $condition_product_id);
                 $request->session()->put('order_supply_condition_product_text', $condition_product_text);
@@ -108,9 +99,6 @@ class OrderSupplyUnitPriceController extends Controller
                 $condition_company_code = null;
                 $condition_company_id   = null;
                 $condition_company_text = null;
-                $condition_shop_code    = null;
-                $condition_shop_id      = null;
-                $condition_shop_text    = null;
                 $condition_product_code = null;
                 $condition_product_id   = null;
                 $condition_product_text = null;
@@ -119,9 +107,6 @@ class OrderSupplyUnitPriceController extends Controller
                 $request->session()->forget('order_supply_condition_company_code');
                 $request->session()->forget('order_supply_condition_company_id');
                 $request->session()->forget('order_supply_condition_company_text');
-                $request->session()->forget('order_supply_condition_shop_code');
-                $request->session()->forget('order_supply_condition_shop_id');
-                $request->session()->forget('order_supply_condition_shop_text');
                 $request->session()->forget('order_supply_condition_product_code');
                 $request->session()->forget('order_supply_condition_product_id');
                 $request->session()->forget('order_supply_condition_product_text');
@@ -150,9 +135,6 @@ class OrderSupplyUnitPriceController extends Controller
             ->selectRaw('MIN(OrderSupplyUnitPriceDetail.apply_from) AS apply_from')
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'OrderSupplyUnitPrice.company_id');
-            })
-            ->leftJoin('supply_shops AS SupplyShop', function ($join) {
-                $join->on('SupplyShop.id', '=', 'OrderSupplyUnitPrice.shop_id');
             })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
@@ -242,9 +224,6 @@ class OrderSupplyUnitPriceController extends Controller
             "condition_company_code"                   => $condition_company_code,
             "condition_company_id"                     => $condition_company_id,
             "condition_company_text"                   => $condition_company_text,
-            "condition_shop_code"                      => $condition_shop_code,
-            "condition_shop_id"                        => $condition_shop_id,
-            "condition_shop_text"                      => $condition_shop_text,
             "condition_product_code"                   => $condition_product_code,
             "condition_product_id"                     => $condition_product_id,
             "condition_product_text"                   => $condition_product_text,
@@ -280,9 +259,6 @@ class OrderSupplyUnitPriceController extends Controller
         $OrderSupplyUnitPriceData = $request->data['OrderSupplyUnitPrice'];
         $OrderSupplyUnitPriceDetailData = $request->data['OrderSupplyUnitPriceDetail'];
 
-        // 値がNULLのところを初期化
-        if(empty($OrderSupplyUnitPriceData['supply_shop_id'])) $OrderSupplyUnitPriceData['supply_shop_id'] = 0;
-
         // トランザクション開始
         DB::connection()->beginTransaction();
 
@@ -293,7 +269,6 @@ class OrderSupplyUnitPriceController extends Controller
             // ---------------------------------
             $OrderSupplyUnitPrice = new OrderSupplyUnitPrice;
             $OrderSupplyUnitPrice->company_id       = $OrderSupplyUnitPriceData['supply_company_id'];   // 企業ID
-            $OrderSupplyUnitPrice->shop_id          = $OrderSupplyUnitPriceData['supply_shop_id'];      // 店舗ID
             $OrderSupplyUnitPrice->remarks          = $OrderSupplyUnitPriceData['remarks'];             // 備考
             $OrderSupplyUnitPrice->active           = 1;                                                // 有効フラグ
             $OrderSupplyUnitPrice->created_user_id  = $userInfoId;                                      // 作成者ID
@@ -377,15 +352,9 @@ class OrderSupplyUnitPriceController extends Controller
             'SupplyCompany.id                AS supply_company_id',
             'SupplyCompany.code              AS supply_company_code',
             'SupplyCompany.name              AS supply_company_name',
-            'SupplyShop.id                   AS supply_shop_id',
-            'SupplyShop.code                 AS supply_shop_code',
-            'SupplyShop.name                 AS supply_shop_name'
         )
         ->join('supply_companies AS SupplyCompany', function ($join) {
             $join->on('SupplyCompany.id', '=', 'OrderSupplyUnitPrice.company_id');
-        })
-        ->leftJoin('supply_shops AS SupplyShop', function ($join) {
-            $join->on('SupplyShop.id', '=', 'OrderSupplyUnitPrice.shop_id');
         })
         ->where('OrderSupplyUnitPrice.id', '=', $order_supply_unit_price_id)
         ->first();
@@ -443,9 +412,6 @@ class OrderSupplyUnitPriceController extends Controller
         $OrderSupplyUnitPriceDatas       = $request->data['OrderSupplyUnitPrice'];
         $OrderSupplyUnitPriceDetailDatas = $request->data['OrderSupplyUnitPriceDetail'];
 
-        // 値がNULLのところを初期化
-        if(empty($OrderSupplyUnitPriceDatas['supply_shop_id'])) $OrderSupplyUnitPriceDatas['supply_shop_id'] = 0;
-
         // トランザクション開始
         DB::connection()->beginTransaction();
 
@@ -456,7 +422,6 @@ class OrderSupplyUnitPriceController extends Controller
             // --------------------------------
             $OrderSupplyUnitPrice = \App\OrderSupplyUnitPrice::find($OrderSupplyUnitPriceDatas['id']);
             $OrderSupplyUnitPrice->company_id       = $OrderSupplyUnitPriceDatas['supply_company_id'];  // 企業ID
-            $OrderSupplyUnitPrice->shop_id          = $OrderSupplyUnitPriceDatas['supply_shop_id'];     // 店舗ID
             $OrderSupplyUnitPrice->remarks          = $OrderSupplyUnitPriceDatas['remarks'];            // 備考
             $OrderSupplyUnitPrice->modified_user_id = $user_info_id;                                    // 更新者ユーザーID
             $OrderSupplyUnitPrice->modified         = Carbon::now();                                    // 更新時間

@@ -245,26 +245,6 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./../AjaxSetSaleShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
                 } else if (selector_code.match(/product_code/)) { // 製品IDの部分
 
                     $.ajax({
@@ -335,33 +315,6 @@
                     });
                 }
             });
-
-            //-------------------------------------
-            // autocomplete処理 売上店舗ID
-            //-------------------------------------
-            $(".sale_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./../AjaxAutoCompleteSaleShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
 
             //-------------------------------------
             // autocomplete処理 製品ID

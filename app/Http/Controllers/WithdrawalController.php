@@ -153,9 +153,6 @@ class WithdrawalController extends Controller
             "condition_company_code"      => $condition_company_code,
             "condition_company_id"        => $condition_company_id,
             "condition_company_text"      => $condition_company_text,
-            // "condition_shop_code"         => $condition_shop_code,
-            // "condition_shop_id"           => $condition_shop_id,
-            // "condition_shop_text"         => $condition_shop_text,
             "withdrawalList"              => $withdrawalList
         ]);
     }
@@ -192,21 +189,14 @@ class WithdrawalController extends Controller
             'Withdrawal.staff_id               AS staff_id',
             'Withdrawal.remarks                AS remarks',
             'Withdrawal.supply_company_id      AS supply_company_id',
-            'Withdrawal.supply_shop_id         AS supply_shop_id',
             'Withdrawal.withdrawal_submit_type AS withdrawal_submit_type',
             'SupplyCompany.name                AS supply_company_name',
             'SupplyCompany.code                AS supply_company_code',
-            'SupplyShop.name                   AS supply_shop_name',
-            'SupplyShop.code                   AS supply_shop_code',
             'Staff.code                        AS staff_code'
         )
         ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
         ->join('supply_companies AS SupplyCompany', function ($join) {
             $join->on('SupplyCompany.id', '=', 'Withdrawal.supply_company_id');
-        })
-        ->leftJoin('supply_shops as SupplyShop', function ($join) {
-            $join->on('SupplyShop.id', '=', 'Withdrawal.supply_shop_id')
-                 ->where('SupplyShop.active', '=', true);
         })
         ->join('staffs as Staff', function ($join) {
             $join->on('Staff.id', '=', 'Withdrawal.staff_id')
@@ -278,7 +268,6 @@ class WithdrawalController extends Controller
             // 入力値を配列に格納する
             $insertParams = array(
                 'supply_company_id'      => $withdrawalDatas['withdrawal_company_id'],
-                'supply_shop_id'         => $withdrawalDatas['withdrawal_shop_id'],
                 'date'                   => $withdrawalDatas['withdrawal_date'],
                 'payment_from_date'      => $withdrawalDatas['payment_from_date'],
                 'payment_to_date'        => $withdrawalDatas['payment_to_date'],
@@ -398,7 +387,6 @@ class WithdrawalController extends Controller
                 // 入力値を配列に格納する
                 $updateParams = array(
                     'supply_company_id'      => $withdrawalDatas['withdrawal_company_id'],
-                    'supply_shop_id'         => $withdrawalDatas['withdrawal_shop_id'],
                     'date'                   => $withdrawalDatas['withdrawal_date'],
                     'payment_from_date'      => $withdrawalDatas['payment_from_date'],
                     'payment_to_date'        => $withdrawalDatas['payment_to_date'],

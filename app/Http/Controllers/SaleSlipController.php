@@ -58,9 +58,6 @@ class SaleSlipController extends Controller
                 'condition_company_code',
                 'condition_company_id',
                 'condition_company_text',
-                'condition_shop_code',
-                'condition_shop_id',
-                'condition_shop_text',
                 'condition_product_code',
                 'condition_product_id',
                 'condition_product_text',
@@ -1290,100 +1287,6 @@ class SaleSlipController extends Controller
     }
 
     /**
-     * 売上店舗ID更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxAutoCompleteSaleShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // 入力候補を初期化
-        $auto_complete_array = array();
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            $saleShopList = DB::table('sale_shops AS SaleShop')
-            ->select(
-                'SaleShop.name  AS sale_shop_name'
-            )->where([
-                    ['SaleShop.active', '=', '1'],
-            ])->where(function($query) use ($input_text){
-                $query
-                ->orWhere('SaleShop.name', 'like', "%{$input_text}%")
-                ->orWhere('SaleShop.yomi', 'like', "%{$input_text}%");
-            })
-            ->get();
-
-            if (!empty($saleShopList)) {
-
-                foreach ($saleShopList as $sale_shop_val) {
-
-                    array_push($auto_complete_array, $sale_shop_val->sale_shop_name);
-                }
-            }
-        }
-
-        return json_encode($auto_complete_array);
-    }
-
-    /**
-     * 売上先店舗更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxSetSaleShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // すべて数字かどうかチェック
-        if (is_numeric($input_text)) {
-            $input_code = $input_text;
-            $input_name = null;
-        } else {
-            $input_code = null;
-            $input_name = $input_text;
-        }
-
-        // 初期化
-        $output_code = null;
-        $output_id   = null;
-        $output_name = null;
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            // 製品一覧を取得
-            $saleShopList = DB::table('sale_shops AS SaleShop')
-            ->select(
-                'SaleShop.code  AS code',
-                'SaleShop.id    AS id',
-                'SaleShop.name  AS name'
-            )
-            ->if(!empty($input_code), function ($query) use ($input_code) {
-                return $query->where('SaleShop.code', '=', $input_code);
-            })
-            ->if(!empty($input_name), function ($query) use ($input_name) {
-                return $query->where('SaleShop.name', 'like', $input_name);
-            })
-            ->first();
-
-            if (!empty($saleShopList)) {
-                $output_code = $saleShopList->code;
-                $output_id   = $saleShopList->id;
-                $output_name = $saleShopList->name;
-            }
-        }
-
-        $returnArray = array($output_code, $output_id, $output_name);
-
-        return json_encode($returnArray);
-    }
-
-    /**
      * 売上先店舗更新時のAjax処理
      *
      * @return \Illuminate\Contracts\Support\Renderable
@@ -2367,7 +2270,6 @@ class SaleSlipController extends Controller
             ->select(
                 'SupplySlipDetail.id           AS supply_slip_id',
                 'SupplyCompany.name            AS supply_company_name',
-                'SupplyShop.name               AS supply_shop_name',
                 'Product.name                  AS product_name',
                 'Standard.name                 AS standard_name',
                 'Quality.name                  AS quality_name',
@@ -2403,9 +2305,6 @@ class SaleSlipController extends Controller
             })
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id');
-            })
-            ->leftJoin('supply_shops AS SupplyShop', function ($join) {
-                $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
             })
             ->when($action == 'edit', function($query) use ($inventory_sub_query) {
                 $query
@@ -2466,7 +2365,6 @@ class SaleSlipController extends Controller
                     $ajaxHtml .= "    <td><input type='tel' class='modal-sale-num' id='use_num_".$detail_id."' value='".$remain_num."'></td>";
                     $ajaxHtml .= "    <td><div id='date_".$detail_id."'>".$supplySlipDetails->supply_slip_supply_date."</div></td>";
                     $ajaxHtml .= "    <td><div id='company_".$detail_id."'>".$supplySlipDetails->supply_company_name."</div></td>";
-                    $ajaxHtml .= "    <td><div id='shop_".$detail_id."'>".$supplySlipDetails->supply_shop_name."</div></td>";
                     $ajaxHtml .= "    <td><div id='standard_".$detail_id."'>".$supplySlipDetails->standard_name."</div></td>";
                     $ajaxHtml .= "    <td><div id='quality_".$detail_id."'>".$supplySlipDetails->quality_name."</div></td>";
                     $ajaxHtml .= "    <td><div id='unit_price_".$detail_id."'>".$supplySlipDetails->unit_price."</div></td>";

@@ -369,34 +369,12 @@ class OwnerCompanyController extends Controller
             // codeが入力されていない場合
             if (empty($request->data['OwnerCompany']['code'])) {
 
-                do {
+                $max_code = DB::table('owner_companies AS OwnerCompany')
+                    ->where('OwnerCompany.active', 1)
+                    ->whereRaw('OwnerCompany.code REGEXP "^[0-9]+$"')
+                    ->max(DB::raw('CAST(OwnerCompany.code AS UNSIGNED)'));
 
-                    // codeのMAX値を取得
-                    $OwnerCompanyCode = DB::table('owner_companies AS OwnerCompany')
-                    ->select(
-                        'OwnerCompany.code AS code'
-                    )
-                    ->where([
-                        ['OwnerCompany.active', '=', '1'],
-                    ])->orderBy('id', 'desc')->first();
-
-                    if (!is_numeric($OwnerCompanyCode->code)) {
-                        throw new Exception("コードが数値ではありません。");
-                    }
-
-                    $owner_company_code = intval($OwnerCompanyCode->code) + 1;
-
-                    // codeが存在するかチェック
-                    $OwnerCompanyCodeCheck = DB::table('owner_companies AS OwnerCompany')
-                    ->select(
-                        'OwnerCompany.code AS code'
-                    )
-                    ->where([
-                        ['OwnerCompany.active', '=', '1'],
-                        ['OwnerCompany.code', '=', $owner_company_code],
-                    ])->orderBy('id', 'desc')->first();
-
-                } while (!empty($OwnerCompanyCodeCheck));
+                $owner_company_code = $max_code ? $max_code + 1 : 1000;
 
             } else {
 
@@ -404,16 +382,13 @@ class OwnerCompanyController extends Controller
                 $owner_company_code = $request->data['OwnerCompany']['code'];
 
                 // codeが存在するかチェック
-                $OwnerCompanyCodeCheck = DB::table('owner_companies AS OwnerCompany')
-                ->select(
-                    'OwnerCompany.code AS code'
-                )
-                ->where([
-                    ['OwnerCompany.active', '=', '1'],
-                    ['OwnerCompany.code', '=', $owner_company_code],
-                ])->orderBy('id', 'desc')->first();
+                $code_exists = DB::table('owner_companies AS OwnerCompany')
+                    ->where([
+                        ['OwnerCompany.active', '=', '1'],
+                        ['OwnerCompany.code', '=', $owner_company_code],
+                    ])->exists();
 
-                if (!empty($OwnerCompanyCodeCheck)){
+                if ($code_exists) {
 
                     $exception_type = 1;
 

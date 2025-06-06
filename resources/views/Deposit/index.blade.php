@@ -30,7 +30,7 @@
                                 <div class="table-td table-code-td slip-td">
                                     <input type="number" class="search-control" id="deposit_id" name="data[Deposit][id]" value="{{$condition_id}}" tabindex="3">
                                 </div>
-                                <div class="table-th">取引先企業</div>
+                                <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" value="{{$condition_company_code}}" tabindex="4">
                                     <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]" value="{{$condition_company_id}}">

@@ -41,17 +41,10 @@ class DailyPerformanceController extends Controller
             $dp_supply_company_code  = $request->session()->get('dp_supply_company_code');
             $dp_supply_company_id    = $request->session()->get('dp_supply_company_id');
             $dp_supply_company_text  = $request->session()->get('dp_supply_company_text');
-            $dp_supply_shop_code     = $request->session()->get('dp_supply_shop_code');
-            $dp_supply_shop_id       = $request->session()->get('dp_supply_shop_id');
-            $dp_supply_shop_text     = $request->session()->get('dp_supply_shop_text');
 
             $dp_sale_company_code  = $request->session()->get('dp_sale_company_code');
             $dp_sale_company_id    = $request->session()->get('dp_sale_company_id');
             $dp_sale_company_text  = $request->session()->get('dp_sale_company_text');
-            $dp_sale_shop_code     = $request->session()->get('dp_sale_shop_code');
-            $dp_sale_shop_id       = $request->session()->get('dp_sale_shop_id');
-            $dp_sale_shop_text     = $request->session()->get('dp_sale_shop_text');
-
 
             $dp_product_code  = $request->session()->get('dp_product_code');
             $dp_product_id    = $request->session()->get('dp_product_id');
@@ -71,16 +64,10 @@ class DailyPerformanceController extends Controller
                 $dp_supply_company_code  = $request->data['DailyPerformance']['supply_company_code'];
                 $dp_supply_company_id    = $request->data['DailyPerformance']['supply_company_id'];
                 $dp_supply_company_text  = $request->data['DailyPerformance']['supply_company_text'];
-                $dp_supply_shop_code     = $request->data['DailyPerformance']['supply_shop_code'];
-                $dp_supply_shop_id       = $request->data['DailyPerformance']['supply_shop_id'];
-                $dp_supply_shop_text     = $request->data['DailyPerformance']['supply_shop_text'];
 
                 $dp_sale_company_code  = $request->data['DailyPerformance']['sale_company_code'];
                 $dp_sale_company_id    = $request->data['DailyPerformance']['sale_company_id'];
                 $dp_sale_company_text  = $request->data['DailyPerformance']['sale_company_text'];
-                $dp_sale_shop_code     = $request->data['DailyPerformance']['sale_shop_code'];
-                $dp_sale_shop_id       = $request->data['DailyPerformance']['sale_shop_id'];
-                $dp_sale_shop_text     = $request->data['DailyPerformance']['sale_shop_text'];
 
                 $dp_product_code       = $request->data['DailyPerformance']['product_code'];
                 $dp_product_id         = $request->data['DailyPerformance']['product_id'];
@@ -101,16 +88,10 @@ class DailyPerformanceController extends Controller
                 $request->session()->put('dp_supply_company_code', $dp_supply_company_code);
                 $request->session()->put('dp_supply_company_id', $dp_supply_company_id);
                 $request->session()->put('dp_supply_company_text', $dp_supply_company_text);
-                $request->session()->put('dp_supply_shop_code', $dp_supply_shop_code);
-                $request->session()->put('dp_supply_shop_id', $dp_supply_shop_id);
-                $request->session()->put('dp_supply_shop_text', $dp_supply_shop_text);
 
                 $request->session()->put('dp_sale_company_code', $dp_sale_company_code);
                 $request->session()->put('dp_sale_company_id', $dp_sale_company_id);
                 $request->session()->put('dp_sale_company_text', $dp_sale_company_text);
-                $request->session()->put('dp_sale_shop_code', $dp_sale_shop_code);
-                $request->session()->put('dp_sale_shop_id', $dp_sale_shop_id);
-                $request->session()->put('dp_sale_shop_text', $dp_sale_shop_text);
 
                 $request->session()->put('dp_product_code', $dp_product_code);
                 $request->session()->put('dp_product_id', $dp_product_id);
@@ -129,16 +110,10 @@ class DailyPerformanceController extends Controller
                 $dp_supply_company_code  = null;
                 $dp_supply_company_id    = null;
                 $dp_supply_company_text  = null;
-                $dp_supply_shop_code     = null;
-                $dp_supply_shop_id       = null;
-                $dp_supply_shop_text     = null;
 
                 $dp_sale_company_code  = null;
                 $dp_sale_company_id    = null;
                 $dp_sale_company_text  = null;
-                $dp_sale_shop_code     = null;
-                $dp_sale_shop_id       = null;
-                $dp_sale_shop_text     = null;
 
                 $dp_product_code       = null;
                 $dp_product_id         = null;
@@ -155,16 +130,10 @@ class DailyPerformanceController extends Controller
                 $request->session()->forget('dp_supply_company_code');
                 $request->session()->forget('dp_supply_company_id');
                 $request->session()->forget('dp_supply_company_text');
-                $request->session()->forget('dp_supply_shop_code');
-                $request->session()->forget('dp_supply_shop_id');
-                $request->session()->forget('dp_supply_shop_text');
 
                 $request->session()->forget('dp_sale_company_code');
                 $request->session()->forget('dp_sale_company_id');
                 $request->session()->forget('dp_sale_company_text');
-                $request->session()->forget('dp_sale_shop_code');
-                $request->session()->forget('dp_sale_shop_id');
-                $request->session()->forget('dp_sale_shop_text');
 
                 $request->session()->forget('dp_product_code');
                 $request->session()->forget('dp_product_id');
@@ -251,9 +220,6 @@ class DailyPerformanceController extends Controller
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id');
             })
-            ->leftJoin('supply_shops AS SupplyShop', function ($join) {
-                $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
-            })
             ->if(!empty($dp_supply_sub_query), function ($query) use ($dp_supply_sub_query) {
                 return $query
                        ->join(DB::raw('('. $dp_supply_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
@@ -267,9 +233,6 @@ class DailyPerformanceController extends Controller
             })
             ->if(!empty($dp_supply_company_id), function ($query) use ($dp_supply_company_id) {
                 return $query->where('SupplySlip.supply_company_id', '=', $dp_supply_company_id);
-            })
-            ->if(!empty($dp_supply_shop_id), function ($query) use ($dp_supply_shop_id) {
-                return $query->where('SupplySlip.supply_shop_id', '=', $dp_supply_shop_id);
             })
             ->where('SupplySlip.active', '=', '1')
             ->if($dp_date_type == 1, function ($query) {
@@ -353,9 +316,6 @@ class DailyPerformanceController extends Controller
                 ->if(!empty($dp_sale_company_id), function ($query) use ($dp_sale_company_id) {
                     return $query->where('SaleSlip.sale_company_id', '=', $dp_sale_company_id);
                 })
-                ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
-                    return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
-                })
                 ->if(!empty($dp_product_id), function ($queryDetail) use ($dp_product_id) {
                     return $queryDetail->where('SaleSlipDetail.product_id', '=', $dp_product_id);
                 })
@@ -382,9 +342,6 @@ class DailyPerformanceController extends Controller
                 ->join('sale_companies AS SaleCompany', function ($join) {
                     $join->on('SaleCompany.id', '=', 'SaleSlip.sale_company_id');
                 })
-                ->leftJoin('sale_shops AS SaleShop', function ($join) {
-                    $join->on('SaleShop.id', '=', 'SaleSlip.sale_shop_id');
-                })
                 ->if(!empty($first_date) && !empty($last_date) && $dp_date_type == 1, function ($query) use ($first_date, $last_date) {
                     return $query->whereBetween('SaleSlip.date', [$first_date, $last_date]);
                 })
@@ -393,9 +350,6 @@ class DailyPerformanceController extends Controller
                 })
                 ->if(!empty($dp_sale_company_id), function ($query) use ($dp_sale_company_id) {
                     return $query->where('SaleSlip.sale_company_id', '=', $dp_sale_company_id);
-                })
-                ->if(!empty($dp_sale_shop_id), function ($query) use ($dp_sale_shop_id) {
-                    return $query->where('SaleSlip.sale_shop_id', '=', $dp_sale_shop_id);
                 })
                 ->where('SaleSlip.active', '=', '1')
                 ->if($dp_date_type == 1, function ($query) {
@@ -491,16 +445,10 @@ class DailyPerformanceController extends Controller
             "dp_supply_company_code"            => $dp_supply_company_code,
             "dp_supply_company_id"              => $dp_supply_company_id,
             "dp_supply_company_text"            => $dp_supply_company_text,
-            "dp_supply_shop_code"               => $dp_supply_shop_code,
-            "dp_supply_shop_id"                 => $dp_supply_shop_id,
-            "dp_supply_shop_text"               => $dp_supply_shop_text,
 
             "dp_sale_company_code"              => $dp_sale_company_code,
             "dp_sale_company_id"                => $dp_sale_company_id,
             "dp_sale_company_text"              => $dp_sale_company_text,
-            "dp_sale_shop_code"                 => $dp_sale_shop_code,
-            "dp_sale_shop_id"                   => $dp_sale_shop_id,
-            "dp_sale_shop_text"                 => $dp_sale_shop_text,
 
             "dp_product_code"                   => $dp_product_code,
             "dp_product_id"                     => $dp_product_id,
@@ -603,194 +551,6 @@ class DailyPerformanceController extends Controller
                 $output_code = $supplyCompanyList->code;
                 $output_id   = $supplyCompanyList->id;
                 $output_name = $supplyCompanyList->name;
-            }
-        }
-
-        $returnArray = array($output_code, $output_id, $output_name);
-
-        return json_encode($returnArray);
-    }
-
-    /**
-     * 仕入店舗ID更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxAutoCompleteSupplyShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // 入力候補を初期化
-        $auto_complete_array = array();
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            $supplyShopList = DB::table('supply_shops AS SupplyShop')
-            ->select(
-                'SupplyShop.name  AS supply_shop_name'
-            )->where([
-                    ['SupplyShop.active', '=', '1']
-            ])->where(function($query) use ($input_text){
-                $query
-                ->orWhere('SupplyShop.name', 'like', "%{$input_text}%")
-                ->orWhere('SupplyShop.yomi', 'like', "%{$input_text}%");
-            })
-            ->get();
-
-            if (!empty($supplyShopList)) {
-
-                foreach ($supplyShopList as $supply_shop_val) {
-
-                    array_push($auto_complete_array, $supply_shop_val->supply_shop_name);
-                }
-            }
-        }
-
-        return json_encode($auto_complete_array);
-    }
-
-    /**
-     * 仕入先店舗更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxSetSupplyShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // すべて数字かどうかチェック
-        if (is_numeric($input_text)) {
-            $input_code = $input_text;
-            $input_name = null;
-        } else {
-            $input_code = null;
-            $input_name = $input_text;
-        }
-
-        // 初期化
-        $output_code = null;
-        $output_id   = null;
-        $output_name = null;
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            // 製品一覧を取得
-            $supplyShopList = DB::table('supply_shops AS SupplyShop')
-            ->select(
-                'SupplyShop.code  AS code',
-                'SupplyShop.id    AS id',
-                'SupplyShop.name  AS name'
-            )
-            ->if(!empty($input_code), function ($query) use ($input_code) {
-                return $query->where('SupplyShop.code', '=', $input_code);
-            })
-            ->if(!empty($input_name), function ($query) use ($input_name) {
-                return $query->where('SupplyShop.name', 'like', $input_name);
-            })
-            ->first();
-
-            if (!empty($supplyShopList)) {
-                $output_code = $supplyShopList->code;
-                $output_id   = $supplyShopList->id;
-                $output_name = $supplyShopList->name;
-            }
-        }
-
-        $returnArray = array($output_code, $output_id, $output_name);
-
-        return json_encode($returnArray);
-    }
-
-    /**
-     * 売上店舗ID更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxAutoCompleteSaleShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // 入力候補を初期化
-        $auto_complete_array = array();
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            $saleShopList = DB::table('sale_shops AS SaleShop')
-            ->select(
-                'SaleShop.name  AS sale_shop_name'
-            )->where([
-                    ['SaleShop.active', '=', '1'],
-            ])->where(function($query) use ($input_text){
-                $query
-                ->orWhere('SaleShop.name', 'like', "%{$input_text}%")
-                ->orWhere('SaleShop.yomi', 'like', "%{$input_text}%");
-            })
-            ->get();
-
-            if (!empty($saleShopList)) {
-
-                foreach ($saleShopList as $sale_shop_val) {
-
-                    array_push($auto_complete_array, $sale_shop_val->sale_shop_name);
-                }
-            }
-        }
-
-        return json_encode($auto_complete_array);
-    }
-
-    /**
-     * 売上先店舗更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxSetSaleShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // すべて数字かどうかチェック
-        if (is_numeric($input_text)) {
-            $input_code = $input_text;
-            $input_name = null;
-        } else {
-            $input_code = null;
-            $input_name = $input_text;
-        }
-
-        // 初期化
-        $output_code = null;
-        $output_id   = null;
-        $output_name = null;
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            // 製品一覧を取得
-            $saleShopList = DB::table('sale_shops AS SaleShop')
-            ->select(
-                'SaleShop.code  AS code',
-                'SaleShop.id    AS id',
-                'SaleShop.name  AS name'
-            )
-            ->if(!empty($input_code), function ($query) use ($input_code) {
-                return $query->where('SaleShop.code', '=', $input_code);
-            })
-            ->if(!empty($input_name), function ($query) use ($input_name) {
-                return $query->where('SaleShop.name', 'like', $input_name);
-            })
-            ->first();
-
-            if (!empty($saleShopList)) {
-                $output_code = $saleShopList->code;
-                $output_id   = $saleShopList->id;
-                $output_name = $saleShopList->name;
             }
         }
 

@@ -52,9 +52,6 @@ class OrderSaleUnitPriceController extends Controller
             $condition_company_code = $request->session()->get('order_sale_condition_company_code');
             $condition_company_id   = $request->session()->get('order_sale_condition_company_id');
             $condition_company_text = $request->session()->get('order_sale_condition_company_text');
-            $condition_shop_code    = $request->session()->get('order_sale_condition_shop_code');
-            $condition_shop_id      = $request->session()->get('order_sale_condition_shop_id');
-            $condition_shop_text    = $request->session()->get('order_sale_condition_shop_text');
             $condition_product_code = $request->session()->get('order_sale_condition_product_code');
             $condition_product_id   = $request->session()->get('order_sale_condition_product_id');
             $condition_product_text = $request->session()->get('order_sale_condition_product_text');
@@ -66,9 +63,6 @@ class OrderSaleUnitPriceController extends Controller
                 $condition_company_code = $request->data['OrderSaleUnitPrice']['sale_company_code'];
                 $condition_company_id   = $request->data['OrderSaleUnitPrice']['sale_company_id'];
                 $condition_company_text = $request->data['OrderSaleUnitPrice']['sale_company_text'];
-                $condition_shop_code    = $request->data['OrderSaleUnitPrice']['sale_shop_code'];
-                $condition_shop_id      = $request->data['OrderSaleUnitPrice']['sale_shop_id'];
-                $condition_shop_text    = $request->data['OrderSaleUnitPrice']['sale_shop_text'];
                 $condition_product_code = $request->data['OrderSaleUnitPrice']['product_code'];
                 $condition_product_id   = $request->data['OrderSaleUnitPrice']['product_id'];
                 $condition_product_text = $request->data['OrderSaleUnitPrice']['product_text'];
@@ -94,9 +88,6 @@ class OrderSaleUnitPriceController extends Controller
                 $request->session()->put('order_sale_condition_company_code', $condition_company_code);
                 $request->session()->put('order_sale_condition_company_id', $condition_company_id);
                 $request->session()->put('order_sale_condition_company_text', $condition_company_text);
-                $request->session()->put('order_sale_condition_shop_code', $condition_shop_code);
-                $request->session()->put('order_sale_condition_shop_id', $condition_shop_id);
-                $request->session()->put('order_sale_condition_shop_text', $condition_shop_text);
                 $request->session()->put('order_sale_condition_product_code', $condition_product_code);
                 $request->session()->put('order_sale_condition_product_id', $condition_product_id);
                 $request->session()->put('order_sale_condition_product_text', $condition_product_text);
@@ -108,9 +99,6 @@ class OrderSaleUnitPriceController extends Controller
                 $condition_company_code = null;
                 $condition_company_id   = null;
                 $condition_company_text = null;
-                $condition_shop_code    = null;
-                $condition_shop_id      = null;
-                $condition_shop_text    = null;
                 $condition_product_code = null;
                 $condition_product_id   = null;
                 $condition_product_text = null;
@@ -119,9 +107,6 @@ class OrderSaleUnitPriceController extends Controller
                 $request->session()->forget('order_sale_condition_company_code');
                 $request->session()->forget('order_sale_condition_company_id');
                 $request->session()->forget('order_sale_condition_company_text');
-                $request->session()->forget('order_sale_condition_shop_code');
-                $request->session()->forget('order_sale_condition_shop_id');
-                $request->session()->forget('order_sale_condition_shop_text');
                 $request->session()->forget('order_sale_condition_product_code');
                 $request->session()->forget('order_sale_condition_product_id');
                 $request->session()->forget('order_sale_condition_product_text');
@@ -150,9 +135,6 @@ class OrderSaleUnitPriceController extends Controller
             ->selectRaw('MIN(OrderSaleUnitPriceDetail.apply_from) AS apply_from')
             ->join('sale_companies AS SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'OrderSaleUnitPrice.company_id');
-            })
-            ->leftJoin('sale_shops AS SaleShop', function ($join) {
-                $join->on('SaleShop.id', '=', 'OrderSaleUnitPrice.shop_id');
             })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
@@ -242,9 +224,6 @@ class OrderSaleUnitPriceController extends Controller
             "condition_company_code"                 => $condition_company_code,
             "condition_company_id"                   => $condition_company_id,
             "condition_company_text"                 => $condition_company_text,
-            "condition_shop_code"                    => $condition_shop_code,
-            "condition_shop_id"                      => $condition_shop_id,
-            "condition_shop_text"                    => $condition_shop_text,
             "condition_product_code"                 => $condition_product_code,
             "condition_product_id"                   => $condition_product_id,
             "condition_product_text"                 => $condition_product_text,
@@ -280,9 +259,6 @@ class OrderSaleUnitPriceController extends Controller
         $OrderSaleUnitPriceData = $request->data['OrderSaleUnitPrice'];
         $OrderSaleUnitPriceDetailData = $request->data['OrderSaleUnitPriceDetail'];
 
-        // 値がNULLのところを初期化
-        if(empty($OrderSaleUnitPriceData['sale_shop_id'])) $OrderSaleUnitPriceData['sale_shop_id'] = 0;
-
         // トランザクション開始
         DB::connection()->beginTransaction();
 
@@ -293,7 +269,6 @@ class OrderSaleUnitPriceController extends Controller
             // ---------------------------------
             $OrderSaleUnitPrice = new OrderSaleUnitPrice;
             $OrderSaleUnitPrice->company_id       = $OrderSaleUnitPriceData['sale_company_id']; // 企業ID
-            $OrderSaleUnitPrice->shop_id          = $OrderSaleUnitPriceData['sale_shop_id'];    // 店舗ID
             $OrderSaleUnitPrice->remarks          = $OrderSaleUnitPriceData['remarks'];         // 備考
             $OrderSaleUnitPrice->active           = 1;                                          // 有効フラグ
             $OrderSaleUnitPrice->created_user_id  = $userInfoId;                                // 作成者ID
@@ -377,15 +352,9 @@ class OrderSaleUnitPriceController extends Controller
             'SaleCompany.id                AS sale_company_id',
             'SaleCompany.code              AS sale_company_code',
             'SaleCompany.name              AS sale_company_name',
-            'SaleShop.id                   AS sale_shop_id',
-            'SaleShop.code                 AS sale_shop_code',
-            'SaleShop.name                 AS sale_shop_name'
         )
         ->join('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'OrderSaleUnitPrice.company_id');
-        })
-        ->leftJoin('sale_shops AS SaleShop', function ($join) {
-            $join->on('SaleShop.id', '=', 'OrderSaleUnitPrice.shop_id');
         })
         ->where('OrderSaleUnitPrice.id', '=', $order_sale_unit_price_id)
         ->first();
@@ -443,9 +412,6 @@ class OrderSaleUnitPriceController extends Controller
         $OrderSaleUnitPriceDatas       = $request->data['OrderSaleUnitPrice'];
         $OrderSaleUnitPriceDetailDatas = $request->data['OrderSaleUnitPriceDetail'];
 
-        // 値がNULLのところを初期化
-        if(empty($OrderSaleUnitPriceDatas['sale_shop_id'])) $OrderSaleUnitPriceDatas['sale_shop_id'] = 0;
-
         // トランザクション開始
         DB::connection()->beginTransaction();
 
@@ -456,7 +422,6 @@ class OrderSaleUnitPriceController extends Controller
             // --------------------------------
             $OrderSaleUnitPrice = \App\OrderSaleUnitPrice::find($OrderSaleUnitPriceDatas['id']);
             $OrderSaleUnitPrice->company_id       = $OrderSaleUnitPriceDatas['sale_company_id'];    // 企業ID
-            $OrderSaleUnitPrice->shop_id          = $OrderSaleUnitPriceDatas['sale_shop_id'];       // 店舗ID
             $OrderSaleUnitPrice->remarks          = $OrderSaleUnitPriceDatas['remarks'];            // 備考
             $OrderSaleUnitPrice->modified_user_id = $user_info_id;                                  // 更新者ユーザーID
             $OrderSaleUnitPrice->modified         = Carbon::now();                                  // 更新時間

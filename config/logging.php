@@ -53,6 +53,12 @@ return [
             'days' => 14,
         ],
 
+        'custom_level_logger' => [
+            'driver' => 'custom',
+            'via' => App\Logging\CustomLevelLogger::class,
+            'level' => 'debug',
+        ],
+
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),

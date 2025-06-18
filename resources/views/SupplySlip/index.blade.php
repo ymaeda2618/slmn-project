@@ -37,10 +37,6 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[SupplySlip][supply_company_text]" value="{{$condition_company_text}}" readonly>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
                                 <div class="table-th">仕入製品</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control product_code_input" id="product_code" name="data[SupplySlipDetail][product_code]" value="{{$condition_product_code}}" tabindex="5">
@@ -49,6 +45,10 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="product_text" name="data[SupplySlipDetail][product_text]" value="{{$condition_product_text}}" readonly>
                                 </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
                                 <div class="table-th">状態</div>
                                 <div class="table-double-td">
                                     <select class="search-control " id="supply_submit_type " name="data[SupplySlip][supply_submit_type] ">

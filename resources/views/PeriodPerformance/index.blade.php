@@ -39,10 +39,6 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[PeriodPerformance][supply_company_text]" value="{{$pp_supply_company_text}}" readonly>
                                 </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
                                 <div class="table-th">売上先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[PeriodPerformance][sale_company_code]" value="{{$pp_sale_company_code}}" tabindex="5">

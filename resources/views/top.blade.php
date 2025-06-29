@@ -222,8 +222,38 @@
             </div>
         </div>
     </div>
-    @endsection
+    @endsection @push('scripts')
+    <!-- Slick CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css" />
+
+    <!-- Slick JS -->
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
+
+    <!-- 初期化 -->
+    <script>
+        $(document).ready(function() {
+            if (window.matchMedia("(max-width: 768px)").matches) {
+                console.log("Init Slick for smartphone");
+                $('.achievements-area').slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    dots: true,
+                    arrows: false,
+                    infinite: false,
+                    adaptiveHeight: true
+                });
+            }
+        });
+    </script>
+    @endpush
+
     <style>
+        .container {
+            max-width: unset!important;
+            padding-right: 30px !important;
+        }
+
         .achievements-title-area {
             width: 100%;
             font-size: 20px;
@@ -313,6 +343,48 @@
             border-radius: 20px;
             width: 100px;
         }
+        /* 既存の achievements-area に上書え */
+
+        .achievements-area {
+            width: 100%;
+            margin: 0px auto 30px;
+        }
+        /* モバイル時だけ Slick 有効＆崩れ防止 */
+
+        @media (max-width: 768px) {
+            .achievements-area {
+                display: block !important;
+                margin: 0 auto 20px;
+            }
+            .achievements-detail {
+                width: 100%;
+                max-width: 360px;
+                margin: 0 auto;
+                box-sizing: border-box;
+            }
+            .achievements-detail-body {
+                display: flex;
+                flex-wrap: wrap;
+                padding: 15px 10px;
+                box-sizing: border-box;
+            }
+            .achievements {
+                width: 50%;
+                padding: 5px;
+                box-sizing: border-box;
+            }
+            .slick-slide {
+                justify-content: center;
+                box-sizing: border-box;
+            }
+            .slick-track {
+                display: flex !important;
+                align-items: stretch !important;
+            }
+            .slick-list {
+                overflow: hidden;
+            }
+        }
         /* ボタンエリア */
 
         .menu-title-area {
@@ -381,5 +453,17 @@
             background-color: #dbd2d2;
             border-radius: 10px;
             padding: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .menu-btn-area {
+                display: block;
+                width: 100%;
+            }
+            .menu-btn-area .btn-title {
+                padding-left: 0px;
+                width: 90%;
+                margin: auto;
+            }
         }
     </style>

@@ -373,26 +373,6 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } else if (selector_code.match(/withdrawal_shop/)) { // 支払先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSupplyShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
                 } else if (selector_code.match(/staff/)) { // 担当者IDの部分
 
                     $.ajax({
@@ -425,32 +405,6 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSupplyCompany",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 支払店舗ID
-            //-------------------------------------
-            $(".withdrawal_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSupplyShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -748,7 +702,6 @@
         var payment_from_date = '';
         var payment_to_date = '';
         var payment_company = '';
-        var payment_shop = '';
         var staff_code = '';
         var total_price = '';
 

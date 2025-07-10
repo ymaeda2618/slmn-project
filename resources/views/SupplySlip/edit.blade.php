@@ -551,26 +551,6 @@
                             setMultiOrderSupplyUnitPirce();
                         });
 
-                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./../AjaxSetSupplyShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
                 } else if (selector_code.match(/product_code/)) { // 製品IDの部分
 
                     $.ajax({
@@ -766,33 +746,6 @@
                     });
                 }
             });
-
-            //-------------------------------------
-            // autocomplete処理 仕入店舗ID
-            //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./../AjaxAutoCompleteSupplyShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
 
             //-------------------------------------
             // autocomplete処理 製品ID
@@ -1513,7 +1466,6 @@
         // 変数初期化
         // ----------
         var supply_company_code; // 仕入店舗
-        var supply_shop_code; // 仕入店舗
         var product_code; // 製品ID
         var unit_price; // 単価
         var unit_num; // 受注数量
@@ -1534,7 +1486,6 @@
         }
 
         supply_company_code = $("#supply_company_code").val();
-        supply_shop_code = $("#supply_shop_code").val();
         if (supply_company_code == '') {
             alert('「仕入店舗」を入力してください。');
             return false;

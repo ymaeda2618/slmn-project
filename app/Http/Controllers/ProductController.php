@@ -23,6 +23,7 @@ class ProductController extends Controller
      */
     public function __construct()
     {
+        parent::__construct();
         $this->middleware('auth');
     }
 
@@ -98,6 +99,15 @@ class ProductController extends Controller
                 $request->session()->put('condition_product_id', $condition_product_id);
                 $request->session()->put('condition_product_text', $condition_product_text);
 
+                \Log::info('製品一覧 検索条件', [
+                    'user_id'      => $this->login_user_id,
+                    'date_from'    => $condition_date_from,
+                    'date_to'      => $condition_date_to,
+                    'product_type' => $condition_product_type,
+                    'status_id'    => $condition_status_id,
+                    'search_text'  => $condition_search_text
+                ]);
+
             } else { // リセットボタンが押された時の処理
 
                 $condition_date_from     = null;
@@ -117,6 +127,10 @@ class ProductController extends Controller
                 $request->session()->forget('condition_product_code');
                 $request->session()->forget('condition_product_id');
                 $request->session()->forget('condition_product_text');
+
+                \Log::info('製品一覧 検索条件リセット', [
+                    'user_id' => $this->login_user_id
+                ]);
             }
         }
 
@@ -194,6 +208,11 @@ class ProductController extends Controller
             ])
             ->orderBy('Product.created', 'desc')->paginate(20);
 
+            \Log::info('製品一覧取得', [
+                'user_id' => $this->login_user_id,
+                '件数'     => $productList->total()
+            ]);
+
             // 対象日付のチェック
             $product_search_type_name = "";
             $product_search_type_code = "";
@@ -203,10 +222,15 @@ class ProductController extends Controller
 
         } catch (\Exception $e) {
 
-            dd($e);
+            \Log::error('製品一覧取得エラー', [
+                'user_id' => $this->login_user_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
 
-            return view('Product.complete')->with([
-                'errorMessage' => $e
+            return view('errors.error')->with([
+                'error_message' => $e->getMessage()
             ]);
         }
 
@@ -237,6 +261,11 @@ class ProductController extends Controller
      */
     public function edit(Request $request, $product_id)
     {
+        \Log::info('製品編集画面 表示', [
+            'user_id'    => $this->login_user_id,
+            'product_id' => $product_id
+        ]);
+
         // カテゴリーカテゴリー
         $productTypeList = ProductType::where([
             ['auto_regis_type_flg', 0],
@@ -278,10 +307,14 @@ class ProductController extends Controller
         ])
         ->first();
 
+        \Log::info('製品編集対象取得', [
+            'user_id'     => $this->login_user_id,
+            'editProduct' => $editProduct
+        ]);
+
         // エラーメッセージ取得
         $error_message       = $request->session()->get('error_message');
         $request->session()->forget('error_message');
-
 
         return view('Product.edit')->with([
             "productTypeList"  => $productTypeList,
@@ -301,6 +334,10 @@ class ProductController extends Controller
      */
     public function create(Request $request)
     {
+        \Log::info('製品新規登録画面 表示', [
+            'user_id' => $this->login_user_id
+        ]);
+
         // カテゴリーカテゴリー
         $productTypeList = ProductType::where([
             ['auto_regis_type_flg', 0],
@@ -326,7 +363,6 @@ class ProductController extends Controller
         $error_message       = $request->session()->get('error_message');
         $request->session()->forget('error_message');
 
-
         return view('Product.create')->with([
             "productTypeList"           => $productTypeList,
             "statusList"                => $statusList,
@@ -343,6 +379,11 @@ class ProductController extends Controller
      */
     public function confirm(Request $request)
     {
+        \Log::info('製品確認画面 表示', [
+            'user_id' => $this->login_user_id,
+            'data'    => $request->data['Product'] ?? []
+        ]);
+
         if($request->submit_type == 1){
             $action_url = './ProductComplete';
         } else {
@@ -411,6 +452,12 @@ class ProductController extends Controller
             // リクエストされたコードを格納
             $product_code = $request->data['Product']['code'];
 
+            \Log::info('製品更新開始', [
+                'user_id'     => $user_info_id,
+                'product_id'  => $request->data['Product']['product_id'],
+                'product_code'=> $product_code
+            ]);
+
             // codeが存在するかチェック
             $productCodeCheck = DB::table('products AS Product')
             ->select(
@@ -423,10 +470,12 @@ class ProductController extends Controller
                 ['Product.code', '=', $product_code],
             ])->orderBy('id', 'desc')->first();
 
-            if (!empty($productCodeCheck)){
-
+            if (!empty($productCodeCheck)) {
                 $exception_type = 1;
-
+                \Log::error('製品更新エラー：重複コード', [
+                    'user_id' => $user_info_id,
+                    'code'    => $product_code
+                ]);
                 throw new Exception();
             }
 
@@ -451,23 +500,30 @@ class ProductController extends Controller
             // 保存処理
             $Product->save();
 
+            \Log::info('製品更新完了', [
+                'user_id'    => $user_info_id,
+                'product_id' => $Product->id
+            ]);
+
         } catch (\Exception $e) {
 
             DB::rollback();
 
-            if($exception_type == 1){ // 登録済みのコードを指定の場合
+            \Log::error('製品更新例外エラー', [
+                'user_id' => $user_info_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
 
+            if($exception_type == 1){ // 登録済みのコードを指定の場合
                 $errorMsg = "指定のコードは既に登録済みです。";
                 $request->session()->put('error_message', $errorMsg);
-
                 return redirect('./ProductEdit/'.$request->data['Product']['product_id']);
             }
 
-            var_dump($e);
-            die;
-
-            return view('Product.complete')->with([
-                'errorMessage' => $e
+            return view('errors.error')->with([
+                'error_message' => $e->getMessage()
             ]);
         }
 
@@ -496,6 +552,10 @@ class ProductController extends Controller
         $exception_type = 0;
 
         try {
+            \Log::info('製品登録開始', [
+                'user_id' => $user_info_id,
+                'request' => $request->data['Product'] ?? []
+            ]);
 
             // codeが入力されていない場合
             if(empty($request->data['Product']['code'])){
@@ -536,10 +596,12 @@ class ProductController extends Controller
                     ['Product.code', '=', $product_code],
                 ])->orderBy('id', 'desc')->first();
 
-                if (!empty($productCodeCheck)){
-
+                if (!empty($productCodeCheck)) {
                     $exception_type = 1;
-
+                    \Log::error('製品登録エラー：重複コード', [
+                        'user_id' => $user_info_id,
+                        'code'    => $product_code
+                    ]);
                     throw new Exception();
                 }
             }
@@ -568,9 +630,22 @@ class ProductController extends Controller
             $Product->save();
             DB::connection()->commit();
 
+            \Log::info('製品登録完了', [
+                'user_id'    => $user_info_id,
+                'product_id' => $Product->id,
+                'code'       => $Product->code
+            ]);
+
         } catch (\Exception $e) {
 
             DB::rollback();
+
+            \Log::error('製品登録例外エラー', [
+                'user_id' => $user_info_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
 
             if($exception_type == 1){ // 登録済みのコードを指定の場合
 
@@ -580,8 +655,8 @@ class ProductController extends Controller
                 return redirect('./ProductCreate');
             }
 
-            return view('Product.complete')->with([
-                'errorMessage' => $e
+            return view('errors.error')->with([
+                'error_message' => $e->getMessage()
             ]);
         }
 
@@ -602,6 +677,11 @@ class ProductController extends Controller
 
         if(empty($standard_count)) $standard_count = 1;
 
+        \Log::info('AjaxAddStandard 呼び出し', [
+            'user_id' => $this->login_user_id,
+            'standard_count' => $standard_count
+        ]);
+
         $ajaxHtml = '';
 
         $ajaxHtml .= "<tr id='standart_list_".$standard_count."' class='standard_list'>";
@@ -617,6 +697,10 @@ class ProductController extends Controller
 
         $returnArray = array($standard_count, $ajaxHtml);
 
+        \Log::info('AjaxAddStandard 処理完了', [
+            'user_id' => $this->login_user_id,
+            'next_standard_count' => $standard_count
+        ]);
 
         return $returnArray;
     }
@@ -630,6 +714,11 @@ class ProductController extends Controller
     {
         // 入力された値を取得
         $input_text = $request->inputText;
+
+        \Log::info('AjaxAutoCompleteProduct 呼び出し', [
+            'user_id' => $this->login_user_id,
+            'inputText' => $input_text
+        ]);
 
         // 入力候補を初期化
         $auto_complete_array = array();
@@ -666,17 +755,26 @@ class ProductController extends Controller
             }
         }
 
+        \Log::info('AjaxAutoCompleteProduct レスポンス', [
+            'user_id' => $this->login_user_id,
+            'suggestions_count' => count($auto_complete_array)
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
     /**
-     * 製品ID更新時のAjax処理
+     * CSVダウンロード処理
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
     public function csvDownLoad(Request $request)
     {
         $fileName = "product.csv";
+
+        \Log::info('CSVダウンロード処理開始', [
+            'user_id' => $this->login_user_id
+        ]);
 
         // セッションにある検索条件を取得する
 
@@ -735,6 +833,11 @@ class ProductController extends Controller
                 ['ProductType.auto_regis_type_flg', '=', '0'],
             ])->orderByRaw('CAST(Product.code AS SIGNED) ASC') // 文字列を数値としてソート
             ->get();
+
+            \Log::info('CSV対象製品数', [
+                'user_id' => $this->login_user_id,
+                'count'   => $productList->count()
+            ]);
 
             // csv配列作成
             $product_data = [];
@@ -842,12 +945,26 @@ class ProductController extends Controller
             $response->headers->set('Content-Type', 'text/csv; charset=Shift_JIS');
             $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
+            \Log::info('CSVダウンロード処理完了', [
+                'user_id' => $this->login_user_id
+            ]);
+
+
             return $response;
         } catch (\Exception $e) {
 
-            dd($e);
+            \Log::error('CSVダウンロード処理例外', [
+                'user_id' => $this->login_user_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
 
-            return null;
+
+            return view('errors.error')->with([
+                'error_message' => 'CSVダウンロード中にエラーが発生しました：' . $e->getMessage()
+            ]);
+
         }
     }
 }

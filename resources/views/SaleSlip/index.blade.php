@@ -30,7 +30,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">取引先企業</div>
+                                <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-cell">
                                     <input type="text" class="search-control company-code-input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" value="{{$condition_company_code}}" tabindex="3">
                                     <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]" value="{{$condition_company_id}}">
@@ -576,26 +576,6 @@
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
                             url: "./AjaxSetSaleCompany",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSaleShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,

@@ -1,4 +1,5 @@
 @extends('layouts.app') @section('content')
+<link rel="stylesheet" href="{{ asset('css/slip-common.css') }}">
 <div class="container">
 
     <div class="row justify-content-center">
@@ -30,11 +31,11 @@
                         <tr>
                             <td>
                                 <div class="table-th">取引先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[SupplySlip][supply_company_code]" value="{{$condition_company_code}}" tabindex="3">
+                                <div class="table-td table-code-cell">
+                                    <input type="text" class="search-control company-code-input" id="supply_company_code" name="data[SupplySlip][supply_company_code]" value="{{$condition_company_code}}" tabindex="3">
                                     <input type="hidden" id="supply_company_id" name="data[SupplySlip][supply_company_id]" value="{{$condition_company_id}}">
                                 </div>
-                                <div class="table-td table-name-td">
+                                <div class="table-td table-name-cell">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[SupplySlip][supply_company_text]" value="{{$condition_company_text}}" readonly>
                                 </div>
                             </td>
@@ -42,15 +43,15 @@
                         <tr>
                             <td>
                                 <div class="table-th">仕入製品</div>
-                                <div class="table-td table-code-td">
+                                <div class="table-td table-code-cell">
                                     <input type="text" class="search-control product_code_input" id="product_code" name="data[SupplySlipDetail][product_code]" value="{{$condition_product_code}}" tabindex="5">
                                     <input type="hidden" id="product_id" name="data[SupplySlipDetail][product_id]" value="{{$condition_product_id}}">
                                 </div>
-                                <div class="table-td table-name-td">
+                                <div class="table-td table-name-cell">
                                     <input type="text" class="search-control" id="product_text" name="data[SupplySlipDetail][product_text]" value="{{$condition_product_text}}" readonly>
                                 </div>
                                 <div class="table-th">状態</div>
-                                <div class="table-double-td">
+                                <div class="table-double-cell">
                                     <select class="search-control " id="supply_submit_type " name="data[SupplySlip][supply_submit_type] ">
                                         <option value="0 " selected>全て</option>
                                         <option value="1 ">登録済</option>
@@ -100,6 +101,7 @@
                 <div class='sum-display-div'>総税抜額:{{number_format($supply_slip_condition_notax_sub_total)}}円</div>
                 <div class='sum-display-div'>総額:{{number_format($supply_slip_condition_notax_sub_total)}}円</div>
                 @endif
+                <div class="float-clear"></div>
                 <div class='display-condition-div'>並び順
                     <select id='display-sort' name="display_sort" class='display-condition-select'>
                     <option value="0">伝票日付:降順</option>
@@ -123,7 +125,7 @@
         </form>
 
         <!--一覧表示エリア-->
-        <div class='list-area'>
+        <div class='list-area pc-area'>
             <table class='index-table'>
                 <tbody>
                     <tr>
@@ -210,6 +212,109 @@
                         </td>
                     </tr>
                     @endforeach
+                </tbody>
+            </table>
+            @endforeach
+        </div>
+
+        <!--SP版表示エリア-->
+        <div class='list-area sp-area'>
+            <table class='index-table'>
+                <tbody>
+                    <tr>
+                        <th>種別.</th>
+                        <th>伝票No.</th>
+                        <th class="double-width" colspan="2">登録日</th>
+                    </tr>
+                    <tr>
+                        <th class="double-width" colspan="2">伝票日付</th>
+                        <th class="double-width" colspan="2">納品日付</th>
+                    </tr>
+                    <tr>
+                        <th>取引先コード</th>
+                        <th class="triple-width" colspan="3">取引先名</th>
+                    </tr>
+                    <tr>
+                        <th class="fourth-width" colspan="4">税抜商品合計</th>
+                    </tr>
+                </tbody>
+            </table>
+            @foreach ($supplySlipList as $supplySlips)
+            <table class='index-table'>
+                <tbody>
+                    <tr class="backgroud-color-beige">
+                        <!--種別-->
+                        @if ($supplySlips->supply_submit_type == 1 || $supplySlips->supply_submit_type == 4)
+                        <td>登録済</td>
+                        @else
+                        <td>一時保存</td>
+                        @endif
+                        <td>
+                            <!--伝票NO-->{{$supplySlips->supply_slip_id}}
+                        </td>
+                        <td class="double-width" colspan="2">
+                            <!--登録日付-->{{$supplySlips->supply_slip_modified}}
+                        </td>
+                    </tr>
+                    <tr class="backgroud-color-beige">
+                        <td class="double-width" colspan="2">
+                            <!--伝票日付-->{{$supplySlips->supply_slip_date}}
+                        </td>
+                        <td class="double-width" colspan="2">
+                            <!--納品日-->{{$supplySlips->supply_slip_delivery_date}}
+                        </td>
+                    </tr>
+                    <tr class="backgroud-color-beige">
+                        <td>
+                            <!--取引先コード-->{{$supplySlips->supply_company_code}}
+                        </td>
+                        <td class="bold-tr triple-width company-name" colspan="3">
+                            <!--取引先名-->{{$supplySlips->supply_company_name}}
+                        </td>
+                    </tr>
+                    <tr class="backgroud-color-beige">
+                        <td class="fourth-width" colspan="4">
+                            <!--総合計-->{{number_format($supplySlips->notax_sub_total)}}
+                        </td>
+                    </tr>
+                    @foreach ($supply_slip_detail_arr[$supplySlips->supply_slip_id] as $supply_slip_detail_key => $supply_slip_detail_val)
+                    <tr>
+                        <td>
+                            <!--製品コード-->{{$supply_slip_detail_val['product_code']}}
+                        </td>
+                        <td class="triple-width product-name" colspan="3">
+                            <!--製品名-->{{$supply_slip_detail_val['product_name']}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="double-width" colspan="2">
+                            <!--単価-->{{number_format($supply_slip_detail_val['supply_slip_detail_unit_price'])}}
+                        </td>
+                        <td>
+                            <!--数量-->{{$supply_slip_detail_val['supply_slip_detail_unit_num']}}
+                        </td>
+                        <td>
+                            <!--単位-->{{$supply_slip_detail_val['unit_name']}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="double-width" colspan="2">
+                            <!--担当者名-->{{$supply_slip_detail_val['staff_name']}}
+                        </td>
+                        <td class="double-width" colspan="2">
+                            <!--摘要-->{{$supply_slip_detail_val['memo']}}
+                        </td>
+                    </tr>
+                    @endforeach @if (Home::authClerkCheck())
+                    <tr>
+                        <td class="double-width" colspan="2">
+                            <!--編集ボタン--><a class='edit-btn' target="_blank" href='./SupplySlipEdit/{{$supplySlips->supply_slip_id}}'>編集</a>
+                        </td>
+                        <td class="double-width" colspan="2">
+
+                        </td>
+                    </tr>
+                    @endif
                 </tbody>
             </table>
             @endforeach
@@ -338,39 +443,13 @@
             //-------------------------------------
             // autocomplete処理 仕入店舗ID
             //-------------------------------------
-            $(".supply_company_code_input").autocomplete({
+            $(".company-code-input").autocomplete({
                 source: function(req, resp) {
                     $.ajax({
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSupplyCompany",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 仕入店舗ID
-            //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSupplyShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -501,312 +580,3 @@
         });
     })(jQuery);
 </script>
-
-<style>
-    /* 共通 */
-
-    .search-control {
-        display: block;
-        width: 100%;
-        height: 30px;
-        padding: 5px;
-        font-size: 10px;
-        line-height: 1.6;
-        color: #495057;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #ced4da;
-        border-radius: .25rem;
-        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    }
-
-    .search-control[readonly] {
-        background-color: #e9ecef;
-        opacity: 1;
-    }
-
-    .top-title {
-        max-width: 1300px;
-        font-size: 1.4em;
-        font-weight: bold;
-        width: 90%;
-        padding: 25px 0px 25px 20px;
-    }
-
-    .radio-label {
-        margin-bottom: initial!important;
-        font-weight: bolder;
-        margin-right: 10px;
-    }
-
-    #index-search-form {
-        width: 100%;
-    }
-
-    .search-area {
-        max-width: 1300px;
-        width: 90%;
-        padding: 10px 0px 0px;
-        border: 1px solid #bcbcbc;
-        border-radius: 5px;
-        margin: auto;
-    }
-
-    .search-area table {
-        margin: auto;
-        width: 100%;
-    }
-
-    .table-th {
-        width: 10%;
-        padding: 15px 0px 0px 10px;
-        font-size: 10px;
-        float: left;
-        font-weight: bolder;
-    }
-
-    .table-td {
-        width: 20%;
-        padding: 10px;
-        font-size: 10px;
-        float: left;
-    }
-
-    .table-code-td {
-        padding-right: 0px;
-    }
-
-    .table-name-td {
-        padding-left: 0px;
-    }
-
-    .table-double-td {
-        width: 40%;
-        padding: 10px;
-        font-size: 10px;
-        float: left;
-    }
-
-    .radio_box {
-        padding-top: 15px;
-    }
-
-    .search-btn-area {
-        text-align: center;
-        margin: 10px auto 10px;
-        width: 100%;
-        display: inline-block;
-    }
-
-    .search-btn {
-        width: 80%;
-        font-size: 10px;
-        max-width: 150px;
-        height: 30px;
-        border-radius: 10px;
-        margin-right: 2%;
-    }
-
-    .initial-btn {
-        width: 80%;
-        font-size: 10px;
-        max-width: 150px;
-        height: 30px;
-        border-radius: 10px;
-        margin-left: 2%;
-    }
-
-    /* アコーディオン全体のデザイン */
-
-    .accordion {
-        max-width: 1300px;
-        width: 90%;
-        margin: 20px auto;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-    /* アコーディオン全体 */
-
-    .accordion {
-        max-width: 1300px;
-        width: 90%;
-        margin: 20px auto;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        overflow: hidden;
-    }
-    /* ヘッダー部分（ボタン） */
-
-    .accordion-header {
-        padding: 5px;
-        cursor: pointer;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-    }
-
-    .accordion-header span {
-        margin-left: 10px;
-    }
-    /* 矢印アイコン */
-
-    .accordion-arrow {
-        font-size: 12px;
-        transition: transform 0.3s ease;
-    }
-    /* アコーディオンの内容（最初は非表示） */
-
-    .accordion-content {
-        display: none;
-        padding: 15px;
-        background: #f9f9f9;
-        border-top: 1px solid #ccc;
-    }
-    /* 矢印が回転するクラス */
-
-    .rotate {
-        transform: rotate(180deg);
-    }
-
-    .csv-type-table-area th {
-        font-size: 12px;
-    }
-
-    .csv-type-table-area td select {
-        font-size: 12px;
-        border-radius: 5px;
-        margin-left: 20px;
-    }
-
-    .csv-btn-area input {
-        max-width: 120px;
-    }
-
-    /*総額エリア*/
-
-    .sum-display-area {
-        max-width: 1300px;
-        width: 90%;
-        padding-top: 20px;
-        padding-left: 20px;
-        margin: auto;
-    }
-
-    .sum-display-div {
-        float: left;
-        margin-right: 1rem;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-    .display-condition-div {
-        float: right;
-        margin-right: 1rem;
-        font-weight: bold;
-        font-size: 12px;
-        padding: 2px;
-    }
-
-    .display-condition-select {
-        font-size: 10px;
-        color: #495057;
-        background-color: #fff;
-        background-clip: padding-box;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
-    }
-    /*伝票表示エリア*/
-
-    .list-area {
-        max-width: 1300px;
-        width: 90%;
-        margin: 25px auto 50px;
-    }
-
-    .index-table {
-        width: 100%;
-        letter-spacing: 2px;
-        border-top: solid 1px #ccc;
-        border-bottom: solid 2px #ccc;
-        margin: 5px 0px;
-    }
-
-    .index-table th {
-        width: 10%;
-        padding: 10px;
-        padding-left: 10px;
-        background-color: #57595b;
-        font-weight: bold;
-        color: white;
-        font-size: 10px;
-        letter-spacing: 1px;
-        border: 1px solid #bcbcbc;
-    }
-
-    .index-table td {
-        font-size: 10px;
-        padding-left: 20px;
-        padding: 8px;
-        border: 1px solid #bcbcbc;
-        width: 10%;
-    }
-
-    .double-width {
-        width: 20%!important;
-    }
-
-    .triple-width {
-        width: 30%!important;
-    }
-
-    .forth-width {
-        width: 40%!important;
-    }
-
-    .width-10 {
-        width: 10%!important;
-    }
-
-    .width-15 {
-        width: 15%!important;
-    }
-
-    .width-20 {
-        width: 20%!important;
-    }
-
-    .width-30 {
-        width: 30%!important;
-    }
-
-    .edit-btn {
-        border-radius: 5px;
-        color: #fff;
-        background-color: #72be92;
-        width: 80%;
-        margin: auto;
-        display: block;
-        text-align: center;
-        padding: 10px;
-    }
-
-    .regis-complete {
-        background-color: #D2F0F0;
-        font-weight: bold;
-        border-left: 3px solid #0099CB!important;
-        text-align: center;
-    }
-
-    .regis-temp {
-        background-color: #f0d2d2;
-        font-weight: bold;
-        border-left: 3px solid #cb0000!important;
-        text-align: center;
-    }
-
-    .bold-tr {
-        font-weight: bold;
-    }
-</style>

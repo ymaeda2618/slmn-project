@@ -31,6 +31,32 @@ class SupplySlipController extends Controller
      */
     public function index(Request $request)
     {
+
+        // 現在のURL（このSupplySlipIndex）を取得
+        $current_url = $request->url();
+
+        // リファラー（直前のURL）を取得
+        $referer = $request->headers->get('referer');
+
+        // リファラーが存在し、かつこの画面以外から遷移してきた場合
+        if ($referer && strpos($referer, $current_url) === false) {
+            // セッション初期化
+            $request->session()->forget([
+                'condition_date_type',
+                'condition_date_from',
+                'condition_date_to',
+                'condition_company_code',
+                'condition_company_id',
+                'condition_company_text',
+                'condition_product_code',
+                'condition_product_id',
+                'condition_product_text',
+                'condition_submit_type',
+                'condition_display_sort',
+                'condition_display_num',
+            ]);
+        }
+
         // リクエストパスを取得
         $request_path = $request->path();
         $path_array   = explode('/', $request_path);
@@ -58,9 +84,6 @@ class SupplySlipController extends Controller
             $condition_company_code  = $request->session()->get('condition_company_code');
             $condition_company_id    = $request->session()->get('condition_company_id');
             $condition_company_text  = $request->session()->get('condition_company_text');
-            $condition_shop_code     = $request->session()->get('condition_shop_code');
-            $condition_shop_id       = $request->session()->get('condition_shop_id');
-            $condition_shop_text     = $request->session()->get('condition_shop_text');
             $condition_product_code  = $request->session()->get('condition_product_code');
             $condition_product_id    = $request->session()->get('condition_product_id');
             $condition_product_text  = $request->session()->get('condition_product_text');
@@ -87,9 +110,6 @@ class SupplySlipController extends Controller
                 $condition_company_code  = isset($req_data['supply_company_code']) ? $req_data['supply_company_code'] : NULL;
                 $condition_company_id    = isset($req_data['supply_company_id']) ? $req_data['supply_company_id'] : NULL;
                 $condition_company_text  = isset($req_data['supply_company_text']) ? $req_data['supply_company_text'] : NULL;
-                $condition_shop_code     = isset($req_data['supply_shop_code']) ? $req_data['supply_shop_code'] : NULL;
-                $condition_shop_id       = isset($req_data['supply_shop_id']) ? $req_data['supply_shop_id'] : NULL;
-                $condition_shop_text     = isset($req_data['supply_shop_text']) ? $req_data['supply_shop_text'] : NULL;
                 $condition_product_code  = isset($req_detail_data['product_code']) ? $req_detail_data['product_code'] : NULL;
                 $condition_product_id    = isset($req_detail_data['product_id']) ? $req_detail_data['product_id'] : NULL;
                 $condition_product_text  = isset($req_detail_data['product_text']) ? $req_detail_data['product_text'] : NULL;
@@ -114,9 +134,6 @@ class SupplySlipController extends Controller
                 $request->session()->put('condition_company_code', $condition_company_code);
                 $request->session()->put('condition_company_id', $condition_company_id);
                 $request->session()->put('condition_company_text', $condition_company_text);
-                $request->session()->put('condition_shop_code', $condition_shop_code);
-                $request->session()->put('condition_shop_id', $condition_shop_id);
-                $request->session()->put('condition_shop_text', $condition_shop_text);
                 $request->session()->put('condition_product_code', $condition_product_code);
                 $request->session()->put('condition_product_id', $condition_product_id);
                 $request->session()->put('condition_product_text', $condition_product_text);
@@ -132,9 +149,6 @@ class SupplySlipController extends Controller
                 $condition_company_code  = null;
                 $condition_company_id    = null;
                 $condition_company_text  = null;
-                $condition_shop_code     = null;
-                $condition_shop_id       = null;
-                $condition_shop_text     = null;
                 $condition_product_code  = null;
                 $condition_product_id    = null;
                 $condition_product_text  = null;
@@ -147,9 +161,6 @@ class SupplySlipController extends Controller
                 $request->session()->forget('condition_company_code');
                 $request->session()->forget('condition_company_id');
                 $request->session()->forget('condition_company_text');
-                $request->session()->forget('condition_shop_code');
-                $request->session()->forget('condition_shop_id');
-                $request->session()->forget('condition_shop_text');
                 $request->session()->forget('condition_product_code');
                 $request->session()->forget('condition_product_id');
                 $request->session()->forget('condition_product_text');
@@ -191,9 +202,6 @@ class SupplySlipController extends Controller
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id');
             })
-            ->leftJoin('supply_shops AS SupplyShop', function ($join) {
-                $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
-            })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
                        ->join(DB::raw('('. $product_sub_query->toSql() .') as SupplySlipDetail'), 'SupplySlipDetail.supply_slip_id', '=', 'SupplySlip.id')
@@ -207,9 +215,6 @@ class SupplySlipController extends Controller
             })
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('SupplySlip.supply_company_id', '=', $condition_company_id);
-            })
-            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
-                return $query->where('SupplySlip.supply_shop_id', '=', $condition_shop_id);
             })
             ->if(!empty($condition_submit_type), function ($query) use ($condition_submit_type) {
                 return $query->where('SupplySlip.supply_submit_type', '=', $condition_submit_type);
@@ -242,9 +247,6 @@ class SupplySlipController extends Controller
             ->join('supply_companies AS SupplyCompany', function ($join) {
                 $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id');
             })
-            ->leftJoin('supply_shops AS SupplyShop', function ($join) {
-                $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id');
-            })
             ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
                 return $query->whereBetween('SupplySlip.date', [$condition_date_from, $condition_date_to]);
             })
@@ -253,9 +255,6 @@ class SupplySlipController extends Controller
             })
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('SupplySlip.supply_company_id', '=', $condition_company_id);
-            })
-            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
-                return $query->where('SupplySlip.supply_shop_id', '=', $condition_shop_id);
             })
             ->if(!empty($condition_product_id), function ($query) use ($product_sub_query) {
                 return $query
@@ -359,9 +358,6 @@ class SupplySlipController extends Controller
             ->if(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                 return $query->where('SupplySlip.supply_company_id', '=', $condition_company_id);
             })
-            ->if(!empty($condition_shop_id), function ($query) use ($condition_shop_id) {
-                return $query->where('SupplySlip.supply_shop_id', '=', $condition_shop_id);
-            })
             ->if(!empty($condition_product_id), function ($queryDetail) use ($condition_product_id) {
                 return $queryDetail->where('SupplySlipDetail.product_id', '=', $condition_product_id);
             })
@@ -435,9 +431,6 @@ class SupplySlipController extends Controller
             "condition_company_code"       => $condition_company_code,
             "condition_company_id"         => $condition_company_id,
             "condition_company_text"       => $condition_company_text,
-            "condition_shop_code"          => $condition_shop_code,
-            "condition_shop_id"            => $condition_shop_id,
-            "condition_shop_text"          => $condition_shop_text,
             "condition_product_code"       => $condition_product_code,
             "condition_product_id"         => $condition_product_id,
             "condition_product_text"       => $condition_product_text,
@@ -490,9 +483,6 @@ class SupplySlipController extends Controller
             'SupplyCompany.code             AS supply_company_code',
             'SupplyCompany.id               AS supply_company_id',
             'SupplyCompany.name             AS supply_company_name',
-            'SupplyShop.code                AS supply_shop_code',
-            'SupplyShop.id                  AS supply_shop_id',
-            'SupplyShop.name                AS supply_shop_name',
             'Delivery.code                  AS delivery_code',
             'Delivery.id                    AS delivery_id',
             'Delivery.name                  AS delivery_name'
@@ -502,10 +492,6 @@ class SupplySlipController extends Controller
         ->join('supply_companies as SupplyCompany', function ($join) {
             $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
                  ->where('SupplyCompany.active', '=', true);
-        })
-        ->leftJoin('supply_shops as SupplyShop', function ($join) {
-            $join->on('SupplyShop.id', '=', 'SupplySlip.supply_shop_id')
-                 ->where('SupplyShop.active', '=', true);
         })
         ->leftJoin('deliverys as Delivery', function ($join) {
             $join->on('Delivery.id', '=', 'SupplySlip.delivery_id')
@@ -628,7 +614,6 @@ class SupplySlipController extends Controller
             } else {
 
                 // 値がNULLのところを初期化
-                if(empty($SupplySlipData['supply_shop_id'])) $SupplySlipData['supply_shop_id'] = 0;
                 if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;
                 if(empty($SupplySlipData['delivery_price'])) $SupplySlipData['delivery_price'] = 0;
                 if(empty($SupplySlipData['adjust_price'])) $SupplySlipData['adjust_price'] = 0;
@@ -638,7 +623,6 @@ class SupplySlipController extends Controller
                 $SupplySlip->date               = $SupplySlipData['supply_date'];          // 日付
                 $SupplySlip->delivery_date      = $SupplySlipData['delivery_date'];        // 納品日
                 $SupplySlip->supply_company_id  = $SupplySlipData['supply_company_id'];    // 仕入先ID
-                $SupplySlip->supply_shop_id     = $SupplySlipData['supply_shop_id'];       // 仕入先店舗ID
                 $SupplySlip->delivery_id        = $SupplySlipData['delivery_id'];          // 配送ID
                 $SupplySlip->notax_sub_total_8  = $SupplySlipData['notax_sub_total_8'];    // 8%課税対象額
                 $SupplySlip->notax_sub_total_10 = $SupplySlipData['notax_sub_total_10'];   // 10%課税対象額
@@ -748,7 +732,6 @@ class SupplySlipController extends Controller
         $date_to      = $request->session()->get('condition_date_to');
         $company_id   = $request->session()->get('condition_company_id');
         $product_id   = $request->session()->get('condition_product_id');
-        $shop_id      = $request->session()->get('condition_shop_id');
         $submit_type  = $request->session()->get('condition_submit_type');
         $display_sort = $request->session()->get('condition_display_sort');
         $display_num  = $request->session()->get('condition_display_num');
@@ -779,7 +762,6 @@ class SupplySlipController extends Controller
                     DATE_FORMAT(SupplySlip.modified, "%m-%d %H:%i") AS supply_slip_modified
                 ')
                 ->join('supply_companies AS SupplyCompany', 'SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
-                ->leftJoin('supply_shops AS SupplyShop', 'SupplyShop.id', '=', 'SupplySlip.supply_shop_id')
                 ->when(!empty($product_id), function ($query) use ($product_id) {
                     return $query->whereExists(function ($subQuery) use ($product_id) {
                         $subQuery->select(DB::raw(1))
@@ -797,9 +779,6 @@ class SupplySlipController extends Controller
                 })
                 ->when(!empty($company_id), function ($query) use ($company_id) {
                     return $query->where('SupplySlip.supply_company_id', '=', $company_id);
-                })
-                ->when(!empty($shop_id), function ($query) use ($shop_id) {
-                    return $query->where('SupplySlip.supply_shop_id', '=', $shop_id);
                 })
                 ->when(!empty($submit_type), function ($query) use ($submit_type) {
                     return $query->where('SupplySlip.supply_submit_type', '=', $submit_type);
@@ -874,9 +853,6 @@ class SupplySlipController extends Controller
                 ->when(!empty($company_id), function ($query) use ($company_id) {
                     return $query->where('SupplySlip.supply_company_id', '=', $company_id);
                 })
-                ->when(!empty($shop_id), function ($query) use ($shop_id) {
-                    return $query->where('SupplySlip.supply_shop_id', '=', $shop_id);
-                })
                 ->when(!empty($product_id), function ($query) use ($product_id) {
                     return $query->where('SupplySlipDetail.product_id', '=', $product_id);
                 })
@@ -901,12 +877,14 @@ class SupplySlipController extends Controller
 
                 $supplySlipId = $detailData->supply_slip_id;
 
+                $tax = '8%';
                 // 税抜金額
                 $notax_total = $detailData->unit_price * $detailData->unit_num;
                 // 税込金額
                 if ($detailData->product_tax_id == 1) { // 8%の場合
                     $total = floor($notax_total * 1.08);
                 } else {
+                    $tax = '10%';
                     $total = floor($notax_total * 1.1);
                 }
 
@@ -925,13 +903,14 @@ class SupplySlipController extends Controller
                     8  => $detailData->unit_num,                                // 数量
                     9  => $detailData->unit_name,                               // 数量単位
                     10 => $detailData->unit_price,                              // 単価
-                    11 => $notax_total,                                         // 税抜合計金額
-                    12 => $total,                                               // 税込合計金額
-                    13 => $detailData->origin_area_id,                          // 産地コード
-                    14 => $detailData->origin_area_name,                        // 産地名
-                    15 => $detailData->staff_code,                              // 担当者コード
-                    16 => $detailData->staff_name,                              // 担当者名
-                    17 => $detailData->memo,                                    // 摘要
+                    11 => $tax,                                                 // 税率
+                    12 => $notax_total,                                         // 税抜合計金額
+                    13 => $total,                                               // 税込合計金額
+                    14 => $detailData->origin_area_id,                          // 産地コード
+                    15 => $detailData->origin_area_name,                        // 産地名
+                    16 => $detailData->staff_code,                              // 担当者コード
+                    17 => $detailData->staff_name,                              // 担当者名
+                    18 => $detailData->memo,                                    // 摘要
                 ];
 
             }
@@ -956,6 +935,7 @@ class SupplySlipController extends Controller
                     '数量',
                     '数量単位',
                     '単価',
+                    '税率',
                     '税抜合計金額',
                     '税込合計金額',
                     '産地コード',
@@ -1133,100 +1113,6 @@ class SupplySlipController extends Controller
                 $output_code = $supplyCompanyList->code;
                 $output_id   = $supplyCompanyList->id;
                 $output_name = $supplyCompanyList->name;
-            }
-        }
-
-        $returnArray = array($output_code, $output_id, $output_name);
-
-        return json_encode($returnArray);
-    }
-
-    /**
-     * 仕入店舗ID更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxAutoCompleteSupplyShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // 入力候補を初期化
-        $auto_complete_array = array();
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            $supplyShopList = DB::table('supply_shops AS SupplyShop')
-            ->select(
-                'SupplyShop.name  AS supply_shop_name'
-            )->where([
-                    ['SupplyShop.active', '=', '1']
-            ])->where(function($query) use ($input_text){
-                $query
-                ->orWhere('SupplyShop.name', 'like', "%{$input_text}%")
-                ->orWhere('SupplyShop.yomi', 'like', "%{$input_text}%");
-            })
-            ->get();
-
-            if (!empty($supplyShopList)) {
-
-                foreach ($supplyShopList as $supply_shop_val) {
-
-                    array_push($auto_complete_array, $supply_shop_val->supply_shop_name);
-                }
-            }
-        }
-
-        return json_encode($auto_complete_array);
-    }
-
-    /**
-     * 仕入先店舗更新時のAjax処理
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
-     */
-    public function AjaxSetSupplyShop(Request $request)
-    {
-        // 入力された値を取得
-        $input_text = $request->inputText;
-
-        // すべて数字かどうかチェック
-        if (is_numeric($input_text)) {
-            $input_code = $input_text;
-            $input_name = null;
-        } else {
-            $input_code = null;
-            $input_name = $input_text;
-        }
-
-        // 初期化
-        $output_code = null;
-        $output_id   = null;
-        $output_name = null;
-
-        if (!empty($input_text)) {
-
-            // 製品DB取得
-            // 製品一覧を取得
-            $supplyShopList = DB::table('supply_shops AS SupplyShop')
-            ->select(
-                'SupplyShop.code  AS code',
-                'SupplyShop.id    AS id',
-                'SupplyShop.name  AS name'
-            )
-            ->if(!empty($input_code), function ($query) use ($input_code) {
-                return $query->where('SupplyShop.code', '=', $input_code);
-            })
-            ->if(!empty($input_name), function ($query) use ($input_name) {
-                return $query->where('SupplyShop.name', 'like', $input_name);
-            })
-            ->first();
-
-            if (!empty($supplyShopList)) {
-                $output_code = $supplyShopList->code;
-                $output_id   = $supplyShopList->id;
-                $output_name = $supplyShopList->name;
             }
         }
 
@@ -1872,7 +1758,6 @@ class SupplySlipController extends Controller
             $SupplySlipDetailData = $request->data['SupplySlipDetail'];
 
             // 値がNULLのところを初期化
-            if(empty($SupplySlipData['supply_shop_id'])) $SupplySlipData['supply_shop_id'] = 0;
             if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;
             if(empty($SupplySlipData['delivery_price'])) $SupplySlipData['delivery_price'] = 0;
             if(empty($SupplySlipData['adjust_price'])) $SupplySlipData['adjust_price'] = 0;
@@ -1882,7 +1767,6 @@ class SupplySlipController extends Controller
             $SupplySlip->date               = $SupplySlipData['supply_date'];          // 日付
             $SupplySlip->delivery_date      = $SupplySlipData['delivery_date'];        // 納品日
             $SupplySlip->supply_company_id  = $SupplySlipData['supply_company_id'];    // 仕入先ID
-            $SupplySlip->supply_shop_id     = $SupplySlipData['supply_shop_id'];       // 仕入先店舗ID
             $SupplySlip->delivery_id        = $SupplySlipData['delivery_id'];          // 配送ID
             $SupplySlip->notax_sub_total_8  = $SupplySlipData['notax_sub_total_8'];    // 8%課税対象額
             $SupplySlip->notax_sub_total_10 = $SupplySlipData['notax_sub_total_10'];   // 10%課税対象額

@@ -176,6 +176,8 @@ Route::get('DepositEdit/{deposit_id}', 'DepositController@edit');
 Route::post('editRegisterDeposit', 'DepositController@editRegisterDeposit');
 Route::post('invoiceOutput', 'DepositController@invoiceOutput');
 Route::get('invoiceOutput/{deposit_id}', 'DepositController@invoiceOutput');
+Route::post('AjaxSetOwnerCompany', 'DepositController@AjaxSetOwnerCompany');
+Route::post('AjaxAutoCompleteOwnerCompany', 'DepositController@AjaxAutoCompleteOwnerCompany');
 
 // 在庫管理
 Route::get('InventoryAdjustmentIndex', 'InventoryAdjustmentController@index');
@@ -267,6 +269,18 @@ Route::post('payments/{id}/edit-confirm', 'PaymentController@editConfirm')->name
 Route::post('payments/{id}/update', 'PaymentController@update')->name('payments.update');
 
 
+// 本部企業
+Route::get('OwnerCompanyEdit/{owner_company_id}', 'OwnerCompanyController@edit');
+Route::get('OwnerCompanyIndex', 'OwnerCompanyController@index');
+Route::get('OwnerCompanyIndex/{page_num}', 'OwnerCompanyController@index');
+Route::post('OwnerCompanyIndex', 'OwnerCompanyController@index');
+Route::post('OwnerCompanyIndex/{page_num}', 'OwnerCompanyController@index');
+Route::get('OwnerCompanyCreate', 'OwnerCompanyController@create');
+Route::post('OwnerCompanyConfirm', 'OwnerCompanyController@confirm');
+Route::post('OwnerCompanyComplete', 'OwnerCompanyController@complete');
+Route::post('OwnerCompanyEditComplete', 'OwnerCompanyController@editComplete');
+Route::post('OwnerCompanyAjaxAddStandard', 'OwnerCompanyController@AjaxAddStandard');
+Route::get('OwnerCompanyAjaxGetShops/{owner_company_id}', 'OwnerCompanyController@AjaxGetShops');
 
 
 // 全ユーザ

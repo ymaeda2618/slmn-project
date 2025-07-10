@@ -44,7 +44,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">仕入先企業</div>
+                                <div class="table-th">仕入先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[DailyPerformance][supply_company_code]" value="{{$dp_supply_company_code}}" tabindex="3">
                                     <input type="hidden" id="supply_company_id" name="data[DailyPerformance][supply_company_id]" value="{{$dp_supply_company_id}}">
@@ -52,33 +52,13 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[DailyPerformance][supply_company_text]" value="{{$dp_supply_company_text}}" readonly>
                                 </div>
-                                <div class="table-th">仕入先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[DailyPerformance][supply_shop_code]" value="{{$dp_supply_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="supply_shop_id" name="data[DailyPerformance][supply_shop_id]" value="{{$dp_supply_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[DailyPerformance][supply_shop_text]" value="{{$dp_supply_shop_text}}" readonly>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="table-th">売上先企業</div>
+                                <div class="table-th">売上先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[DailyPerformance][sale_company_code]" value="{{$dp_sale_company_code}}" tabindex="5">
                                     <input type="hidden" id="sale_company_id" name="data[DailyPerformance][sale_company_id]" value="{{$dp_sale_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="sale_company_text" name="data[DailyPerformance][sale_company_text]" value="{{$dp_sale_company_text}}" readonly>
-                                </div>
-                                <div class="table-th">売上先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[DailyPerformance][sale_shop_code]" value="{{$dp_sale_shop_code}}" tabindex="6">
-                                    <input type="hidden" id="sale_shop_id" name="data[DailyPerformance][sale_shop_id]" value="{{$dp_sale_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[DailyPerformance][sale_shop_text]" value="{{$dp_sale_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -143,7 +123,7 @@
                         </td>
                         <td>
                             <!--売上金額-->{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount'], 2))}}円
-                            (現金：{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount_0'], 2))}}円, 
+                            (現金：{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount_0'], 2))}}円,
                             売掛：{{preg_replace("/\.?0+$/","",number_format($daily_performance_val['sale_daily_amount_1'], 2))}}円)
                         </td>
                     </tr>
@@ -233,7 +213,7 @@
 
 
             //-------------------------------------
-            // autocomplete処理 仕入企業ID
+            // autocomplete処理 仕入店舗ID
             //-------------------------------------
             $(".supply_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -259,33 +239,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入店舗ID
-            //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSupplyShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
             $(".sale_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -294,32 +248,6 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSaleCompany",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 売上店舗ID
-            //-------------------------------------
-            $(".sale_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSaleShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -407,7 +335,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/supply_company/)) { // 仕入先企業
+                if (selector_code.match(/supply_company/)) { // 仕入先店舗
 
                     $.ajax({
                             headers: {
@@ -427,53 +355,13 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSupplyShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/sale_company/)) { // 売上先企業
+                } else if (selector_code.match(/sale_company/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
                             url: "./AjaxSetSaleCompany",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSaleShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -538,7 +426,7 @@
 
 <style>
     /* 共通 */
-    
+
     .search-control {
         display: block;
         width: 100%;
@@ -553,12 +441,12 @@
         border-radius: .25rem;
         transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
     }
-    
+
     .search-control[readonly] {
         background-color: #e9ecef;
         opacity: 1;
     }
-    
+
     .top-title {
         max-width: 1300px;
         font-size: 1.4em;
@@ -566,13 +454,13 @@
         width: 90%;
         padding: 25px 0px 25px 20px;
     }
-    
+
     .radio-label {
         margin-bottom: initial!important;
         font-weight: bolder;
         margin-right: 10px;
     }
-    
+
     .search-area {
         max-width: 1300px;
         width: 90%;
@@ -580,12 +468,12 @@
         border: 1px solid #bcbcbc;
         border-radius: 5px;
     }
-    
+
     .search-area table {
         margin: auto;
         width: 100%;
     }
-    
+
     .table-th {
         width: 10%;
         padding: 15px 0px 0px 10px;
@@ -593,40 +481,40 @@
         float: left;
         font-weight: bolder;
     }
-    
+
     .table-td {
         width: 20%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-    
+
     .table-code-td {
         padding-right: 0px;
     }
-    
+
     .table-name-td {
         padding-left: 0px;
     }
-    
+
     .table-double-td {
         width: 40%;
         padding: 10px;
         font-size: 10px;
         float: left;
     }
-    
+
     .radio_box {
         padding-top: 15px;
     }
-    
+
     .search-btn-area {
         text-align: center;
         margin: 10px auto 10px;
         width: 100%;
         display: inline-block;
     }
-    
+
     .search-btn {
         width: 80%;
         font-size: 10px;
@@ -635,7 +523,7 @@
         border-radius: 10px;
         margin-right: 2%;
     }
-    
+
     .initial-btn {
         width: 80%;
         font-size: 10px;
@@ -645,14 +533,14 @@
         margin-left: 2%;
     }
     /*総額エリア*/
-    
+
     .sum-display-area {
         max-width: 1300px;
         width: 90%;
         padding-top: 20px;
         padding-left: 20px;
     }
-    
+
     .sum-display-div {
         float: left;
         margin-right: 1rem;
@@ -660,18 +548,18 @@
         font-size: 14px;
     }
     /*伝票表示エリア*/
-    
+
     .list-area {
         max-width: 1300px;
         width: 90%;
         margin: 20px auto 50px;
     }
-    
+
     .index-table {
         width: 100%;
         letter-spacing: 2px;
     }
-    
+
     .index-table th {
         width: 40%;
         padding: 10px;
@@ -683,11 +571,11 @@
         letter-spacing: 1px;
         border: 1px solid #bcbcbc;
     }
-    
+
     .index-table th:first-of-type {
         width: 20%;
     }
-    
+
     .index-table td {
         font-size: 12px;
         padding: 8px;
@@ -698,7 +586,7 @@
         text-align: right;
         font-weight: bold;
     }
-    
+
     .index-table td:first-of-type {
         font-size: 12px;
         padding: 8px;

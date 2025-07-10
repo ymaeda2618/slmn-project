@@ -22,7 +22,7 @@
 
             <div class="company-shop-area">
                 <div class="company-area">
-                    <div class="company-shop-label">売上企業</div>
+                    <div class="company-shop-label">売上店舗</div>
                     <div class="width-40">
                         <input type="text" class="form-control sale_company_code_input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" value="{{$SaleSlipList->sale_company_code}}" tabindex="1">
                         <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]">
@@ -609,26 +609,6 @@
 
                             // 仕入発注単価の設定
                             setMultiOrderSaleUnitPirce();
-                        });
-
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./../AjaxSetSaleShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
                         });
 
                 } else if (selector_code.match(/payment_method_type/)) { // 支払い方法
@@ -1566,79 +1546,6 @@
     }
 
     //-----------------------
-    // 対応仕入入力
-    //-----------------------
-    function showSupplySaleModal(slip_num) {
-
-        // 対象product_idを取得
-        var product_id = $("#product_id_" + slip_num).val();
-
-        // 数量を取得
-        var unit_num = $("#unit_num_" + slip_num).val();
-
-        // 売上伝票IDを取得
-        var sale_slip_id = $("#sale_slip_id").val();
-
-        if (isNaN(product_id) || product_id == "") {
-
-            alert("製品が選択されておりません。");
-            return;
-        }
-
-        if (isNaN(unit_num) || unit_num == "") {
-
-            alert("売上数量を先に入力してください。");
-            return;
-        }
-
-        var use_num_arr = [];
-        var supply_slip_id_arr = [];
-        var use_num;
-        var use_num_count = 0;
-        var use_num_total = 0;
-
-        // すでに取得済みのデータを取得
-        $(".use_num_" + slip_num).each(function() {
-
-            use_num_arr.push($(this).val());
-        });
-
-        $(".supply_slip_id_" + slip_num).each(function() {
-
-            supply_slip_id_arr.push($(this).val());
-        });
-
-        var fd = new FormData();
-        fd.append("slip_num", slip_num);
-        fd.append("product_id", product_id);
-        fd.append("use_num_arr", use_num_arr);
-        fd.append("supply_slip_id_arr", supply_slip_id_arr);
-        fd.append("sale_slip_id", sale_slip_id);
-        fd.append("action", 'edit');
-
-        $.ajax({
-                headers: {
-                    "X-CSRF-TOKEN": $("[name='_token']").val()
-                },
-                url: "./../AjaxShowSupplySlip",
-                type: "POST",
-                dataType: "JSON",
-                data: fd,
-                processData: false,
-                contentType: false
-            })
-            .done(function(data) {
-
-                $("#modal_product_area").remove();
-                $("#modal_table_area").remove();
-                $("#sum-area").remove();
-                $("#modal_body_area").append(data[0]);
-                $("#sale_slip_no").val(slip_num);
-                $("#sale_supply_slip_modal").modal("show") //モーダル出現
-            });
-    }
-
-    //-----------------------
     // チェックボックスをチェック、利用数を変更したときの処理
     //-----------------------
     $(document).on('change', '.modal-checkbox', function() {
@@ -1789,7 +1696,6 @@
         // 変数初期化
         // ----------
         var sale_company_code; // 売上企業
-        var sale_shop_code; // 売上店舗
         var product_code; // 製品ID
         var unit_price; // 単価
         var unit_num; // 数量
@@ -1811,9 +1717,8 @@
         }
 
         sale_company_code = $("#sale_company_code").val();
-        sale_shop_code = $("#sale_shop_code").val();
         if (sale_company_code == '') {
-            alert('「売上企業」を入力してください。');
+            alert('「売上店舗」を入力してください。');
             return false;
         }
 

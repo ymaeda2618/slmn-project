@@ -42,23 +42,29 @@ class DepositController extends Controller
         if ($_SERVER["REQUEST_METHOD"] != "POST"
         ) { // ページング処理
 
-            $condition_id             = $request->session()->get('deposit_condition_id');
-            $condition_date_type      = $request->session()->get('deposit_condition_date_from');
-            $condition_date_from      = $request->session()->get('deposit_condition_date_from');
-            $condition_date_to        = $request->session()->get('deposit_condition_date_to');
-            $condition_company_code   = $request->session()->get('deposit_condition_company_code');
-            $condition_company_id     = $request->session()->get('deposit_condition_company_id');
-            $condition_company_text   = $request->session()->get('deposit_condition_company_text');
+            $condition_id                 = $request->session()->get('deposit_condition_id');
+            $condition_date_type          = $request->session()->get('deposit_condition_date_type');
+            $condition_date_from          = $request->session()->get('deposit_condition_date_from');
+            $condition_date_to            = $request->session()->get('deposit_condition_date_to');
+            $condition_company_code       = $request->session()->get('deposit_condition_company_code');
+            $condition_company_id         = $request->session()->get('deposit_condition_company_id');
+            $condition_company_text       = $request->session()->get('deposit_condition_company_text');
+            $condition_owner_company_code = $request->session()->get('deposit_condition_owner_company_code');
+            $condition_owner_company_id   = $request->session()->get('deposit_condition_owner_company_id');
+            $condition_owner_company_text = $request->session()->get('deposit_condition_owner_company_text');
 
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
 
-                $condition_id           = $request->data['Deposit']['id'];
-                $condition_date_type    = $request->data['Deposit']['date_type'];
-                $condition_company_code = $request->data['Deposit']['deposit_company_code'];
-                $condition_company_id   = $request->data['Deposit']['deposit_company_id'];
-                $condition_company_text = $request->data['Deposit']['deposit_company_text'];
+                $condition_id                 = $request->data['Deposit']['id'];
+                $condition_date_type          = $request->data['Deposit']['date_type'];
+                $condition_company_code       = $request->data['Deposit']['deposit_company_code'];
+                $condition_company_id         = $request->data['Deposit']['deposit_company_id'];
+                $condition_company_text       = $request->data['Deposit']['deposit_company_text'];
+                $condition_owner_company_code = $request->data['Deposit']['deposit_owner_company_code'];
+                $condition_owner_company_id   = $request->data['Deposit']['deposit_owner_company_id'];
+                $condition_owner_company_text = $request->data['Deposit']['deposit_owner_company_text'];
 
                 // 日付の設定
                 $condition_date_from = $request->data['Deposit']['deposit_date_from'];
@@ -78,6 +84,9 @@ class DepositController extends Controller
                 $request->session()->put('deposit_condition_company_code', $condition_company_code);
                 $request->session()->put('deposit_condition_company_id', $condition_company_id);
                 $request->session()->put('deposit_condition_company_text', $condition_company_text);
+                $request->session()->put('deposit_condition_owner_company_code', $condition_owner_company_code);
+                $request->session()->put('deposit_condition_owner_company_id', $condition_owner_company_id);
+                $request->session()->put('deposit_condition_owner_company_text', $condition_owner_company_text);
 
             } else { // リセットボタンが押された時の処理
 
@@ -85,20 +94,22 @@ class DepositController extends Controller
                 $condition_date_type      = null;
                 $condition_date_from      = null;
                 $condition_date_to        = null;
-                $condition_sale_date_from = null;
-                $condition_sale_date_to   = null;
                 $condition_company_code   = null;
                 $condition_company_id     = null;
                 $condition_company_text   = null;
+                $condition_owner_company_code = null;
+                $condition_owner_company_id = null;
+                $condition_owner_company_text = null;
                 $request->session()->forget('deposit_condition_id');
                 $request->session()->forget('deposit_condition_date_type');
                 $request->session()->forget('deposit_condition_date_from');
                 $request->session()->forget('deposit_condition_date_to');
-                $request->session()->forget('deposit_condition_sale_date_from');
-                $request->session()->forget('deposit_condition_sale_date_to');
                 $request->session()->forget('deposit_condition_company_code');
                 $request->session()->forget('deposit_condition_company_id');
                 $request->session()->forget('deposit_condition_company_text');
+                $request->session()->forget('deposit_condition_owner_company_code');
+                $request->session()->forget('deposit_condition_owner_company_id');
+                $request->session()->forget('deposit_condition_owner_company_text');
 
             }
         }
@@ -114,10 +125,15 @@ class DepositController extends Controller
                 'Deposit.sale_to_date        AS sale_to_date',
                 'Deposit.amount              AS amount',
                 'Deposit.deposit_submit_type AS deposit_submit_type',
-                'SaleCompany.name            AS sale_company_name'
+                'SaleCompany.name            AS sale_company_name',
+                'OwnerCompany.name           AS owner_company_name',
+                'Deposit.owner_company_id'
             )
-            ->join('sale_companies AS SaleCompany', function ($join) {
+            ->leftJoin('sale_companies AS SaleCompany', function ($join) {
                 $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
+            })
+            ->leftJoin('owner_companies AS OwnerCompany', function ($join) {
+                $join->on('OwnerCompany.id', '=', 'Deposit.owner_company_id');
             })
             ->if(!empty($condition_date_from) && !empty($condition_date_to) && $condition_date_type == 1, function ($query) use ($condition_date_from, $condition_date_to) {
                 return $query->whereBetween('Deposit.date', [$condition_date_from, $condition_date_to]);
@@ -133,6 +149,9 @@ class DepositController extends Controller
             })
             ->if(!empty($condition_id), function ($query) use ($condition_id) {
                 return $query->where('Deposit.id', '=', $condition_id);
+            })
+            ->if(!empty($condition_owner_company_id), function ($query) use ($condition_owner_company_id) {
+                return $query->where('Deposit.owner_company_id', '=', $condition_owner_company_id);
             })
             ->where('Deposit.active', '=', '1')
             ->orderBy('Deposit.date', 'desc')
@@ -155,16 +174,19 @@ class DepositController extends Controller
         else  $check_str_slip_date = "checked";
 
         return view('Deposit.index')->with([
-            "search_action"            => $search_action,
-            "check_str_slip_date"      => $check_str_slip_date,
-            "check_str_deposit_date"   => $check_str_deposit_date,
-            "condition_id"             => $condition_id,
-            "condition_date_from"      => $condition_date_from,
-            "condition_date_to"        => $condition_date_to,
-            "condition_company_code"   => $condition_company_code,
-            "condition_company_id"     => $condition_company_id,
-            "condition_company_text"   => $condition_company_text,
-            "depositList"              => $depositList
+            "search_action"                => $search_action,
+            "check_str_slip_date"          => $check_str_slip_date,
+            "check_str_deposit_date"       => $check_str_deposit_date,
+            "condition_id"                 => $condition_id,
+            "condition_date_from"          => $condition_date_from,
+            "condition_date_to"            => $condition_date_to,
+            "condition_company_code"       => $condition_company_code,
+            "condition_company_id"         => $condition_company_id,
+            "condition_company_text"       => $condition_company_text,
+            "depositList"                  => $depositList,
+            "condition_owner_company_code" => $condition_owner_company_code,
+            "condition_owner_company_id"   => $condition_owner_company_id,
+            "condition_owner_company_text" => $condition_owner_company_text,
         ]);
     }
 
@@ -197,12 +219,26 @@ class DepositController extends Controller
             $depositDatas       = $request->data['Deposit'];
             $depositDetailDatas = $request->data['DepositDetail'];
 
+            // 本部企業毎 or 店舗毎を判定
+            $invoice_output_type = $depositDatas['invoice_output_type'];
+
+            // 初期化
+            $owner_company_id = null;
+            $sale_company_id  = null;
+
+            if ($invoice_output_type == "0") {
+                // 本部企業毎
+                $owner_company_id = $depositDatas['deposit_owner_id'];
+            } else {
+                // 店舗毎
+                $sale_company_id = $depositDatas['deposit_company_id'];
+            }
+
             // 入力値を配列に格納する
             $insertParams = array(
-                'sale_company_id'     => $depositDatas['deposit_company_id'],
-                'sale_shop_id'        => $depositDatas['deposit_shop_id'],
-                //'date'                => $depositDatas['deposit_date'],
-                'date'                => $depositDatas['payment_date'],// 入金日付には支払期限を入れる
+                'owner_company_id'    => $owner_company_id,
+                'sale_company_id'     => $sale_company_id,
+                'date'                => $depositDatas['payment_date'],            // 入金日付には支払期限を入れる
                 'sale_from_date'      => $depositDatas['sales_from_date'],
                 'sale_to_date'        => $depositDatas['sales_to_date'],
                 'payment_date'        => $depositDatas['payment_date'],
@@ -216,7 +252,7 @@ class DepositController extends Controller
                 'created_user_id'     => $user_info_id,
                 'created'             => Carbon::now(),
                 'modified_user_id'    => $user_info_id,
-                'modified'            => Carbon::now()
+                'modified'            => Carbon::now(),
             );
 
             $depositNewId = DB::table('deposits')->insertGetId($insertParams);
@@ -224,38 +260,27 @@ class DepositController extends Controller
             // --------------------------------------
             // 詳細テーブルに登録する(deposit_withdrawal_details)
             // --------------------------------------
+            $insertDetailParams = [];
             // sale_slip_idの数ループさせる
             foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
-
-                // 仕入伝票データ取得
-                $saleSlipDate    = $depositDetailDatas[$saleSlipId]['date'];
-                $notaxSubTotal8  = $depositDetailDatas[$saleSlipId]['notax_subTotal_8'];
-                $notaxSubTotal10 = $depositDetailDatas[$saleSlipId]['notax_subTotal_10'];
-                $subTotal        = $depositDetailDatas[$saleSlipId]['subTotal'];
-                $deliveryPrice   = $depositDetailDatas[$saleSlipId]['delivery_price'];
-                $adjustPrice     = $depositDetailDatas[$saleSlipId]['adjust_price'];
-                $total           = $depositDetailDatas[$saleSlipId]['total'];
-
-                // 登録データ格納
-                $insertDetailParams[] = array(
+                $insertDetailParams[] = [
                     'deposit_withdrawal_id'   => $depositNewId,
                     'supply_sale_slip_id'     => $saleSlipId,
-                    //'deposit_withdrawal_date' => $depositDatas['deposit_date'],
-                    'deposit_withdrawal_date' => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
-                    'supply_sale_slip_date'   => $saleSlipDate,
+                    'deposit_withdrawal_date' => $depositDatas['payment_date'],
+                    'supply_sale_slip_date'   => $depositDetailDatas[$saleSlipId]['date'],
                     'type'                    => 2,
-                    'notax_sub_total_8'       => $notaxSubTotal8,
-                    'notax_sub_total_10'      => $notaxSubTotal10,
-                    'sub_total'               => $subTotal,
-                    'delivery_price'          => $deliveryPrice,
-                    'adjust_price'            => $adjustPrice,
-                    'total'                   => $total,
+                    'notax_sub_total_8'       => $depositDetailDatas[$saleSlipId]['notax_subTotal_8'],
+                    'notax_sub_total_10'      => $depositDetailDatas[$saleSlipId]['notax_subTotal_10'],
+                    'sub_total'               => $depositDetailDatas[$saleSlipId]['subTotal'],
+                    'delivery_price'          => $depositDetailDatas[$saleSlipId]['delivery_price'],
+                    'adjust_price'            => $depositDetailDatas[$saleSlipId]['adjust_price'],
+                    'total'                   => $depositDetailDatas[$saleSlipId]['total'],
                     'active'                  => 1,
                     'created_user_id'         => $user_info_id,
                     'created'                 => Carbon::now(),
                     'modified_user_id'        => $user_info_id,
                     'modified'                => Carbon::now(),
-                );
+                ];
             }
 
             if (!empty($insertDetailParams)) {
@@ -266,16 +291,14 @@ class DepositController extends Controller
             // 売上データのフラグを売上済みにする
             // -----------------------------
             DB::table('sale_slips')
-            ->whereIn('id', $depositDetailDatas['sale_slip_ids'])
-            ->update(array('sale_flg' => 1));
+                ->whereIn('id', $depositDetailDatas['sale_slip_ids'])
+                ->update(array('sale_flg' => 1));
 
             // 問題なければコミット
             DB::connection()->commit();
 
         } catch (\Exception $e) {
-
             DB::rollback();
-
             dd($e);
         }
 
@@ -292,38 +315,39 @@ class DepositController extends Controller
         // 出金データ取得
         $depositDatas = DB::table('deposits AS Deposit')
         ->select(
-            'Deposit.id                  AS deposit_id',
-            'Deposit.date                AS deposit_date',
-            'Deposit.sale_from_date      AS sale_from_date',
-            'Deposit.sale_to_date        AS sale_to_date',
-            'Deposit.payment_date        AS payment_date',
-            'Deposit.sub_total           AS sub_total',
-            'Deposit.adjustment_amount   AS adjustment_amount',
-            'Deposit.amount              AS amount',
-            'Deposit.deposit_method_id   AS deposit_method_id',
-            'Deposit.staff_id            AS staff_id',
-            'Deposit.remarks             AS remarks',
-            'Deposit.deposit_submit_type AS deposit_submit_type',
-            'Deposit.sale_company_id     AS sale_company_id',
-            'Deposit.sale_shop_id        AS sale_shop_id',
-            'SaleCompany.name            AS sale_company_name',
-            'SaleCompany.code            AS sale_company_code',
-            'SaleCompany.tax_calc_type   AS sale_company_tax_calc_type',
-            'SaleShop.name               AS sale_shop_name',
-            'SaleShop.code               AS sale_shop_code',
-            'Staff.code                  AS staff_code'
+            'Deposit.id                       AS deposit_id',
+            'Deposit.date                     AS deposit_date',
+            'Deposit.sale_from_date           AS sale_from_date',
+            'Deposit.sale_to_date             AS sale_to_date',
+            'Deposit.payment_date             AS payment_date',
+            'Deposit.sub_total                AS sub_total',
+            'Deposit.adjustment_amount        AS adjustment_amount',
+            'Deposit.amount                   AS amount',
+            'Deposit.deposit_method_id        AS deposit_method_id',
+            'Deposit.staff_id                 AS staff_id',
+            'Deposit.remarks                  AS remarks',
+            'Deposit.deposit_submit_type      AS deposit_submit_type',
+            'Deposit.sale_company_id          AS sale_company_id',
+            'Deposit.owner_company_id         AS owner_company_id',
+            'SaleCompany.name                 AS sale_company_name',
+            'SaleCompany.code                 AS sale_company_code',
+            'SaleCompany.tax_calc_type        AS sale_company_tax_calc_type',
+            'Staff.code                       AS staff_code',
+            'OwnerCompany.name                AS owner_company_name',
+            'OwnerCompany.code                AS owner_company_code',
+            'OwnerCompany.invoice_output_type AS invoice_output_type'
         )
         ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
-        ->join('sale_companies AS SaleCompany', function ($join) {
+        ->leftJoin('sale_companies AS SaleCompany', function ($join) {
             $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
-        })
-        ->leftJoin('sale_shops as SaleShop', function ($join) {
-            $join->on('SaleShop.id', '=', 'Deposit.sale_shop_id')
-                 ->where('SaleShop.active', '=', true);
         })
         ->join('staffs as Staff', function ($join) {
             $join->on('Staff.id', '=', 'Deposit.staff_id')
                  ->where('Staff.active', '=', true);
+        })
+        ->leftJoin('owner_companies as OwnerCompany', function ($join) {
+            $join->on('OwnerCompany.id', '=', 'Deposit.owner_company_id')
+                 ->where('OwnerCompany.active', '=', true);
         })
         ->where([
             ['Deposit.id', '=', $deposit_id],
@@ -332,7 +356,7 @@ class DepositController extends Controller
         ->first();
 
         // 仕入データ取得
-        $saleSlipList = DB::table('sale_slips AS SaleSlip')
+        $saleSlipQuery = DB::table('sale_slips AS SaleSlip')
         ->select(
             'SaleSlip.id As id',
             'SaleSlip.date As date',
@@ -343,28 +367,43 @@ class DepositController extends Controller
             'SaleSlip.sale_flg As sale_flg'
         )
         ->whereBetween('SaleSlip.date', [$depositDatas->sale_from_date, $depositDatas->sale_to_date])
-        ->where([
-            ['SaleSlip.sale_company_id', '=', $depositDatas->sale_company_id],
-            ['SaleSlip.active', '=', '1']
-        ])
-        ->get();
+        ->where('SaleSlip.active', '=', '1');
+
+        if (!empty($depositDatas->owner_company_id)) {
+            // 本部企業の場合、関連する全売上先店舗を取得
+            $saleCompanyIds = DB::table('sale_companies')
+                ->where('owner_company_id', $depositDatas->owner_company_id)
+                ->where('active', true)
+                ->pluck('id')
+                ->toArray();
+
+            $saleSlipQuery->whereIn('SaleSlip.sale_company_id', $saleCompanyIds);
+        } else {
+            // 店舗単位
+            $saleSlipQuery->where('SaleSlip.sale_company_id', $depositDatas->sale_company_id);
+        }
+
+        $saleSlipList = $saleSlipQuery->get();
 
         // 出金詳細データ取得
-        $depositDetailDatas = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
-        ->select(
-            'DepositWithdrawalDetail.supply_sale_slip_id As sale_slip_id'
-        )
-        ->where([
-            ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $deposit_id],
-            ['DepositWithdrawalDetail.type', '=', '2'],
-            ['DepositWithdrawalDetail.active', '=', '1']
-        ])
-        ->get();
+        $depositDetailIds = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
+            ->where([
+                ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $deposit_id],
+                ['DepositWithdrawalDetail.type', '=', '2'],
+                ['DepositWithdrawalDetail.active', '=', '1']
+            ])
+            ->pluck('supply_sale_slip_id')
+            ->toArray();
 
         return view('Deposit.edit')->with([
             'depositDatas'       => $depositDatas,
             'saleSlipDatas'      => $saleSlipList,
-            'depositDetailDatas' => $depositDetailDatas,
+            'depositDetailDatas' => $depositDetailIds,
+            'targetType'         => !empty($depositDatas->owner_company_id) ? 'owner' : 'sale',
+            'targetName'         => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_name : $depositDatas->sale_company_name,
+            'targetCode'         => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_code : $depositDatas->sale_company_code,
+            'targetId'           => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_id : $depositDatas->sale_company_id,
+            'targetTaxCalcType'  => $depositDatas->sale_company_tax_calc_type ?? 0,
         ]);
     }
 
@@ -404,13 +443,11 @@ class DepositController extends Controller
                                 ['DepositWithdrawalDetail.active', '=', '1']
                             ]);
                 })
-                ->join('deposits AS Deposit', function ($join) {
-                    $join->on('Deposit.id', '=', 'DepositWithdrawalDetail.deposit_withdrawal_id')
-                            ->where('Deposit.active', '=', '1');
-                })
+                ->join('deposits AS Deposit', 'Deposit.id', '=', 'DepositWithdrawalDetail.deposit_withdrawal_id')
                 ->where([
                     ['Deposit.id', '=', $depositDatas['id']],
                     ['SaleSlip.active', '=', '1'],
+                    ['Deposit.active', '=', '1']
                 ])
                 ->get();
 
@@ -448,9 +485,8 @@ class DepositController extends Controller
 
                 // 入力値を配列に格納する
                 $updateParams = array(
+                    'owner_company_id'    => $depositDatas['deposit_owner_id'],
                     'sale_company_id'     => $depositDatas['deposit_company_id'],
-                    'sale_shop_id'        => $depositDatas['deposit_shop_id'],
-                    //'date'                => $depositDatas['deposit_date'],
                     'date'                => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
                     'sale_from_date'      => $depositDatas['sale_from_date'],
                     'sale_to_date'        => $depositDatas['sale_to_date'],
@@ -476,15 +512,15 @@ class DepositController extends Controller
                 // -------------------------------------
                 // データ削除前に支払フラグ戻すように仕入IDを取得しておく
                 $delBeforeSaleSlipIds = DB::table('deposit_withdrawal_details AS DepositWithdrawalDetail')
-                ->select(
-                    'DepositWithdrawalDetail.supply_sale_slip_id As sale_slip_id'
-                )
-                ->where([
-                    ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $depositDatas['id']],
-                    ['DepositWithdrawalDetail.type', '=', '2'],
-                    ['DepositWithdrawalDetail.active', '=', '1']
-                ])
-                ->get();
+                    ->select(
+                        'DepositWithdrawalDetail.supply_sale_slip_id As sale_slip_id'
+                    )
+                    ->where([
+                        ['DepositWithdrawalDetail.deposit_withdrawal_id', '=', $depositDatas['id']],
+                        ['DepositWithdrawalDetail.type', '=', '2'],
+                        ['DepositWithdrawalDetail.active', '=', '1']
+                    ])
+                    ->get();
 
                 // データ削除
                 \App\DepositWithdrawalDetail::where('deposit_withdrawal_id', $depositDatas['id'])->delete();
@@ -494,36 +530,26 @@ class DepositController extends Controller
                 // -------
                 // sale_slip_idの数ループさせる
                 if (isset($depositDetailDatas['sale_slip_ids'])) {
+                    $insertDetailParams = [];
                     foreach ($depositDetailDatas['sale_slip_ids'] as $saleSlipId) {
-                        // 仕入伝票データ取得
-                        $saleSlipDate    = $depositDetailDatas[$saleSlipId]['date'];
-                        $notaxSubTotal8  = $depositDetailDatas[$saleSlipId]['notax_subTotal_8'];
-                        $notaxSubTotal10 = $depositDetailDatas[$saleSlipId]['notax_subTotal_10'];
-                        $subTotal        = $depositDetailDatas[$saleSlipId]['subTotal'];
-                        $deliveryPrice   = $depositDetailDatas[$saleSlipId]['delivery_price'];
-                        $adjustPrice     = $depositDetailDatas[$saleSlipId]['adjust_price'];
-                        $total           = $depositDetailDatas[$saleSlipId]['total'];
-
-                        // 登録データ格納
-                        $insertDetailParams[] = array(
+                        $insertDetailParams[] = [
                             'deposit_withdrawal_id'   => $depositDatas['id'],
                             'supply_sale_slip_id'     => $saleSlipId,
-                            // 'deposit_withdrawal_date' => $depositDatas['deposit_date'],
-                            'deposit_withdrawal_date' => $depositDatas['payment_date'], // 入金日付には支払期限を入れる
-                            'supply_sale_slip_date'   => $saleSlipDate,
+                            'deposit_withdrawal_date' => $depositDatas['payment_date'],
+                            'supply_sale_slip_date'   => $depositDetailDatas[$saleSlipId]['date'],
                             'type'                    => 2,
-                            'notax_sub_total_8'       => $notaxSubTotal8,
-                            'notax_sub_total_10'      => $notaxSubTotal10,
-                            'sub_total'               => $subTotal,
-                            'delivery_price'          => $deliveryPrice,
-                            'adjust_price'            => $adjustPrice,
-                            'total'                   => $total,
+                            'notax_sub_total_8'       => $depositDetailDatas[$saleSlipId]['notax_subTotal_8'],
+                            'notax_sub_total_10'      => $depositDetailDatas[$saleSlipId]['notax_subTotal_10'],
+                            'sub_total'               => $depositDetailDatas[$saleSlipId]['subTotal'],
+                            'delivery_price'          => $depositDetailDatas[$saleSlipId]['delivery_price'],
+                            'adjust_price'            => $depositDetailDatas[$saleSlipId]['adjust_price'],
+                            'total'                   => $depositDetailDatas[$saleSlipId]['total'],
                             'active'                  => 1,
                             'created_user_id'         => $user_info_id,
                             'created'                 => Carbon::now(),
                             'modified_user_id'        => $user_info_id,
                             'modified'                => Carbon::now(),
-                        );
+                        ];
                     }
                 }
 
@@ -687,63 +713,49 @@ class DepositController extends Controller
     public function AjaxSearchSaleSlips(Request $request) {
 
         // 入力された値を取得
-        $saleFromDate  = $request->sales_from_date;
-        $saleToDate    = $request->sales_to_date;
-        $saleCompany   = $request->sales_company;
-        $searchDateVal = $request->search_date_val;
-        $action        = $request->action;
+        $saleFromDate     = $request->sales_from_date;
+        $saleToDate       = $request->sales_to_date;
+        $saleCompanyId    = $request->sale_company_id;
+        $ownerCompanyId   = $request->owner_company_id;
+        $searchDateVal    = $request->search_date_val;
+        $action           = $request->action;
 
         // 入力された値のチェック
-        if (empty($saleFromDate) && empty($saleToDate)) {
-            return false;
-        }
-
-        if (empty($saleCompany)) {
-            return false;
-        }
+        if (empty($saleFromDate) && empty($saleToDate)) return false;
 
         // どちらか片方にしか日付が入っていない場合は入っている方の日付と同じ日付を設定する
-        if (!empty($saleFromDate) && empty($saleToDate)) {
-            $saleToDate = $saleFromDate;
-        }
+        if (!empty($saleFromDate) && empty($saleToDate)) $saleToDate = $saleFromDate;
+        if (empty($saleFromDate) && !empty($saleToDate)) $saleFromDate = $saleToDate;
 
-        if (empty($saleFromDate) && !empty($saleToDate)) {
-            $saleFromDate = $saleToDate;
-        }
+        // 本部か店舗かでクエリを変える
+        $query = DB::table('sale_slips AS SaleSlip')
+            ->select(
+                'SaleSlip.id As id',
+                'SaleSlip.date As date',
+                'SaleSlip.notax_sub_total_8 As notax_sub_total_8',
+                'SaleSlip.notax_sub_total_10 As notax_sub_total_10',
+                'SaleSlip.delivery_price As delivery_price',
+                'SaleSlip.adjust_price As adjust_price'
+            )
+            ->join('sale_companies AS SaleCompany', 'SaleCompany.id', '=', 'SaleSlip.sale_company_id')
+            ->where('SaleSlip.deposit_flg', '=', '0')
+            ->where('SaleSlip.active', '=', '1');
 
-        if ($action == 'edit') {
-            $whereArray = [
-                ['SaleSlip.sale_company_id', '=', $saleCompany],
-                ['SaleSlip.deposit_flg', '=', '0'],
-                ['SaleSlip.active', '=', '1']
-            ];
+        if ($ownerCompanyId) {
+            $query->where('SaleCompany.owner_company_id', '=', $ownerCompanyId);
+        } elseif ($saleCompanyId) {
+            $query->where('SaleSlip.sale_company_id', '=', $saleCompanyId);
         } else {
-            $whereArray = [
-                ['SaleSlip.sale_company_id', '=', $saleCompany],
-                //['SaleSlip.sale_flg', '=', '0'], 現状出力した明細も出すようにする
-                ['SaleSlip.deposit_flg', '=', '0'],
-                ['SaleSlip.active', '=', '1']
-            ];
+            return false;
         }
 
-        // 対象日付から売上伝票を取得
-        $saleSlipList = DB::table('sale_slips AS SaleSlip')
-        ->select(
-            'SaleSlip.id As id',
-            'SaleSlip.date As date',
-            'SaleSlip.notax_sub_total_8 As notax_sub_total_8',
-            'SaleSlip.notax_sub_total_10 As notax_sub_total_10',
-            'SaleSlip.delivery_price As delivery_price',
-            'SaleSlip.adjust_price As adjust_price'
-        )
-        ->if($searchDateVal == 1, function ($query) use ($saleFromDate, $saleToDate){
-            return $query->whereBetween('SaleSlip.date', [$saleFromDate, $saleToDate]);
-        })
-        ->if($searchDateVal == 2, function ($query) use ($saleFromDate, $saleToDate){
-            return $query->whereBetween('SaleSlip.delivery_date', [$saleFromDate, $saleToDate]);
-        })
-        ->where($whereArray)
-        ->get();
+        if ($searchDateVal == 1) {
+            $query->whereBetween('SaleSlip.date', [$saleFromDate, $saleToDate]);
+        } else if ($searchDateVal == 2) {
+            $query->whereBetween('SaleSlip.delivery_date', [$saleFromDate, $saleToDate]);
+        }
+
+        $saleSlipList = $query->get();
 
         // 取得してきたデータを計算してHTMLを形成
         // HTML格納変数初期化
@@ -835,109 +847,136 @@ class DepositController extends Controller
      */
     public function invoiceOutput($depositId) {
 
-        // 請求情報を取得
+        // ------------------------------
+        // 1. 出力基準を取得（owner_companies.invoice_output_type）
+        // ------------------------------
+        $depositMeta = DB::table('deposits AS Deposit')
+            ->select(
+                'Deposit.sale_company_id',
+                'Deposit.owner_company_id',
+                'OwnerCompany.invoice_output_type'
+            )
+            ->leftJoin('owner_companies AS OwnerCompany', 'OwnerCompany.id', '=', 'Deposit.owner_company_id')
+            ->where('Deposit.id', $depositId)
+            ->first();
+
+        // 請求書出力フラグ
+        $invoiceOutputType = $depositMeta->invoice_output_type ?? 1;
+
+        // ------------------------------
+        // 2. 請求情報を取得（出力基準に応じて企業情報を切り替え）
+        // ------------------------------
         $depositList = DB::table('deposits AS Deposit')
-        ->select(
-            'Deposit.id                                  AS deposit_id',
-            'Deposit.payment_date                        AS payment_date',
-            'Deposit.adjustment_amount                   AS deposit_adjust_price',
-            'Deposit.remarks                             AS remarks',
-            'Deposit.sale_from_date                      AS sale_from_date',
-            'Deposit.sale_to_date                        AS sale_to_date',
-            'DepositWithdrawalDetail.supply_sale_slip_id AS sale_slip_id',
-            'DepositWithdrawalDetail.delivery_price      AS delivery_price',
-            'DepositWithdrawalDetail.adjust_price        AS sale_adjust_price',
-            'SaleCompany.id                              AS company_id',
-            'SaleCompany.name                            AS company_name',
-            'SaleCompany.postal_code                     AS company_postal_code',
-            'SaleCompany.address                         AS company_address',
-            'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
-            'SaleCompany.invoice_display_name            AS company_invoice_display_name',
-            'SaleCompany.invoice_display_address         AS company_invoice_display_address',
-            'SaleCompany.invoice_display_postal_code     AS company_invoice_display_postal_code',
-            'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
-            'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
-            'SaleSlipDetail.unit_price                   AS unit_price',
-            'SaleSlipDetail.unit_num                     AS unit_num',
-            'SaleSlipDetail.notax_price                  AS notax_price',
-            'SaleSlipDetail.memo                         AS memo',
-            'Product.name                                AS product_name',
-            'Product.tax_id                              AS tax_id',
-            'Unit.name                                   AS unit_name',
-            'OriginArea.name                             AS origin_name',
-        )
-        ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
-        ->join('sale_companies AS SaleCompany', function ($join) {
-            $join->on('SaleCompany.id', '=', 'Deposit.sale_company_id');
-        })
-        ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
-            $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
-                 ->where('DepositWithdrawalDetail.type', '=', '2'); // 入出金タイプ 1:出金, 2:入金
-        })
-        ->join('sale_slips AS SaleSlip', function ($join) {
-            $join->on('DepositWithdrawalDetail.supply_sale_slip_id', '=', 'SaleSlip.id');
-        })
-        ->join('sale_slip_details AS SaleSlipDetail', function ($join) {
-            $join->on('SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
-                 ->where('DepositWithdrawalDetail.type', '=', '2');
-        })
-        ->join('products AS Product', function ($join) {
-            $join->on('SaleSlipDetail.product_id', '=', 'Product.id');
-        })
-        ->join('units AS Unit', function ($join) {
-            $join->on('Product.unit_id', '=', 'Unit.id');
-        })
-        ->leftJoin('origin_areas as OriginArea', function ($join) {
-            $join->on('OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
-                 ->where('OriginArea.active', '=', true);
-        })
-        ->where([
-            ['Deposit.id', '=', $depositId],
-            ['Deposit.active', '=', '1']
-        ])
-        ->orderBy('SaleSlip.delivery_date', 'asc')
-        ->orderBy('SaleSlip.id', 'asc')
-        ->orderBy('SaleSlipDetail.sort', 'asc')
-        ->get();
+            ->select(
+                'Deposit.id                                  AS deposit_id',
+                'Deposit.payment_date                        AS payment_date',
+                'Deposit.adjustment_amount                   AS deposit_adjust_price',
+                'Deposit.remarks                             AS remarks',
+                'Deposit.sale_from_date                      AS sale_from_date',
+                'Deposit.sale_to_date                        AS sale_to_date',
+                'DepositWithdrawalDetail.supply_sale_slip_id AS sale_slip_id',
+                'DepositWithdrawalDetail.delivery_price      AS delivery_price',
+                'DepositWithdrawalDetail.adjust_price        AS sale_adjust_price',
 
-        // ------------------------
-        // 企業情報を取得する
-        // ------------------------
-        $companyDatas = CompanySetting::getCompanyData();
+                // 本部企業用
+                'OwnerCompany.id                             AS owner_company_id',
+                'OwnerCompany.name                           AS owner_name',
+                'OwnerCompany.postal_code                    AS owner_postal_code',
+                'OwnerCompany.address                        AS owner_address',
+                'OwnerCompany.invoice_display_name           AS owner_invoice_display_name',
+                'OwnerCompany.invoice_display_postal_code    AS owner_invoice_display_postal_code',
+                'OwnerCompany.invoice_display_address        AS owner_invoice_display_address',
+                'OwnerCompany.invoice_display_flg            AS owner_invoice_display_flg',
 
-        // ------------------------
-        // 取得してきたデータを整形する
-        // ------------------------
+                // 売上先店舗用
+                'SaleCompany.id                              AS company_id',
+                'SaleCompany.name                            AS company_name',
+                'SaleCompany.postal_code                     AS company_postal_code',
+                'SaleCompany.address                         AS company_address',
+                'SaleCompany.invoice_display_name            AS company_invoice_display_name',
+                'SaleCompany.invoice_display_postal_code     AS company_invoice_display_postal_code',
+                'SaleCompany.invoice_display_address         AS company_invoice_display_address',
+                'SaleCompany.invoice_display_flg             AS company_invoice_display_flg',
+                'SaleCompany.tax_calc_type                   AS company_tax_calc_type',
 
-        // 請求元企業情報の整形
-        // 初期化
-        $companyInfo = array();
-        $bank_type = array(
-            1 => '普通',
-            2 => '当座',
-            3 => 'その他',
-        );
+                // 明細関連
+                'SaleSlipDetail.inventory_unit_num           AS inventory_unit_num',
+                'SaleSlipDetail.unit_price                   AS unit_price',
+                'SaleSlipDetail.unit_num                     AS unit_num',
+                'SaleSlipDetail.notax_price                  AS notax_price',
+                'SaleSlipDetail.memo                         AS memo',
+                'Product.name                                AS product_name',
+                'Product.tax_id                              AS tax_id',
+                'Unit.name                                   AS unit_name',
+                'OriginArea.name                             AS origin_name'
+            )
+            ->selectRaw('DATE_FORMAT(SaleSlip.delivery_date, "%m/%d") AS sale_slip_delivery_date')
+            ->join('deposit_withdrawal_details AS DepositWithdrawalDetail', function ($join) {
+                $join->on('DepositWithdrawalDetail.deposit_withdrawal_id', '=', 'Deposit.id')
+                    ->where('DepositWithdrawalDetail.type', '=', '2');
+            })
+            ->join('sale_slips AS SaleSlip', 'SaleSlip.id', '=', 'DepositWithdrawalDetail.supply_sale_slip_id')
+            ->join('sale_slip_details AS SaleSlipDetail', 'SaleSlipDetail.sale_slip_id', '=', 'SaleSlip.id')
+            ->join('products AS Product', 'SaleSlipDetail.product_id', '=', 'Product.id')
+            ->join('units AS Unit', 'Product.unit_id', '=', 'Unit.id')
+            ->leftJoin('origin_areas AS OriginArea', 'OriginArea.id', '=', 'SaleSlipDetail.origin_area_id')
+            ->leftJoin('sale_companies AS SaleCompany', 'SaleCompany.id', '=', 'Deposit.sale_company_id')
+            ->leftJoin('owner_companies AS OwnerCompany', 'OwnerCompany.id', '=', 'Deposit.owner_company_id')
+            ->where('Deposit.id', $depositId)
+            ->where('Deposit.active', 1)
+            ->orderBy('SaleSlip.delivery_date')
+            ->orderBy('SaleSlip.id')
+            ->orderBy('SaleSlipDetail.sort')
+            ->get();
 
-        $companyInfo['name']            = empty($companyDatas[0]->name)            ? '' : $companyDatas[0]->name;
-        $companyInfo['address']         = empty($companyDatas[0]->address)         ? '' : $companyDatas[0]->address;
-        $companyInfo['office_tel']      = empty($companyDatas[0]->office_tel)      ? '' : $companyDatas[0]->office_tel;
-        $companyInfo['office_fax']      = empty($companyDatas[0]->office_fax)      ? '' : $companyDatas[0]->office_fax;
-        $companyInfo['shop_tel']        = empty($companyDatas[0]->shop_tel)        ? '' : $companyDatas[0]->shop_tel;
-        $companyInfo['shop_fax']        = empty($companyDatas[0]->shop_fax)        ? '' : $companyDatas[0]->shop_fax;
-        $companyInfo['invoice_form_id'] = empty($companyDatas[0]->invoice_form_id) ? '' : $companyDatas[0]->invoice_form_id;
-        $companyInfo['bank_name']       = empty($companyDatas[0]->bank_name)       ? '' : $companyDatas[0]->bank_name;
-        $companyInfo['branch_name']     = empty($companyDatas[0]->branch_name)     ? '' : $companyDatas[0]->branch_name;
-        $companyInfo['bank_type']       = empty($companyDatas[0]->bank_type)       ? '' : $bank_type[$companyDatas[0]->bank_type];
-        $companyInfo['bank_account']    = empty($companyDatas[0]->bank_account)    ? '' : $companyDatas[0]->bank_account;
-        $companyInfo['company_image']   = empty($companyDatas[0]->company_image)   ? '' : $companyDatas[0]->company_image;
+        // ------------------------------
+        // 3. 出力基準企業の情報を設定
+        // ------------------------------
+        $row = $depositList->first();
+        $displayName            = $invoiceOutputType == 0 ? $row->owner_name : $row->company_name;
+        $displayAddress         = $invoiceOutputType == 0 ? $row->owner_address : $row->company_address;
+        $displayPostalCode      = $invoiceOutputType == 0 ? $row->owner_postal_code : $row->company_postal_code;
+        $displayFlg             = $invoiceOutputType == 0 ? $row->owner_invoice_display_flg : $row->company_invoice_display_flg;
+        $displayOverrideName    = $invoiceOutputType == 0 ? $row->owner_invoice_display_name : $row->company_invoice_display_name;
+        $displayOverrideAddress = $invoiceOutputType == 0 ? $row->owner_invoice_display_address : $row->company_invoice_display_address;
+        $displayOverridePostal  = $invoiceOutputType == 0 ? $row->owner_invoice_display_postal_code : $row->company_invoice_display_postal_code;
 
-        // 郵便番号は間にハイフンを入れる
-        if (!empty($companyDatas[0]->postal_code)) {
-            $codeBefore = substr($companyDatas[0]->postal_code, 0, 3);
-            $codeAfter  = substr($companyDatas[0]->postal_code, 3, 4);
-            $companyInfo['postal_code'] = $codeBefore . '-' . $codeAfter;
+        if ($displayFlg) {
+            if (!empty($displayOverrideName)) $displayName = $displayOverrideName;
+            if (!empty($displayOverrideAddress)) $displayAddress = $displayOverrideAddress;
+            if (!empty($displayOverridePostal)) $displayPostalCode = $displayOverridePostal;
         }
 
+        $postal_code = '';
+        if (!empty($displayPostalCode)) {
+            $postal_code = substr($displayPostalCode, 0, 3) . '-' . substr($displayPostalCode, 3);
+        }
+
+        // ------------------------------
+        // 4. 請求元（自社）企業情報取得
+        // ------------------------------
+        $companyDatas = CompanySetting::getCompanyData();
+        $bank_type = [1 => '普通', 2 => '当座', 3 => 'その他'];
+
+        $companyInfo = [
+            'name'            => $companyDatas[0]->name ?? '',
+            'address'         => $companyDatas[0]->address ?? '',
+            'postal_code'     => !empty($companyDatas[0]->postal_code) ? substr($companyDatas[0]->postal_code, 0, 3) . '-' . substr($companyDatas[0]->postal_code, 3) : '',
+            'office_tel'      => $companyDatas[0]->office_tel ?? '',
+            'office_fax'      => $companyDatas[0]->office_fax ?? '',
+            'shop_tel'        => $companyDatas[0]->shop_tel ?? '',
+            'shop_fax'        => $companyDatas[0]->shop_fax ?? '',
+            'invoice_form_id' => $companyDatas[0]->invoice_form_id ?? '',
+            'bank_name'       => $companyDatas[0]->bank_name ?? '',
+            'branch_name'     => $companyDatas[0]->branch_name ?? '',
+            'bank_type'       => isset($companyDatas[0]->bank_type) ? $bank_type[$companyDatas[0]->bank_type] : '',
+            'bank_account'    => $companyDatas[0]->bank_account ?? '',
+            'company_image'   => $companyDatas[0]->company_image ?? '',
+        ];
+
+        // ------------------------------
+        // 5. 明細計算処理など（元コードと同様に続く）
+        // ------------------------------
         // 初期化処理
         $calcDepositList = array();
         $companyTaxCalcType = 0;
@@ -974,7 +1013,7 @@ class DepositController extends Controller
             $prev_thedate = $depositDatas->sale_slip_delivery_date;
             $thedate_subtotal += $depositDatas->notax_price;
 
-             // 税計算種別が0:伝票ごとの場合
+            // 税計算種別が0:伝票ごとの場合
             if (
                 $companyTaxCalcType == 0 &&
                 !empty($prev_sale_slip_id) &&
@@ -994,18 +1033,29 @@ class DepositController extends Controller
             // 企業情報格納
             if (!isset($calcDepositList['company_info'])) {
 
-                if (isset($depositDatas->shop_name) && !empty($depositDatas->shop_name)) { // 店舗情報がる場合はこちらを入れる
+                if (isset($depositDatas->owner_name) && !empty($depositDatas->owner_name)) { // 本部情報がある場合はこちらを入れる
 
-                    $companyId = $depositDatas->company_id; // ブラウザ名になるので店舗の場合でもこちらを入れる
-                    $calcDepositList['company_info']['name']    = $depositDatas->shop_name;
-                    $company_name                               = $depositDatas->shop_name;
-                    $calcDepositList['company_info']['address'] = $depositDatas->shop_address;
+                    $companyId = $depositDatas->owner_company_id;
+                    $calcDepositList['company_info']['name']    = $depositDatas->owner_name;
+                    $company_name                               = $depositDatas->owner_name;
+                    $calcDepositList['company_info']['address'] = $depositDatas->owner_address;
                     // 郵便番号は間にハイフンを入れる
                     $calcDepositList['company_info']['code'] = '';
-                    if (!empty($depositDatas->shop_postal_code)) {
-                        $codeBefore = substr($depositDatas->shop_postal_code, 0, 3);
-                        $codeAfter  = substr($depositDatas->shop_postal_code, 3, 4);
+                    if (!empty($depositDatas->owner_postal_code)) {
+                        $codeBefore = substr($depositDatas->owner_postal_code, 0, 3);
+                        $codeAfter  = substr($depositDatas->owner_postal_code, 3, 4);
                         $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                    }
+                    // 請求書用フラグが有効の場合は請求書用の名前、郵便番号、住所を使用する
+                    if ($depositDatas->owner_invoice_display_flg) {
+                        $calcDepositList['company_info']['name'] = $depositDatas->owner_invoice_display_name;
+                        $calcDepositList['company_info']['address'] = $depositDatas->owner_invoice_display_address;
+                        // 郵便番号は間にハイフンを入れる
+                        if (!empty($depositDatas->owner_invoice_display_postal_code)) {
+                            $codeBefore = substr($depositDatas->owner_invoice_display_postal_code, 0, 3);
+                            $codeAfter  = substr($depositDatas->owner_invoice_display_postal_code, 3, 4);
+                            $calcDepositList['company_info']['code'] = '〒' . $codeBefore . '-' . $codeAfter;
+                        }
                     }
 
                 } else {
@@ -1202,9 +1252,7 @@ class DepositController extends Controller
             }
         }
 
-        // テスト用
-        //return view('pdf.pdf_tamplate')->with(['depositList'=> $calcDepositList]);
-
+        // 最後にPDF出力処理
         $pdf = \PDF::view('pdf.pdf_tamplate', [
             'depositList' => $calcDepositList,
             'companyInfo' => $companyInfo
@@ -1216,8 +1264,104 @@ class DepositController extends Controller
         ->setOption('footer-html', view('pdf.pdfFooter', [
             'company_name' => $calcDepositList['company_info']['name']
         ]));
-        return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
+
+        return $pdf->inline('invoice_paymentDate' . '_' . $companyId .'.pdf');    //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード
+
+    }
+
+    /**
+     * 本部企業更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxSetOwnerCompany(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // すべて数字かどうかチェック
+        if (is_numeric($input_text)) {
+            $input_code = $input_text;
+            $input_name = null;
+        } else {
+            $input_code = null;
+            $input_name = $input_text;
+        }
+
+        // 初期化
+        $output_code = null;
+        $output_id   = null;
+        $output_name = null;
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            // 製品一覧を取得
+            $ownerComapnyList = DB::table('owner_companies AS OwnerCompany')
+            ->select(
+                'OwnerCompany.code AS code',
+                'OwnerCompany.id   AS id',
+                'OwnerCompany.name AS name'
+            )
+            ->if(!empty($input_code), function ($query) use ($input_code) {
+                return $query->where('OwnerCompany.code', '=', $input_code);
+            })
+            ->if(!empty($input_name), function ($query) use ($input_name) {
+                return $query->where('OwnerCompany.name', 'like', $input_name);
+            })
+            ->first();
+
+            if (!empty($ownerComapnyList)) {
+                $output_code = $ownerComapnyList->code;
+                $output_id   = $ownerComapnyList->id;
+                $output_name = $ownerComapnyList->name;
+            }
+        }
+
+        $returnArray = array($output_code, $output_id, $output_name);
+
+        return json_encode($returnArray);
+    }
+
+    /**
+     * 本部企業ID更新時のAjax処理
+     *
+     * @return \Illuminate\Contracts\Support\Renderable
+     */
+    public function AjaxAutoCompleteOwnerCompany(Request $request)
+    {
+        // 入力された値を取得
+        $input_text = $request->inputText;
+
+        // 入力候補を初期化
+        $auto_complete_array = array();
+
+        if (!empty($input_text)) {
+
+            // 製品DB取得
+            $ownerCompanyList = DB::table('owner_companies AS OwnerCompany')
+            ->select(
+                'OwnerCompany.name AS owner_company_name'
+            )->where([
+                    ['OwnerCompany.active', '=', '1'],
+            ])->where(function($query) use ($input_text){
+                $query
+                ->orWhere('OwnerCompany.name', 'like', "%{$input_text}%")
+                ->orWhere('OwnerCompany.yomi', 'like', "%{$input_text}%");
+            })
+            ->get();
+
+            if (!empty($ownerCompanyList)) {
+
+                foreach ($ownerCompanyList as $owner_company_val) {
+
+                    array_push($auto_complete_array, $owner_company_val->owner_company_name);
+                }
+            }
+        }
+
+        return json_encode($auto_complete_array);
     }
 
 }

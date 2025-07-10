@@ -24,7 +24,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">取引先企業</div>
+                                <div class="table-th">取引先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[OrderSupplyUnitPrice][supply_company_code]" value="{{$condition_company_code}}" tabindex="3">
                                     <input type="hidden" id="supply_company_id" name="data[OrderSupplyUnitPrice][supply_company_id]" value="{{$condition_company_id}}">
@@ -32,21 +32,9 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[OrderSupplyUnitPrice][supply_company_text]" value="{{$condition_company_text}}" readonly>
                                 </div>
-                                <div class="table-th">取引先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[OrderSupplyUnitPrice][supply_shop_code]" value="{{$condition_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="supply_shop_id" name="data[OrderSupplyUnitPrice][supply_shop_id]" value="{{$condition_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[OrderSupplyUnitPrice][supply_shop_text]" value="{{$condition_shop_text}}" readonly>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
                                 <div class="table-th">仕入製品</div>
                                 <div class="table-td table-code-td">
-                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[OrderSupplyUnitPrice][product_code]" value="{{$condition_product_code}}" tabindex="5">
+                                    <input type="text" class="search-control product_code_input" id="product_code" name="data[OrderSupplyUnitPrice][product_code]" value="{{$condition_product_code}}" tabindex="4">
                                     <input type="hidden" id="product_id" name="data[OrderSupplyUnitPrice][product_id]" value="{{$condition_product_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
@@ -136,9 +124,9 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 検索されて選択状態の企業を取得
+            // 検索されて選択状態の店舗を取得
             var supply_submit_type_selected = $("#supply_submit_type_selected").val();
-            // 検索条件で設定された企業を設定
+            // 検索条件で設定された店舗を設定
             $('#supply_submit_type').val(supply_submit_type_selected);
 
             //-------------------------------------
@@ -208,7 +196,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入企業ID
+            // autocomplete処理 仕入店舗ID
             //-------------------------------------
             $(".supply_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -217,32 +205,6 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSupplyCompany",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 仕入店舗ID
-            //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSupplyShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -304,33 +266,13 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/supply_company/)) { // 仕入先企業
+                if (selector_code.match(/supply_company/)) { // 仕入先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
                             url: "./AjaxSetSupplyCompany",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSupplyShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,

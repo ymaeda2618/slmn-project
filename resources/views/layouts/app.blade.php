@@ -11,7 +11,7 @@
     <title>{{ config('app.name', 'Mizucho System') }}</title>
 
     <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}" defer></script>
+    <script src="{{ asset('js/app.js') }}"></script>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
@@ -79,10 +79,9 @@
                                 </a>
                             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                                 @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}ProductCreate" class="dropdown-item">製品登録</a> @endif
-                                <a href="{{ asset('/') }}ProductIndex" class="dropdown-item">製品一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyCompanyCreate" class="dropdown-item">仕入先企業登録</a> @endif
-                                <a href="{{ asset('/') }}SupplyCompanyIndex" class="dropdown-item">仕入先企業一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleCompanyCreate" class="dropdown-item">売上先企業登録</a> @endif
-                                <a href="{{ asset('/') }}SaleCompanyIndex" class="dropdown-item">売上先企業一覧</a>
-                                @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}CompanySettingIndex" class="dropdown-item">企業情報登録</a> @endif
+                                <a href="{{ asset('/') }}ProductIndex" class="dropdown-item">製品一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SupplyCompanyCreate" class="dropdown-item">仕入先店舗登録</a> @endif
+                                <a href="{{ asset('/') }}SupplyCompanyIndex" class="dropdown-item">仕入先店舗一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}SaleCompanyCreate" class="dropdown-item">売上先店舗登録</a> @endif
+                                <a href="{{ asset('/') }}SaleCompanyIndex" class="dropdown-item">売上先店舗一覧</a> @if (Home::authOwnerCheck()) <a href="{{ asset('/') }}CompanySettingIndex" class="dropdown-item">企業情報登録</a> @endif
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -111,11 +110,14 @@
             @yield('content')
         </main>
     </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Popper -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+    <!-- スクリプトをここでまとめて呼び出す -->
+    @stack('scripts')
+
 </body>
-<!-- jQuery読み込み -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<!-- PopperのJS読み込み -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
-<!-- BootstrapのJS読み込み -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js">
-    < /html>
+
+</html>

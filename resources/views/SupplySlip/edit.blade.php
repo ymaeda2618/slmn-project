@@ -21,23 +21,13 @@
 
             <div class="company-shop-area">
                 <div class="company-area">
-                    <div class="company-shop-label">仕入企業</div>
+                    <div class="company-shop-label">仕入店舗</div>
                     <div class="width-40">
                         <input type="text" class="form-control supply_company_code_input" id="supply_company_code" name="data[SupplySlip][supply_company_code]" value="{{$SupplySlipList->supply_company_code}}" tabindex="1">
                         <input type="hidden" id="supply_company_id" name="data[SupplySlip][supply_company_id]" value="{{$SupplySlipList->supply_company_id}}">
                     </div>
                     <div class="width-60">
                         <input type="text" class="form-control" id="supply_company_text" name="data[SupplySlip][supply_company_text]" value="{{$SupplySlipList->supply_company_name}}" readonly>
-                    </div>
-                </div>
-                <div class="shop-area">
-                    <div class="company-shop-label">仕入店舗</div>
-                    <div class="width-40">
-                        <input type="text" class="form-control supply_shop_code_input" id="supply_shop_code" name="data[SupplySlip][supply_shop_code]" value="{{$SupplySlipList->supply_shop_code}}" tabindex="2">
-                        <input type="hidden" id="supply_shop_id" name="data[SupplySlip][supply_shop_id]" value="{{$SupplySlipList->supply_shop_id}}">
-                    </div>
-                    <div class="width-60">
-                        <input type="text" class="form-control" id="supply_shop_text" name="data[SupplySlip][supply_shop_text]" value="{{$SupplySlipList->supply_shop_name}}" readonly>
                     </div>
                 </div>
             </div>
@@ -239,7 +229,7 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 一番最初は仕入先企業にフォーカスする
+            // 一番最初は仕入先店舗にフォーカスする
             $('#supply_company_code').focus();
 
             // 初期化処理
@@ -538,7 +528,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/supply_company/)) { // 仕入先企業
+                if (selector_code.match(/supply_company/)) { // 仕入先店舗
 
                     $.ajax({
                             headers: {
@@ -559,26 +549,6 @@
 
                             // 仕入発注単価の設定
                             setMultiOrderSupplyUnitPirce();
-                        });
-
-                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./../AjaxSetSupplyShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
                         });
 
                 } else if (selector_code.match(/product_code/)) { // 製品IDの部分
@@ -752,7 +722,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入企業ID
+            // autocomplete処理 仕入店舗ID
             //-------------------------------------
             $(".supply_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -776,33 +746,6 @@
                     });
                 }
             });
-
-            //-------------------------------------
-            // autocomplete処理 仕入店舗ID
-            //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./../AjaxAutoCompleteSupplyShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
 
             //-------------------------------------
             // autocomplete処理 製品ID
@@ -1522,8 +1465,7 @@
         // ----------
         // 変数初期化
         // ----------
-        var supply_company_code; // 仕入企業
-        var supply_shop_code; // 仕入店舗
+        var supply_company_code; // 仕入店舗
         var product_code; // 製品ID
         var unit_price; // 単価
         var unit_num; // 受注数量
@@ -1544,9 +1486,8 @@
         }
 
         supply_company_code = $("#supply_company_code").val();
-        supply_shop_code = $("#supply_shop_code").val();
         if (supply_company_code == '') {
-            alert('「仕入企業」を入力してください。');
+            alert('「仕入店舗」を入力してください。');
             return false;
         }
 
@@ -1629,7 +1570,7 @@
      */
     function setOrderSupplyUnitPrice(product_id, selector_unit_price) {
 
-        // 画面から企業IDと仕入日付を取得
+        // 画面から店舗IDと仕入日付を取得
         var company_id = $('#supply_company_id').val();
         var supply_date = $('#supply_date').val();
 
@@ -1682,7 +1623,7 @@
     }
 
     function setMultiOrderSupplyUnitPirce() {
-        // 伝票数と企業IDを取得
+        // 伝票数と店舗IDを取得
         var slip_num = $('#slip_num').val();
         var company_id = $('#supply_company_id').val();
 

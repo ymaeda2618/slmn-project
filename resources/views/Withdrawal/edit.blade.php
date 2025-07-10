@@ -26,7 +26,6 @@
 
                 <table class="withdrawal-from-table">
                     <tr>
-                        <th colspan="2" class="payment-label">支払先企業</th>
                         <th colspan="2" class="payment-label">支払先店舗</th>
                     </tr>
                     <tr>
@@ -36,13 +35,6 @@
                         </td>
                         <td class="width-30">
                             <input type="text" class="form-control" id="withdrawal_company_text" name="data[Withdrawal][withdrawal_company_text]" value="{{$withdrawalDatas->supply_company_name}}" readonly>
-                        </td>
-                        <td class="width-20">
-                            <input type="text" class="form-control withdrawal_shop_code_input" id="withdrawal_shop_code" name="data[Withdrawal][withdrawal_shop_code]" value="{{$withdrawalDatas->supply_shop_code}}" tabindex="5">
-                            <input type="hidden" id="withdrawal_shop_id" name="data[Withdrawal][withdrawal_shop_id]" value="{{$withdrawalDatas->supply_shop_id}}">
-                        </td>
-                        <td class="width-30">
-                            <input type="text" class="form-control" id="withdrawal_shop_text" name="data[Withdrawal][withdrawal_shop_text]" value="{{$withdrawalDatas->supply_shop_name}}" readonly>
                         </td>
                     </tr>
 
@@ -280,7 +272,7 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 一番最初は売上先企業にフォーカスする
+            // 一番最初は売上先店舗にフォーカスする
             $('#sale_company_code').focus();
 
             // 初期化処理
@@ -428,33 +420,13 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/withdrawal_company/)) { // 支払先企業
+                if (selector_code.match(/withdrawal_company/)) { // 支払先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
                             url: "./../AjaxSetSupplyCompany",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/withdrawal_shop/)) { // 支払先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./../AjaxSetSupplyShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -491,7 +463,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 支払企業ID
+            // autocomplete処理 支払店舗ID
             //-------------------------------------
             $(".withdrawal_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -500,32 +472,6 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./../AjaxAutoCompleteSupplyCompany",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 支払店舗ID
-            //-------------------------------------
-            $(".withdrawal_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./../AjaxAutoCompleteSupplyShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -657,7 +603,7 @@
         }
 
         if (payment_company == '') {
-            alert('支払先企業を入力してください。');
+            alert('支払先店舗を入力してください。');
             return;
         }
 
@@ -839,7 +785,6 @@
         var payment_from_date = '';
         var payment_to_date = '';
         var payment_company = '';
-        var payment_shop = '';
         var staff_code = '';
         var total_price = '';
 
@@ -861,7 +806,7 @@
 
         payment_company = $("#withdrawal_company_code").val();
         if (payment_company == '') {
-            alert('支払先企業を入力してください');
+            alert('支払先店舗を入力してください');
             return false;
         }
 

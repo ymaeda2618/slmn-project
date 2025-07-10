@@ -3,7 +3,7 @@
 
     <div class="row justify-content-center">
 
-        <div class="top-title">仕入先店舗一覧</div>
+        <div class="top-title">本部企業一覧</div>
 
         <!--検索エリア-->
         <div class='search-area'>
@@ -13,13 +13,13 @@
                     <tbody>
                         <tr>
                             <td>
-                                <div class="table-th-v2">仕入先店舗名</div>
+                                <div class="table-th-v2">本部企業名</div>
                                 <div class="table-td-v2">
-                                    <input type="text" class="form-control" id="supply_company_name" name="data[SupplyCompany][supply_company_name]" value='{{$supply_company_name}}'>
+                                    <input type="text" class="form-control" id="owner_company_name" name="data[OwnerCompany][owner_company_name]" value='{{$owner_company_name}}'>
                                 </div>
                                 <div class="table-th-v2">締め日</div>
                                 <div class="table-td-v2">
-                                    <select class="form-control" id="closing_date" name="data[SupplyCompany][closing_date]">
+                                    <select class="form-control" id="closing_date" name="data[OwnerCompany][closing_date]">
                                         <option value="0" selected>-</option>
                                         <option value="99">月末</option>
                                         <option value="88">都度</option>
@@ -67,26 +67,38 @@
 
         <!--一覧表示エリア-->
         <div class='list-area'>
-            <table class='index-table'>
+            <table class='index-table '>
                 <tbody>
                     <tr>
                         <th>コード</th>
-                        <th>店舗名</th>
+                        <th>企業名</th>
                         <th>締め日</th>
+                        <th>店舗一覧</th>
                         @if (Home::authOwnerCheck()) <th>編集</th> @endif
                     </tr>
-                    @foreach ($supplyCompanyList as $supplyCompanies)
+                    @foreach ($ownerCompanyList as $ownerCompanies)
                     <tr>
-                        <td>{{$supplyCompanies->code}}</td>
-                        <td>{{$supplyCompanies->supply_company_name}}</td>
-                        @if($supplyCompanies->closing_date == 99)
+                        <td>{{$ownerCompanies->code}}</td>
+                        <td>{{$ownerCompanies->owner_company_name}}</td>
+                        @if($ownerCompanies->closing_date == 99)
                         <td>月末</td>
-                        @elseif($supplyCompanies->closing_date == 88)
+                        @elseif($ownerCompanies->closing_date == 88)
                         <td>都度</td>
                         @else
-                        <td>{{$supplyCompanies->closing_date}}日</td>
+                        <td>{{$ownerCompanies->closing_date}}日</td>
                         @endif
-                        @if (Home::authOwnerCheck()) <td><a class='edit-btn' href='./SupplyCompanyEdit/{{$supplyCompanies->supply_company_id}}'>編集</a></td> @endif
+                        <td>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-info open-shop-modal"
+                                data-id="{{ $ownerCompanies->owner_company_id }}"
+                                data-name="{{ $ownerCompanies->owner_company_name }}"
+                                data-toggle="modal"
+                                data-target="#shopModal">
+                                店舗一覧
+                            </button>
+                        </td>
+                        @if (Home::authOwnerCheck()) <td><a class='edit-btn' href='./OwnerCompanyEdit/{{$ownerCompanies->owner_company_id}}'>編集</a></td> @endif
                     </tr>
                     @endforeach
                 </tbody>
@@ -94,7 +106,37 @@
         </div>
 
         <div class="d-flex justify-content-center">
-            {{ $supplyCompanyList->links() }}
+            {{ $ownerCompanyList->links() }}
+        </div>
+
+        {{-- モーダル --}}
+        <div class="modal fade" id="shopModal" tabindex="-1" role="dialog" aria-labelledby="shopModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg custom-modal-wide" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title"><span id="modalCompanyName"></span> の店舗一覧</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="閉じる">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>コード</th>
+                                    <th>店舗名</th>
+                                    <th>ヨミガナ</th>
+                                    <th>種別</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shopTableBody">
+                                {{-- JSでここに行を追加 --}}
+                            </tbody>
+                        </table>
+                        <div id="noShops" class="text-muted" style="display:none;">店舗が登録されていません。</div>
+                    </div>
+                </div>
+            </div>
         </div>
 
     </div>
@@ -112,6 +154,45 @@
 
         });
     })(jQuery);
+
+    $(document).ready(function () {
+        $('.open-shop-modal').on('click', function () {
+            const companyId = $(this).data('id');
+            const companyName = $(this).data('name');
+
+            $('#modalCompanyName').text(companyName);
+            $('#shopTableBody').empty();
+            $('#noShops').hide();
+
+            $.ajax({
+                url: `./OwnerCompanyAjaxGetShops/${companyId}`,
+                method: 'GET',
+                success: function (shops) {
+                    if (shops.length === 0) {
+                        $('#noShops').show();
+                    } else {
+                        shops.forEach(shop => {
+                            $('#shopTableBody').append(`
+                                <tr>
+                                    <td>${shop.code}</td>
+                                    <td>${shop.name}</td>
+                                    <td>${shop.yomi ? shop.yomi : '-'}</td>
+                                    <td>${shop.type}</td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function () {
+                    $('#shopTableBody').append(`
+                        <tr>
+                            <td colspan="2" class="text-danger">店舗情報の取得に失敗しました</td>
+                        </tr>
+                    `);
+                }
+            });
+        });
+    });
 </script>
 
 <style>
@@ -225,5 +306,9 @@
         display: block;
         text-align: center;
         padding: 10px;
+    }
+
+    .custom-modal-wide {
+        max-width: 65% !important;
     }
 </style>

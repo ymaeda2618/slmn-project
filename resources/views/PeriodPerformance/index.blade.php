@@ -31,7 +31,7 @@
                         </tr>
                         <tr>
                             <td>
-                                <div class="table-th">仕入先企業</div>
+                                <div class="table-th">仕入先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control supply_company_code_input" id="supply_company_code" name="data[PeriodPerformance][supply_company_code]" value="{{$pp_supply_company_code}}" tabindex="3">
                                     <input type="hidden" id="supply_company_id" name="data[PeriodPerformance][supply_company_id]" value="{{$pp_supply_company_id}}">
@@ -39,33 +39,13 @@
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="supply_company_text" name="data[PeriodPerformance][supply_company_text]" value="{{$pp_supply_company_text}}" readonly>
                                 </div>
-                                <div class="table-th">仕入先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control supply_shop_code_input" id="supply_shop_code" name="data[PeriodPerformance][supply_shop_code]" value="{{$pp_supply_shop_code}}" tabindex="4">
-                                    <input type="hidden" id="supply_shop_id" name="data[PeriodPerformance][supply_shop_id]" value="{{$pp_supply_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="supply_shop_text" name="data[PeriodPerformance][supply_shop_text]" value="{{$pp_supply_shop_text}}" readonly>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="table-th">売上先企業</div>
+                                <div class="table-th">売上先店舗</div>
                                 <div class="table-td table-code-td">
                                     <input type="text" class="search-control sale_company_code_input" id="sale_company_code" name="data[PeriodPerformance][sale_company_code]" value="{{$pp_sale_company_code}}" tabindex="5">
                                     <input type="hidden" id="sale_company_id" name="data[PeriodPerformance][sale_company_id]" value="{{$pp_sale_company_id}}">
                                 </div>
                                 <div class="table-td table-name-td">
                                     <input type="text" class="search-control" id="sale_company_text" name="data[PeriodPerformance][sale_company_text]" value="{{$pp_sale_company_text}}" readonly>
-                                </div>
-                                <div class="table-th">売上先店舗</div>
-                                <div class="table-td table-code-td">
-                                    <input type="text" class="search-control sale_shop_code_input" id="sale_shop_code" name="data[PeriodPerformance][sale_shop_code]" value="{{$pp_sale_shop_code}}" tabindex="6">
-                                    <input type="hidden" id="sale_shop_id" name="data[PeriodPerformance][sale_shop_id]" value="{{$pp_sale_shop_id}}">
-                                </div>
-                                <div class="table-td table-name-td">
-                                    <input type="text" class="search-control read-only" id="sale_shop_text" name="data[PeriodPerformance][sale_shop_text]" value="{{$pp_sale_shop_text}}" readonly>
                                 </div>
                             </td>
                         </tr>
@@ -243,7 +223,7 @@
 
 
             //-------------------------------------
-            // autocomplete処理 仕入企業ID
+            // autocomplete処理 仕入店舗ID
             //-------------------------------------
             $(".supply_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -269,33 +249,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 仕入店舗ID
-            //-------------------------------------
-            $(".supply_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSupplyShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
             $(".sale_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -304,32 +258,6 @@
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
                         url: "./AjaxAutoCompleteSaleCompany",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
-            //-------------------------------------
-            // autocomplete処理 売上店舗ID
-            //-------------------------------------
-            $(".sale_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSaleShop",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -443,7 +371,7 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/supply_company/)) { // 仕入先企業
+                if (selector_code.match(/supply_company/)) { // 仕入先店舗
 
                     $.ajax({
                             headers: {
@@ -463,53 +391,13 @@
                             $("#" + selector_text).val(data[2]);
                         });
 
-                } else if (selector_code.match(/supply_shop/)) { // 仕入先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSupplyShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/sale_company/)) { // 売上先企業
+                } else if (selector_code.match(/sale_company/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
                             url: "./AjaxSetSaleCompany",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSaleShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,

@@ -11,7 +11,6 @@
             <br>
             <table class="sale-from-table">
                 <tr>
-                    <th class="column-label" colspan="2">売上企業</th>
                     <th class="column-label" colspan="2">売上店舗</th>
                 </tr>
                 <tr>
@@ -21,13 +20,6 @@
                     </td>
                     <td class="width-30">
                         <input type="text" class="form-control" id="sale_company_text" name="data[OrderSaleUnitPrice][sale_company_text]" readonly>
-                    </td>
-                    <td class="width-20">
-                        <input type="text" class="form-control sale_shop_code_input" id="sale_shop_code" name="data[OrderSaleUnitPrice][sale_shop_code]" tabindex="2" required="required">
-                        <input type="hidden" id="sale_shop_id" name="data[OrderSaleUnitPrice][sale_shop_id]">
-                    </td>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="sale_shop_text" name="data[OrderSaleUnitPrice][sale_shop_text]" readonly>
                     </td>
                 </tr>
 
@@ -123,7 +115,7 @@
     (function($) {
         jQuery(window).load(function() {
 
-            // 一番最初は売上先企業にフォーカスする
+            // 一番最初は売上先店舗にフォーカスする
             $('#sale_company_code').focus();
 
             //-------------------------------------
@@ -241,33 +233,13 @@
                 var fd = new FormData();
                 fd.append("inputText", set_val);
 
-                if (selector_code.match(/sale_company/)) { // 売上先企業
+                if (selector_code.match(/sale_company/)) { // 売上先店舗
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
                             url: "./AjaxSetSaleCompany",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSaleShop",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -327,7 +299,7 @@
             });
 
             //-------------------------------------
-            // autocomplete処理 売上企業ID
+            // autocomplete処理 売上店舗ID
             //-------------------------------------
             $(".sale_company_code_input").autocomplete({
                 source: function(req, resp) {
@@ -351,33 +323,6 @@
                     });
                 }
             });
-
-            //-------------------------------------
-            // autocomplete処理 売上店舗ID
-            //-------------------------------------
-            $(".sale_shop_code_input").autocomplete({
-                source: function(req, resp) {
-                    $.ajax({
-                        headers: {
-                            "X-CSRF-TOKEN": $("[name='_token']").val()
-                        },
-                        url: "./AjaxAutoCompleteSaleShop",
-                        type: "POST",
-                        cache: false,
-                        dataType: "json",
-                        data: {
-                            inputText: req.term
-                        },
-                        success: function(o) {
-                            resp(o);
-                        },
-                        error: function(xhr, ts, err) {
-                            resp(['']);
-                        }
-                    });
-                }
-            });
-
 
             //-------------------------------------
             // autocomplete処理 製品ID
@@ -548,7 +493,7 @@
         // ----------
         // 変数初期化
         // ----------
-        var sale_company_code;  // 売上企業
+        var sale_company_code;  // 売上店舗
         var product_code;       // 製品ID
         var order_unit_price;   // 金額
         var staff_code;         // 担当者
@@ -558,7 +503,7 @@
         // -----------
         sale_company_code = $("#sale_company_code").val();
         if (sale_company_code == '') {
-            alert('「売上企業」を入力してください。');
+            alert('「売上店舗」を入力してください。');
             return false;
         }
 

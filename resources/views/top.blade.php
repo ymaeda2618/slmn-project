@@ -250,7 +250,7 @@
 
     <style>
         .container {
-            max-width: unset!important;
+            max-width: 1500px !important;
             padding-right: 30px !important;
         }
 

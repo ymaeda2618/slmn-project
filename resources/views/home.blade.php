@@ -1,13 +1,10 @@
-<?php 
+<?php
     $today = date('Y-m-d');
-?>
-@extends('layouts.app')
-
-@section('content')
+?> @extends('layouts.app') @section('content')
 <div class="container">
     <div class="row justify-content-center">
 
-        {{--  当日営業情報  --}}
+        {{-- 当日営業情報 --}}
         <div class="today-info">
             <div class="today-info-header">本日の営業情報</div>
 
@@ -32,9 +29,7 @@
                     </tr>
                 </table>
             </div>
-        </div>  {{--  today-info END  --}}
-
-        {{--  当月営業情報  --}}
+        </div> {{-- today-info END --}} {{-- 当月営業情報 --}}
         <div class="this-month-info">
             <div class="this-month-info-header">当月の営業情報</div>
 
@@ -59,50 +54,58 @@
                     </tr>
                 </table>
             </div>
-        </div> {{--  this-month-info END  --}}
-
-        {{--  本日のお知らせ  --}}
+        </div> {{-- this-month-info END --}} {{-- 本日のお知らせ --}}
         <div class="today-announcement">
             <div class="today-announcement-header">本日のお知らせ</div>
 
             <div class="today-announcement-body">
                 <ul class="today-announcement-list">
                     @if (!empty($todayAnnouncement))
-                        <li><a href="{{ asset('/') }}SaleSlipIndex?sale_submit_type=3">仕入伝票が未設定の売上が{{$todayAnnouncement['notSetSlipCnt']}}件あります。</a></li>
+                    <li><a href="{{ asset('/') }}SaleSlipIndex?sale_submit_type=3">仕入伝票が未設定の売上が{{$todayAnnouncement['notSetSlipCnt']}}件あります。</a></li>
                     @else
-                        <li>本日のお知らせ情報はありません。</li>
+                    <li>本日のお知らせ情報はありません。</li>
                     @endif
-                <ul class="today-announcement-list">
+                    <ul class="today-announcement-list">
             </div>
 
-        </div> {{--  today-announcement END  --}}
+        </div> {{-- today-announcement END --}}
 
     </div>
 </div>
 @endsection
 <style>
-    .today-info, .this-month-info, .today-announcement {
+    .today-info,
+    .this-month-info,
+    .today-announcement {
         font-size: 1.4em;
         font-weight: bold;
         width: 100%;
         padding: 25px 0px;
     }
-    .today-info-header, .this-month-info-header, .today-announcement-header {
+
+    .today-info-header,
+    .this-month-info-header,
+    .today-announcement-header {
         padding: .5em .75em;
         border: 1px solid #ccc;
         border-radius: 4px 4px, 0, 0;
         background-color: #f6f6f6;
     }
-    .today-info-body, .this-month-info-body, .today-announcement-body {
+
+    .today-info-body,
+    .this-month-info-body,
+    .today-announcement-body {
         padding: .5em .75em;
         border: 1px solid #ccc;
     }
+
     table {
         border-top: 1px solid #ccc;
         width: 100%;
         border-collapse: collapse;
-        font-size:14px;
+        font-size: 14px;
     }
+
     table tr {
         border-bottom: 1px solid #ccc;
     }
@@ -119,45 +122,45 @@
         padding: 16px;
         width: 22%;
         font-weight: normal;
-        background-color:#e9e9e9; 
+        background-color: #e9e9e9;
     }
 
     .today-announcement-list,
     .today-announcement-list li {
-        padding:0px;
-        margin:0px;
+        padding: 0px;
+        margin: 0px;
     }
 
-    .today-announcement-list li{
-        list-style-type:none !important;
-        list-style-image:none !important;
+    .today-announcement-list li {
+        list-style-type: none !important;
+        list-style-image: none !important;
         margin: 5px 0px 15px 0px !important;
-        position:relative;
-        padding-left:20px;
-        font-size:14px;
+        position: relative;
+        padding-left: 20px;
+        font-size: 14px;
         font-weight: normal;
     }
 
-    .today-announcement-list li:before{
-        content:''; 
-        height:0px; 
+    .today-announcement-list li:before {
+        content: '';
+        height: 0px;
         width: 100%;
-        display:block; 
-        position:absolute; 
-        top:30px; 
-        left:0px; 
+        display: block;
+        position: absolute;
+        top: 30px;
+        left: 0px;
         border-bottom: 1px dashed #aaa;
     }
 
-    .today-announcement-list li:after{
-        content:'';
-        display:block; 
-        position:absolute; 
-        background:#aaa;
-        width:5px;
-        height:5px; 
-        top:8px; 
-        left:5px; 
+    .today-announcement-list li:after {
+        content: '';
+        display: block;
+        position: absolute;
+        background: #aaa;
+        width: 5px;
+        height: 5px;
+        top: 8px;
+        left: 5px;
         border-radius: 5px;
     }
 
@@ -165,5 +168,4 @@
         color: black !important;
         text-decoration: none !important;
     }
-
 </style>

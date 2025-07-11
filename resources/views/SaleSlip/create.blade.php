@@ -1286,7 +1286,7 @@
     function priceNumChange(changedSlipNum) {
         function toNumber(val) {
             let num = parseFloat(val);
-            return isNaN(num) ? 0 : num;
+            return isNaN(num) ? null : num;
         }
 
         function calcDecimal(unitPrice, unitNum) {
@@ -1304,13 +1304,16 @@
             let $taxId = $("#tax_id_" + i);
             let $notaxPrice = $("#notax_price_" + i);
 
+            // 要素が見つからない場合はskip
             if ($unitPrice.length === 0 || $unitNum.length === 0 || $taxId.length === 0) continue;
 
             let unitPrice = toNumber($unitPrice.val());
             let unitNum = toNumber($unitNum.val());
 
-            $unitPrice.val(unitPrice);
-            $unitNum.val(unitNum);
+            // どちらかが空欄の場合は計算しない
+            if (unitPrice === null || unitNum === null) {
+                continue;
+            }
 
             let calc = calcDecimal(unitPrice, unitNum); // ← Decimal.js 使用
             $notaxPrice.val(calc);
@@ -1334,8 +1337,8 @@
         let taxTotal = taxTotal8 + taxTotal10;
         let subTotal = notaxTotal + taxTotal;
 
-        let delivery = toNumber($("#delivery_price").val());
-        let adjust = toNumber($("#adjust_price").val());
+        let delivery = toNumber($("#delivery_price").val()) ?? 0;
+        let adjust = toNumber($("#adjust_price").val()) ?? 0;
         let total = subTotal + delivery + adjust;
 
         // 表示更新
@@ -1748,6 +1751,7 @@
 
                 // 単価を設定
                 var selector_unit_price_val = $("#" + selector_unit_price).val();
+
                 if (!selector_unit_price_val) {
                     $("#" + selector_unit_price).val(price);
                 } else if (selector_unit_price_val && price && price !== selector_unit_price_val) {

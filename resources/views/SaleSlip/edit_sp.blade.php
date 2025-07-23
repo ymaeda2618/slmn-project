@@ -1,236 +1,368 @@
 @extends('layouts.app') @section('content')
-<link rel="stylesheet" href="{{ asset('css/slip-create-common.css') }}">
-<div class="container">
+    <link rel="stylesheet" href="{{ asset('css/slip-create-common.css') }}">
+    <div class="container">
+        <input type="hidden" id="sale_slip_id" value="{{ $sale_slip_id }}">
+        <div class="row justify-content-center">
 
-    <div class="row justify-content-center">
+            <div class="top-title">売上伝票 編集画面</div>
 
-        <div class="top-title">売上伝票 新規作成画面</div>
-
-        <form class="smn-form" id="sale-slip-create-form" method="post" action="./registerSaleSlips" enctype="multipart/form-data" onsubmit="return inputCheck();">
-            {{ csrf_field() }}
-            <div class="date-area">
-                <div class="slip_date_box">
-                    <label class="column-label" for="sale_date">売上日付</label>
-                    <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]" value="<?php echo date('Y-m-d');?>">
-                </div>
-
-                <div class="delivery_date_box">
-                    <label class="column-label" for="delivery_date">納品日付</label>
-                    <input type="date" class="form-control " id="delivery_date " name="data[SaleSlip][delivery_date]" value="<?php echo date('Y-m-d');?>">
-                </div>
-            </div>
-
-
-            <div class="company-shop-area">
-                <div class="company-area">
-                    <div class="company-shop-label">売上店舗</div>
-                    <div class="width-40">
-                        <input type="text" class="form-control sale_company_code_input" id="sale_company_code" name="data[SaleSlip][sale_company_code]" tabindex="1">
-                        <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]">
+            <form class="smn-form" id="sale-slip-create-form" method="post" action="./../editRegisterSaleSlips"
+                enctype="multipart/form-data" onsubmit="return inputCheck();">
+                {{ csrf_field() }}
+                <div class="date-area">
+                    <div class="slip_date_box">
+                        <label class="column-label" for="sale_date">売上日付</label>
+                        <input type="date" class="form-control " id="sale_date" name="data[SaleSlip][sale_date]"
+                            value="{{ $SaleSlipList->sale_slip_sale_date }}">
                     </div>
-                    <div class="width-60">
-                        <input type="text" class="form-control" id="sale_company_text" name="data[SaleSlip][sale_company_text]" readonly>
+
+                    <div class="delivery_date_box">
+                        <label class="column-label" for="delivery_date">納品日付</label>
+                        <input type="date" class="form-control " id="delivery_date " name="data[SaleSlip][delivery_date]"
+                            value="{{ $SaleSlipList->sale_slip_delivery_date }}">
                     </div>
                 </div>
-                <div class="shop-area">
-                    <div class="company-shop-label">支払い方法</div>
-                    <div class="width-40">
-                        <input type="text" class="form-control" id="payment_method_type" name="data[SaleSlip][payment_method_type]" value="0" tabindex="2">
+
+
+                <div class="company-shop-area">
+                    <div class="company-area">
+                        <div class="company-shop-label">売上店舗</div>
+                        <div class="width-40">
+                            <input type="text" class="form-control sale_company_code_input" id="sale_company_code"
+                                name="data[SaleSlip][sale_company_code]" value="{{ $SaleSlipList->sale_company_code }}"
+                                tabindex="1">
+                            <input type="hidden" id="sale_company_id" name="data[SaleSlip][sale_company_id]">
+                        </div>
+                        <div class="width-60">
+                            <input type="text" class="form-control" id="sale_company_text"
+                                name="data[SaleSlip][sale_company_text]" value="{{ $SaleSlipList->sale_company_name }}"
+                                readonly>
+                        </div>
                     </div>
-                    <div class="width-60">
-                        <input type="text" class="form-control" id="payment_method_type_text" name="data[SaleSlip][payment_method_type_text]" value="掛け売り" readonly>
+                    <div class="shop-area">
+                        <div class="company-shop-label">支払い方法</div>
+                        <div class="width-40">
+                            <input type="text" class="form-control" id="payment_method_type"
+                                name="data[SaleSlip][payment_method_type]" value="{{ $SaleSlipList->payment_method_type }}"
+                                tabindex="2">
+                        </div>
+                        <div class="width-60">
+                            <input type="text" class="form-control" id="payment_method_type_text"
+                                name="data[SaleSlip][payment_method_type_text]"
+                                value="{{ $SaleSlipList->payment_method_type_text }}" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="slip-data-table">
+                    @foreach ($SaleSlipDetailList as $SaleSlipDetails)
+                        <?php $tabInitialNum = intval(7 * $SaleSlipDetails->sort + 2); ?>
+
+                        <tr id="slip-partition-{{ $SaleSlipDetails->sort }}" class="partition-area"></tr>
+                        <input type="hidden" name="sort" id="sort-{{ $SaleSlipDetails->sort }}"
+                            value="{{ $SaleSlipDetails->sort }}">
+                        <input type="hidden" name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][id]"
+                            id="id-{{ $SaleSlipDetails->sort }}" value="{{ $SaleSlipDetails->sale_slip_detail_id }}">
+
+                        {{-- 1行目 製品コード・製品名・削除 --}}
+                        <tr id="slip-upper-{{ $SaleSlipDetails->sort }}">
+                            <td class="index-td-red" rowspan="6">{{ $SaleSlipDetails->sort }}</td>
+                            <td colspan="1">
+                                <input type="text" class="form-control product_code_input"
+                                    id="product_code_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][product_code]"
+                                    value="{{ $SaleSlipDetails->product_code }}" placeholder="製品コード"
+                                    tabindex="{{ $tabInitialNum + 1 }}">
+                                <input type="hidden" id="product_id_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][product_id]"
+                                    value="{{ $SaleSlipDetails->product_id }}">
+                                <input type="hidden" id="tax_id_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][tax_id]"
+                                    value="{{ $SaleSlipDetails->tax_id }}">
+                            </td>
+                            <td colspan="3">
+                                <input type="text" class="form-control" id="product_text_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][product_text]"
+                                    value="{{ $SaleSlipDetails->product_name }}" placeholder="製品名" readonly>
+                            </td>
+                            <td class="remove-btn-td" rowspan="6">
+                                <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary"
+                                    onclick='javascript:removeSlip({{ $SaleSlipDetails->sort }})'>削除</button>
+                            </td>
+                        </tr>
+
+                        {{-- 2行目 個数・個数単位・数量・数量単位 --}}
+                        <tr>
+                            <td>
+                                @php $readonly = empty($SaleSlipDetails->inventory_unit_id) ? 'readonly' : ''; @endphp
+                                <input type="number" class="form-control"
+                                    id="inventory_unit_num_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][inventory_unit_num]"
+                                    value="{{ $SaleSlipDetails->inventory_unit_num }}" {{ $readonly }}
+                                    placeholder="個数" tabindex="{{ $tabInitialNum + 2 }}">
+                            </td>
+                            <td>
+                                <input type="text" class="form-control"
+                                    id="inventory_unit_text_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][inventory_unit_text]"
+                                    value="{{ $SaleSlipDetails->inventory_unit_name }}" placeholder="個数単位" readonly>
+                                <input type="hidden" id="inventory_unit_id_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][inventory_unit_id]"
+                                    value="{{ $SaleSlipDetails->inventory_unit_id }}">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control" id="unit_num_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][unit_num]"
+                                    value="{{ $SaleSlipDetails->unit_num }}"
+                                    onchange='javascript:priceNumChange({{ $SaleSlipDetails->sort }})' placeholder="数量"
+                                    tabindex="{{ $tabInitialNum + 3 }}">
+                            </td>
+                            <td>
+                                <input type="text" class="form-control" id="unit_text_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][unit_text]"
+                                    value="{{ $SaleSlipDetails->unit_name }}" placeholder="数量単位" readonly>
+                                <input type="hidden" id="unit_id_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][unit_id]"
+                                    value="{{ $SaleSlipDetails->unit_id }}">
+                            </td>
+                        </tr>
+                        {{-- 4行目 単価・小計 --}}
+                        <tr>
+                            <td colspan="2">
+                                <input type="number" class="form-control" id="unit_price_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][unit_price]"
+                                    value="{{ $SaleSlipDetails->unit_price }}"
+                                    onchange='javascript:priceNumChange({{ $SaleSlipDetails->sort }})' placeholder="単価"
+                                    tabindex="{{ $tabInitialNum + 4 }}">
+                            </td>
+                            <td colspan="2">
+                                <input type="text" class="form-control" id="notax_price_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][notax_price]"
+                                    value="{{ $SaleSlipDetails->notax_price }}" placeholder="金額" readonly>
+                            </td>
+                        </tr>
+
+                        {{-- 5行目 産地コード・産地名 --}}
+                        <tr>
+                            <td colspan="2">
+                                <input type="text" class="form-control origin_area_code_input"
+                                    id="origin_area_code_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][origin_area_code]"
+                                    value="{{ $SaleSlipDetails->origin_area_id }}" placeholder="産地コード"
+                                    tabindex="{{ $tabInitialNum + 5 }}">
+                                <input type="hidden" id="origin_area_id_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][origin_area_id]"
+                                    value="{{ $SaleSlipDetails->origin_area_id }}">
+                            </td>
+                            <td colspan="2">
+                                <input type="text" class="form-control"
+                                    id="origin_area_text_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][origin_area_text]"
+                                    value="{{ $SaleSlipDetails->origin_area_name }}" placeholder="産地名" readonly>
+                            </td>
+                        </tr>
+
+                        {{-- 6行目 担当コード・氏名・摘要 --}}
+                        <tr>
+                            <td colspan="2">
+                                <input type="text" class="form-control staff_code_input"
+                                    id="staff_code_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][staff_code]"
+                                    value="{{ $SaleSlipDetails->staff_code }}" placeholder="担当者コード"
+                                    tabindex="{{ $tabInitialNum + 6 }}">
+                                <input type="hidden" id="staff_id_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][staff_id]"
+                                    value="{{ $SaleSlipDetails->staff_id }}">
+                            </td>
+                            <td colspan="2">
+                                <input type="text" class="form-control" id="staff_text_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][staff_text]"
+                                    value="{{ $SaleSlipDetails->staff_name }}" placeholder="担当者名" readonly>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <input type="text" class="form-control" id="memo_{{ $SaleSlipDetails->sort }}"
+                                    name="data[SaleSlipDetail][{{ $SaleSlipDetails->sort }}][memo]"
+                                    value="{{ $SaleSlipDetails->memo }}" placeholder="摘要欄"
+                                    tabindex="{{ $tabInitialNum + 7 }}">
+                            </td>
+                        </tr>
+                    @endforeach
+                </table>
+
+                {{-- 在庫紐付け情報 --}}
+                <div id="supply-slip-area">
+                    @foreach ($inventoryManageArr as $sale_slip_detail_sort => $sale_slip_detail_sort_val)
+                        <div id="supply-slip-area-{{ $sale_slip_detail_sort }}">
+                            @foreach ($sale_slip_detail_sort_val as $inventory_manage_sort => $inventory_manage_sort_val)
+                                @if (!empty($inventory_manage_sort_val['supply_detail_slip_id']) && !empty($inventory_manage_sort_val['unit_num']))
+                                    <input type="hidden" class="use_num_{{ $sale_slip_detail_sort }}"
+                                        name="data[InventoryManage][{{ $sale_slip_detail_sort }}][use_num][{{ $inventory_manage_sort }}]"
+                                        value="{{ $inventory_manage_sort_val['unit_num'] }}">
+                                    <input type="hidden" class="supply_slip_id_{{ $sale_slip_detail_sort }}"
+                                        name="data[InventoryManage][{{ $sale_slip_detail_sort }}][supply_slip_id][{{ $inventory_manage_sort }}]"
+                                        value="{{ $inventory_manage_sort_val['supply_detail_slip_id'] }}">
+                                @endif
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
+
+                <br><br>
+
+                <div class="add-slip-btn-area">
+                    <button id="add-slip-btn" type="button" class="btn add-slip-btn btn-primary">伝票追加</button>
+                </div>
+
+                <table class="total-table">
+                    <tr>
+                        <th>8%対象額</th>
+                        <th>8%税額</th>
+                        <th>8%税込額</th>
+                    </tr>
+                    <tr>
+                        <td><input type="tel" class="form-control" id="notax_sub_total_8"
+                                name="data[SaleSlip][notax_sub_total_8]" value="{{ $SaleSlipList->notax_sub_total_8 }}"
+                                readonly></td>
+                        <td><input type="tel" class="form-control" id="tax_total_8"
+                                name="data[SaleSlip][tax_total_8]" value="{{ $SaleSlipList->tax_total_8 }}" readonly>
+                        </td>
+                        <td><input type="tel" class="form-control" id="sub_total_8"
+                                name="data[SaleSlip][sub_total_8]" value="{{ $SaleSlipList->sub_total_8 }}" readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>10%対象額</th>
+                        <th>10%税額</th>
+                        <th>10%税込額</th>
+                    </tr>
+                    <tr>
+                        <td><input type="tel" class="form-control" id="notax_sub_total_10"
+                                name="data[SaleSlip][notax_sub_total_10]" value="{{ $SaleSlipList->notax_sub_total_10 }}"
+                                readonly></td>
+                        <td><input type="tel" class="form-control" id="tax_total_10"
+                                name="data[SaleSlip][tax_total_10]" value="{{ $SaleSlipList->tax_total_10 }}" readonly>
+                        </td>
+                        <td><input type="tel" class="form-control" id="sub_total_10"
+                                name="data[SaleSlip][sub_total_10]" value="{{ $SaleSlipList->sub_total_10 }}" readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>税抜小計</th>
+                        <th>税額</th>
+                        <th>税込小計</th>
+                    </tr>
+                    <tr>
+                        <td><input type="tel" class="form-control" id="notax_sub_total"
+                                name="data[SaleSlip][notax_sub_total]" value="{{ $SaleSlipList->notax_sub_total }}"
+                                readonly></td>
+                        <td><input type="tel" class="form-control" id="tax_total" name="data[SaleSlip][tax_total]"
+                                value="{{ $SaleSlipList->tax_total }}" readonly></td>
+                        <td><input type="tel" class="form-control" id="sub_total" name="data[SaleSlip][sub_total]"
+                                value="{{ $SaleSlipList->sub_total }}" readonly></td>
+                    </tr>
+                    <tr>
+                        <th>配送コード</th>
+                        <th>配送名</th>
+                        <th>配送税込額</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="text" class="form-control delivery_code_input" id="delivery_code"
+                                name="data[SaleSlip][delivery_code]" value="{{ $SaleSlipList->delivery_code }}">
+                            <input type="hidden" id="delivery_id" name="data[SaleSlip][delivery_id]"
+                                value="{{ $SaleSlipList->delivery_id }}">
+                        </td>
+                        <td><input type="text" class="form-control" id="delivery_text"
+                                name="data[SaleSlip][delivery_text]" value="{{ $SaleSlipList->delivery_name }}"
+                                readonly></td>
+                        <td><input type="number" class="form-control" id="delivery_price"
+                                name="data[SaleSlip][delivery_price]" value="{{ $SaleSlipList->delivery_price }}"
+                                onKeyUp='javascript:adjustPrice()'></td>
+                    </tr>
+                    <tr>
+                        <th>調整額</th>
+                        <th colspan="2">調整後税込額</th>
+                    </tr>
+                    <tr>
+                        <td><input type="number" class="form-control" id="adjust_price"
+                                name="data[SaleSlip][adjust_price]" value="{{ $SaleSlipList->adjust_price }}"
+                                onKeyUp='javascript:adjustPrice()'></td>
+                        <td colspan="2"><input type="number" class="form-control" id="total"
+                                name="data[SaleSlip][total]" value="{{ $SaleSlipList->total }}" readonly></td>
+                    </tr>
+                </table>
+                <br><br>
+                <div class="form-group">
+                    <label class="column-label" for="remarks">備考欄</label>
+                    <textarea id="remarks" class="form-control" name="data[SaleSlip][remarks]" rows="4" cols="40">{{ $SaleSlipList->remarks }}</textarea>
+                </div>
+                <input type="hidden" name="data[SaleSlip][id]" value="{{ $SaleSlipList->sale_slip_id }}">
+                <input type='hidden' name="slip_num" id="slip_num" value="{{ intval($SaleSlipDetails->sort) + 1 }}">
+
+                <table class="register-btn-table">
+                    <tr>
+                        <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除 4:請求書印刷</td>
+                    </tr>
+                    <tr>
+                        <td class="width-20">
+                            <input type="tel" class="form-control" id="sale_submit_type"
+                                name="data[SaleSlip][sale_submit_type]" value="{{ $SaleSlipList->sale_submit_type }}">
+                        </td>
+                        <td class="width-30">
+                            <?php
+                            $text = '';
+                            if ($SaleSlipList->sale_submit_type == 1) {
+                                $text = '登録';
+                            }
+                            if ($SaleSlipList->sale_submit_type == 2) {
+                                $text = '一時保存';
+                            }
+                            if ($SaleSlipList->sale_submit_type == 4) {
+                                $text = '請求書印刷';
+                            }
+                            ?>
+                            <input type="text" class="form-control" id="sale_submit_type_text"
+                                name="data[SaleSlip][sale_submit_type_text]" value="{{ $text }}" readonly>
+                        </td>
+                        <td class="width-50">
+                            <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
+                        </td>
+                    </tr>
+                </table>
+                <input type="hidden" name="deposit_flg" id="deposit_flg" value="{{ $depositFlg }}">
+            </form>
+
+            <!-- モーダル -->
+            <div class="modal fade" id="sale_supply_slip_modal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4>
+                                <div class="modal-title" id="myModalLabel">売上対象の仕入れを選択してください</div>
+                            </h4>
+                        </div>
+                        <div class="modal-body text-left" id="modal_body_area">
+                            <div class="product-area" id="modal_product_area"></div>
+                            <table class="modal-table" id="modal_table_area">
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-danger" id="modal-submit">決定</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">選択をやめる</button>
+                            <input type="hidden" id="sale_slip_num" value="">
+                        </div>
                     </div>
                 </div>
             </div>
-
-            <table class="slip-data-table">
-                <tr>
-                    <th class="width-5">No.</th>
-                    <th class="width-20" colspan="2">製品</th>
-                    <th class="width-10">個数</th>
-                    <th class="width-10">数量</th>
-                    <th class="width-15" colspan="2">単価 / 小計</th>
-                    <th class="width-15" colspan="2">産地</th>
-                    <th class="width-20" colspan="3">担当者 / 摘要</th>
-                    <th class="width-5">削除</th>
-                </tr>
-                <tr id="slip-partition-1" class="partition-area"></tr>
-                <input type="hidden" name="sort-1" id="sort" value="1">
-                <input type="hidden" name="data[SaleSlipDetail][1][id]" id="id-1" value="">
-                <tr id="slip-upper-1">
-                    <td class="index-td-red" rowspan="2">1</td>
-                    <td colspan="2">
-                        <input type="text" class="form-control product_code_input" id="product_code_1" name="data[SaleSlipDetail][1][product_code]" tabindex="3">
-                        <input type="hidden" id="product_id_1" name="data[SaleSlipDetail][1][product_id]">
-                        <input type='hidden' id='tax_id_1' name="data[SaleSlipDetail][1][tax_id]" value="1">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" id="inventory_unit_num_1" name="data[SaleSlipDetail][1][inventory_unit_num]" step="0.01" tabindex="4">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" id="unit_num_1" name="data[SaleSlipDetail][1][unit_num]" onchange='javascript:priceNumChange(1)' step="0.01" tabindex="5">
-                    </td>
-                    <td colspan="2">
-                        <input type="number" class="form-control" id="unit_price_1" name="data[SaleSlipDetail][1][unit_price]" onchange='javascript:priceNumChange(1)' step="0.01" tabindex="6">
-                    </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control origin_area_code_input" id="origin_area_code_1" name="data[SaleSlipDetail][1][origin_area_code]" tabindex="7">
-                        <input type="hidden" id="origin_area_id_1" name="data[SaleSlipDetail][1][origin_area_id]">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control staff_code_input" id="staff_code_1" name="data[SaleSlipDetail][1][staff_code]" value="1009" tabindex="8">
-                        <input type="hidden" id="staff_id_1" name="data[SaleSlipDetail][1][staff_id]" value="9">
-                    </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control" id="staff_text_1" name="data[SaleSlipDetail][1][staff_text]" placeholder="担当欄" value="石塚 貞雄" readonly>
-                    </td>
-                    <td rowspan="2">
-                        <button id="remove-slip-btn" type="button" class="btn rmv-slip-btn btn-secondary" onclick='javascript:removeSlip(1) '>削除</button>
-                    </td>
-                </tr>
-                <tr id="slip-lower-1">
-                    <td colspan="2">
-                        <input type="text" class="form-control" id="product_text_1" name="data[SaleSlipDetail][1][product_text]" placeholder="製品欄" readonly>
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="inventory_unit_text_1" name="data[SaleSlipDetail][1][inventory_unit_text]" placeholder="個数欄" readonly>
-                        <input type="hidden" id="inventory_unit_id_1" name="data[SaleSlipDetail][1][inventory_unit_id]" value="1">
-                    </td>
-                    <td>
-                        <input type="text" class="form-control" id="unit_text_1" name="data[SaleSlipDetail][1][unit_text]" placeholder="数量欄" readonly>
-                        <input type="hidden" id="unit_id_1" name="data[SaleSlipDetail][1][unit_id]" value="1">
-                    </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control" id="notax_price_1" name="data[SaleSlipDetail][1][notax_price]" value="0" readonly>
-                    </td>
-                    <td colspan="2">
-                        <input type="text" class="form-control" id="origin_area_text_1" name="data[SaleSlipDetail][1][origin_area_text]" placeholder="産地欄" readonly>
-                    </td>
-                    <td colspan="3">
-                        <input type="text" class="form-control" id="memo_1" name="data[SaleSlipDetail][1][memo]" placeholder="摘要欄" tabindex="9">
-                    </td>
-                </tr>
-            </table>
-
-            <div id="supply-slip-area">
-                <div id="supply-slip-area-1"></div>
-            </div>
-            <br><br>
-            <div class="add-slip-btn-area">
-                <button id="add-slip-btn" type="button" class="btn add-slip-btn btn-primary">伝票追加</button>
-                <input type='hidden' name="slip_num" id="slip_num" value="2">
-            </div>
-
-            <table class="total-table">
-                <tr>
-                    <th>8%対象額</th>
-                    <th>8%税額</th>
-                    <th>8%税込額</th>
-                </tr>
-                <tr>
-                    <td><input type="tel" class="form-control" id="notax_sub_total_8" name="data[SaleSlip][notax_sub_total_8]" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="tax_total_8" name="data[SaleSlip][tax_total_8]" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="sub_total_8" name="data[SaleSlip][sub_total_8]" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th>10%対象額</th>
-                    <th>10%税額</th>
-                    <th>10%税込額</th>
-                </tr>
-                <tr>
-                    <td><input type="tel" class="form-control" id="notax_sub_total_10" name="data[SaleSlip][notax_sub_total_10]" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="tax_total_10" name="data[SaleSlip][tax_total_10]" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="sub_total_10" name="data[SaleSlip][sub_total_10]" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th>税抜小計</th>
-                    <th>税額</th>
-                    <th>税込小計</th>
-                </tr>
-                <tr>
-                    <td><input type="tel" class="form-control" id="notax_sub_total" name="data[SaleSlip][notax_sub_total]" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="tax_total" name="data[SaleSlip][tax_total]" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="sub_total" name="data[SaleSlip][sub_total]" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th>配送コード</th>
-                    <th>配送名</th>
-                    <th>配送税込額</th>
-                </tr>
-                <tr>
-                    <td>
-                        <input type="text" class="form-control delivery_code_input" id="delivery_code" name="data[SaleSlip][delivery_code]">
-                        <input type="hidden" id="delivery_id" name="data[SaleSlip][delivery_id]">
-                    </td>
-                    <td><input type="text" class="form-control" id="delivery_text" name="data[SaleSlip][delivery_text]" readonly></td>
-                    <td><input type="number" class="form-control" id="delivery_price" name="data[SaleSlip][delivery_price]" value='0' onKeyUp='javascript:adjustPrice()'></td>
-                </tr>
-                <tr>
-                    <th>調整額</th>
-                    <th colspan="2">調整後税込額</th>
-                </tr>
-                <tr>
-                    <td><input type="number" class="form-control" id="adjust_price" name="data[SaleSlip][adjust_price]" value='0' onKeyUp='javascript:adjustPrice()'></td>
-                    <td colspan="2"><input type="number" class="form-control" id="total" name="data[SaleSlip][total]" value='0' readonly></td>
-                </tr>
-            </table>
-            <br>
-            <div class="biko-area">
-                <label class="column-label" for="remarks">備考欄</label>
-                <textarea id="remarks" class="form-control" name="data[SaleSlip][remarks]" rows="4" cols="40"></textarea>
-            </div>
-
-            <table class="register-btn-table">
-                <tr>
-                    <td class='status-memo-area' colspan="3">1:登録 2:一時保存 3:削除 4:請求書印刷</td>
-                </tr>
-                <tr>
-                    <td class="width-20">
-                        <input type="tel" class="form-control" id="sale_submit_type" name="data[SaleSlip][sale_submit_type]" value="1">
-                    </td>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="sale_submit_type_text" name="data[SaleSlip][sale_submit_type_text]" value="登録" readonly>
-                    </td>
-                    <td class="width-50">
-                        <button id="register-btn" class="register-btn btn btn-primary" type="button">登録</button>
-                    </td>
-                </tr>
-            </table>
-
-            <input type="hidden" name="submit_type" id="submit_type" value="1">
-        </form>
-
-        <!-- モーダル -->
-        <div class="modal fade" id="sale_supply_slip_modal" tabindex="-1" role="dialog" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h4>
-                            <div class="modal-title" id="myModalLabel">売上対象の仕入れを選択してください</div>
-                        </h4>
-                    </div>
-                    <div class="modal-body text-left" id="modal_body_area">
-                        <div class="product-area" id="modal_product_area"></div>
-                        <table class="modal-table" id="modal_table_area">
-                        </table>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" id="modal-submit">決定</button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">選択をやめる</button>
-                        <input type="hidden" id="sale_slip_num" value="">
-                    </div>
+            <div id="overlay">
+                <div class="cv-spinner">
+                    <span class="spinner"></span>
                 </div>
             </div>
         </div>
-
-        <div id="overlay">
-            <div class="cv-spinner">
-                <span class="spinner"></span>
-            </div>
-        </div>
-
     </div>
-</div>
 @endsection
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -321,6 +453,10 @@
                             $('#sale_submit_type_text').val("一時保存");
                             $('#register-btn').prop('disabled', false);
                             $('#register-btn').focus();
+                        } else if (submit_type == 3) {
+                            $('#sale_submit_type_text').val("削除");
+                            $('#register-btn').prop('disabled', false);
+                            $('#register-btn').focus();
                         } else if (submit_type == 4) {
                             $('#sale_submit_type_text').val("請求書印刷");
                             $('#register-btn').prop('disabled', false);
@@ -351,13 +487,15 @@
 
                         if ($('input[tabindex="' + tabindex + '"]').length) {
 
-                            if (this_id.match(/unit_num_/) || this_id.match(/unit_price_/)) { // 数量と単価の場合は一度値を削除しない
+                            if (this_id.match(/unit_num_/) || this_id.match(
+                                /unit_price_/)) { // 数量と単価の場合は一度値を削除しない
 
                                 var this_val = $('input[tabindex="' + tabindex + '"]').val();
                                 $('input[tabindex="' + tabindex + '"]').focus();
                                 $('input[tabindex="' + tabindex + '"]').val(this_val);
 
                             } else {
+
                                 var this_val = $('input[tabindex="' + tabindex + '"]').val();
                                 $('input[tabindex="' + tabindex + '"]').val("");
                                 $('input[tabindex="' + tabindex + '"]').focus();
@@ -446,7 +584,8 @@
 
                         if ($('input[tabindex="' + tabindex + '"]').length) {
 
-                            if (this_id.match(/unit_num_/) || this_id.match(/unit_price_/)) { // 数量と単価の場合は一度値を削除しない
+                            if (this_id.match(/unit_num_/) || this_id.match(
+                                /unit_price_/)) { // 数量と単価の場合は一度値を削除しない
 
                                 var this_val = $('input[tabindex="' + tabindex + '"]').val();
                                 $('input[tabindex="' + tabindex + '"]').focus();
@@ -457,7 +596,6 @@
                                 $('input[tabindex="' + tabindex + '"]').val("");
                                 $('input[tabindex="' + tabindex + '"]').focus();
                                 $('input[tabindex="' + tabindex + '"]').val(this_val);
-
                             }
                         }
                     }
@@ -560,7 +698,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetSaleCompany",
+                            url: "./../AjaxSetSaleCompany",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -577,33 +715,13 @@
                             setMultiOrderSaleUnitPirce();
                         });
 
-                } else if (selector_code.match(/sale_shop/)) { // 売上先店舗
-
-                    $.ajax({
-                            headers: {
-                                "X-CSRF-TOKEN": $("[name='_token']").val()
-                            },
-                            url: "./AjaxSetSaleShop",
-                            type: "POST",
-                            dataType: "JSON",
-                            data: fd,
-                            processData: false,
-                            contentType: false
-                        })
-                        .done(function(data) {
-
-                            $("#" + selector_code).val(data[0]);
-                            $("#" + selector_id).val(data[1]);
-                            $("#" + selector_text).val(data[2]);
-                        });
-
                 } else if (selector_code.match(/payment_method_type/)) { // 支払い方法
 
                     $.ajax({
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetPaymentMethodType",
+                            url: "./../AjaxSetPaymentMethodType",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -620,7 +738,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetProduct",
+                            url: "./../AjaxSetProduct",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -648,28 +766,35 @@
                             $("#" + selector_unit_text).val(data[6]);
 
                             // 仕入単位
-                            var selector_inventory_unit_id = selector_id.replace('product_', 'inventory_unit_');
-                            var selector_inventory_unit_text = selector_text.replace('product_', 'inventory_unit_');
+                            var selector_inventory_unit_id = selector_id.replace('product_',
+                                'inventory_unit_');
+                            var selector_inventory_unit_text = selector_text.replace('product_',
+                                'inventory_unit_');
                             $("#" + selector_inventory_unit_id).val(data[7]);
                             $("#" + selector_inventory_unit_text).val(data[8]);
                             if (data[8] == '' || data[8] == null) {
-                                var selector_inventory_unit_num = selector_id.replace('product_id_', 'inventory_unit_num_');
+                                var selector_inventory_unit_num = selector_id.replace(
+                                    'product_id_', 'inventory_unit_num_');
                                 $("#" + selector_inventory_unit_num).attr('readonly', true);
                             } else {
-                                var selector_inventory_unit_num = selector_id.replace('product_id_', 'inventory_unit_num_');
+                                var selector_inventory_unit_num = selector_id.replace(
+                                    'product_id_', 'inventory_unit_num_');
                                 $("#" + selector_inventory_unit_num).attr('readonly', false);
                             }
 
                             // 金額設定
-                            var selector_unit_price = selector_id.replace('product_id_', 'unit_price_');
-                            var selector_unit_num = selector_id.replace('product_id_', 'unit_num_');
+                            var selector_unit_price = selector_id.replace('product_id_',
+                                'unit_price_');
+                            var selector_unit_num = selector_id.replace('product_id_',
+                                'unit_num_');
 
                             // 製品が変わった場合は再計算
                             if (before_product_id != data[1]) {
 
                                 $("#" + selector_unit_price).val('');
                                 $("#" + selector_unit_num).val('');
-                                priceNumChange(parseInt(selector_id.replace('product_id_', ''), 10));
+                                priceNumChange(parseInt(selector_id.replace('product_id_', ''),
+                                    10));
                             }
 
                             // 発注単価を設定
@@ -688,7 +813,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetStandard",
+                            url: "./../AjaxSetStandard",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -709,7 +834,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetQuality",
+                            url: "./../AjaxSetQuality",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -729,7 +854,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetOriginArea",
+                            url: "./../AjaxSetOriginArea",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -749,7 +874,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetStaff",
+                            url: "./../AjaxSetStaff",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -768,7 +893,7 @@
                             headers: {
                                 "X-CSRF-TOKEN": $("[name='_token']").val()
                             },
-                            url: "./AjaxSetDelivery",
+                            url: "./../AjaxSetDelivery",
                             type: "POST",
                             dataType: "JSON",
                             data: fd,
@@ -793,7 +918,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteSaleCompany",
+                        url: "./../AjaxAutoCompleteSaleCompany",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -819,7 +944,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteProduct",
+                        url: "./../AjaxAutoCompleteProduct",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -850,7 +975,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteStandard",
+                        url: "./../AjaxAutoCompleteStandard",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -877,7 +1002,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteQuality",
+                        url: "./../AjaxAutoCompleteQuality",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -903,7 +1028,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteOriginArea",
+                        url: "./../AjaxAutoCompleteOriginArea",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -929,7 +1054,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteStaff",
+                        url: "./../AjaxAutoCompleteStaff",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -955,7 +1080,7 @@
                         headers: {
                             "X-CSRF-TOKEN": $("[name='_token']").val()
                         },
-                        url: "./AjaxAutoCompleteDelivery",
+                        url: "./../AjaxAutoCompleteDelivery",
                         type: "POST",
                         cache: false,
                         dataType: "json",
@@ -976,7 +1101,6 @@
             // 伝票追加処理
             //--------------------
             var canAjax = true;
-
             $("#add-slip-btn").on('click', function() {
 
                 if (!canAjax) {
@@ -988,6 +1112,7 @@
                 // ボタンを非活性にして、処理中を出す。
                 $("#overlay").fadeIn(300);
 
+
                 // 伝票ナンバーを取得
                 var slip_num = $("#slip_num").val();
 
@@ -998,7 +1123,7 @@
                         headers: {
                             'X-CSRF-TOKEN': $("[name='_token']").val()
                         },
-                        url: "./SaleSlipAjaxAddSlip",
+                        url: "./../SaleSlipAjaxAddSlipSp",
                         type: "POST",
                         dataType: "JSON",
                         data: fd,
@@ -1021,9 +1146,10 @@
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
+                                        "X-CSRF-TOKEN": $("[name='_token']")
+                                            .val()
                                     },
-                                    url: "./AjaxAutoCompleteProduct",
+                                    url: "./../AjaxAutoCompleteProduct",
                                     type: "POST",
                                     cache: false,
                                     dataType: "json",
@@ -1046,9 +1172,10 @@
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
+                                        "X-CSRF-TOKEN": $("[name='_token']")
+                                            .val()
                                     },
-                                    url: "./AjaxAutoCompleteOriginArea",
+                                    url: "./../AjaxAutoCompleteOriginArea",
                                     type: "POST",
                                     cache: false,
                                     dataType: "json",
@@ -1071,9 +1198,10 @@
                             source: function(req, resp) {
                                 $.ajax({
                                     headers: {
-                                        "X-CSRF-TOKEN": $("[name='_token']").val()
+                                        "X-CSRF-TOKEN": $("[name='_token']")
+                                            .val()
                                     },
-                                    url: "./AjaxAutoCompleteStaff",
+                                    url: "./../AjaxAutoCompleteStaff",
                                     type: "POST",
                                     cache: false,
                                     dataType: "json",
@@ -1090,6 +1218,7 @@
                             }
                         });
                         $("#staff-code-area-" + slip_num).append(staff_code_selector);
+
                     })
                     .fail(function(XMLHttpRequest, textStatus, errorThrown) {
                         alert(XMLHttpRequest);
@@ -1115,6 +1244,8 @@
                     $('#sale-slip-create-form').submit();
                 } else if (this_val == "2") {
                     $('#sale-slip-create-form').submit();
+                } else if (this_val == "3") {
+                    $('#sale-slip-create-form').submit();
                 } else if (this_val == "4") {
                     $('#sale-slip-create-form').submit();
                 } else {
@@ -1139,6 +1270,10 @@
                     $('#register-btn').focus();
                 } else if (submit_type == 2) {
                     $('#sale_submit_type_text').val("一時保存");
+                    $('#register-btn').prop('disabled', false);
+                    $('#register-btn').focus();
+                } else if (submit_type == 3) {
+                    $('#sale_submit_type_text').val("削除");
                     $('#register-btn').prop('disabled', false);
                     $('#register-btn').focus();
                 } else if (submit_type == 4) {
@@ -1266,6 +1401,7 @@
         // 調整後金額を取得
         total = sub_total + delivery_price + adjust_price;
 
+
         // 各課税額に入れる
         $("#notax_sub_total_8").val(notax_sub_total_8);
         $("#tax_total_8").val(tax_total_8);
@@ -1287,7 +1423,7 @@
     function priceNumChange(changedSlipNum) {
         function toNumber(val) {
             let num = parseFloat(val);
-            return isNaN(num) ? null : num;
+            return isNaN(num) ? 0 : num;
         }
 
         function calcDecimal(unitPrice, unitNum) {
@@ -1305,16 +1441,13 @@
             let $taxId = $("#tax_id_" + i);
             let $notaxPrice = $("#notax_price_" + i);
 
-            // 要素が見つからない場合はskip
             if ($unitPrice.length === 0 || $unitNum.length === 0 || $taxId.length === 0) continue;
 
             let unitPrice = toNumber($unitPrice.val());
             let unitNum = toNumber($unitNum.val());
 
-            // どちらかが空欄の場合は計算しない
-            if (unitPrice === null || unitNum === null) {
-                continue;
-            }
+            $unitPrice.val(unitPrice);
+            $unitNum.val(unitNum);
 
             let calc = calcDecimal(unitPrice, unitNum); // ← Decimal.js 使用
             $notaxPrice.val(calc);
@@ -1338,8 +1471,8 @@
         let taxTotal = taxTotal8 + taxTotal10;
         let subTotal = notaxTotal + taxTotal;
 
-        let delivery = toNumber($("#delivery_price").val()) ?? 0;
-        let adjust = toNumber($("#adjust_price").val()) ?? 0;
+        let delivery = toNumber($("#delivery_price").val());
+        let adjust = toNumber($("#adjust_price").val());
         let total = subTotal + delivery + adjust;
 
         // 表示更新
@@ -1375,7 +1508,7 @@
                 headers: {
                     "X-CSRF-TOKEN": $("[name='_token']").val()
                 },
-                url: "./SaleSlipAjaxChangeProductId",
+                url: "./../SaleSlipAjaxChangeProductId",
                 type: "POST",
                 dataType: "JSON",
                 data: fd,
@@ -1408,16 +1541,23 @@
 
     function removeSlip(remove_num) {
 
-        // 削除
+        // 伝票部分の行を削除（6行分）
         $("#slip-partition-" + remove_num).remove();
         $("#id-" + remove_num).remove();
         $("#sort-" + remove_num).remove();
+
+        // 1伝票は6行あるのでそれらをまとめて削除
+        for (let i = 0; i < 6; i++) {
+            $("#slip-upper-" + remove_num).next().remove();
+        }
         $("#slip-upper-" + remove_num).remove();
-        $("#slip-lower-" + remove_num).remove();
+
+        // 仕入伝票紐付け要素削除
         $(".use_num_" + remove_num).remove();
         $(".supply_slip_id_" + remove_num).remove();
+        $("#supply-slip-area-" + remove_num).remove();
 
-        // 再計算
+        // 再計算を実行
         priceNumChange(remove_num);
 
     }
@@ -1522,7 +1662,7 @@
         $("#tax_total").val(tax_total);
         $("#sub_total").val(sub_total);
 
-        // $("#adjust_price").val(adjust_price);
+        //$("#adjust_price").val(adjust_price);
         $("#total").val(total);
     }
 
@@ -1604,6 +1744,74 @@
         $('#sum_unit_num_area').text(use_num_total);
     }
 
+    //-----------------------
+    // モーダルで決定が押された時の処理
+    //-----------------------
+    $(document).on('click', '#modal-submit', function() {
+
+        var checkbox_id;
+        var use_num_id;
+        var supply_slip_id;
+        var use_num;
+        var use_num_count = 0;
+        var use_num_total = 0;
+
+
+        var sale_slip_no = $("#sale_slip_no").val();
+        var use_num_count = $('#sum_count_area').text();
+        var use_num_total = $('#sum_unit_num_area').text();
+        var html = "";
+
+        var count = 0;
+
+        // 売上数量を取得
+        var unit_num = parseInt($("#unit_num_" + sale_slip_no).val(), 10);
+
+        // 数値変換する
+        use_num_total = parseInt(use_num_total, 10);
+
+        // 売上の数量を超えていた場合はアラートを出す
+        if (unit_num < use_num_total) {
+            alert("売上伝票の数量を超えています。");
+            return false;
+        }
+
+        // 全てのチェックボックスを処理する
+        $('.modal-checkbox').each(function(i, elem) {
+
+            // チェックされているボックスの場合
+            if (elem.checked) {
+
+                // チェックされているIDを取得
+                checkbox_id = elem.id;
+                // use_numのIDを取得
+                use_num_id = checkbox_id.replace('checkbox_', 'use_num_');
+                // use_numに入力されている値を取得
+                use_num = parseInt($('#' + use_num_id).val(), 10);
+                // 仕入詳細IDを取得
+                supply_slip_id = checkbox_id.replace('checkbox_', '');
+
+                html += "<input type='hidden' class='use_num_" + sale_slip_no +
+                    "' name='data[InventoryManage][" + sale_slip_no + "][use_num][" + count +
+                    "]' value='" + use_num + "'>";
+                html += "<input type='hidden' class='supply_slip_id_" + sale_slip_no +
+                    "' name='data[InventoryManage][" + sale_slip_no + "][supply_slip_id][" + count +
+                    "]' value='" + supply_slip_id + "'>";
+                count += 1;
+            }
+        });
+
+        $(".use_num_" + sale_slip_no + "").remove();
+        $(".supply_slip_id_" + sale_slip_no + "").remove();
+        $(".use_num_" + sale_slip_no).remove();
+        $(".supply_slip_id_" + sale_slip_no).remove();
+        $("#supply-slip-area-" + sale_slip_no + "").append(html);
+        $("#sale_supply_slip_count_" + sale_slip_no + "").val(use_num_count);
+        $("#sale_supply_slip_unit_num_" + sale_slip_no + "").val(use_num_total);
+        $("#sale_supply_slip_modal").modal("hide") //モーダル閉じる
+
+    });
+
     //------------
     // 入力チェック
     //------------
@@ -1618,6 +1826,7 @@
         var unit_num; // 数量
         var staff_code; // 担当
         var inventory_unit_num // 発注数量
+        var deposit_flg // 入金フラグ
 
         // -----------
         // 入力チェック
@@ -1670,6 +1879,12 @@
                 return false;
             }
 
+        }
+
+        deposit_flg = $("#deposit_flg").val();
+        if (deposit_flg == 1) {
+            alert('入金済みの伝票は編集できません。');
+            return false;
         }
     }
 
@@ -1736,7 +1951,7 @@
                 headers: {
                     "X-CSRF-TOKEN": $("[name='_token']").val()
                 },
-                url: "./getOrderSaleUnitPrice",
+                url: "./../getOrderSaleUnitPrice",
                 type: "POST",
                 dataType: "JSON",
                 data: fd,
@@ -1752,12 +1967,12 @@
 
                 // 単価を設定
                 var selector_unit_price_val = $("#" + selector_unit_price).val();
-
                 if (!selector_unit_price_val) {
                     $("#" + selector_unit_price).val(price);
                 } else if (selector_unit_price_val && price && price !== selector_unit_price_val) {
                     $("#" + selector_unit_price).val(price);
                 }
+
 
             })
             .fail(function(XMLHttpRequest, textStatus, errorThrown) {
@@ -1789,68 +2004,4 @@
             setOrderSaleUnitPrice(product_id, selector_unit_price);
         });
     }
-
-    //-----------------------
-    // モーダルで決定が押された時の処理
-    //-----------------------
-    $(document).on('click', '#modal-submit', function() {
-
-        var checkbox_id;
-        var use_num_id;
-        var supply_slip_id;
-        var use_num;
-        var use_num_count = 0;
-        var use_num_total = 0;
-
-
-        var sale_slip_no = $("#sale_slip_no").val();
-        var use_num_count = $('#sum_count_area').text();
-        var use_num_total = $('#sum_unit_num_area').text();
-        var html = "";
-
-        var count = 0;
-
-        // 売上数量を取得
-        var unit_num = parseInt($("#unit_num_" + sale_slip_no).val(), 10);
-
-        // 数値変換する
-        use_num_total = parseInt(use_num_total, 10);
-
-        // 売上の数量を超えていた場合はアラートを出す
-        if (unit_num < use_num_total) {
-            alert("売上伝票の数量を超えています。");
-            return false;
-        }
-
-        // 全てのチェックボックスを処理する
-        $('.modal-checkbox').each(function(i, elem) {
-
-            // チェックされているボックスの場合
-            if (elem.checked) {
-
-                // チェックされているIDを取得
-                checkbox_id = elem.id;
-                // use_numのIDを取得
-                use_num_id = checkbox_id.replace('checkbox_', 'use_num_');
-                // use_numに入力されている値を取得
-                use_num = parseInt($('#' + use_num_id).val(), 10);
-                // 仕入詳細IDを取得
-                supply_slip_id = checkbox_id.replace('checkbox_', '');
-
-                html += "<input type='hidden' class='use_num_" + sale_slip_no + "' name='data[InventoryManage][" + sale_slip_no + "][use_num][" + count + "]' value='" + use_num + "'>";
-                html += "<input type='hidden' class='supply_slip_id_" + sale_slip_no + "' name='data[InventoryManage][" + sale_slip_no + "][supply_slip_id][" + count + "]' value='" + supply_slip_id + "'>";
-                count += 1;
-            }
-        });
-
-        $(".use_num_" + sale_slip_no + "").remove();
-        $(".supply_slip_id_" + sale_slip_no + "").remove();
-        $(".use_num_" + sale_slip_no).remove();
-        $(".supply_slip_id_" + sale_slip_no).remove();
-        $("#supply-slip-area-" + sale_slip_no + "").append(html);
-        $("#sale_supply_slip_count_" + sale_slip_no + "").val(use_num_count);
-        $("#sale_supply_slip_unit_num_" + sale_slip_no + "").val(use_num_total);
-        $("#sale_supply_slip_modal").modal("hide") //モーダル閉じる
-
-    });
 </script>

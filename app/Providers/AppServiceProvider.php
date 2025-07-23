@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        // 明示的に default を指定
+        Paginator::defaultView('vendor.pagination.default');
+
         Builder::macro('if', function (bool $condition, callable $func) {
             return $condition ? $func($this) : $this;
         });

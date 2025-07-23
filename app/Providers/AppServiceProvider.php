@@ -6,6 +6,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\View;
+use App\Http\ViewCreators\ViewSwitchCreator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // 明示的に default を指定
         Paginator::defaultView('vendor.pagination.default');
+
+        // ビューを SP ブレードに自動切替
+        View::creator('*', ViewSwitchCreator::class);
 
         Builder::macro('if', function (bool $condition, callable $func) {
             return $condition ? $func($this) : $this;

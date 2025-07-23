@@ -132,6 +132,7 @@ Route::post('SaleSlipIndex', 'SaleSlipController@index');
 Route::post('SaleSlipIndex/{page_num}', 'SaleSlipController@index');
 Route::get('SaleSlipCreate', 'SaleSlipController@create');
 Route::post('SaleSlipAjaxAddSlip', 'SaleSlipController@AjaxAddSlip');
+Route::post('SaleSlipAjaxAddSlipSp', 'SaleSlipController@AjaxAddSlipSp');
 Route::post('SaleSlipAjaxChangeProductId', 'SaleSlipController@AjaxChangeProductId');
 Route::post('AjaxAutoCompleteSaleCompany', 'SaleSlipController@AjaxAutoCompleteSaleCompany');
 Route::post('AjaxSetSaleCompany', 'SaleSlipController@AjaxSetSaleCompany');

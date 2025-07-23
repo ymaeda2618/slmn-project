@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
 use App\Standard;
 use App\Staff;
 use App\SaleSlip;
@@ -2118,7 +2119,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= "<input type='hidden' name='sort' id='sort-".$slip_num."' value='".$slip_num."'>";
         $ajaxHtml1 .= "<input type='hidden' name='data[SaleSlipDetail][".$slip_num."][id]' id='id-".$slip_num."' value=''>";
         $ajaxHtml1 .= '<tr id="slip-upper-' . $slip_num . '">';
-        $ajaxHtml1 .= '    <td class="index-td" rowspan="2">' . $slip_num . '</td>';
+        $ajaxHtml1 .= '    <td class="index-td-red" rowspan="2">' . $slip_num . '</td>';
         $ajaxHtml1 .= '    <td colspan="2" id="product-code-area-' . $slip_num . '">';
         $ajaxHtml1 .= '        <input type="hidden" id="product_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_id]">';
         $ajaxHtml1 .= '        <input type="hidden" id="tax_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][tax_id]" value="' . $slip_num . '">';
@@ -2189,6 +2190,100 @@ class SaleSlipController extends Controller
 
         return $returnArray;
     }
+
+    /**
+     * SP用 売上伝票追加処理（Ajax）
+     */
+    public function AjaxAddSlipSp(Request $request)
+    {
+        $slipNum = (int) $request->input('slip_num', 1);
+        $tabInitialNum = 7 * $slipNum + 2;
+
+        // 伝票 HTML 本体
+        $html = "";
+        $html .= "<tr id='slip-partition-{$slipNum}' class='partition-area'></tr>";
+        $html .= "<input type='hidden' name='sort-{$slipNum}' id='sort' value='{$slipNum}'>";
+        $html .= "<input type='hidden' name='data[SaleSlipDetail][{$slipNum}][id]' id='id-{$slipNum}' value=''>";
+        $html .= "<tr id='slip-upper-{$slipNum}'>";
+        $html .= "  <td class='index-td-red' rowspan='6'>{$slipNum}</td>";
+        $html .= "  <td colspan='1'>";
+        $html .= "    <input type='text' class='form-control product_code_input' id='product_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][product_code]' placeholder='製品コード' tabindex='" . ($tabInitialNum + 1) . "'>";
+        $html .= "    <input type='hidden' id='product_id_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][product_id]'>";
+        $html .= "    <input type='hidden' id='tax_id_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][tax_id]' value='1'>";
+        $html .= "  </td>";
+        $html .= "  <td colspan='3'>";
+        $html .= "    <input type='text' class='form-control' id='product_text_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][product_text]' placeholder='製品欄' readonly>";
+        $html .= "  </td>";
+        $html .= "  <td class='remove-btn-td' rowspan='6'>";
+        $html .= "    <button id='remove-slip-btn' type='button' class='btn rmv-slip-btn btn-secondary' onclick='javascript:removeSlip({$slipNum})'>削除</button>";
+        $html .= "  </td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "  <td>";
+        $html .= "    <input type='number' class='form-control' id='inventory_unit_num_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][inventory_unit_num]' placeholder='個数' step='0.01' tabindex='" . ($tabInitialNum + 2) . "'>";
+        $html .= "  </td>";
+        $html .= "  <td>";
+        $html .= "    <input type='text' class='form-control' id='inventory_unit_text_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][inventory_unit_text]' placeholder='個数単位' readonly>";
+        $html .= "    <input type='hidden' id='inventory_unit_id_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][inventory_unit_id]' value='1'>";
+        $html .= "  </td>";
+        $html .= "  <td>";
+        $html .= "    <input type='number' class='form-control' id='unit_num_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][unit_num]' placeholder='数量' onchange='javascript:priceNumChange({$slipNum})' step='0.01' tabindex='" . ($tabInitialNum + 3) . "'>";
+        $html .= "  </td>";
+        $html .= "  <td>";
+        $html .= "    <input type='text' class='form-control' id='unit_text_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][unit_text]' placeholder='数量単位' readonly>";
+        $html .= "    <input type='hidden' id='unit_id_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][unit_id]' value='1'>";
+        $html .= "  </td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "  <td colspan='2'>";
+        $html .= "    <input type='number' class='form-control' id='unit_price_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][unit_price]' placeholder='単価' onchange='javascript:priceNumChange({$slipNum})' step='0.01' tabindex='" . ($tabInitialNum + 4) . "'>";
+        $html .= "  </td>";
+        $html .= "  <td colspan='2'>";
+        $html .= "    <input type='text' class='form-control' id='notax_price_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][notax_price]' placeholder='金額' value='0' readonly>";
+        $html .= "  </td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "  <td colspan='2'>";
+        $html .= "    <input type='text' class='form-control origin_area_code_input' id='origin_area_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][origin_area_code]' placeholder='産地コード' tabindex='" . ($tabInitialNum + 5) . "'>";
+        $html .= "    <input type='hidden' id='origin_area_id_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][origin_area_id]'>";
+        $html .= "  </td>";
+        $html .= "  <td colspan='2'>";
+        $html .= "    <input type='text' class='form-control' id='origin_area_text_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][origin_area_text]' placeholder='産地名' readonly>";
+        $html .= "  </td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "  <td colspan='2'>";
+        $html .= "    <input type='text' class='form-control staff_code_input' id='staff_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][staff_code]' placeholder='担当者コード' value='1009' tabindex='" . ($tabInitialNum + 6) . "'>";
+        $html .= "    <input type='hidden' id='staff_id_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][staff_id]' value='9'>";
+        $html .= "  </td>";
+        $html .= "  <td colspan='2'>";
+        $html .= "    <input type='text' class='form-control' id='staff_text_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][staff_text]' placeholder='担当名' value='石塚 貞雄' readonly>";
+        $html .= "  </td>";
+        $html .= "</tr>";
+        $html .= "<tr>";
+        $html .= "  <td colspan='4'>";
+        $html .= "    <input type='text' class='form-control' id='memo_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][memo]' placeholder='摘要欄' tabindex='" . ($tabInitialNum + 7) . "'>";
+        $html .= "  </td>";
+        $html .= "</tr>";
+
+        // 仕入伝票格納エリア
+        $html2 = "<div id='supply-slip-area-{$slipNum}'></div>";
+
+        // オートコンプリート用DOM（Ajax後にappendする）
+        $autoProduct = "<input type='text' class='form-control product_code_input' id='product_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][product_code]' tabindex='" . ($tabInitialNum + 1) . "'>";
+        $autoOrigin  = "<input type='text' class='form-control origin_area_code_input' id='origin_area_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][origin_area_code]' tabindex='" . ($tabInitialNum + 5) . "'>";
+        $autoStaff   = "<input type='text' class='form-control staff_code_input' id='staff_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][staff_code]' value='1009' tabindex='" . ($tabInitialNum + 6) . "'>";
+
+        return Response::json([
+            $slipNum + 1,
+            $html,
+            $html2,
+            $autoProduct,
+            $autoOrigin,
+            $autoStaff
+        ]);
+    }
+
 
     /**
      * 売上対象製品取得

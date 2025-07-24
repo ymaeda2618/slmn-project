@@ -29,8 +29,8 @@ class PaymentController extends Controller
      */
     public function index(Request $request)
     {
-        // 抽出対象の締め日 15:15日 88:都度 99:末日
-        $condition_closing_date = 99;
+        // 抽出対象の締め日 0:すべて 15:15日 88:都度 99:末日
+        $condition_closing_date = 0;
 
         // 集計日付 デフォルトは先月の月初から月末
         $condition_date_from = null;
@@ -58,7 +58,7 @@ class PaymentController extends Controller
                     $req_data = $request->data;
                 }
 
-                $condition_closing_date  = isset($req_data['closing_date']) ? $req_data['closing_date'] : 99;
+                $condition_closing_date  = isset($req_data['closing_date']) ? $req_data['closing_date'] : 0;
 
                  // 日付の設定
                 $condition_date_from     = isset($req_data['date_from']) ? $req_data['date_from'] : NULL;
@@ -92,7 +92,7 @@ class PaymentController extends Controller
             } else { // リセットボタンが押された時の処理
 
                 // 締め日
-                $condition_closing_date  = 99;
+                $condition_closing_date  = 0;
                 // 集計日付
                 $condition_date_from     = null;
                 $condition_date_to       = null;
@@ -119,7 +119,7 @@ class PaymentController extends Controller
         }
 
         if(empty($condition_closing_date)) {
-            $condition_closing_date = 99;
+            $condition_closing_date = 0;
             $request->session()->put('condition_closing_date', $condition_closing_date);
         }
 
@@ -139,6 +139,7 @@ class PaymentController extends Controller
 
         // 締め日の配列
         $closing_date_list = [
+            0  => 'すべて',
             99 => '末日',
             15 => '15日',
             88 => '都度',
@@ -178,11 +179,9 @@ class PaymentController extends Controller
                     $join->on('PaymentSummary.sale_company_id', '=', 'SaleCompany.id');
                 })
                 ->mergeBindings($subQuery) // 重要：バインディングをマージ
-                ->where([
-                    ['SaleSlip.active', '=', '1'],
-                    ['SaleCompany.active', '=', '1'],
-                    ['SaleCompany.closing_date', '=', $condition_closing_date],
-                ])
+                ->when(!empty($condition_closing_date), function ($query) use ($condition_closing_date) {
+                    return $query->where('SaleCompany.closing_date', '=', $condition_closing_date);
+                })
                 ->when(!empty($condition_staff_id), function ($query) use ($condition_staff_id) {
                     return $query->where('SaleCompany.staff_id', '=', $condition_staff_id);
                 })
@@ -270,6 +269,7 @@ class PaymentController extends Controller
                     'SaleCompany.name                  AS sale_company_name',
                     'SaleCompany.invoice_display_flg   AS sale_invoice_display_flg',
                     'SaleCompany.invoice_display_name  AS sale_company_invoice_display_name',
+                    'SaleCompany.closing_date          AS sale_company_closing_date',
                     'SaleCompany.bank_account_name     AS bank_account_name',
                     'Staff.name_sei                    AS staff_name_sei',
                     'Staff.name_mei                    AS staff_name_mei',
@@ -285,8 +285,10 @@ class PaymentController extends Controller
                 ->where([
                     ['SaleSlip.active', '=', '1'],
                     ['SaleCompany.active', '=', '1'],
-                    ['SaleCompany.closing_date', '=', $condition_closing_date],
                 ])
+                ->when(!empty($condition_closing_date), function ($query) use ($condition_closing_date) {
+                    return $query->where('SaleCompany.closing_date', '=', $condition_closing_date);
+                })
                 ->when(!empty($condition_staff_id), function ($query) use ($condition_staff_id) {
                     return $query->where('SaleCompany.staff_id', '=', $condition_staff_id);
                 })
@@ -316,6 +318,7 @@ class PaymentController extends Controller
                         : $item->sale_company_name,
                     '振込口座名'           => $item->bank_account_name,
                     '税込合計金額'         => $taxTotal,
+                    '締め日'              => $item->sale_company_closing_date,
                     '担当者'               => $item->staff_name_sei . '' . $item->staff_name_mei,
                 ];
             });

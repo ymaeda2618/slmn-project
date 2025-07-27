@@ -102,6 +102,7 @@ Route::post('SupplySlipIndex', 'SupplySlipController@index');
 Route::post('SupplySlipIndex/{page_num}', 'SupplySlipController@index');
 Route::get('SupplySlipCreate', 'SupplySlipController@create');
 Route::post('SupplySlipAjaxAddSlip', 'SupplySlipController@AjaxAddSlip');
+Route::post('SupplySlipAjaxAddSlipSp', 'SupplySlipController@AjaxAddSlipSp');
 Route::post('SaleSlipAjaxChangeProductId', 'SupplySlipController@AjaxChangeProductId');
 Route::post('AjaxAutoCompleteSupplyCompany', 'SupplySlipController@AjaxAutoCompleteSupplyCompany');
 Route::post('AjaxSetSupplyCompany', 'SupplySlipController@AjaxSetSupplyCompany');

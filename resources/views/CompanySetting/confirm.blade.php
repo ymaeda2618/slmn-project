@@ -20,34 +20,6 @@
                 <input type="text" class="form-control" id="address" name="data[CompanySetting][address]" value="{{$request['data']['CompanySetting']['address']}}" readonly>
             </div>
             <div class="form-group">
-                <label class="column-label" for="bank_code">銀行コード：</label>
-                <input type="text" class="form-control" id="bank_code" name="data[CompanySetting][bank_code]" value="{{$request['data']['CompanySetting']['bank_code']}}" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_name">銀行名：</label>
-                <input type="text" class="form-control" id="bank_name" name="data[CompanySetting][bank_name]" value="{{$request['data']['CompanySetting']['bank_name']}}" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_code">支店コード：</label>
-                <input type="text" class="form-control" id="branch_code" name="data[CompanySetting][branch_code]" value="{{$request['data']['CompanySetting']['branch_code']}}" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_name">支店名：</label>
-                <input type="text" class="form-control" id="branch_name" name="data[CompanySetting][branch_name]" value="{{$request['data']['CompanySetting']['branch_name']}}" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_type">口座種別：</label>@if($request['data']['CompanySetting']['bank_type'] == 0)
-                <input type="text" class="form-control" id="bank_type_text" name="data[CompanySetting][bank_type_text]" value="-" readonly> @elseif($request['data']['CompanySetting']['bank_type'] == 1)
-                <input type="text" class="form-control" id="bank_type_text" name="data[CompanySetting][bank_type_text]" value="普通" readonly> @elseif($request['data']['CompanySetting']['bank_type'] == 2)
-                <input type="text" class="form-control" id="bank_type_text" name="data[CompanySetting][bank_type_text]" value="当座" readonly> @else
-                <input type="text" class="form-control" id="bank_type_text" name="data[CompanySetting][bank_type_text]" value="その他" readonly> @endif
-                <input type='hidden' name="data[CompanySetting][bank_type]" value="{{$request['data']['CompanySetting']['bank_type']}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_account">口座番号：</label>
-                <input type="text" class="form-control" id="bank_account" name="data[CompanySetting][bank_account]" value="{{$request['data']['CompanySetting']['bank_account']}}" readonly>
-            </div>
-            <div class="form-group">
                 <label class="column-label" for="office_tel">事務所TEL：</label>
                 <input type="text" class="form-control" id="office_tel" name="data[CompanySetting][office_tel]" value="{{$request['data']['CompanySetting']['office_tel']}}" readonly>
             </div>

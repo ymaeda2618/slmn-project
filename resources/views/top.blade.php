@@ -213,6 +213,17 @@
                 </ul>
                 {{-- 見た目を整える為に記述 start --}}
                 <ul>
+                    <li class="btn-title">
+                        <p>自社情報設定</p>
+                        <ul>
+                            <li>
+                                <a href="./CompanySettingIndex" class="edit-btn">企業情報登録</a>
+                            </li>
+                            <li>
+                                <a href="./bank_accounts" class="edit-btn">銀行情報登録</a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
                 <ul>
                 </ul>

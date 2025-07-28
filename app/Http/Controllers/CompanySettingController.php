@@ -11,13 +11,6 @@ use Exception;
 
 class CompanySettingController extends Controller
 {
-    var $bank_type = [
-        0 => '-',
-        1 => '普通',
-        2 => '当座',
-        3 => 'その他',
-    ];
-
     /**
      * Create a new controller instance.
      *
@@ -37,8 +30,7 @@ class CompanySettingController extends Controller
     {
 
         return view('CompanySetting.index')->with([
-            'company_setting_data' => CompanySetting::getCompanyData(),
-            'bank_type'            => $this->bank_type,
+            'company_setting_data' => CompanySetting::getCompanyData()
         ]);
 
     }
@@ -52,8 +44,7 @@ class CompanySettingController extends Controller
     {
 
         return view('CompanySetting.edit')->with([
-            'company_setting_data' => CompanySetting::getCompanyData(),
-            'bank_type'            => $this->bank_type,
+            'company_setting_data' => CompanySetting::getCompanyData()
         ]);
 
     }
@@ -68,9 +59,6 @@ class CompanySettingController extends Controller
 
         $validatedData = $request->validate([
             'data.CompanySetting.postal_code'     => ['nullable', 'regex:/^\d+$/'],
-            'data.CompanySetting.bank_code'       => ['nullable', 'regex:/^\d+$/'],
-            'data.CompanySetting.branch_code'     => ['nullable', 'regex:/^\d+$/'],
-            'data.CompanySetting.bank_account'    => ['nullable', 'regex:/^\d+$/'],
             'data.CompanySetting.office_tel'      => ['nullable', 'regex:/^\d+$/'],
             'data.CompanySetting.office_fax'      => ['nullable', 'regex:/^\d+$/'],
             'data.CompanySetting.shop_tel'        => ['nullable', 'regex:/^\d+$/'],
@@ -79,9 +67,6 @@ class CompanySettingController extends Controller
             'data.CompanySetting.company_image'   => ['nullable', 'image', 'mimes:png', 'max:1024'],
         ],[
             'data.CompanySetting.postal_code.regex'     => '郵便番号は半角数字のみで入力してください。',
-            'data.CompanySetting.bank_code.regex'       => '銀行コードは半角数字のみで入力してください。',
-            'data.CompanySetting.branch_code.regex'     => '支店コードは半角数字のみで入力してください。',
-            'data.CompanySetting.bank_account.regex'    => '口座番号は半角数字のみで入力してください。',
             'data.CompanySetting.office_tel.regex'      => '事務所TELは半角数字のみで入力してください。',
             'data.CompanySetting.office_fax.regex'      => '事務所FAXは半角数字のみで入力してください。',
             'data.CompanySetting.shop_tel.regex'        => '店舗TELは半角数字のみで入力してください。',
@@ -137,12 +122,6 @@ class CompanySettingController extends Controller
             $CompanySetting->name             = $request->data['CompanySetting']['name'];
             $CompanySetting->postal_code      = $request->data['CompanySetting']['postal_code'];
             $CompanySetting->address          = $request->data['CompanySetting']['address'];
-            $CompanySetting->bank_code        = $request->data['CompanySetting']['bank_code'];
-            $CompanySetting->bank_name        = $request->data['CompanySetting']['bank_name'];
-            $CompanySetting->branch_code      = $request->data['CompanySetting']['branch_code'];
-            $CompanySetting->branch_name      = $request->data['CompanySetting']['branch_name'];
-            $CompanySetting->bank_type        = $request->data['CompanySetting']['bank_type'];
-            $CompanySetting->bank_account     = $request->data['CompanySetting']['bank_account'];
             $CompanySetting->office_tel       = $request->data['CompanySetting']['office_tel'];
             $CompanySetting->office_fax       = $request->data['CompanySetting']['office_fax'];
             $CompanySetting->shop_tel         = $request->data['CompanySetting']['shop_tel'];

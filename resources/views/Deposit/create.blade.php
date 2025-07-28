@@ -1,204 +1,237 @@
 @extends('layouts.app') @section('content')
-<div class="container">
+    <div class="container">
 
-    <div class="row justify-content-center">
-        <div class="top-title">請求登録画面</div>
+        <div class="row justify-content-center">
+            <div class="top-title">請求登録画面</div>
 
-        <form class="smn-form" id="deposit-create-form" method="post" action="./registerDeposit" enctype="multipart/form-data" onsubmit="return submitCheck();">
-            {{ csrf_field() }}
+            <form class="smn-form" id="deposit-create-form" method="post" action="./registerDeposit"
+                enctype="multipart/form-data" onsubmit="return submitCheck();">
+                {{ csrf_field() }}
 
-            <div class="form-group">
-                <label class="column-label payment-date-label" for="payment_date">支払期日</label>
-                <input type="date" class="form-control " id="deposit_company_payment_date" name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d',strtotime('+1 month'));?>" tabindex="2">
-            </div>
-
-            <div class="search-area">
-                <div class="sales-date-form">
-                    <div class="radio_box">
-                        <label><input type="radio" name="data[Deposit][search_date]" value="1" checked> 伝票日付</label>
-                        <label><input type="radio" name="data[Deposit][search_date]" value="2"> 納品日付</label>
-                    </div>
-                    <input type="date" class="form-control width-45 sales_from_date" id="sales_from_date" name="data[Deposit][sales_from_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="3">
-                    <p class="sales-block">〜</p>
-                    <input type="date" class="form-control width-45 sales_to_date" id="sales_to_date" name="data[Deposit][sales_to_date]" value="<?php echo date('Y-m-d');?>" onchange='javascript:changeCalcFlg()' tabindex="4">
+                <div class="form-group">
+                    <label class="column-label payment-date-label" for="payment_date">支払期日</label>
+                    <input type="date" class="form-control " id="deposit_company_payment_date"
+                        name="data[Deposit][payment_date]" value="<?php echo date('Y-m-d', strtotime('+1 month')); ?>" tabindex="2">
                 </div>
 
-                <div class="form-group" style="margin-bottom: 0 !important;">
-                    <div class="radio_box">
-                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="0" onchange="toggleCompanyInput()"> 本部企業毎</label>
-                        <label><input type="radio" name="data[Deposit][invoice_output_type]" value="1" checked onchange="toggleCompanyInput()"> 売上先店舗毎</label>
+                <div class="search-area">
+                    <div class="sales-date-form">
+                        <div class="radio_box">
+                            <label><input type="radio" name="data[Deposit][search_date]" value="1" checked>
+                                伝票日付</label>
+                            <label><input type="radio" name="data[Deposit][search_date]" value="2"> 納品日付</label>
+                        </div>
+                        <input type="date" class="form-control width-45 sales_from_date" id="sales_from_date"
+                            name="data[Deposit][sales_from_date]" value="<?php echo date('Y-m-d'); ?>"
+                            onchange='javascript:changeCalcFlg()' tabindex="3">
+                        <p class="sales-block">〜</p>
+                        <input type="date" class="form-control width-45 sales_to_date" id="sales_to_date"
+                            name="data[Deposit][sales_to_date]" value="<?php echo date('Y-m-d'); ?>"
+                            onchange='javascript:changeCalcFlg()' tabindex="4">
                     </div>
+
+                    <div class="form-group" style="margin-bottom: 0 !important;">
+                        <div class="radio_box">
+                            <label><input type="radio" name="data[Deposit][invoice_output_type]" value="0"
+                                    onchange="toggleCompanyInput()"> 本部企業毎</label>
+                            <label><input type="radio" name="data[Deposit][invoice_output_type]" value="1" checked
+                                    onchange="toggleCompanyInput()"> 売上先店舗毎</label>
+                        </div>
+                    </div>
+
+                    <table class="deposit-from-table">
+                        <tr>
+                            <th colspan="2" class="sales-label owner_company_area" style="display: none;">本部企業</th>
+                            <th colspan="2" class="sales-label sale_company_area">売上先店舗</th>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="width-50 owner_company_area" id="owner_company_area"
+                                style="display: none;">
+                                <div class="d-flex">
+                                    <input type="text" class="form-control mr-2 deposit_owner_code_input"
+                                        id="deposit_owner_code" name="data[Deposit][deposit_owner_code]"
+                                        onchange='changeCalcFlg()' tabindex="5" style="width: 50%;">
+                                    <input type="text" class="form-control" id="deposit_owner_text"
+                                        name="data[Deposit][deposit_owner_text]" readonly style="width: 50%;">
+                                </div>
+                                <input type="hidden" id="deposit_owner_id" name="data[Deposit][deposit_owner_id]">
+                            </td>
+                            <td colspan="2" class="width-50 sale_company_area" id="sale_company_area">
+                                <div class="d-flex">
+                                    <input type="text" class="form-control mr-2 deposit_company_code_input"
+                                        id="deposit_company_code" name="data[Deposit][deposit_company_code]"
+                                        onchange='changeCalcFlg()' tabindex="6" style="width: 50%;">
+                                    <input type="text" class="form-control" id="deposit_company_text"
+                                        name="data[Deposit][deposit_company_text]" readonly style="width: 50%;">
+                                </div>
+                                <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]">
+                                <input type="hidden" id="deposit_company_tax_calc_type"
+                                    name="data[Deposit][deposit_company_tax_calc_type]">
+                            </td>
+                        </tr>
+
+                    </table>
+                    <button id="search-btn" class="search-btn btn btn-primary" type="button"
+                        onclick='javascript:searchSaleSlips()'>抽出</button>
+                    <button id="calc-btn" class="calc-btn btn btn-primary" type="button"
+                        onclick="javascript:calcSalesPrice()">計算</button>
+                    <input type="hidden" id="calc-flg" value="0">
                 </div>
 
-                <table class="deposit-from-table">
-                    <tr>
-                        <th colspan="2" class="sales-label owner_company_area" style="display: none;">本部企業</th>
-                        <th colspan="2" class="sales-label sale_company_area">売上先店舗</th>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="width-50 owner_company_area" id="owner_company_area" style="display: none;">
-                            <div class="d-flex">
-                                <input type="text" class="form-control mr-2 deposit_owner_code_input" id="deposit_owner_code" name="data[Deposit][deposit_owner_code]" onchange='changeCalcFlg()' tabindex="5" style="width: 50%;">
-                                <input type="text" class="form-control" id="deposit_owner_text" name="data[Deposit][deposit_owner_text]" readonly style="width: 50%;">
-                            </div>
-                            <input type="hidden" id="deposit_owner_id" name="data[Deposit][deposit_owner_id]">
-                        </td>
-                        <td colspan="2" class="width-50 sale_company_area" id="sale_company_area">
-                            <div class="d-flex">
-                                <input type="text" class="form-control mr-2 deposit_company_code_input" id="deposit_company_code" name="data[Deposit][deposit_company_code]" onchange='changeCalcFlg()' tabindex="6" style="width: 50%;">
-                                <input type="text" class="form-control" id="deposit_company_text" name="data[Deposit][deposit_company_text]" readonly style="width: 50%;">
-                            </div>
-                            <input type="hidden" id="deposit_company_id" name="data[Deposit][deposit_company_id]">
-                            <input type="hidden" id="deposit_company_tax_calc_type" name="data[Deposit][deposit_company_tax_calc_type]">
-                        </td>
-                    </tr>
+                {{-- 抽出結果表示欄 開始 --}}
+                <div id="result-area" class="result-area">
+                    <input type="checkbox" id="checkbox_all">
+                    <label for="checkbox_all">全て選択 / 解除</label>
+                    <table class="result-table" onchange="javascript:changeCalcFlg()">
+                        <tr>
+                            <th class="width-5">選択</th>
+                            <th>伝票日付</th>
+                            <th>8%税抜合計</th>
+                            <th>外税8%</th>
+                            <th>10%税抜合計</th>
+                            <th>外税10%</th>
+                            <th>小計</th>
+                            <th>配送額</th>
+                            <th>調整額</th>
+                            <th>調整後金額</th>
+                            <th class="width-5">明細</th>
+                        </tr>
+                    </table>
+                    <div id="sale-slip-area"></div>
+                </div>
+                {{-- 抽出結果表示欄 終了 --}}
 
+                <table class="deposit-table">
+                    <tr>
+                        <th class="width-5">担当者</th>
+                        <td>
+                            <input type="text" class="form-control staff_code_input" id="staff_code"
+                                name="data[Deposit][staff_code]" value="1009" tabindex="7">
+                            <input type="hidden" id="staff_id" name="data[Deposit][staff_id]" value="9">
+                        </td>
+                        <td class="width-30">
+                            <input type="text" class="form-control" id="staff_text" name="data[Deposit][staff_text]"
+                                value="石塚 貞雄" readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>請求金額</th>
+                        <td class="width-20">
+                            <input type="number" class="form-control" id="price" name="data[Deposit][price]"
+                                readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>調整金額</th>
+                        <td class="width-20">
+                            <input type="number" class="form-control" id="adjustment_price"
+                                name="data[Deposit][adjustment_price]" onchange='javascript:calcTotalSalesPrice()'
+                                tabindex="8">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>振込先</th>
+                        <td>
+                            <select name="data[Deposit][deposit_method_id]" id="bank_account_id" class="form-control" required>
+                                @foreach ($bankAccounts as $account)
+                                    <option value="{{ $account->id }}">
+                                        {{ $account->bank_name }}（{{ $account->branch_name }}）{{ $account->account_number }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>メモ</th>
+                        <td colspan="5">
+                            <textarea class="form-control" id="memo" name="data[Deposit][memo]" row="5" tabindex="10"
+                                style="margin-top: 0px; margin-bottom: 0px; height: 150px;"></textarea>
+                        </td>
+                    </tr>
                 </table>
-                <button id="search-btn" class="search-btn btn btn-primary" type="button" onclick='javascript:searchSaleSlips()'>抽出</button>
-                <button id="calc-btn" class="calc-btn btn btn-primary" type="button" onclick="javascript:calcSalesPrice()">計算</button>
-                <input type="hidden" id="calc-flg" value="0">
-            </div>
 
-            {{-- 抽出結果表示欄 開始 --}}
-            <div id="result-area" class="result-area">
-                <input type="checkbox" id="checkbox_all">
-                <label for="checkbox_all">全て選択 / 解除</label>
-                <table class="result-table" onchange="javascript:changeCalcFlg()">
+                <table class="total-table">
                     <tr>
-                        <th class="width-5">選択</th>
-                        <th>伝票日付</th>
-                        <th>8%税抜合計</th>
-                        <th>外税8%</th>
-                        <th>10%税抜合計</th>
-                        <th>外税10%</th>
-                        <th>小計</th>
-                        <th>配送額</th>
+                        <th>8%対象額</th>
+                        <th>8%税額</th>
+                        <th>8%税込額</th>
+                    </tr>
+                    <tr>
+                        <td><input type="tel" class="form-control" id="notax_sub_total_8" value='0' readonly>
+                        </td>
+                        <td><input type="tel" class="form-control" id="tax_total_8" value='0' readonly></td>
+                        <td><input type="tel" class="form-control" id="sub_total_8" value='0' readonly></td>
+                    </tr>
+                    <tr>
+                        <th>10%対象額</th>
+                        <th>10%税額</th>
+                        <th>10%税込額</th>
+                    </tr>
+                    <tr>
+                        <td><input type="tel" class="form-control" id="notax_sub_total_10" value='0' readonly>
+                        </td>
+                        <td><input type="tel" class="form-control" id="tax_total_10" value='0' readonly></td>
+                        <td><input type="tel" class="form-control" id="sub_total_10" value='0' readonly></td>
+                    </tr>
+                    <tr>
+                        <th>税抜小計</th>
+                        <th>税額</th>
+                        <th>税込小計</th>
+                    </tr>
+                    <tr>
+                        <td><input type="tel" class="form-control" id="notax_sub_total" value='0' readonly>
+                        </td>
+                        <td><input type="tel" class="form-control" id="tax_total" value='0' readonly></td>
+                        <td><input type="tel" class="form-control" id="sub_total" value='0' readonly></td>
+                    </tr>
+                    <tr>
+                        <th>配送額総計</th>
+                        <th>伝票調整額総計</th>
                         <th>調整額</th>
-                        <th>調整後金額</th>
-                        <th class="width-5">明細</th>
+                    </tr>
+                    <tr>
+                        <td><input type="text" class="form-control" id="delivery_total_price" value='0'
+                                readonly></td>
+                        <td><input type="text" class="form-control" id="slip_adjust_total_price" value='0'
+                                readonly></td>
+                        <td><input type="text" class="form-control" id="adjust_total_price" value='0' readonly>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">最終請求金額</th>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><input type="number" class="form-control" id="total_price"
+                                name="data[Deposit][total_price]" value='0' readonly></td>
                     </tr>
                 </table>
-                <div id="sale-slip-area"></div>
-            </div>
-            {{-- 抽出結果表示欄 終了 --}}
 
-            <table class="deposit-table">
-                <tr>
-                    <th class="width-5">担当者</th>
-                    <td>
-                        <input type="text" class="form-control staff_code_input" id="staff_code" name="data[Deposit][staff_code]" value="1009" tabindex="7">
-                        <input type="hidden" id="staff_id" name="data[Deposit][staff_id]" value="9">
-                    </td>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="staff_text" name="data[Deposit][staff_text]" value="石塚 貞雄" readonly>
-                    </td>
-                </tr>
-                <tr>
-                    <th>請求金額</th>
-                    <td class="width-20">
-                        <input type="number" class="form-control" id="price" name="data[Deposit][price]" readonly>
-                    </td>
-                </tr>
-                <tr>
-                    <th>調整金額</th>
-                    <td class="width-20">
-                        <input type="number" class="form-control" id="adjustment_price" name="data[Deposit][adjustment_price]" onchange='javascript:calcTotalSalesPrice()' tabindex="8">
-                    </td>
-                </tr>
-                <tr>
-                    <th>入金手段</th>
-                    <td>
-                        <select class="form-control" name="data[Deposit][deposit_method_id]" tabindex="9">
-                            <option value="1">東信当座</option>
-                            <option value="2">東信普通</option>
-                            <option value="3">みずほ</option>
-                            <option value="4">みずほ個人</option>
-                            <option value="5">UFJ個人</option>
-                            <option value="6">現金</option>
-                            <option value="7">小切手</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <th>メモ</th>
-                    <td colspan="5">
-                        <textarea class="form-control" id="memo" name="data[Deposit][memo]" row="5" tabindex="10" style="margin-top: 0px; margin-bottom: 0px; height: 150px;"></textarea>
-                    </td>
-                </tr>
-            </table>
+                <br>
+                <br>
+                <table class="register-btn-table">
+                    <tr>
+                        <td class='status-memo-area' colspan="3">0:未入金 1:入金済 2:繰越</td>
+                    </tr>
+                    <tr>
+                        <td class="width-20">
+                            <input type="tel" class="form-control" id="deposit_submit_type"
+                                name="data[Deposit][deposit_submit_type]" value="0">
+                        </td>
+                        <td class="width-30">
+                            <input type="text" class="form-control" id="deposit_submit_type_text"
+                                name="data[Deposit][deposit_submit_type_text]" value="入金済" readonly>
+                        </td>
+                        <td class="width-50">
+                            <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録"
+                                tabindex="11">
+                        </td>
+                    </tr>
+                </table>
 
-            <table class="total-table">
-                <tr>
-                    <th>8%対象額</th>
-                    <th>8%税額</th>
-                    <th>8%税込額</th>
-                </tr>
-                <tr>
-                    <td><input type="tel" class="form-control" id="notax_sub_total_8" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="tax_total_8" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="sub_total_8" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th>10%対象額</th>
-                    <th>10%税額</th>
-                    <th>10%税込額</th>
-                </tr>
-                <tr>
-                    <td><input type="tel" class="form-control" id="notax_sub_total_10" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="tax_total_10" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="sub_total_10" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th>税抜小計</th>
-                    <th>税額</th>
-                    <th>税込小計</th>
-                </tr>
-                <tr>
-                    <td><input type="tel" class="form-control" id="notax_sub_total" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="tax_total" value='0' readonly></td>
-                    <td><input type="tel" class="form-control" id="sub_total" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th>配送額総計</th>
-                    <th>伝票調整額総計</th>
-                    <th>調整額</th>
-                </tr>
-                <tr>
-                    <td><input type="text" class="form-control" id="delivery_total_price" value='0' readonly></td>
-                    <td><input type="text" class="form-control" id="slip_adjust_total_price" value='0' readonly></td>
-                    <td><input type="text" class="form-control" id="adjust_total_price" value='0' readonly></td>
-                </tr>
-                <tr>
-                    <th colspan="2">最終請求金額</th>
-                </tr>
-                <tr>
-                    <td colspan="2"><input type="number" class="form-control" id="total_price" name="data[Deposit][total_price]" value='0' readonly></td>
-                </tr>
-            </table>
+            </form>
+        </div>
 
-            <br>
-            <br>
-            <table class="register-btn-table">
-                <tr>
-                    <td class='status-memo-area' colspan="3">0:未入金 1:入金済 2:繰越</td>
-                </tr>
-                <tr>
-                    <td class="width-20">
-                        <input type="tel" class="form-control" id="deposit_submit_type" name="data[Deposit][deposit_submit_type]" value="0">
-                    </td>
-                    <td class="width-30">
-                        <input type="text" class="form-control" id="deposit_submit_type_text" name="data[Deposit][deposit_submit_type_text]" value="入金済" readonly>
-                    </td>
-                    <td class="width-50">
-                        <input type="button" id="register-btn" class="register-btn btn btn-primary" value="請求登録" tabindex="11">
-                    </td>
-                </tr>
-            </table>
-
-        </form>
     </div>
-
-</div>
 @endsection
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -702,13 +735,16 @@
             // 消費税計算方法が伝票ごとの消費税計算の場合
             if (tax_calc_type == 0) {
                 // 8%消費税額
-                subTotal8 += parseInt($('#sale-slip-tax8-' + id).val()) + parseInt($('#sale-slip-subTotal8-' + id).val());
+                subTotal8 += parseInt($('#sale-slip-tax8-' + id).val()) + parseInt($('#sale-slip-subTotal8-' +
+                    id).val());
                 // 10%消費税額
-                subTotal10 += parseInt($('#sale-slip-tax10-' + id).val()) + parseInt($('#sale-slip-subTotal10-' + id).val());
+                subTotal10 += parseInt($('#sale-slip-tax10-' + id).val()) + parseInt($(
+                    '#sale-slip-subTotal10-' + id).val());
             }
 
             // チェックしたら詳細エリアにIDを追加
-            $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id + '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
+            $('#sale-slip-area').append('<input type="hidden" id="sale-slip-detail-id-' + id +
+                '" name="data[DepositDetail][sale_slip_ids][]" value="' + id + '">');
 
         });
 
@@ -988,31 +1024,31 @@
     }
 
     .width-5 {
-        width: 5%!important;
+        width: 5% !important;
     }
 
     .width-10 {
-        width: 10%!important;
+        width: 10% !important;
     }
 
     .width-15 {
-        width: 15%!important;
+        width: 15% !important;
     }
 
     .width-20 {
-        width: 20%!important;
+        width: 20% !important;
     }
 
     .width-30 {
-        width: 30%!important;
+        width: 30% !important;
     }
 
     .width-40 {
-        width: 40%!important;
+        width: 40% !important;
     }
 
     .width-45 {
-        width: 45%!important;
+        width: 45% !important;
     }
 
     .slip-table {
@@ -1025,7 +1061,7 @@
     }
 
     .remove-slip-btn {
-        height: calc(4.2rem + 7px)!important;
+        height: calc(4.2rem + 7px) !important;
         width: 100%;
     }
 
@@ -1099,8 +1135,8 @@
 
     .calc-btn {
         margin: 1%;
-        background-color: #FF570D!important;
-        border-color: #FF570D!important;
+        background-color: #FF570D !important;
+        border-color: #FF570D !important;
     }
 
     .total-table {

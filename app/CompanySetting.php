@@ -32,4 +32,9 @@ class CompanySetting extends Model
                 ->where('company_id', $companyId)
                 ->get();
     }
+
+    public function bankAccounts()
+    {
+        return $this->hasMany(BankAccount::class);
+    }
 }

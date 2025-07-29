@@ -980,7 +980,7 @@ class DepositController extends Controller
         if ($deposit && $deposit->bankAccount) {
             $bankAccount = $deposit->bankAccount;
         }
-dd($bankAccount);
+
         $companyInfo = [
             'name'            => $companyDatas[0]->name ?? '',
             'address'         => $companyDatas[0]->address ?? '',

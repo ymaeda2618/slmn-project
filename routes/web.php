@@ -284,6 +284,11 @@ Route::post('OwnerCompanyEditComplete', 'OwnerCompanyController@editComplete');
 Route::post('OwnerCompanyAjaxAddStandard', 'OwnerCompanyController@AjaxAddStandard');
 Route::get('OwnerCompanyAjaxGetShops/{owner_company_id}', 'OwnerCompanyController@AjaxGetShops');
 
+// 銀行口座設定
+Route::resource('bank_accounts', BankAccountController::class)->only([
+    'index', 'create', 'store', 'edit', 'update', 'destroy'
+]);
+
 
 // 全ユーザ
 Route::group(['middleware' => ['auth', 'can:user-higher']], function () {

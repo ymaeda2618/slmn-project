@@ -20,30 +20,6 @@
                 <input type="text" class="form-control" value="<?= $company_setting_data[0]->address ?>" readonly>
             </div>
             <div class="form-group">
-                <label class="column-label" for="bank_code">銀行コード：</label>
-                <input type="text" class="form-control" value="<?= $company_setting_data[0]->bank_code ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_name">銀行名：</label>
-                <input type="text" class="form-control" value="<?= $company_setting_data[0]->bank_name ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_code">支店コード：</label>
-                <input type="text" class="form-control" value="<?= $company_setting_data[0]->branch_code ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_name">支店名：</label>
-                <input type="text" class="form-control" value="<?= $company_setting_data[0]->branch_name ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_type">口座種別：</label>
-                <input type="text" class="form-control" value="<?= $bank_type[$company_setting_data[0]->bank_type] ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_account">口座番号：</label>
-                <input type="text" class="form-control" value="<?= $company_setting_data[0]->bank_account ?>" readonly>
-            </div>
-            <div class="form-group">
                 <label class="column-label" for="office_tel">事務所TEL：</label>
                 <input type="text" class="form-control" value="<?= $company_setting_data[0]->office_tel ?>" readonly>
             </div>

@@ -26,7 +26,7 @@ class Deposit extends Model
         'sub_total',
         'adjustment_amount',
         'amount',
-        'deposit_method_id',
+        'bank_account_id',
         'remarks',
         'deposit_submit_type',
         'sort',

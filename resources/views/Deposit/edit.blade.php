@@ -212,10 +212,10 @@
                     <tr>
                         <th>振込先</th>
                         <td>
-                            <select name="data[Deposit][deposit_method_id]" class="form-control">
+                            <select name="data[Deposit][bank_account_id]" class="form-control">
                                 @foreach ($bankAccounts as $bank)
                                     <option value="{{ $bank->id }}"
-                                        {{ $depositDatas->deposit_method_id == $bank->id ? 'selected' : '' }}>
+                                        {{ $depositDatas->bank_account_id == $bank->id ? 'selected' : '' }}>
                                         {{ $bank->bank_name }}
                                         {{ $bank->branch_name }}（{{ $bank->account_type_label }}）{{ $bank->account_number }}
                                     </option>

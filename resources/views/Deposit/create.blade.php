@@ -132,7 +132,7 @@
                     <tr>
                         <th>振込先</th>
                         <td>
-                            <select name="data[Deposit][deposit_method_id]" id="bank_account_id" class="form-control" required>
+                            <select name="data[Deposit][bank_account_id]" id="bank_account_id" class="form-control" required>
                                 @foreach ($bankAccounts as $account)
                                     <option value="{{ $account->id }}">
                                         {{ $account->bank_name }}（{{ $account->branch_name }}）{{ $account->account_number }}

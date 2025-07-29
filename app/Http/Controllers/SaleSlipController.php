@@ -2659,7 +2659,7 @@ class SaleSlipController extends Controller
                     'sub_total'           => $subtotal,
                     'adjustment_amount'   => $adjustPrice,
                     'amount'              => $total,
-                    'deposit_method_id'   => 6,
+                    'bank_account_id'   => 6,
                     'deposit_submit_type' => 0,
                     'modified_user_id'    => $userInfoId,
                     'modified'            => Carbon::now()
@@ -2689,7 +2689,7 @@ class SaleSlipController extends Controller
                     'sub_total'           => $saleSlipDatas->subtotal,
                     'adjustment_amount'   => $saleSlipDatas->adjust_price,
                     'amount'              => $saleSlipDatas->total,
-                    'deposit_method_id'   => 6,
+                    'bank_account_id'   => 6,
                     'deposit_submit_type' => 0,
                     'active'              => 1,
                     'created_user_id'     => $userInfoId,

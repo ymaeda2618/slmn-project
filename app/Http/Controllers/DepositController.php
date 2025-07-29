@@ -251,7 +251,7 @@ class DepositController extends Controller
                 'sub_total'           => $depositDatas['price'],
                 'adjustment_amount'   => $depositDatas['adjustment_price'],
                 'amount'              => $depositDatas['total_price'],
-                'deposit_method_id'   => $depositDatas['deposit_method_id'],
+                'bank_account_id'     => $depositDatas['bank_account_id'],
                 'remarks'             => $depositDatas['memo'],
                 'deposit_submit_type' => $depositDatas['deposit_submit_type'],
                 'created_user_id'     => $user_info_id,
@@ -328,7 +328,7 @@ class DepositController extends Controller
             'Deposit.sub_total                AS sub_total',
             'Deposit.adjustment_amount        AS adjustment_amount',
             'Deposit.amount                   AS amount',
-            'Deposit.deposit_method_id        AS deposit_method_id',
+            'Deposit.bank_account_id          AS bank_account_id',
             'Deposit.staff_id                 AS staff_id',
             'Deposit.remarks                  AS remarks',
             'Deposit.deposit_submit_type      AS deposit_submit_type',
@@ -512,7 +512,7 @@ class DepositController extends Controller
                     'adjustment_amount'   => $depositDatas['adjustment_price'],
                     'amount'              => $depositDatas['total_price'],
                     'deposit_submit_type' => $depositDatas['deposit_submit_type'],
-                    'deposit_method_id'   => $depositDatas['deposit_method_id'],
+                    'bank_account_id'     => $depositDatas['bank_account_id'],
                     'remarks'             => $depositDatas['memo'],
                     'modified_user_id'    => $user_info_id,
                     'modified'            => Carbon::now()
@@ -980,7 +980,7 @@ class DepositController extends Controller
         if ($deposit && $deposit->bankAccount) {
             $bankAccount = $deposit->bankAccount;
         }
-
+dd($bankAccount);
         $companyInfo = [
             'name'            => $companyDatas[0]->name ?? '',
             'address'         => $companyDatas[0]->address ?? '',

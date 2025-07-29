@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\CompanySetting;
+use App\BankAccount;
+use App\Deposit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -197,7 +199,10 @@ class DepositController extends Controller
      */
     public function create(Request $request)
     {
-        return view('Deposit.create');
+        $company = CompanySetting::first(); // 1社前提
+        $bankAccounts = BankAccount::where('company_setting_id', $company->id)->get();
+
+        return view('Deposit.create', compact('bankAccounts'));
     }
 
     /**
@@ -246,7 +251,7 @@ class DepositController extends Controller
                 'sub_total'           => $depositDatas['price'],
                 'adjustment_amount'   => $depositDatas['adjustment_price'],
                 'amount'              => $depositDatas['total_price'],
-                'deposit_method_id'   => $depositDatas['deposit_method_id'],
+                'bank_account_id'     => $depositDatas['bank_account_id'],
                 'remarks'             => $depositDatas['memo'],
                 'deposit_submit_type' => $depositDatas['deposit_submit_type'],
                 'created_user_id'     => $user_info_id,
@@ -323,7 +328,7 @@ class DepositController extends Controller
             'Deposit.sub_total                AS sub_total',
             'Deposit.adjustment_amount        AS adjustment_amount',
             'Deposit.amount                   AS amount',
-            'Deposit.deposit_method_id        AS deposit_method_id',
+            'Deposit.bank_account_id          AS bank_account_id',
             'Deposit.staff_id                 AS staff_id',
             'Deposit.remarks                  AS remarks',
             'Deposit.deposit_submit_type      AS deposit_submit_type',
@@ -394,6 +399,16 @@ class DepositController extends Controller
             ])
             ->pluck('supply_sale_slip_id')
             ->toArray();
+        // 銀行口座一覧取得
+        $bankAccounts = BankAccount::with('companySetting')
+            ->whereHas('companySetting', function ($query) {
+                $query->where('id', 1); // 基本1レコード
+            })
+            ->get()
+            ->map(function ($bank) {
+                $bank->account_type_label = $bank->account_type == 1 ? '普通' : ($bank->account_type == 2 ? '当座' : 'その他');
+                return $bank;
+            });
 
         return view('Deposit.edit')->with([
             'depositDatas'       => $depositDatas,
@@ -404,6 +419,7 @@ class DepositController extends Controller
             'targetCode'         => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_code : $depositDatas->sale_company_code,
             'targetId'           => !empty($depositDatas->owner_company_id) ? $depositDatas->owner_company_id : $depositDatas->sale_company_id,
             'targetTaxCalcType'  => $depositDatas->sale_company_tax_calc_type ?? 0,
+            'bankAccounts'       => $bankAccounts,
         ]);
     }
 
@@ -496,7 +512,7 @@ class DepositController extends Controller
                     'adjustment_amount'   => $depositDatas['adjustment_price'],
                     'amount'              => $depositDatas['total_price'],
                     'deposit_submit_type' => $depositDatas['deposit_submit_type'],
-                    'deposit_method_id'   => $depositDatas['deposit_method_id'],
+                    'bank_account_id'     => $depositDatas['bank_account_id'],
                     'remarks'             => $depositDatas['memo'],
                     'modified_user_id'    => $user_info_id,
                     'modified'            => Carbon::now()
@@ -933,7 +949,14 @@ class DepositController extends Controller
         // 3. 請求元（自社）企業情報取得
         // ------------------------------
         $companyDatas = CompanySetting::getCompanyData();
+
+        // 銀行口座取得用
+        $deposit = Deposit::with('bankAccount')->find($depositId);
+        $bankAccount = null;
         $bank_type = [1 => '普通', 2 => '当座', 3 => 'その他'];
+        if ($deposit && $deposit->bankAccount) {
+            $bankAccount = $deposit->bankAccount;
+        }
 
         $companyInfo = [
             'name'            => $companyDatas[0]->name ?? '',
@@ -944,10 +967,10 @@ class DepositController extends Controller
             'shop_tel'        => $companyDatas[0]->shop_tel ?? '',
             'shop_fax'        => $companyDatas[0]->shop_fax ?? '',
             'invoice_form_id' => $companyDatas[0]->invoice_form_id ?? '',
-            'bank_name'       => $companyDatas[0]->bank_name ?? '',
-            'branch_name'     => $companyDatas[0]->branch_name ?? '',
-            'bank_type'       => isset($companyDatas[0]->bank_type) ? $bank_type[$companyDatas[0]->bank_type] : '',
-            'bank_account'    => $companyDatas[0]->bank_account ?? '',
+            'bank_name'       => $bankAccount->bank_name ?? '',
+            'branch_name'     => $bankAccount->branch_name ?? '',
+            'bank_type'       => $bank_type[$bankAccount->account_type] ?? '',
+            'bank_account'    => $bankAccount->account_number ?? '',
             'company_image'   => $companyDatas[0]->company_image ?? '',
         ];
 

@@ -8,7 +8,7 @@
         <div class="error-alert">{{$error_message}}</div>
         @endif
 
-        <form class="event-form" id="event-create-form" method="post" action="./CompanySettingConfirm" enctype="multipart/form-data" onsubmit="return inputCheck();">
+        <form class="event-form" id="event-create-form" method="post" action="./../CompanySettingConfirm" enctype="multipart/form-data" onsubmit="return inputCheck();">
             {{ csrf_field() }}
             <div class="form-group">
                 <label class="column-label" for="name">名前：</label>
@@ -24,45 +24,6 @@
             <div class="form-group">
                 <label class="column-label" for="address">住所：</label>
                 <input type="text" class="form-control" id="address" name="data[CompanySetting][address]" value="{{$company_setting_data[0]->address}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_code">銀行コード (※半角数字で入力してください)：</label>
-                @error('data.CompanySetting.bank_code')
-                <div class="text-red-500">{{ $message }}</div>
-                @enderror
-                <input type="text" class="form-control" id="bank_code" name="data[CompanySetting][bank_code]" value="{{old('data.CompanySetting.bank_code', $company_setting_data[0]->bank_code)}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_name">銀行名：</label>
-                <input type="text" class="form-control" id="bank_name" name="data[CompanySetting][bank_name]" value="{{$company_setting_data[0]->bank_name}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_code">支店コード (※半角数字で入力してください)：</label>
-                @error('data.CompanySetting.branch_code')
-                <div class="text-red-500">{{ $message }}</div>
-                @enderror
-                <input type="text" class="form-control" id="branch_code" name="data[CompanySetting][branch_code]" value="{{old('data.CompanySetting.branch_code', $company_setting_data[0]->branch_code)}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="branch_name">支店名：</label>
-                <input type="text" class="form-control" id="branch_name" name="data[CompanySetting][branch_name]" value="{{$company_setting_data[0]->branch_name}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_type">口座種別：</label>
-                <select class="file-control" id="bank_type" name="data[CompanySetting][bank_type]">
-                    <option value="0">-</option>
-                    <option value="1">普通</option>
-                    <option value="2">当座</option>
-                    <option value="3">その他</option>
-                </select>
-                <input type='hidden' id="bank_type_selected" value="{{$company_setting_data[0]->bank_type}}">
-            </div>
-            <div class="form-group">
-                <label class="column-label" for="bank_account">口座番号 (※半角数字で入力してください)：</label>
-                @error('data.CompanySetting.bank_account')
-                <div class="text-red-500">{{ $message }}</div>
-                @enderror
-                <input type="text" class="form-control" id="bank_account" name="data[CompanySetting][bank_account]" value="{{old('data.CompanySetting.bank_account', $company_setting_data[0]->bank_account)}}">
             </div>
             <div class="form-group">
                 <label class="column-label" for="office_tel">事務所TEL (※半角数字で入力してください)：</label>
@@ -122,16 +83,6 @@
 
 <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
 <script type="text/javascript">
-    (function($) {
-        jQuery(window).load(function() {
-
-            // 検索されて選択状態の役職を取得
-            var bank_type_selected = $("#bank_type_selected").val();
-            // 検索条件で設定された役職を設定
-            $('#bank_type').val(bank_type_selected);
-        });
-
-    })(jQuery);
 
     //------------
     // 入力チェック

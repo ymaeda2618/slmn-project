@@ -191,6 +191,7 @@ class PaymentController extends Controller
                 ->when(!empty($condition_company_id), function ($query) use ($condition_company_id) {
                     return $query->where('SaleSlip.sale_company_id', '=', $condition_company_id);
                 })
+                ->where('SaleSlip.active', '=', '1')
                 ->whereBetween('SaleSlip.date', [$condition_date_from, $condition_date_to])
                 ->orderBy('SaleSlip.sale_company_id', 'desc')
                 ->groupBy('SaleSlip.sale_company_id')

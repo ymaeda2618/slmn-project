@@ -946,30 +946,7 @@ class DepositController extends Controller
             ->get();
 
         // ------------------------------
-        // 3. 出力基準企業の情報を設定
-        // ------------------------------
-        $row = $depositList->first();
-        $displayName            = $invoiceOutputType == 0 ? $row->owner_name : $row->company_name;
-        $displayAddress         = $invoiceOutputType == 0 ? $row->owner_address : $row->company_address;
-        $displayPostalCode      = $invoiceOutputType == 0 ? $row->owner_postal_code : $row->company_postal_code;
-        $displayFlg             = $invoiceOutputType == 0 ? $row->owner_invoice_display_flg : $row->company_invoice_display_flg;
-        $displayOverrideName    = $invoiceOutputType == 0 ? $row->owner_invoice_display_name : $row->company_invoice_display_name;
-        $displayOverrideAddress = $invoiceOutputType == 0 ? $row->owner_invoice_display_address : $row->company_invoice_display_address;
-        $displayOverridePostal  = $invoiceOutputType == 0 ? $row->owner_invoice_display_postal_code : $row->company_invoice_display_postal_code;
-
-        if ($displayFlg) {
-            if (!empty($displayOverrideName)) $displayName = $displayOverrideName;
-            if (!empty($displayOverrideAddress)) $displayAddress = $displayOverrideAddress;
-            if (!empty($displayOverridePostal)) $displayPostalCode = $displayOverridePostal;
-        }
-
-        $postal_code = '';
-        if (!empty($displayPostalCode)) {
-            $postal_code = substr($displayPostalCode, 0, 3) . '-' . substr($displayPostalCode, 3);
-        }
-
-        // ------------------------------
-        // 4. 請求元（自社）企業情報取得
+        // 3. 請求元（自社）企業情報取得
         // ------------------------------
         $companyDatas = CompanySetting::getCompanyData();
 
@@ -998,7 +975,7 @@ class DepositController extends Controller
         ];
 
         // ------------------------------
-        // 5. 明細計算処理など（元コードと同様に続く）
+        // 4. 明細計算処理など（元コードと同様に続く）
         // ------------------------------
         // 初期化処理
         $calcDepositList = array();

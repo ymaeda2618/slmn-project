@@ -29,6 +29,7 @@ class SaleSlipController extends Controller
      */
     public function __construct()
     {
+        parent::__construct();
         $this->middleware('auth');
         $this->SaleSlip         = new SaleSlip;
         $this->SaleSlipDetail   = new SaleSlipDetail;
@@ -43,6 +44,8 @@ class SaleSlipController extends Controller
     public function index(Request $request)
     {
 
+        $user_id = $this->login_user_id ?? null;
+
         // 現在のURL（このSaleSlipIndex）を取得
         $current_url = $request->url();
 
@@ -51,6 +54,7 @@ class SaleSlipController extends Controller
 
         // リファラーが存在し、かつこの画面以外から遷移してきた場合
         if ($referer && strpos($referer, $current_url) === false) {
+            \Log::info('【SaleSlipIndex】セッション初期化', ['user_id' => $user_id]);
             // セッション初期化
             $request->session()->forget([
                 'condition_date_type',
@@ -81,7 +85,7 @@ class SaleSlipController extends Controller
 
         // postできたか、getできたか
         if ($_SERVER["REQUEST_METHOD"] != "POST") { // ページング処理
-
+            \Log::info('【SaleSlipIndex】GET処理（ページング）', ['user_id' => $user_id]);
             $condition_date_type     = $request->session()->get('condition_date_type');
             $condition_date_from     = $request->session()->get('condition_date_from');
             $condition_date_to       = $request->session()->get('condition_date_to');
@@ -122,7 +126,7 @@ class SaleSlipController extends Controller
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
-
+                \Log::info('【SaleSlipIndex】POST処理：検索ボタン', ['user_id' => $user_id]);
                 $req_data = $request->data['SaleSlip'];
                 if (isset($request->data['SaleSlipDetail'])) {
                     $req_detail_data = $request->data['SaleSlipDetail'];
@@ -182,7 +186,7 @@ class SaleSlipController extends Controller
                 $request->session()->put('condition_no_display', $condition_no_display);
 
             } else { // リセットボタンが押された時の処理
-
+                \Log::info('【SaleSlipIndex】POST処理：リセットボタン', ['user_id' => $user_id]);
                 $condition_date_type     = 1;
                 $condition_date_from     = date('Y-m-d');
                 $condition_date_to       = date('Y-m-d');
@@ -229,7 +233,11 @@ class SaleSlipController extends Controller
                 !empty($condition_product_id) &&
                 !empty($condition_staff_id)
             ) {
-
+                \Log::info('【SaleSlipIndex】サブクエリ作成', [
+                    'user_id'    => $user_id,
+                    'product_id' => $condition_product_id,
+                    'staff_id'   => $condition_staff_id,
+                ]);
                 $product_sub_query = DB::table('sale_slip_details as SubTable')
                 ->select('SubTable.sale_slip_id AS sale_slip_id')
                 ->where('SubTable.product_id', '=', $condition_product_id)
@@ -316,6 +324,11 @@ class SaleSlipController extends Controller
             ->orderBy('SaleSlip.id', 'desc')
             ->paginate($condition_display_num);
 
+            \Log::info('【SaleSlipIndex】売上一覧取得', [
+                'user_id' => $user_id,
+                '件数' => $saleSlipList->total()
+            ]);
+
             //---------------------
             // 売上一覧を総額集計
             //---------------------
@@ -395,6 +408,14 @@ class SaleSlipController extends Controller
                     $sale_slip_tax_amount   = ($delivery_price_amount + $adjust_price_amount + $sub_total_amount);
                 }
 
+                \Log::info('【SaleSlipIndex】売上集計（絞りなし）', [
+                    'user_id'         => $user_id,
+                    'sale_slip_num'   => $sale_slip_num,
+                    'delivery_price'  => $delivery_price_amount,
+                    'adjust_price'    => $adjust_price_amount,
+                    'notax_sub_total' => $notax_sub_total_amount,
+                ]);
+
             } else { // 製品IDと担当者IDの絞りがある場合
 
                 $saleSlipDetailSumList = DB::table('sale_slip_details AS SaleSlipDetail')
@@ -462,6 +483,12 @@ class SaleSlipController extends Controller
                     $sale_slip_condition_num              = $saleSlipDetailSumVal[0]->sale_slip_detail_num;
                     $sale_slip_condition_notax_sub_total  = $saleSlipDetailSumVal[0]->notax_price_sum;
                 }
+
+                \Log::info('【SaleSlipIndex】売上集計（絞りあり）', [
+                    'user_id' => $user_id,
+                    '明細件数' => $sale_slip_condition_num,
+                    '税抜合計' => $sale_slip_condition_notax_sub_total
+                ]);
 
             }
             //---------------------
@@ -552,8 +579,14 @@ class SaleSlipController extends Controller
             ->orderBy('SaleSlipDetail.sort', 'asc')
             ->get();
 
-            $sale_slip_detail_arr                  = array(); // 各伝票にいくつ明細がついているのかをカウントする配列
-            $sale_slip_detail_count_arr            = array(); // 各小計が入るファイルをリセット
+            \Log::info('【SaleSlipIndex】伝票詳細取得', [
+                'user_id' => $user_id,
+                '対象伝票数' => count($sale_slip_id_arr),
+                '明細数' => count($SaleSlipDetailList),
+            ]);
+
+            $sale_slip_detail_arr       = array(); // 各伝票にいくつ明細がついているのかをカウントする配列
+            $sale_slip_detail_count_arr = array(); // 各小計が入るファイルをリセット
 
             // 伝票詳細で取得したDBをループ
             foreach($SaleSlipDetailList as $SaleSlipDetails){
@@ -591,10 +624,14 @@ class SaleSlipController extends Controller
 
         } catch (\Exception $e) {
 
-            dd($e);
+            \Log::error('【SaleSlipIndex】エラー発生', [
+                'user_id' => $user_id,
+                'line'    => $e->getLine(),
+                'message' => $e->getMessage(),
+            ]);
 
-            return view('SaleSlip.complete')->with([
-                'errorMessage' => $e
+            return view('errors.error')->with([
+                'errorMessage' => $e->getMessage()
             ]);
         }
 
@@ -641,6 +678,14 @@ class SaleSlipController extends Controller
      */
     public function edit($sale_slip_id)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('【SaleSlipEdit】処理開始', [
+            'user_id'      => $user_id,
+            'sale_slip_id' => $sale_slip_id
+        ]);
+
         // activeの変数を格納
         $this_active = 1;
 
@@ -694,6 +739,12 @@ class SaleSlipController extends Controller
             ['SaleSlip.active', '=', $this_active],
         ])
         ->first();
+
+        \Log::info('【SaleSlipEdit】伝票取得完了', [
+            'user_id'      => $user_id,
+            'sale_slip_id' => $sale_slip_id,
+            'result'       => !empty($SaleSlipList) ? 'OK' : 'NOT FOUND'
+        ]);
 
         //------------------
         // 売上伝票詳細取得
@@ -787,6 +838,11 @@ class SaleSlipController extends Controller
         ])
         ->get();
 
+        \Log::info('【SaleSlipEdit】伝票詳細取得完了', [
+            'user_id'       => $user_id,
+            'details_count' => count($SaleSlipDetailList),
+        ]);
+
         //------------------
         // 在庫管理
         //------------------
@@ -808,10 +864,14 @@ class SaleSlipController extends Controller
             ->orderByRaw("SaleSlipDetail.sort asc, InventoryManage.sort asc")
             ->get();
 
+        \Log::info('【SaleSlipEdit】在庫管理取得完了', [
+            'user_id'             => $user_id,
+            'inventory_row_count' => count($inventoryManageList)
+        ]);
+
         // 在庫管理しやすいようにする
         $inventoryManageArr = array();
         foreach($inventoryManageList as $inventoryManageVal) {
-
             $sale_slip_detail_sort = $inventoryManageVal->sale_slip_detail_sort;
             $inventory_manage_sort = $inventoryManageVal->inventory_manage_sort;
 
@@ -840,6 +900,11 @@ class SaleSlipController extends Controller
             $depositFlg = $depositList[0]->deposit_flg;
         }
 
+        \Log::info('【SaleSlipEdit】入金チェック完了', [
+            'user_id'    => $user_id,
+            'depositFlg' => $depositFlg,
+        ]);
+
         return view('SaleSlip.edit')->with([
             "sale_slip_id"        => $sale_slip_id,
             "SaleSlipList"        => $SaleSlipList,
@@ -857,10 +922,17 @@ class SaleSlipController extends Controller
     public function editRegister(Request $request)
     {
 
+        $user_id = $this->login_user_id ?? null;
+
         // トランザクション開始
         DB::connection()->beginTransaction();
 
         try{
+
+            \Log::info('【editRegister】処理開始', [
+                'user_id'              => $user_id,
+                'request_sale_slip_id' => $request->data['SaleSlip']['id'] ?? null,
+            ]);
 
             // ユーザー情報の取得
             $user_info    = \Auth::user();
@@ -870,6 +942,8 @@ class SaleSlipController extends Controller
             $SaleSlipDetailData = $request->data['SaleSlipDetail'];
 
             if ($SaleSlipData['sale_submit_type'] == 3) {
+
+                \Log::info('【editRegister】論理削除開始', ['user_id' => $user_id]);
 
                 // -----------------
                 // 伝票を論理削除させる
@@ -881,7 +955,11 @@ class SaleSlipController extends Controller
 
                 $SaleSlip->save();
 
+                \Log::info('【editRegister】伝票論理削除完了', ['sale_slip_id' => $SaleSlip->id]);
+
             } else {
+
+                \Log::info('【editRegister】伝票更新処理開始', ['user_id' => $user_id]);
 
                 // 値がNULLのところを初期化
                 if(empty($SaleSlipData['delivery_id'])) $SaleSlipData['delivery_id'] = 0;
@@ -913,6 +991,8 @@ class SaleSlipController extends Controller
                 $SaleSlip->modified           = Carbon::now();                         // 更新時間
 
                 $SaleSlip->save();
+
+                \Log::info('【editRegister】伝票更新完了', ['sale_slip_id' => $SaleSlip->id]);
 
                 // 作成したIDを取得する
                 $sale_slip_new_id = $SaleSlip->id;
@@ -961,7 +1041,6 @@ class SaleSlipController extends Controller
                 }
 
                 if(!empty($sale_slip_detail)) {
-
                     DB::table('sale_slip_details')->insert($sale_slip_detail);
                     $saleSlipDetailIds[] = DB::getPdo()->lastInsertId();
                 }
@@ -1088,6 +1167,8 @@ class SaleSlipController extends Controller
             // 問題なければコミット
             DB::connection()->commit();
 
+            \Log::info('【editRegister】完了', ['user_id' => $user_id]);
+
             // 登録のタイプが請求書印刷の場合(sale_submit_type:4)
             if ($SaleSlipData['sale_submit_type'] == 4) {
 
@@ -1102,7 +1183,16 @@ class SaleSlipController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            \Log::error('【editRegister】エラー', [
+                'user_id' => $user_id,
+                'line'    => $e->getLine(),
+                'message' => $e->getMessage()
+            ]);
+
+            return view('errors.error')->with([
+                'errorMessage' => $e->getMessage()
+            ]);
+
         }
 
         return redirect('./SaleSlipCreate');
@@ -1125,11 +1215,20 @@ class SaleSlipController extends Controller
      */
     public function AjaxChangeProductId(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 伝票番号を取得
         $slip_num = $request->slip_num;
 
         // 製品IDを取得
         $product_id = $request->selected_product_id;
+
+        \Log::info('【AjaxChangeProductId】リクエスト受信', [
+            'user_id'    => $user_id,
+            'slip_num'   => $slip_num,
+            'product_id' => $product_id,
+        ]);
 
         if (!empty($product_id)) {
 
@@ -1141,10 +1240,10 @@ class SaleSlipController extends Controller
 
             // 製品の税率情報を取得
             $productList = DB::table('products AS Product')
-            ->select(
-                'Product.tax_id  AS tax_id',
-                'Tax.name        AS tax_name'
-            )
+                ->select(
+                    'Product.tax_id  AS tax_id',
+                    'Tax.name        AS tax_name'
+                )
                 ->join('taxes AS Tax', function ($join) {
                     $join->on('Tax.id', '=', 'Product.tax_id');
                 })
@@ -1156,9 +1255,17 @@ class SaleSlipController extends Controller
             $tax_id   = $productList->tax_id;
             $tax_name = $productList->tax_name;
 
+            \Log::info('【AjaxChangeProductId】データ取得完了', [
+                'user_id'    => $user_id,
+                'tax_id'     => $tax_id,
+                'tax_name'   => $tax_name,
+                'standard数' => count($StandardList),
+            ]);
+
         } else {
             $tax_id   = 0;
             $tax_name = '';
+            \Log::info('【AjaxChangeProductId】空のproduct_id', ['user_id' => $user_id]);
         }
 
         // 規格のSELECTを形成
@@ -1184,11 +1291,19 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteSaleCompany(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
         // 入力候補を初期化
         $auto_complete_array = array();
+
+        \Log::info('【AjaxAutoCompleteSaleCompany】入力受信', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         if (!empty($input_text)) {
 
@@ -1206,12 +1321,14 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($saleCompanyList)) {
-
                 foreach ($saleCompanyList as $sale_company_val) {
-
                     array_push($auto_complete_array, $sale_company_val->sale_company_name);
                 }
             }
+            \Log::info('【AjaxAutoCompleteSaleCompany】候補件数', [
+                'user_id' => $user_id,
+                'count'   => count($auto_complete_array),
+            ]);
         }
 
         return json_encode($auto_complete_array);
@@ -1224,8 +1341,14 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetSaleCompany(Request $request)
     {
+        $user_id = $this->login_user_id ?? null;
         // 入力された値を取得
         $input_text = $request->inputText;
+
+        \Log::info('【AjaxSetSaleCompany】入力受信', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
@@ -1279,6 +1402,14 @@ class SaleSlipController extends Controller
                     // 日付指定
                     $output_cloging_date = date('Y-m-d', strtotime(date('Y-m-' . $closing_date)));
                 }
+
+                \Log::info('【AjaxSetSaleCompany】企業情報取得', [
+                    'user_id'      => $user_id,
+                    'company_id'   => $output_id,
+                    'closing_date' => $closing_date,
+                ]);
+            } else {
+                \Log::info('【AjaxSetSaleCompany】該当なし', ['user_id' => $user_id]);
             }
         }
 
@@ -1294,6 +1425,9 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetPaymentMethodType(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 初期化
         $output_name = null;
 
@@ -1310,6 +1444,12 @@ class SaleSlipController extends Controller
 
         $returnArray = array($output_name);
 
+        \Log::info('【AjaxSetPaymentMethodType】支払方法変換', [
+            'user_id'     => $user_id,
+            'input_value' => $input_text,
+            'output_name' => $output_name,
+        ]);
+
         return json_encode($returnArray);
     }
 
@@ -1320,11 +1460,19 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteProduct(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
         // 入力候補を初期化
         $auto_complete_array = array();
+
+        \Log::info('【AjaxAutoCompleteProduct】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         if (!empty($input_text)) {
 
@@ -1347,15 +1495,17 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($productList)) {
-
                 foreach ($productList as $product_val) {
-
                     // サジェスト表示を「コード 商品名 単位」にする
                     $suggest_text = '【' . $product_val->product_code . '】 ' . $product_val->product_name . ' (' . $product_val->unit_name . ')';
-
                     array_push($auto_complete_array, $suggest_text);
                 }
             }
+            \Log::info('【AjaxAutoCompleteProduct】候補取得', [
+                'user_id' => $user_id,
+                '候補件数' => count($auto_complete_array),
+            ]);
+
         }
 
         return json_encode($auto_complete_array);
@@ -1368,10 +1518,18 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetProduct(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
         $brackets_forward = mb_strpos($input_text, "【");
         $brackets_backward = mb_strpos($input_text, "】");
+
+        \Log::info('【AjaxSetProduct】製品入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         if($brackets_forward == 0 && $brackets_backward != false) {
             $length = $brackets_backward-1;
@@ -1445,6 +1603,16 @@ class SaleSlipController extends Controller
                 $output_unit_name           = $productList->unit_name;
                 $output_inventory_unit_id   = $productList->inventory_unit_id;
                 $output_inventory_unit_name = $productList->inventory_unit_name;
+
+                \Log::info('【AjaxSetProduct】製品データ取得', [
+                    'user_id'      => $user_id,
+                    'product_id'   => $output_product_id,
+                    'product_code' => $output_product_code,
+                    'unit_name'    => $output_unit_name,
+                    'tax_name'     => $output_tax_name,
+                ]);
+            } else {
+                \Log::info('【AjaxSetProduct】製品未ヒット', ['user_id' => $user_id]);
             }
         }
 
@@ -1470,6 +1638,9 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteStandard(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $productId  = $request->productId;
         $input_text = $request->inputText;
@@ -1477,8 +1648,13 @@ class SaleSlipController extends Controller
         // 入力候補を初期化
         $auto_complete_array = array();
 
-        if (!empty($input_text)) {
+        \Log::info('【AjaxAutoCompleteStandard】入力開始', [
+            'user_id'   => $user_id,
+            'productId' => $productId,
+            'input'     => $input_text,
+        ]);
 
+        if (!empty($input_text)) {
             // 製品DB取得
             $standardList = DB::table('standards AS Standard')
             ->select(
@@ -1494,12 +1670,14 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($standardList)) {
-
                 foreach ($standardList as $standard_val) {
-
                     array_push($auto_complete_array, $standard_val->name);
                 }
             }
+            \Log::info('【AjaxAutoCompleteStandard】候補取得', [
+                'user_id' => $user_id,
+                '件数'    => count($auto_complete_array),
+            ]);
         }
 
         return json_encode($auto_complete_array);
@@ -1512,9 +1690,18 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetStandard(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $productId  = $request->productId;
         $input_text = $request->inputText;
+
+        \Log::info('【AjaxSetStandard】入力開始', [
+            'user_id'   => $user_id,
+            'productId' => $productId,
+            'input'     => $input_text,
+        ]);
 
         // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
@@ -1531,7 +1718,6 @@ class SaleSlipController extends Controller
         $output_name = null;
 
         if (!empty($input_text)) {
-
             // 製品DB取得
             // 製品一覧を取得
             $productList = DB::table('standards AS Standard')
@@ -1554,12 +1740,22 @@ class SaleSlipController extends Controller
                 $output_code = $productList->code;
                 $output_id   = $productList->id;
                 $output_name = $productList->name;
+
+                \Log::info('【AjaxSetStandard】規格データ取得', [
+                    'user_id'       => $user_id,
+                    'standard_id'   => $output_id,
+                    'standard_code' => $output_code,
+                    'standard_name' => $output_name,
+                ]);
+            } else {
+                \Log::info('【AjaxSetStandard】一致なし', ['user_id' => $user_id]);
             }
         }
 
         $returnArray = array($output_code, $output_id, $output_name);
 
         return json_encode($returnArray);
+
     }
 
     /**
@@ -1569,14 +1765,22 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteQuality(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
         // 入力候補を初期化
         $auto_complete_array = array();
 
-        if (!empty($input_text)) {
+        \Log::info('【AjaxAutoCompleteQuality】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
+
+        if (!empty($input_text)) {
             // 製品DB取得
             $qualityList = DB::table('qualities AS Quality')
             ->select(
@@ -1591,12 +1795,14 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($qualityList)) {
-
                 foreach ($qualityList as $quality_val) {
-
                     array_push($auto_complete_array, $quality_val->name);
                 }
             }
+            \Log::info('【AjaxAutoCompleteQuality】候補取得', [
+                'user_id' => $user_id,
+                '件数'    => count($auto_complete_array),
+            ]);
         }
 
         return json_encode($auto_complete_array);
@@ -1609,8 +1815,16 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetQuality(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
+
+        \Log::info('【AjaxSetQuality】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
@@ -1627,7 +1841,6 @@ class SaleSlipController extends Controller
         $output_name = null;
 
         if (!empty($input_text)) {
-
             // 製品DB取得
             // 製品一覧を取得
             $qualityList = DB::table('qualities AS Quality')
@@ -1648,12 +1861,22 @@ class SaleSlipController extends Controller
                 $output_code = $qualityList->code;
                 $output_id   = $qualityList->id;
                 $output_name = $qualityList->name;
+
+                \Log::info('【AjaxSetQuality】品質取得', [
+                'user_id' => $user_id,
+                'quality_id' => $output_id,
+                'quality_code' => $output_code,
+                'quality_name' => $output_name,
+            ]);
+            } else {
+                \Log::info('【AjaxSetQuality】一致なし', ['user_id' => $user_id]);
             }
         }
 
         $returnArray = array($output_code, $output_id, $output_name);
 
         return json_encode($returnArray);
+
     }
 
     /**
@@ -1663,14 +1886,21 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteOriginArea(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
         // 入力候補を初期化
         $auto_complete_array = array();
 
-        if (!empty($input_text)) {
+        \Log::info('【AjaxAutoCompleteOriginArea】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
+        if (!empty($input_text)) {
             // 製品DB取得
             $originAreaList = DB::table('origin_areas AS OriginArea')
             ->select(
@@ -1685,15 +1915,18 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($originAreaList)) {
-
                 foreach ($originAreaList as $origin_area_val) {
-
                     array_push($auto_complete_array, $origin_area_val->name);
                 }
             }
+            \Log::info('【AjaxAutoCompleteOriginArea】候補取得', [
+                'user_id' => $user_id,
+                '件数' => count($auto_complete_array),
+            ]);
         }
 
         return json_encode($auto_complete_array);
+
     }
 
     /**
@@ -1703,8 +1936,16 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetOriginArea(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
+
+        \Log::info('【AjaxSetOriginArea】入力開始', [
+            'user_id' => $user_id,
+            'input' => $input_text,
+        ]);
 
         // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
@@ -1721,7 +1962,6 @@ class SaleSlipController extends Controller
         $output_name = null;
 
         if (!empty($input_text)) {
-
             // 製品DB取得
             // 製品一覧を取得
             $originAreaList = DB::table('origin_areas AS OriginArea')
@@ -1741,12 +1981,21 @@ class SaleSlipController extends Controller
                 $output_code = $originAreaList->id;
                 $output_id   = $originAreaList->id;
                 $output_name = $originAreaList->name;
+
+                \Log::info('【AjaxSetOriginArea】産地取得', [
+                    'user_id'          => $user_id,
+                    'origin_area_id'   => $output_id,
+                    'origin_area_name' => $output_name,
+                ]);
+            } else {
+                \Log::info('【AjaxSetOriginArea】一致なし', ['user_id' => $user_id]);
             }
         }
 
         $returnArray = array($output_code, $output_id, $output_name);
 
         return json_encode($returnArray);
+
     }
 
     /**
@@ -1756,14 +2005,21 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteStaff(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = str_replace(' ','', $request->inputText);
 
         // 入力候補を初期化
         $auto_complete_array = array();
 
-        if (!empty($input_text)) {
+        \Log::info('【AjaxAutoCompleteStaff】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
+        if (!empty($input_text)) {
             // 製品DB取得
             $staffList = DB::table('staffs AS Staff')
             ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS name')
@@ -1777,15 +2033,18 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($staffList)) {
-
                 foreach ($staffList as $staff_val) {
-
                     array_push($auto_complete_array, $staff_val->name);
                 }
             }
+            \Log::info('【AjaxAutoCompleteStaff】候補取得', [
+                'user_id' => $user_id,
+                '件数' => count($auto_complete_array),
+            ]);
         }
 
         return json_encode($auto_complete_array);
+
     }
 
     /**
@@ -1795,8 +2054,16 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetStaff(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = str_replace(' ','', $request->inputText);
+
+        \Log::info('【AjaxSetStaff】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
@@ -1813,7 +2080,6 @@ class SaleSlipController extends Controller
         $output_name = null;
 
         if (!empty($input_text)) {
-
             // 担当者TBL取得
             $staffList = DB::table('staffs AS Staff')
             ->select(
@@ -1833,12 +2099,21 @@ class SaleSlipController extends Controller
                 $output_code = $staffList->code;
                 $output_id   = $staffList->id;
                 $output_name = $staffList->name;
+
+                \Log::info('【AjaxSetStaff】担当者取得', [
+                    'user_id'    => $user_id,
+                    'staff_id'   => $output_id,
+                    'staff_name' => $output_name,
+                ]);
+            } else {
+                \Log::info('【AjaxSetStaff】一致なし', ['user_id' => $user_id]);
             }
         }
 
         $returnArray = array($output_code, $output_id, $output_name);
 
         return json_encode($returnArray);
+
     }
 
     /**
@@ -1848,6 +2123,9 @@ class SaleSlipController extends Controller
      */
     public function AjaxAutoCompleteDelivery(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1855,7 +2133,6 @@ class SaleSlipController extends Controller
         $auto_complete_array = array();
 
         if (!empty($input_text)) {
-
             // 製品DB取得
             $deliveryList = DB::table('deliverys AS Delivery')
             ->select(
@@ -1870,15 +2147,19 @@ class SaleSlipController extends Controller
             ->get();
 
             if (!empty($deliveryList)) {
-
                 foreach ($deliveryList as $delivery_val) {
-
                     array_push($auto_complete_array, $delivery_val->name);
                 }
             }
+
+            \Log::info('【AjaxAutoCompleteDelivery】候補取得', [
+                'user_id' => $user_id,
+                '件数' => count($auto_complete_array),
+            ]);
         }
 
         return json_encode($auto_complete_array);
+
     }
 
     /**
@@ -1888,8 +2169,16 @@ class SaleSlipController extends Controller
      */
     public function AjaxSetDelivery(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 入力された値を取得
         $input_text = str_replace(' ','', $request->inputText);
+
+        \Log::info('【AjaxSetDelivery】入力開始', [
+            'user_id' => $user_id,
+            'input'   => $input_text,
+        ]);
 
         // すべて数字かどうかチェック
         if (is_numeric($input_text)) {
@@ -1906,7 +2195,6 @@ class SaleSlipController extends Controller
         $output_name = null;
 
         if (!empty($input_text)) {
-
             // 製品 DB取得
             $deliveryList = DB::table('deliverys AS Delivery')
             ->select(
@@ -1926,12 +2214,21 @@ class SaleSlipController extends Controller
                 $output_code = $deliveryList->code;
                 $output_id   = $deliveryList->id;
                 $output_name = $deliveryList->name;
+
+                \Log::info('【AjaxSetDelivery】配送先取得', [
+                    'user_id'       => $user_id,
+                    'delivery_id'   => $output_id,
+                    'delivery_name' => $output_name,
+                ]);
+            } else {
+                \Log::info('【AjaxSetDelivery】一致なし', ['user_id' => $user_id]);
             }
         }
 
         $returnArray = array($output_code, $output_id, $output_name);
 
         return json_encode($returnArray);
+
     }
 
     /**
@@ -1943,6 +2240,7 @@ class SaleSlipController extends Controller
     {
 
         $error_message = "";
+        $user_id = $this->login_user_id ?? null;
 
         DB::connection()->beginTransaction();
 
@@ -1963,6 +2261,7 @@ class SaleSlipController extends Controller
 
             $sort = 1;
             $staffId = '';
+            $detail_count = 0;
 
             foreach ($SaleSlipDetailData as $SaleSlipDetailKey => $SaleSlipDetailVal) {
 
@@ -2004,6 +2303,7 @@ class SaleSlipController extends Controller
                 $SaleSlipDetail->save();
 
                 $sort++;
+                $detail_count++;
 
                 // 作成したIDを取得する
                 $sale_slip_detail_new_id = $SaleSlipDetail->id;
@@ -2082,6 +2382,12 @@ class SaleSlipController extends Controller
 
             DB::connection()->commit();
 
+            \Log::info('【registerSaleSlips】登録成功', [
+                'user_id' => $user_id,
+                'sale_slip_id' => $SaleSlip->id,
+                '明細件数' => $detail_count
+            ]);
+
             // 登録のタイプが請求書印刷の場合(sale_submit_type:4)
             if ($SaleSlipData['sale_submit_type'] == 4) {
                 // 請求登録をして請求一覧画面に遷移させる
@@ -2093,7 +2399,13 @@ class SaleSlipController extends Controller
         } catch (\Exception $e) {
 
             DB::rollback();
-            dd($e);
+
+            \Log::error('【registerSaleSlips】登録失敗', [
+                'user_id' => $user_id,
+                '行' => $e->getLine(),
+                'メッセージ' => $e->getMessage()
+            ]);
+
         }
 
         return redirect('./SaleSlipCreate');
@@ -2106,6 +2418,9 @@ class SaleSlipController extends Controller
      */
     public function AjaxAddSlip(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         // 伝票NOを取得
         $slip_num = $request->slip_num;
         if(empty($slip_num)) $slip_num = 1;
@@ -2119,7 +2434,7 @@ class SaleSlipController extends Controller
         $ajaxHtml1 .= "<input type='hidden' name='sort' id='sort-".$slip_num."' value='".$slip_num."'>";
         $ajaxHtml1 .= "<input type='hidden' name='data[SaleSlipDetail][".$slip_num."][id]' id='id-".$slip_num."' value=''>";
         $ajaxHtml1 .= '<tr id="slip-upper-' . $slip_num . '">';
-        $ajaxHtml1 .= '    <td class="index-td-red" rowspan="2">' . $slip_num . '</td>';
+        $ajaxHtml1 .= '    <td class="index-td" rowspan="2">' . $slip_num . '</td>';
         $ajaxHtml1 .= '    <td colspan="2" id="product-code-area-' . $slip_num . '">';
         $ajaxHtml1 .= '        <input type="hidden" id="product_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][product_id]">';
         $ajaxHtml1 .= '        <input type="hidden" id="tax_id_' . $slip_num . '" name="data[SaleSlipDetail][' . $slip_num . '][tax_id]" value="' . $slip_num . '">';
@@ -2187,6 +2502,12 @@ class SaleSlipController extends Controller
 
         $returnArray = array($slip_num, $ajaxHtml1, $ajaxHtml2, $autoCompleteProduct, $autoCompleteOrigin, $autoCompleteStaff);
 
+        \Log::info('【AjaxAddSlip】追加伝票行生成', [
+            'user_id' => $user_id,
+            'slip_num' => $slip_num,
+            'HTML1_行数' => substr_count($ajaxHtml1, "\n") + 1,
+            'HTML2_行数' => substr_count($ajaxHtml2, "\n") + 1
+        ]);
 
         return $returnArray;
     }
@@ -2196,6 +2517,9 @@ class SaleSlipController extends Controller
      */
     public function AjaxAddSlipSp(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
         $slipNum = (int) $request->input('slip_num', 1);
         $tabInitialNum = 7 * $slipNum + 2;
 
@@ -2274,6 +2598,11 @@ class SaleSlipController extends Controller
         $autoOrigin  = "<input type='text' class='form-control origin_area_code_input' id='origin_area_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][origin_area_code]' tabindex='" . ($tabInitialNum + 5) . "'>";
         $autoStaff   = "<input type='text' class='form-control staff_code_input' id='staff_code_{$slipNum}' name='data[SaleSlipDetail][{$slipNum}][staff_code]' value='1009' tabindex='" . ($tabInitialNum + 6) . "'>";
 
+        \Log::info("AjaxAddSlipSp 実行成功", [
+            'user_id'  => $user_id,
+            'slip_num' => $slipNum
+        ]);
+
         return Response::json([
             $slipNum + 1,
             $html,
@@ -2292,6 +2621,8 @@ class SaleSlipController extends Controller
      */
     public function AjaxShowSupplySlip(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
 
         // 初期化
         $ajaxHtml = "";
@@ -2482,13 +2813,22 @@ class SaleSlipController extends Controller
             $ajaxHtml .= "    <input type='hidden' id='sale_slip_no' value=''>";
             $ajaxHtml .= "<div>";
 
+            \Log::info("AjaxShowSupplySlip 実行成功", [
+                'user_id' => $user_id,
+                'product_id' => $product_id,
+                '件数' => count($supplySlipDetailList)
+            ]);
+
             $returnArray = array($ajaxHtml);
 
         } catch (\Exception $e) {
+            \Log::error("AjaxShowSupplySlip エラー", [
+                'user_id' => $user_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine()
+            ]);
 
-            DB::rollback();
-
-            dd($e);
+            return view('errors.error')->with('error_message', $e->getMessage());
         }
 
         return $returnArray;
@@ -2499,7 +2839,10 @@ class SaleSlipController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function getOrderSaleUnitPrice(Request $request) {
+    public function getOrderSaleUnitPrice(Request $request)
+    {
+
+        $user_id = $this->login_user_id ?? null;
 
         // パラメータの取得
         $companyId = $request->company_id;
@@ -2525,11 +2868,19 @@ class SaleSlipController extends Controller
         ->limit(1)
         ->get();
 
-        $orderSaleUnitPirce = 0;
+        $orderSaleUnitPrice = 0;
         if (isset($orderSaleUnitPriceDetails[0]->notax_price))
-            $orderSaleUnitPirce = $orderSaleUnitPriceDetails[0]->notax_price;
+            $orderSaleUnitPrice = $orderSaleUnitPriceDetails[0]->notax_price;
 
-        return $orderSaleUnitPirce;
+        \Log::info("getOrderSaleUnitPrice 実行成功", [
+            'user_id'    => $user_id,
+            'company_id' => $companyId,
+            'product_id' => $productId,
+            'sale_date'  => $saleDate,
+            '単価'       => $orderSaleUnitPrice
+        ]);
+
+        return $orderSaleUnitPrice;
 
     }
 
@@ -2539,7 +2890,10 @@ class SaleSlipController extends Controller
      * @param int $saleSlipId
      * @param int $staffId
      */
-    private function registerSaleDeposit($saleSlipId, $staffId) {
+    private function registerSaleDeposit($saleSlipId, $staffId)
+    {
+
+        $user_id = $this->login_user_id ?? null;
 
         // ユーザー情報の取得
         $userInfo   = \Auth::user();
@@ -2672,6 +3026,12 @@ class SaleSlipController extends Controller
 
                 $sessionDepositId = $depositId;
 
+                \Log::info('registerSaleDeposit 更新完了', [
+                    'user_id'      => $user_id,
+                    'sale_slip_id' => $saleSlipId,
+                    'deposit_id'   => $depositId
+                ]);
+
             } else {
 
                 // 入出金詳細テーブル(deposit_withdrawal_details)に存在しなかったら新規登録
@@ -2729,6 +3089,12 @@ class SaleSlipController extends Controller
 
                 $sessionDepositId = $depositNewId;
 
+                \Log::info('registerSaleDeposit 新規登録完了', [
+                    'user_id'      => $user_id,
+                    'sale_slip_id' => $saleSlipId,
+                    'deposit_id'   => $depositNewId
+                ]);
+
             }
 
             // -----------------------------
@@ -2745,7 +3111,13 @@ class SaleSlipController extends Controller
 
             DB::rollback();
 
-            dd($e);
+            \Log::error('registerSaleDeposit エラー', [
+                'user_id' => $user_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine()
+            ]);
+
+            return view('errors.error')->with('error_message', $e->getMessage());
 
         }
 
@@ -2760,7 +3132,10 @@ class SaleSlipController extends Controller
     /**
      * 納品書印刷
      */
-    public function deliverySlipOutput($sale_slip_id) {
+    public function deliverySlipOutput($sale_slip_id)
+    {
+
+        $user_id = $this->login_user_id ?? null;
 
         // activeの変数を格納
         $this_active = 1;
@@ -3018,6 +3393,12 @@ class SaleSlipController extends Controller
             'company_name' => $calcDepositList['company_info']['name']
         ]));
 
+        \Log::info('deliverySlipOutput 実行成功', [
+            'user_id'       => $user_id,
+            'sale_slip_id'  => $sale_slip_id,
+            '明細件数'        => count($SaleSlipDetailList)
+        ]);
+
         return $pdf->inline('delivery_slip' . '_' . $companyId .'.pdf');  //ブラウザ上で開ける
         // return $pdf->download('thisis.pdf'); //こっちにすると直接ダウンロード
     }
@@ -3037,6 +3418,8 @@ class SaleSlipController extends Controller
             1 => '現金売り'
         ];
 
+        $userId = $this->login_user_id ?? null;
+
         // セッションにある検索条件を取得する
         $date_type    = $request->session()->get('condition_date_type');
         $date_from    = $request->session()->get('condition_date_from');
@@ -3055,6 +3438,14 @@ class SaleSlipController extends Controller
         if (empty($date_to)) $date_to = date('Y-m-d');
 
         try {
+
+            \Log::info('CSV出力開始', [
+                'user_id'    => $userId,
+                'from'       => $date_from,
+                'to'         => $date_to,
+                'product_id' => $product_id,
+                'staff_id'   => $staff_id,
+            ]);
 
             // ------------------
             // 売上一覧データを取得
@@ -3251,6 +3642,12 @@ class SaleSlipController extends Controller
 
             }
 
+            \Log::info('CSV出力成功', [
+                'user_id'        => $userId,
+                'row_count'      => count($csv_data),
+                'sale_slip_ids'  => $sale_slip_id_arr ?? [],
+            ]);
+
             // レスポンスをストリームで返す
             $response = new StreamedResponse(function () use($csv_data) {
 
@@ -3300,9 +3697,14 @@ class SaleSlipController extends Controller
             return $response;
         } catch (\Exception $e) {
 
-            dd($e);
+            \Log::error('CSV出力エラー', [
+                'user_id'       => $userId,
+                'error_message' => $e->getMessage(),
+                'line'          => $e->getLine(),
+            ]);
 
-            return null;
+            return view('errors.error', ['error_message' => 'CSV出力中にエラーが発生しました。']);
+
         }
     }
 }

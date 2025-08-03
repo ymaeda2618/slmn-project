@@ -715,17 +715,22 @@
                             var selector_unit_num = selector_id.replace('product_id_',
                                 'unit_num_');
 
-                            // 製品が変わった場合は再計算
-                            if (before_product_id != data[1]) {
+                            // すでに単価、もしくは数量が入っている場合はリセットや発注単価設定を行わない
+                            if (
+                                isEmpty($("#" + selector_unit_price).val()) &&
+                                isEmpty($("#" + selector_unit_num).val())
+                            ) {
+                                // 製品が変わった場合は再計算
+                                if (before_product_id != data[1]) {
 
-                                $("#" + selector_unit_price).val('');
-                                $("#" + selector_unit_num).val('');
-                                priceNumChange(parseInt(selector_id.replace('product_id_', ''),
-                                    10));
+                                    $("#" + selector_unit_price).val('');
+                                    $("#" + selector_unit_num).val('');
+                                    priceNumChange(parseInt(selector_id.replace('product_id_', ''), 10));
+                                }
+
+                                // 発注単価を設定
+                                setOrderSaleUnitPrice(data[1], selector_unit_price);
                             }
-
-                            // 発注単価を設定
-                            setOrderSaleUnitPrice(data[1], selector_unit_price);
 
                         });
 
@@ -1215,6 +1220,19 @@
 
         });
     })(jQuery);
+
+    function isEmpty(val) {
+        return (
+            val === undefined ||
+            val === null ||
+            val === false ||
+            val === 0 ||
+            val === '' ||
+            val === '0' ||
+            (Array.isArray(val) && val.length === 0) ||
+            (typeof val === 'object' && !Array.isArray(val) && Object.keys(val).length === 0)
+        );
+    }
 
     function priceNumChange(changedSlipNum) {
         function toNumber(val) {

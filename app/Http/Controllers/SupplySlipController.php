@@ -2278,7 +2278,7 @@ class SupplySlipController extends Controller
         $ajaxHtml1 .= "<input type='hidden' name='sort' id='sort-".$slip_num."' value='".$slip_num."'>";
         $ajaxHtml1 .= "<input type='hidden' name='data[SupplySlipDetail][".$slip_num."][id]' id='id-".$slip_num."' value=''>";
         $ajaxHtml1 .= '<tr id="slip-upper-' . $slip_num . '">';
-        $ajaxHtml1 .= '    <td class="index-td" rowspan="2">' . $slip_num . '</td>';
+        $ajaxHtml1 .= '    <td class="index-td-blue" rowspan="2">' . $slip_num . '</td>';
         $ajaxHtml1 .= '    <td colspan="2" id="product-code-area-' . $slip_num . '">';
         $ajaxHtml1 .= '        <input type="hidden" id="product_id_' . $slip_num . '" name="data[SupplySlipDetail][' . $slip_num . '][product_id]">';
         $ajaxHtml1 .= '        <input type="hidden" id="tax_id_' . $slip_num . '" name="data[SupplySlipDetail][' . $slip_num . '][tax_id]" value="' . $slip_num . '">';

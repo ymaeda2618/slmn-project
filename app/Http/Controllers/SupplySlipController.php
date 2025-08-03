@@ -22,6 +22,7 @@ class SupplySlipController extends Controller
      */
     public function __construct()
     {
+        parent::__construct();
         $this->middleware('auth');
     }
 
@@ -72,6 +73,9 @@ class SupplySlipController extends Controller
         // postできたか、getできたか
         if ($_SERVER["REQUEST_METHOD"] != "POST"
         ) { // ページング処理
+            \Log::info('SupplySlip Index 画面初期表示', [
+                'user_id' => $this->login_user_id ?? null
+            ]);
 
             $condition_date_type     = $request->session()->get('condition_date_type');
             $condition_date_from     = $request->session()->get('condition_date_from');
@@ -99,6 +103,9 @@ class SupplySlipController extends Controller
         } else { // POST時の処理
 
             if (isset($_POST['search-btn'])) { // 検索ボタン押された時の処理
+                \Log::info('SupplySlip Index 検索実行', [
+                    'user_id' => $this->login_user_id ?? null
+                ]);
 
                 $req_data = $request->data['SupplySlip'];
                 if (isset($request->data['SupplySlipDetail'])) {
@@ -144,6 +151,10 @@ class SupplySlipController extends Controller
 
             } else { // リセットボタンが押された時の処理
 
+                \Log::info('SupplySlip Index リセット実行', [
+                    'user_id' => $this->login_user_id ?? null
+                ]);
+
                 $condition_date_type     = 1;
                 $condition_date_from     = date('Y-m-d');
                 $condition_date_to       = date('Y-m-d');
@@ -170,6 +181,16 @@ class SupplySlipController extends Controller
                 $request->session()->forget('condition_display_num');
             }
         }
+
+        \Log::info('検索条件', [
+            'user_id'           => $this->login_user_id ?? null,
+            'date_type'         => $condition_date_type,
+            'date_from'         => $condition_date_from,
+            'date_to'           => $condition_date_to,
+            'supply_company_id' => $condition_company_id,
+            'product_id'        => $condition_product_id,
+            'submit_type'       => $condition_submit_type,
+        ]);
 
         try {
 
@@ -408,6 +429,18 @@ class SupplySlipController extends Controller
                 ];
             }
 
+            \Log::info('SupplySlip 件数/金額', [
+                'user_id' => $this->login_user_id ?? null,
+                '伝票件数' => $supply_slip_num,
+                '配送額合計' => $delivery_price_amount,
+                '調整額合計' => $adjust_price_amount,
+                '税抜合計' => $notax_sub_total_amount,
+                '総合計' => $supply_slip_amount,
+                '条件付き伝票数' => $supply_slip_condition_num,
+                '条件付き税抜小計' => $supply_slip_condition_notax_sub_total,
+                '明細件数' => count($SupplySlipDetailList)
+            ]);
+
             // 対象日付のチェック
             $check_str_slip_date = "";
             $check_str_deliver_date = "";
@@ -416,10 +449,16 @@ class SupplySlipController extends Controller
 
         } catch (\Exception $e) {
 
-            dd($e);
+            \Log::error('SupplySlip Index エラー', [
+                'user_id' => $this->login_user_id ?? null,
+                'message' => $e->getMessage(),
+                'file'    => $e->getFile(),
+                'line'    => $e->getLine(),
+                'trace'   => $e->getTraceAsString()
+            ]);
 
-            return view('SupplySlip.complete')->with([
-                'errorMessage' => $e
+            return view('errors.error')->with([
+                'errorMessage' => $e->getMessage()
             ]);
         }
 
@@ -459,125 +498,144 @@ class SupplySlipController extends Controller
      */
     public function edit($supply_slip_id)
     {
-        // activeの変数を格納
-        $this_active = 1;
 
-
-        // 仕入伝票取得
-        $SupplySlipList = DB::table('supply_slips AS SupplySlip')
-        ->select(
-            'SupplySlip.id                  AS supply_slip_id',
-            'SupplySlip.notax_sub_total_8   AS notax_sub_total_8',
-            'SupplySlip.notax_sub_total_10  AS notax_sub_total_10',
-            'SupplySlip.notax_sub_total     AS notax_sub_total',
-            'SupplySlip.tax_total_8         AS tax_total_8',
-            'SupplySlip.tax_total_10        AS tax_total_10',
-            'SupplySlip.tax_total           AS tax_total',
-            'SupplySlip.sub_total_8         AS sub_total_8',
-            'SupplySlip.sub_total_10        AS sub_total_10',
-            'SupplySlip.sub_total           AS sub_total',
-            'SupplySlip.delivery_price      AS delivery_price',
-            'SupplySlip.adjust_price        AS adjust_price',
-            'SupplySlip.total               AS total',
-            'SupplySlip.remarks             AS remarks',
-            'SupplySlip.supply_submit_type  AS supply_submit_type',
-            'SupplyCompany.code             AS supply_company_code',
-            'SupplyCompany.id               AS supply_company_id',
-            'SupplyCompany.name             AS supply_company_name',
-            'Delivery.code                  AS delivery_code',
-            'Delivery.id                    AS delivery_id',
-            'Delivery.name                  AS delivery_name'
-        )
-        ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d") AS supply_slip_supply_date')
-        ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
-        ->join('supply_companies as SupplyCompany', function ($join) {
-            $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
-                 ->where('SupplyCompany.active', '=', true);
-        })
-        ->leftJoin('deliverys as Delivery', function ($join) {
-            $join->on('Delivery.id', '=', 'SupplySlip.delivery_id')
-                 ->where('Delivery.active', '=', true);
-        })
-        ->where([
-            ['SupplySlip.id', '=', $supply_slip_id],
-            ['SupplySlip.active', '=', $this_active],
-        ])
-        ->first();
-
-        // 仕入伝票詳細取得
-        $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
-        ->select(
-            'SupplySlipDetail.id                 AS supply_slip_detail_id',
-            'SupplySlipDetail.unit_price         AS unit_price',
-            'SupplySlipDetail.unit_num           AS unit_num',
-            'SupplySlipDetail.notax_price        AS notax_price',
-            'SupplySlipDetail.seri_no            AS seri_no',
-            'SupplySlipDetail.inventory_unit_num AS inventory_unit_num',
-            'SupplySlipDetail.memo               AS memo',
-            'SupplySlipDetail.sort               AS sort',
-            'Product.code                        AS product_code',
-            'Product.id                          AS product_id',
-            'Product.name                        AS product_name',
-            'Tax.id                              AS tax_id',
-            'Tax.name                            AS tax_name',
-            'Standard.code                       AS standard_code',
-            'Standard.id                         AS standard_id',
-            'Standard.name                       AS standard_name',
-            'Quality.code                        AS quality_code',
-            'Quality.id                          AS quality_id',
-            'Quality.name                        AS quality_name',
-            'Unit.id                             AS unit_id',
-            'Unit.name                           AS unit_name',
-            'OriginArea.id                       AS origin_area_id',
-            'OriginArea.name                     AS origin_area_name',
-            'Staff.code                          AS staff_code',
-            'Staff.id                            AS staff_id',
-            'InventoryUnit.id                    AS inventory_unit_id',
-            'InventoryUnit.name                  AS inventory_unit_name'
-        )
-        ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
-        ->join('products as Product', function ($join) {
-            $join->on('Product.id', '=', 'SupplySlipDetail.product_id')
-                 ->where('Product.active', '=', true);
-        })
-        ->join('taxes as Tax', function ($join) {
-            $join->on('Tax.id', '=', 'Product.tax_id')
-                 ->where('Tax.active', '=', true);
-        })
-        ->leftJoin('standards as Standard', function ($join) {
-            $join->on('Standard.id', '=', 'SupplySlipDetail.standard_id')
-                 ->where('Standard.active', '=', true);
-        })
-        ->leftJoin('qualities as Quality', function ($join) {
-            $join->on('Quality.id', '=', 'SupplySlipDetail.quality_id')
-                 ->where('Quality.active', '=', true);
-        })
-        ->join('units as Unit', function ($join) {
-            $join->on('Unit.id', '=', 'SupplySlipDetail.unit_id')
-                 ->where('Unit.active', '=', true);
-        })
-        ->leftJoin('origin_areas as OriginArea', function ($join) {
-            $join->on('OriginArea.id', '=', 'SupplySlipDetail.origin_area_id')
-                 ->where('OriginArea.active', '=', true);
-        })
-        ->join('staffs as Staff', function ($join) {
-            $join->on('Staff.id', '=', 'SupplySlipDetail.staff_id')
-                 ->where('Staff.active', '=', true);
-        })
-        ->leftJoin('units as InventoryUnit', function ($join) {
-            $join->on('InventoryUnit.id', '=', 'SupplySlipDetail.inventory_unit_id')
-                 ->where('InventoryUnit.active', '=', true);
-        })
-        ->where([
-            ['SupplySlipDetail.supply_slip_id', '=', $supply_slip_id],
-            ['SupplySlipDetail.active', '=', $this_active],
-        ])
-        ->get();
-
-        return view('SupplySlip.edit')->with([
-            "SupplySlipList"        => $SupplySlipList,
-            "SupplySlipDetailList"  => $SupplySlipDetailList
+        \Log::info('SupplySlipController@edit 開始', [
+            'user_id'        => $this->login_user_id ?? null,
+            'supply_slip_id' => $supply_slip_id
         ]);
+
+        try{
+            // activeの変数を格納
+            $this_active = 1;
+
+            // 仕入伝票取得
+            $SupplySlipList = DB::table('supply_slips AS SupplySlip')
+            ->select(
+                'SupplySlip.id                  AS supply_slip_id',
+                'SupplySlip.notax_sub_total_8   AS notax_sub_total_8',
+                'SupplySlip.notax_sub_total_10  AS notax_sub_total_10',
+                'SupplySlip.notax_sub_total     AS notax_sub_total',
+                'SupplySlip.tax_total_8         AS tax_total_8',
+                'SupplySlip.tax_total_10        AS tax_total_10',
+                'SupplySlip.tax_total           AS tax_total',
+                'SupplySlip.sub_total_8         AS sub_total_8',
+                'SupplySlip.sub_total_10        AS sub_total_10',
+                'SupplySlip.sub_total           AS sub_total',
+                'SupplySlip.delivery_price      AS delivery_price',
+                'SupplySlip.adjust_price        AS adjust_price',
+                'SupplySlip.total               AS total',
+                'SupplySlip.remarks             AS remarks',
+                'SupplySlip.supply_submit_type  AS supply_submit_type',
+                'SupplyCompany.code             AS supply_company_code',
+                'SupplyCompany.id               AS supply_company_id',
+                'SupplyCompany.name             AS supply_company_name',
+                'Delivery.code                  AS delivery_code',
+                'Delivery.id                    AS delivery_id',
+                'Delivery.name                  AS delivery_name'
+            )
+            ->selectRaw('DATE_FORMAT(SupplySlip.date, "%Y-%m-%d") AS supply_slip_supply_date')
+            ->selectRaw('DATE_FORMAT(SupplySlip.delivery_date, "%Y-%m-%d") AS supply_slip_delivery_date')
+            ->join('supply_companies as SupplyCompany', function ($join) {
+                $join->on('SupplyCompany.id', '=', 'SupplySlip.supply_company_id')
+                    ->where('SupplyCompany.active', '=', true);
+            })
+            ->leftJoin('deliverys as Delivery', function ($join) {
+                $join->on('Delivery.id', '=', 'SupplySlip.delivery_id')
+                    ->where('Delivery.active', '=', true);
+            })
+            ->where([
+                ['SupplySlip.id', '=', $supply_slip_id],
+                ['SupplySlip.active', '=', $this_active],
+            ])
+            ->first();
+
+            // 仕入伝票詳細取得
+            $SupplySlipDetailList = DB::table('supply_slip_details AS SupplySlipDetail')
+            ->select(
+                'SupplySlipDetail.id                 AS supply_slip_detail_id',
+                'SupplySlipDetail.unit_price         AS unit_price',
+                'SupplySlipDetail.unit_num           AS unit_num',
+                'SupplySlipDetail.notax_price        AS notax_price',
+                'SupplySlipDetail.seri_no            AS seri_no',
+                'SupplySlipDetail.inventory_unit_num AS inventory_unit_num',
+                'SupplySlipDetail.memo               AS memo',
+                'SupplySlipDetail.sort               AS sort',
+                'Product.code                        AS product_code',
+                'Product.id                          AS product_id',
+                'Product.name                        AS product_name',
+                'Tax.id                              AS tax_id',
+                'Tax.name                            AS tax_name',
+                'Standard.code                       AS standard_code',
+                'Standard.id                         AS standard_id',
+                'Standard.name                       AS standard_name',
+                'Quality.code                        AS quality_code',
+                'Quality.id                          AS quality_id',
+                'Quality.name                        AS quality_name',
+                'Unit.id                             AS unit_id',
+                'Unit.name                           AS unit_name',
+                'OriginArea.id                       AS origin_area_id',
+                'OriginArea.name                     AS origin_area_name',
+                'Staff.code                          AS staff_code',
+                'Staff.id                            AS staff_id',
+                'InventoryUnit.id                    AS inventory_unit_id',
+                'InventoryUnit.name                  AS inventory_unit_name'
+            )
+            ->selectRaw('CONCAT(Staff.name_sei," ",Staff.name_mei) AS staff_name')
+            ->join('products as Product', function ($join) {
+                $join->on('Product.id', '=', 'SupplySlipDetail.product_id')
+                    ->where('Product.active', '=', true);
+            })
+            ->join('taxes as Tax', function ($join) {
+                $join->on('Tax.id', '=', 'Product.tax_id')
+                    ->where('Tax.active', '=', true);
+            })
+            ->leftJoin('standards as Standard', function ($join) {
+                $join->on('Standard.id', '=', 'SupplySlipDetail.standard_id')
+                    ->where('Standard.active', '=', true);
+            })
+            ->leftJoin('qualities as Quality', function ($join) {
+                $join->on('Quality.id', '=', 'SupplySlipDetail.quality_id')
+                    ->where('Quality.active', '=', true);
+            })
+            ->join('units as Unit', function ($join) {
+                $join->on('Unit.id', '=', 'SupplySlipDetail.unit_id')
+                    ->where('Unit.active', '=', true);
+            })
+            ->leftJoin('origin_areas as OriginArea', function ($join) {
+                $join->on('OriginArea.id', '=', 'SupplySlipDetail.origin_area_id')
+                    ->where('OriginArea.active', '=', true);
+            })
+            ->join('staffs as Staff', function ($join) {
+                $join->on('Staff.id', '=', 'SupplySlipDetail.staff_id')
+                    ->where('Staff.active', '=', true);
+            })
+            ->leftJoin('units as InventoryUnit', function ($join) {
+                $join->on('InventoryUnit.id', '=', 'SupplySlipDetail.inventory_unit_id')
+                    ->where('InventoryUnit.active', '=', true);
+            })
+            ->where([
+                ['SupplySlipDetail.supply_slip_id', '=', $supply_slip_id],
+                ['SupplySlipDetail.active', '=', $this_active],
+            ])
+            ->get();
+
+            return view('SupplySlip.edit')->with([
+                "SupplySlipList"        => $SupplySlipList,
+                "SupplySlipDetailList"  => $SupplySlipDetailList
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('SupplySlipController@edit エラー発生', [
+                'user_id'        => $this->login_user_id ?? null,
+                'supply_slip_id' => $supply_slip_id,
+                'error'          => $e->getMessage(),
+                'trace'          => $e->getTraceAsString()
+            ]);
+            return view('errors.error')->with([
+                'errorMessage' => $e->getMessage()
+            ]);
+
+        }
+
     }
 
     /**
@@ -587,6 +645,10 @@ class SupplySlipController extends Controller
      */
     public function editRegister(Request $request)
     {
+
+        \Log::info('SupplySlipController@editRegister 開始', [
+            'user_id' => $this->login_user_id ?? null,
+        ]);
 
         // トランザクション開始
         DB::connection()->beginTransaction();
@@ -600,7 +662,18 @@ class SupplySlipController extends Controller
             $SupplySlipData = $request->data['SupplySlip'];
             $SupplySlipDetailData = $request->data['SupplySlipDetail'];
 
+            \Log::info('受信SupplySlipデータ', [
+                'user_id'         => $this->login_user_id ?? null,
+                'supply_slip_id'  => $SupplySlipData['id'] ?? null,
+                'submit_type'     => $SupplySlipData['supply_submit_type'] ?? null,
+                '詳細件数'         => count($SupplySlipDetailData)
+            ]);
+
             if ($SupplySlipData['supply_submit_type'] == 3) {
+
+                \Log::info('SupplySlip 論理削除モード', [
+                    'supply_slip_id' => $SupplySlipData['id'],
+                ]);
 
                 // -----------------
                 // 伝票を論理削除させる
@@ -613,6 +686,10 @@ class SupplySlipController extends Controller
                 $SupplySlip->save();
 
             } else {
+
+                \Log::info('SupplySlip 登録更新モード', [
+                    'supply_slip_id' => $SupplySlipData['id'],
+                ]);
 
                 // 値がNULLのところを初期化
                 if(empty($SupplySlipData['delivery_id'])) $SupplySlipData['delivery_id'] = 0;
@@ -647,13 +724,23 @@ class SupplySlipController extends Controller
                 // 作成したIDを取得する
                 $supply_slip_new_id = $SupplySlip->id;
 
+                \Log::info('SupplySlipDetail 削除開始', [
+                    'supply_slip_id' => $SupplySlipData['id'],
+                ]);
+
                 // 伝票詳細を削除
                 \App\SupplySlipDetail::where('supply_slip_id', $SupplySlipData['id'])->delete();
 
                 $supply_slip_detail = array();
                 $sort = 1;
 
-                foreach($SupplySlipDetailData as $SupplySlipDetail){
+                foreach ($SupplySlipDetailData as $index => $SupplySlipDetail) {
+                    if (empty($SupplySlipDetail['product_id'])) {
+                        \Log::warning('SupplySlipDetailにproduct_id未設定', [
+                            'index' => $index,
+                            'データ' => $SupplySlipDetail,
+                        ]);
+                    }
 
                     // 値がNULLのところを初期化
                     if (empty($SupplySlipData['inventory_unit_id'])) $SupplySlipData['inventory_unit_id'] = 0;
@@ -685,20 +772,41 @@ class SupplySlipController extends Controller
                 if(!empty($supply_slip_detail)) {
 
                     DB::table('supply_slip_details')->insert($supply_slip_detail);
+
+                    \Log::info('SupplySlipDetail 登録完了', [
+                        '件数'            => count($supply_slip_detail),
+                        'supply_slip_id' => $supply_slip_new_id,
+                    ]);
+
                 }
             }
 
             // 問題なければコミット
             DB::connection()->commit();
 
+            \Log::info('SupplySlipController@editRegister 完了', [
+                'user_id'        => $user_info_id,
+                'supply_slip_id' => $SupplySlipData['id']
+            ]);
+
         } catch (\Exception $e) {
 
             DB::rollback();
 
-            dd($e);
+            \Log::error('SupplySlipController@editRegister エラー', [
+                'user_id' => $this->login_user_id ?? null,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile()
+            ]);
+
+            return view('errors.error')->with([
+                'error_message' => $e->getMessage()
+            ]);
         }
 
         return redirect('./SupplySlipCreate');
+
     }
 
     /**
@@ -727,6 +835,12 @@ class SupplySlipController extends Controller
             2 => '一時保存',
         ];
 
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@csvDownLoad 開始', [
+            'user_id' => $user_id
+        ]);
+
         // セッションにある検索条件を取得する
         $date_type    = $request->session()->get('condition_date_type');
         $date_from    = $request->session()->get('condition_date_from');
@@ -741,6 +855,18 @@ class SupplySlipController extends Controller
         if (empty($date_type)) $date_type = 1;
         if (empty($date_from)) $date_from = date('Y-m-d');
         if (empty($date_to)) $date_to = date('Y-m-d');
+
+        \Log::info('SupplySlipController@csvDownLoad 検索条件', [
+            'user_id'      => $user_id,
+            'date_type'    => $date_type,
+            'date_from'    => $date_from,
+            'date_to'      => $date_to,
+            'company_id'   => $company_id,
+            'product_id'   => $product_id,
+            'submit_type'  => $submit_type,
+            'display_sort' => $display_sort,
+            'display_num'  => $display_num,
+        ]);
 
         try {
 
@@ -799,6 +925,11 @@ class SupplySlipController extends Controller
                 ->where('SupplySlip.active', 1)
                 ->orderBy('SupplySlip.id', 'desc')
                 ->get();
+
+            \Log::info('SupplySlip 一覧取得', [
+                'user_id' => $user_id,
+                '件数' => $supplySlipList->count()
+            ]);
 
             // ---------------
             // 伝票詳細を取得
@@ -864,6 +995,11 @@ class SupplySlipController extends Controller
                 ->orderBy('SupplySlipDetail.sort', 'asc')
                 ->get();
 
+            \Log::info('SupplySlipDetail 一覧取得', [
+                'user_id' => $user_id,
+                '件数' => $SupplySlipDetailList->count()
+            ]);
+
             $supply_data = [];
             foreach ($supplySlipList as $supplyData) {
                 $supply_data[$supplyData->supply_slip_id]['date']                = $supplyData->supply_slip_date;
@@ -916,6 +1052,11 @@ class SupplySlipController extends Controller
 
             }
 
+            \Log::info('CSVデータ生成完了', [
+                'user_id' => $user_id,
+                'csv行数' => count($csv_data)
+            ]);
+
             // レスポンスをストリームで返す
             $response = new StreamedResponse(function () use($csv_data) {
 
@@ -960,12 +1101,25 @@ class SupplySlipController extends Controller
             $response->headers->set('Content-Type', 'text/csv; charset=Shift_JIS');
             $response->headers->set('Content-Disposition', 'attachment; filename="' . $fileName . '"');
 
+            \Log::info('CSVダウンロード完了', [
+                'user_id' => $user_id
+            ]);
+
             return $response;
+
         } catch (\Exception $e) {
 
-            dd($e);
+            \Log::error('SupplySlipController@csvDownLoad エラー発生', [
+                'user_id' => $user_id,
+                'message' => $e->getMessage(),
+                'line'    => $e->getLine(),
+                'file'    => $e->getFile(),
+            ]);
 
-            return null;
+            return view('errors.error')->with([
+                'error_message' => 'CSV出力時にエラーが発生しました：' . $e->getMessage()
+            ]);
+
         }
     }
 
@@ -976,6 +1130,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxChangeProductId(Request $request)
     {
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxChangeProductId 開始', [
+            'user_id'            => $user_id,
+            'slip_num'           => $request->slip_num,
+            'selected_product_id'=> $request->selected_product_id,
+        ]);
+
         // 伝票番号を取得
         $slip_num = $request->slip_num;
 
@@ -1024,6 +1186,14 @@ class SupplySlipController extends Controller
         $ajaxHtml .= "</select>";
 
         $returnArray = array($ajaxHtml, $tax_id, $tax_name);
+
+        \Log::info('SupplySlipController@AjaxChangeProductId 正常終了', [
+            'user_id'      => $user_id,
+            'tax_id'       => $tax_id,
+            'tax_name'     => $tax_name,
+            '標準件数'     => $StandardList->count(),
+        ]);
+
         return $returnArray;
 
     }
@@ -1035,6 +1205,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteSupplyCompany(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteSupplyCompany 開始', [
+            'user_id'   => $user_id,
+            'inputText' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1065,6 +1243,12 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteSupplyCompany レスポンス', [
+            'user_id'     => $user_id,
+            'suggestions' => $auto_complete_array,
+            '件数'         => count($auto_complete_array),
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1075,6 +1259,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetSupplyCompany(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetSupplyCompany 開始', [
+            'user_id'   => $user_id,
+            'inputText' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1119,6 +1311,14 @@ class SupplySlipController extends Controller
 
         $returnArray = array($output_code, $output_id, $output_name);
 
+        \Log::info('SupplySlipController@AjaxSetSupplyCompany レスポンス', [
+            'user_id'      => $user_id,
+            'output_code'  => $output_code,
+            'output_id'    => $output_id,
+            'output_name'  => $output_name,
+            '件数'         => !empty($output_id) ? 1 : 0,
+        ]);
+
         return json_encode($returnArray);
     }
 
@@ -1129,6 +1329,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteProduct(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteProduct 開始', [
+            'user_id'   => $user_id,
+            'inputText' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1167,6 +1375,11 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteProduct 終了', [
+            'user_id' => $user_id,
+            '件数'    => count($auto_complete_array),
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1177,6 +1390,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetProduct(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetProduct 開始', [
+            'user_id'   => $user_id,
+            'inputText' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1264,6 +1485,13 @@ class SupplySlipController extends Controller
             $output_inventory_unit_name
         );
 
+        \Log::info('SupplySlipController@AjaxSetProduct 終了', [
+            'user_id'      => $user_id,
+            'product_id'   => $output_product_id,
+            'product_code' => $output_product_code,
+        ]);
+
+
         return json_encode($returnArray);
     }
 
@@ -1274,6 +1502,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteStandard(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteStandard 開始', [
+            'user_id'    => $user_id,
+            'product_id' => $request->productId,
+            'input_text' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $productId  = $request->productId;
         $input_text = $request->inputText;
@@ -1306,6 +1543,11 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteStandard 終了', [
+            'user_id'       => $user_id,
+            'suggest_count' => count($auto_complete_array),
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1316,6 +1558,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetStandard(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetStandard 開始', [
+            'user_id'    => $user_id,
+            'product_id' => $request->productId,
+            'input_text' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $productId  = $request->productId;
         $input_text = $request->inputText;
@@ -1363,6 +1614,13 @@ class SupplySlipController extends Controller
 
         $returnArray = array($output_code, $output_id, $output_name);
 
+        \Log::info('SupplySlipController@AjaxSetStandard 終了', [
+            'user_id'      => $user_id,
+            'output_code'  => $output_code,
+            'output_id'    => $output_id,
+            'output_name'  => $output_name,
+        ]);
+
         return json_encode($returnArray);
     }
 
@@ -1373,6 +1631,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteQuality(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteQuality 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1403,6 +1669,11 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteQuality 終了', [
+            'user_id' => $user_id,
+            '候補数' => count($auto_complete_array),
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1413,6 +1684,14 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetQuality(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetQuality 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1457,6 +1736,13 @@ class SupplySlipController extends Controller
 
         $returnArray = array($output_code, $output_id, $output_name);
 
+        \Log::info('SupplySlipController@AjaxSetQuality 終了', [
+            'user_id'      => $user_id,
+            'output_code'  => $output_code,
+            'output_id'    => $output_id,
+            'output_name'  => $output_name,
+        ]);
+
         return json_encode($returnArray);
     }
 
@@ -1467,6 +1753,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteOriginArea(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteOriginArea 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+            'line'       => __LINE__,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1497,6 +1792,12 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteOriginArea 終了', [
+            'user_id' => $user_id,
+            'suggestions_count' => count($auto_complete_array),
+            'line' => __LINE__,
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1507,6 +1808,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetOriginArea(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetOriginArea 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+            'line'       => __LINE__,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1550,6 +1860,13 @@ class SupplySlipController extends Controller
 
         $returnArray = array($output_code, $output_id, $output_name);
 
+        \Log::info('SupplySlipController@AjaxSetOriginArea 終了', [
+            'user_id'       => $user_id,
+            'output_id'     => $output_id,
+            'output_name'   => $output_name,
+            'line'          => __LINE__,
+        ]);
+
         return json_encode($returnArray);
     }
 
@@ -1560,6 +1877,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteStaff(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteStaff 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+            'line'       => __LINE__,
+        ]);
+
         // 入力された値を取得
         $input_text = str_replace(' ','', $request->inputText);
 
@@ -1589,6 +1915,12 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteStaff 終了', [
+            'user_id'  => $user_id,
+            'count'    => count($auto_complete_array),
+            'line'     => __LINE__,
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1599,6 +1931,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetStaff(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetStaff 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+            'line'       => __LINE__,
+        ]);
+
         // 入力された値を取得
         $input_text = str_replace(' ','', $request->inputText);
 
@@ -1642,6 +1983,12 @@ class SupplySlipController extends Controller
 
         $returnArray = array($output_code, $output_id, $output_name);
 
+        \Log::info('SupplySlipController@AjaxSetStaff 終了', [
+            'user_id'     => $user_id,
+            'output_name' => $output_name,
+            'line'        => __LINE__,
+        ]);
+
         return json_encode($returnArray);
     }
 
@@ -1652,6 +1999,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxAutoCompleteDelivery(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxAutoCompleteDelivery 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+            'line'       => __LINE__,
+        ]);
+
         // 入力された値を取得
         $input_text = $request->inputText;
 
@@ -1682,6 +2038,11 @@ class SupplySlipController extends Controller
             }
         }
 
+        \Log::info('SupplySlipController@AjaxAutoCompleteDelivery 終了', [
+            'user_id' => $user_id,
+            'line'    => __LINE__,
+        ]);
+
         return json_encode($auto_complete_array);
     }
 
@@ -1692,6 +2053,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxSetDelivery(Request $request)
     {
+
+        $user_id = $this->login_user_id ?? null;
+
+        \Log::info('SupplySlipController@AjaxSetDelivery 開始', [
+            'user_id'    => $user_id,
+            'input_text' => $request->inputText,
+            'line'       => __LINE__,
+        ]);
+
         // 入力された値を取得
         $input_text = str_replace(' ','', $request->inputText);
 
@@ -1731,7 +2101,20 @@ class SupplySlipController extends Controller
                 $output_id   = $deliveryList->id;
                 $output_name = $deliveryList->name;
             }
+
+            \Log::info('SupplySlipController@AjaxSetDelivery 検索結果', [
+                'user_id'     => $user_id,
+                'found_id'    => $output_id,
+                'found_code'  => $output_code,
+                'found_name'  => $output_name,
+                'line'        => __LINE__,
+            ]);
         }
+
+        \Log::info('SupplySlipController@AjaxSetDelivery 終了', [
+            'user_id' => $user_id,
+            'line'    => __LINE__,
+        ]);
 
         $returnArray = array($output_code, $output_id, $output_name);
 
@@ -1746,14 +2129,18 @@ class SupplySlipController extends Controller
     public function registerSupplySlips(Request $request)
     {
 
+        $user_info    = \Auth::user();
+        $user_info_id = $user_info['id'] ?? null;
+
+        \Log::info('SupplySlipController@registerSupplySlips 開始', [
+            'user_id' => $user_info_id,
+            'line'    => __LINE__,
+        ]);
+
         // トランザクション開始
         DB::connection()->beginTransaction();
 
         try{
-
-            // ユーザー情報の取得
-            $user_info    = \Auth::user();
-            $user_info_id = $user_info['id'];
 
             $SupplySlipData = $request->data['SupplySlip'];
             $SupplySlipDetailData = $request->data['SupplySlipDetail'];
@@ -1829,16 +2216,34 @@ class SupplySlipController extends Controller
             if(!empty($supply_slip_detail)) {
 
                 DB::table('supply_slip_details')->insert($supply_slip_detail);
+
+                \Log::info('supply_slip_details 登録完了', [
+                    'user_id' => $user_info_id,
+                    'line' => __LINE__,
+                    'count' => count($supply_slip_detail),
+                ]);
+
             }
 
             // 問題なければコミット
             DB::connection()->commit();
 
+            \Log::info('registerSupplySlips 正常終了', [
+                'user_id' => $user_info_id,
+                'line' => __LINE__,
+            ]);
+
         } catch (\Exception $e) {
 
-            DB::rollback();
+            \Log::error('registerSupplySlips 例外発生', [
+                'user_id'  => $user_info_id,
+                'line'     => __LINE__,
+                'message'  => $e->getMessage(),
+                'file'     => $e->getFile(),
+                'exception_line' => $e->getLine(),
+            ]);
 
-            dd($e);
+            return view('errors.error', ['error_message' => '仕入スリップ登録処理でエラーが発生しました。']);
         }
 
         return redirect('./SupplySlipCreate');
@@ -1851,6 +2256,15 @@ class SupplySlipController extends Controller
      */
     public function AjaxAddSlip(Request $request)
     {
+        $user_info = \Auth::user();
+        $user_info_id = $user_info['id'] ?? null;
+
+        \Log::info('AjaxAddSlip 開始', [
+            'user_id' => $user_info_id,
+            'line' => __LINE__,
+            'slip_num' => $request->slip_num,
+        ]);
+
         // 伝票NOを取得
         $slip_num = $request->slip_num;
         if(empty($slip_num)) $slip_num = 1;
@@ -1928,6 +2342,11 @@ class SupplySlipController extends Controller
 
         $returnArray = array($slip_num, $ajaxHtml1, $autoCompleteProduct, $autoCompleteOrigin, $autoCompleteStaff);
 
+        \Log::info('AjaxAddSlip 正常終了', [
+            'user_id' => $user_info_id,
+            'line' => __LINE__,
+            'next_slip_num' => $slip_num,
+        ]);
 
         return $returnArray;
     }
@@ -1937,6 +2356,16 @@ class SupplySlipController extends Controller
      */
     public function AjaxAddSlipSp(Request $request)
     {
+
+        $user_info = \Auth::user();
+        $user_info_id = $user_info['id'] ?? null;
+
+        \Log::info('AjaxAddSlipSp 開始', [
+            'user_id' => $user_info_id,
+            'line' => __LINE__,
+            'slip_num' => $request->slip_num,
+        ]);
+
         $slipNum = (int) $request->input('slip_num', 1);
         $tabInitialNum = 7 * $slipNum + 2;
 
@@ -2019,6 +2448,12 @@ class SupplySlipController extends Controller
         $autoOrigin  = "<input type='text' class='form-control origin_area_code_input' id='origin_area_code_{$slipNum}' name='data[SupplySlipDetail][{$slipNum}][origin_area_code]' tabindex='" . ($tabInitialNum + 5) . "'>";
         $autoStaff   = "<input type='text' class='form-control staff_code_input' id='staff_code_{$slipNum}' name='data[SupplySlipDetail][{$slipNum}][staff_code]' value='1009' tabindex='" . ($tabInitialNum + 6) . "'>";
 
+        \Log::info('AjaxAddSlipSp 正常終了', [
+            'user_id' => $user_info_id,
+            'line' => __LINE__,
+            'next_slip_num' => $slipNum + 1,
+        ]);
+
         return Response::json([
             $slipNum + 1,
             $html,
@@ -2034,12 +2469,24 @@ class SupplySlipController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function getOrderSupplyUnitPrice(Request $request) {
+    public function getOrderSupplyUnitPrice(Request $request)
+    {
+
+        $user_info = \Auth::user();
+        $user_info_id = $user_info['id'] ?? null;
 
         // パラメータの取得
         $companyId = $request->company_id;
         $productId = $request->product_id;
         $supplyDate = $request->supply_date;
+
+        \Log::info('getOrderSupplyUnitPrice 開始', [
+            'user_id'     => $user_info_id,
+            'line'        => __LINE__,
+            'company_id'  => $companyId,
+            'product_id'  => $productId,
+            'supply_date' => $supplyDate,
+        ]);
 
         // データの取得
         $orderSupplyUnitPriceDetails = DB::table('order_supply_unit_price_details AS OrderSupplyUnitPriceDetails')
@@ -2060,11 +2507,17 @@ class SupplySlipController extends Controller
         ->limit(1)
         ->get();
 
-        $orderSupplyUnitPirce = 0;
+        $orderSupplyUnitPrice = 0;
         if (isset($orderSupplyUnitPriceDetails[0]->notax_price))
-            $orderSupplyUnitPirce = $orderSupplyUnitPriceDetails[0]->notax_price;
+            $orderSupplyUnitPrice = $orderSupplyUnitPriceDetails[0]->notax_price;
 
-        return $orderSupplyUnitPirce;
+        \Log::info('getOrderSupplyUnitPrice 正常終了', [
+            'user_id'     => $user_info_id,
+            'line'        => __LINE__,
+            'unit_price'  => $orderSupplyUnitPrice,
+        ]);
+
+        return $orderSupplyUnitPrice;
 
     }
 }
